@@ -1,0 +1,138 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pageId" standardController="refedge__Related_Reference_Content__c" extensions="refedge.AddNewRefConCollectionController" sidebar="false">
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:sectionHeader title="{!$Label.T_Related_Reference_Content_Edit}" subtitle="{!$Label.New_Related_Reference_Content}" rendered="{!isFullLicenseAccessible}"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    
+    <script>
+        var lookUpWindowOpen = false;
+        var newWin = null; 
+        var popupflag = false;
+        var currentPgName = '';
+        var isNameChanged = false;
+        function ShowLookup(objName){
+            if(!lookUpWindowOpen){
+                lookUpWindowOpen = true;
+                popupflag = true;
+                currentPgName = objName;
+                var name = '';
+                if(objName == 'Reference_Content__c'){
+                    name = document.getElementById('pageId:formId:pageBlockId:pageBlockSectionId1:pbsrefConId:searchRefCon').value;
+                }
+                else if(objName == 'Content_Collection__c'){
+                    name = document.getElementById('pageId:formId:pageBlockId:pageBlockSectionId2:pbsrefConId2:searchRefCon2').value;
+                }
+                newWin = window.open(encodeURI('{!$Page.refedge__CustomLookup}?strText='+name+'&obj='+objName),'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+                lookUpWindowOpen = false;  
+            } 
+        }
+        function closePopup(Id, Name){  
+            if (null != newWin){  
+                newWin.close(); 
+                if(typeof Name != 'undefined'){
+                    if(popupflag){
+                        if(currentPgName == 'Reference_Content__c'){
+                            isNameChanged = false;
+                            document.getElementById("pageId:formId:pageBlockId:pageBlockSectionId1:pbsrefConId:searchRefCon").value = Name;
+                            jsSelectedrefCon(Id,isNameChanged);
+                        }
+                        if(currentPgName == 'Content_Collection__c'){
+                            isNameChanged = false;
+                            document.getElementById("pageId:formId:pageBlockId:pageBlockSectionId2:pbsrefConId2:searchRefCon2").value = Name;
+                            jsSelectedConColl(Id,isNameChanged);
+                        }
+                        popupflag = false;
+                    }
+                }
+            }    
+        } 
+        function changeName(){
+            isNameChanged = true;
+        }
+        function onSave(){
+            save(isNameChanged);
+        }
+    </script>
+    
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlock id="pageBlockId" title="{!$Label.T_Related_Reference_Content_Edit}" mode="edit">
+            
+            <apex:actionFunction name="jsSelectedrefCon" rerender="oprefAccId, pgmsgId">
+                <apex:param name="accId" assignTo="{!collRefContent.refedge__Reference_Content__c}" value=""/>
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="jsSelectedConColl" rerender="pbsrefConId2, pgmsgId">
+                <apex:param name="accId" assignTo="{!collRefContent.refedge__Content_Collection__c}" value=""/>
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="save" action="{!save}" rerender="pgmsgId">
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}"  onclick="onSave();return false;"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection id="pageBlockSectionId1" columns="1" title="{!$Label.Information}" rendered="{!isFromCollection}">
+                <apex:outputField value="{!collRefContent.refedge__Content_Collection__c}"/>
+                <apex:pageBlockSectionitem id="pbsrefConId">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Related_Reference_Content__c.fields.refedge__Reference_Content__c.label}"/>
+                    <apex:outputPanel id="oprefAccId">
+                        <apex:actionRegion >
+                            <div style="float:left" class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputText id="searchRefCon" value="{!refConName}" style="margin-left:0px;width:200px;" onchange="changeName();return false;"/>&nbsp;&nbsp;
+                            </div>
+                            <div style="float:left">
+                            <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="ShowLookup('Reference_Content__c');"/>
+                            </div>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionitem>
+<!--                 <apex:inputField value="{!collRefContent.refedge__Reference_Content__c}"/> -->
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="pageBlockSectionId2" columns="1" title="{!$Label.Information}" rendered="{!NOT(isFromCollection)}">
+<!--                 <apex:inputField value="{!collRefContent.refedge__Content_Collection__c}"/> -->
+                <apex:outputField value="{!collRefContent.refedge__Reference_Content__c}"/>
+                <apex:pageBlockSectionitem id="pbsrefConId2">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Related_Reference_Content__c.fields.refedge__Content_Collection__c.label}"/>
+                    <apex:outputPanel id="oprefAccId2">
+                        <apex:actionRegion >
+                            <div style="float:left" class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputText id="searchRefCon2" value="{!conCollName}" style="margin-left:0px;width:200px;" onchange="changeName();return false;"/>&nbsp;&nbsp;
+                            </div>
+                            <div style="float:left">
+                            <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="ShowLookup('Content_Collection__c');"/>
+                            </div>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionitem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

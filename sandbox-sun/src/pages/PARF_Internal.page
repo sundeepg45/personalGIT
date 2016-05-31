@@ -1,0 +1,145 @@
+<apex:page standardController="PARF_Form__c" extensions="PARFController" showHeader="true" sidebar="true" action="{!init}" cache="false">
+
+    <apex:outputPanel id="pageMessages">
+        <apex:pageMessages />
+    </apex:outputPanel>
+
+    <apex:form >
+        <apex:pageBlock title="{!parfTitle}" id="buttons" mode="maindetail">
+
+            <apex:pageBlockSection title="{!$Label.PARF_PartnerInfo}" columns="1" collapsible="false" rendered="{!isEditable}">
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="txtRHRep" value="{!$Label.PARF_RHISVEmbedded_Rep_Text}"/>
+                    <apex:inputField id="txtRHRep" value="{!parf.RH_ISV_Embedded_Rep__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:inputField id="txtAdminContact" value="{!parf.Admin_Contact__c}"/>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="distributorDirected" value="{!$Label.CCSPForm_Distributor_Directed}"/>
+                    <apex:outputPanel >
+                        <div class="requiredBlock"></div>
+                        <apex:selectRadio id="distributorDirected" styleClass="radio-btns" value="{!parf.Distributor_Directed__c}" onchange="updateDistributorName();">
+                            <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                            <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                        </apex:selectRadio>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!parf.Distributor_Directed__c = 'Yes'}">
+                    <apex:outputLabel for="txtEDPName" value="{!$ObjectType.PARF_Form__c.Fields.EDP_Name__c.Label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputField id="txtEDPName" value="{!parf.EDP_Name__c}"/>
+                        </div>
+                        <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!parf.Distributor_Directed__c = 'Yes'}">
+                    <apex:outputLabel for="txtEDPName" value="{!$ObjectType.PARF_Form__c.Fields.EDP_Email__c.Label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputField id="txtEDPEmail" value="{!parf.EDP_Email__c}"/>
+                        </div>
+                        <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="{!$Label.PARF_RH_Product_Info_Title}" columns="1" collapsible="false" rendered="{!isEditable}">
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="selRHProdDesc" value="{!$ObjectType.PARF_Form__c.Fields.Desired_RH_Prod_Desc__c.Label}"/>
+                    <apex:outputPanel >
+                        <apex:selectList id="selRHProdDesc" value="{!DesiredRHProdDesc}" multiselect="true" size="5">
+                            <apex:selectOptions value="{!DesiredRHProdDescOptions}"/>
+                        </apex:selectList>
+                        <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="products" title="{!$Label.PARF_Product_Info_Title}" columns="1" collapsible="false" rendered="{!isEditable}">
+
+                <apex:pageBlockTable value="{!parfProducts}" var="product" rendered="{!parfProductsExist}">
+                    <apex:column headerValue="{!$ObjectType.PARF_Product__c.Fields.Product_Name__c.Label}">
+                        <apex:outputField value="{!product.product.Product_Name__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="{!$ObjectType.PARF_Product__c.Fields.Product_Description__c.Label}">
+                        <apex:outputField value="{!product.product.Product_Description__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="{!$ObjectType.PARF_Product__c.Fields.Product_URL__c.Label}">
+                        <apex:outputField value="{!product.product.Product_URL__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:commandLink action="{!deleteProduct}" value="{!$Label.Delete}" rerender="products, buttons">
+                            <apex:param name="productToDelete" value="{!product.index}" assignTo="{!productToDelete}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                </apex:pageBlockTable>
+
+                <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                    <apex:outputLabel for="txtProductName" value="{!$ObjectType.PARF_Product__c.Fields.Product_Name__c.Label}"/>
+                    <apex:outputPanel >
+                        <apex:inputText id="txtProductName" value="{!prodName}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                    <apex:outputLabel for="txtProductDescription" value="{!$ObjectType.PARF_Product__c.Fields.Product_Description__c.Label}"/>
+                    <apex:outputPanel >
+                        <apex:inputTextarea id="txtProductDescription" value="{!prodDesc}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                    <apex:outputLabel for="txtProductURL" value="{!$ObjectType.PARF_Product__c.Fields.Product_URL__c.Label}"/>
+                    <apex:inputText id="txtProductURL" value="{!prodURL}" rendered="{!addingNewProduct}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:commandButton styleClass="btn ease" value="{!$Label.Embedded_Save_Product}" action="{!save}" rendered="{!moreProductsAllowed}"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="" columns="1" collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!isRedHatUser}">
+                    <apex:outputLabel for="customTermsRequired" value="Custom Terms Requested"/>
+                    <apex:outputPanel >
+                        <!-- <div class="requiredInput">
+                            <div class="requiredBlock"></div> -->
+                            <apex:inputField id="customTermsRequired" value="{!parf.Custom_Terms_Required__c}"/>
+                        <!-- </div>
+                        <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/> -->
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <!-- <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <div class="requiredInput required-notification">
+                            <div class="requiredBlock"></div>
+                            <apex:outputText value="{!$Label.CCSPForm_Indicates_Required}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem> -->
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons location="bottom" rendered="{!isEditable}">
+            <apex:commandButton id="CancelPARFButton" styleClass="ease previous" action="{!cancel}" value="{!$Label.cancel}" onclick="if(!confirm('{!$Label.Program_Application_Agreement_Are_You_Sure}')) return false;"/>
+                <apex:commandButton action="{!submit}" value="{!submitButtonLabel}" styleClass="ease" onclick="if(!confirm('{!submitConfirmMessage}')) return false;"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockButtons location="bottom" rendered="{!NOT(isEditable)}">
+                <apex:commandButton id="CancelPARFButton" styleClass="ease previous" action="{!cancel}" value="{!$Label.cancel}"/>
+            </apex:pageBlockButtons>
+
+            <apex:actionFunction name="addProduct" action="{!addProduct}" rerender="products, buttons"/>
+            <apex:actionFunction name="updateDistributorName" rerender="products, buttons"/>
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

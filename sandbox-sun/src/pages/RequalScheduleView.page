@@ -1,0 +1,7 @@
+<apex:page controller="RequalSchViewController">
+
+<apex:form >
+    <apex:outputLabel value="Date:"/><apex:inputText value="{!dateParam}"/>
+    <apex:commandButton value="Go" action="{!runJob}"/>
+</apex:form>
+</apex:page>

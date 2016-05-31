@@ -1,0 +1,27 @@
+<apex:page controller="BusinessPlan_CustomTab" action="{!loadbp}">
+
+<apex:pageBlock title="{!$Label.BusinessPlan_CustomTab_MyBP}">
+<apex:form >
+<apex:pageBlockTable value="{!businessplans}" var="bp" rendered="{!businessplansexist}">
+
+<apex:column >
+<apex:facet name="header">{!$Label.RequalificationBusinessPLan_Name}</apex:facet>
+<apex:outputLink value="/{!bp.Id}">{!bp.Name}</apex:outputLink>
+</apex:column>
+<!--<apex:column value="{!bp.Responsible_Red_Hat_Account_Manager__c}"/>-->
+<apex:column value="{!bp.Business_Plan_Version__c}"/>
+<apex:column value="{!bp.Fiscal_Year__c}"/>
+<apex:column value="{!bp.Active__c}"/>
+</apex:pageBlockTable>
+  </apex:form>
+  <apex:pageBlockSection rendered="{!NOT(businessplansexist)}">
+  {!$Label.BusinessPlan_CustomTab_Noresults}
+  
+  
+  </apex:pageBlockSection>
+
+
+</apex:pageBlock>
+
+  
+</apex:page>

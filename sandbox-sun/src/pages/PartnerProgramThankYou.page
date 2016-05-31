@@ -1,0 +1,193 @@
+<!-- <apex:page >
+<apex:pageBlock >
+<apex:outputText value="{!$Label.Program_Thank_You_Text}"/>
+</apex:pageBlock>
+</apex:page> -->
+
+<apex:page controller="PartnerProgramThankYouController" showHeader="false" sidebar="false" action="{!init}">
+
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+        <meta name="viewport" content="width=1200"/>
+        <title>Apply</title>
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+        <!--CSS Files -->
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+        <!--JS Files -->
+
+        <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+
+    <style>
+        .noSidebarCell, .sidebarCell {
+          padding: 0px !important;
+        }
+        body{
+          margin: 0px !important;
+        }
+        body .bPageBlock {
+          border-top-width: 0;
+        }
+        .bPageFooter{
+          padding: 0px !important;
+          display: none;
+        }
+        .bodyDiv .outerNoSidebar {
+          padding: 0px;
+        }
+        .globalHeaderBar {
+          margin: 0;
+        }
+        .red-hat-content input[type="radio"], .red-hat-content input[type="checkbox"] {
+            margin: 0 5px;
+        }
+        .red-hat-content label {
+            margin-bottom: 0px;
+        }
+        .pbBottomButtons .pbTitle, .pbHeader .pbTitle{
+            display: none;
+        }
+        .pbBottomButtons .pbButtonb, .pbHeader .pbButton{
+            text-align: center;
+        }
+        li a:hover{
+          color: #08C0FC !important;
+        }
+        body .bPageBlock {
+          margin-bottom: 0px;
+        }
+        .custom-terms-required textarea{
+          width: 100%;
+          max-width: 100%;
+        }
+        .custom-terms-required .input-field{
+          margin: 0 0 20px 0;
+        }
+        .custom-terms-required .input-field td{
+          text-align: center;
+          padding-right: 10px;
+        }
+        .custom-terms-required .input-field td input{
+          width: 15px;
+          height: auto;
+          padding-left: 0 !important;
+          padding-top: 10px;
+        }
+        .red-hat-content .input-container input, .input-container select {
+          background: none;
+          border: 1px solid #969ba0;
+          width: auto;
+          font-size: 17px;
+          color: #555657;
+          font-family: 'Overpass Light';
+          height: auto;
+          line-height: 40px;
+          padding-left: 8px;
+          margin-top: 25px !important;
+        }
+        #customDelayMsg{
+          margin-top: 2px !important;
+        }
+        #custom-section fieldset{
+          font-family: 'Overpass';
+          width: 60%;
+          margin: 0 auto;
+        }
+        .custom-terms-required textarea{
+          display: block !important;
+          width: 60%;
+          max-width: 60%;
+          margin: 0 auto;
+          margin-top: 25px;
+        }
+        #custom-section h2{
+          width: 60%;
+          margin: 15px auto 0;
+          font-size: 1.6em;
+        }
+        #custom-section fieldset p{
+          margin-top: 2px !important;
+          font-family: 'Overpass Light';
+        }
+    </style>
+
+    <body id="main">
+
+      <div class="red-hat-content">
+
+        <div class="user-header">
+          <div class="container">
+            <div class="row">
+              <div class="row">
+                <div class="col-xs-5">
+                  <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+                </div><!-- /.col-xs-5 -->
+                <div class="col-xs-7">
+                  <div class="description">
+                  </div>
+                </div><!-- /.col-xs-7 -->
+              </div><!-- /.row -->
+            </div><!-- /.row -->
+          </div><!-- /.container -->
+        </div><!-- /.partner-portal-header -->
+
+        <apex:form >
+            <apex:pageMessages />
+
+
+            <apex:pageblock >
+                <div class="join-content-wrap user-signup">
+                  <div class="container">
+                    <div class="row">
+                      <div class="content-wrapper">
+                          <div class="row">
+                            <div class="col-xs-12">
+                              <h1 class="request-problem"></h1>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-xs-12">
+
+                                <apex:outputPanel layout="none">
+
+                                    <p>
+                                        <apex:outputText value="{!$Label.Program_Thank_You_Text}" escape="false"/>
+                                    </p>
+                                    <br/>
+                                    <br/>
+                                  <apex:commandLink action="{!loginButton}" styleClass="btn login previous ease" value="{!$Label.CCSP_My_Account}"/>
+
+                                </apex:outputPanel>
+
+                              </div><!-- /.col-xs-12 -->
+                            </div><!-- /.row -->
+
+                      </div><!-- /.content-wrapper -->
+                    </div><!-- /.row -->
+                  </div><!-- /.container -->
+                </div><!-- /.join-content-wrap /.user-signup -->
+            </apex:pageBlock>
+
+        </apex:form>
+
+        </div>
+    </body>
+
+</apex:page>

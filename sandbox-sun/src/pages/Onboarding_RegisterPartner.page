@@ -1,0 +1,76 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+
+    <apex:includeScript value="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
+    <script type="text/javascript">
+        $.noConflict(); 
+        jQuery(document).ready(function() {
+            jQuery.ajax({
+               url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/getUserInfo', 
+               dataType: 'jsonp',  
+               success:  function(jsonResult) {
+                   if (eval(jsonResult.complete)) {
+                       jQuery('select[name$="partnerCountrySelect"]').val(jsonResult.payload.country);
+                       jQuery('select[name$="partnerCountrySelect"]').change();
+                       jQuery('input[name$="onboardingCountry"]').val(jsonResult.payload.country);
+                   }
+               }    
+            });
+        });
+    </script>
+
+    <apex:outputPanel layout="none">
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_Register_Partner_Application_To_Become_Partner}"/></div>
+    </apex:outputPanel>
+
+    <apex:form id="mainForm">
+        <fieldset class="fieldsetform">
+        <apex:inputHidden id="onboardingCountry" value="{!onboardingCountry}"/>
+        <apex:outputPanel styleClass="rowform" layout="block" id="countrySelection">
+            <apex:outputLabel rendered="{!ISNULL(selectedCountry)}" id="emptyLabel">&nbsp;</apex:outputLabel>
+            <apex:outputLabel rendered="{!NOT(ISNULL(selectedCountry)) && NOT(isEMEACountry)}" id="headquartersLabel"><apex:outputText value="{!$Label.Onboarding_Register_Partner_Company_HeadQuarters}"/></apex:outputLabel>
+            <apex:outputLabel rendered="{!isEMEACountry}" id="officeLabel"><apex:outputText value="{!$Label.Office_Location}"/></apex:outputLabel>            
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!Lead.Country}" size="1" id="partnerCountrySelect">
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Select_Country}" itemValue="" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_US}" itemValue="US" /> 
+                <apex:selectOption itemLabel="-" itemValue="" />
+                <apex:selectOptions value="{!SelectableCountryOptions}"/>
+                <apex:actionSupport event="onchange" rerender="partnerType, countrySelection"/> 
+            </apex:selectList>
+        </apex:outputPanel>
+        <apex:outputPanel styleClass="rowform" layout="block" id="partnerType">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_Register_Partner_Partner_Type}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!Lead.Partner_Type__c}" size="1" id="partnerTypeSelect">
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Select_Type}" itemValue="" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_ISV}" itemValue="{!PartnerTypeISV.Id}" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}" itemValue="{!PartnerTypeReseller.Id}" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CorporateReseller}" itemValue="{!PartnerTypeCorporateReseller.Id}" rendered="{!IF(contains(selectedCountry.Supported_Specialized_Partner_Types__c, 'Corporate Reseller'), true, false)}"/>
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Training}" itemValue="{!PartnerTypeTraining.Id}" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_SI}" itemValue="{!PartnerTypeSI.Id}" />
+                <!-- 
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Regional_SI}" itemValue="{!PartnerTypeRegionalSI.Id}" />
+                -->
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_OEM}" itemValue="{!PartnerTypeOEM.Id}" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CloudProvider}" itemValue="{!PartnerTypeCloudProvider.Id}" />
+                <apex:actionSupport event="onchange" rerender="onboardingType"/> 
+            </apex:selectList>
+        </apex:outputPanel>
+        <apex:outputPanel styleClass="rowform" layout="block" id="onboardingType">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_Onboarding_Type}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!OnboardingType}" size="1" id="onboardingTypeSelect">
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Select_Onboarding_Type}" itemValue="" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_Picklistoption_Join}" itemValue="join" />
+                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_Picklistoption_Create}" itemValue="create" rendered="{!NOT(IsJoinOnlyFlow)}" />
+            </apex:selectList>
+        </apex:outputPanel>
+        <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel id="buttonPanel">
+                <apex:commandButton action="{!registerPartnerSubmit}" value="{!$Label.Onboarding_Register_Partner_Button_Save_And_Continue}" styleClass="rowbutton" id="buttonSaveAndContine"/>
+            </apex:outputPanel>
+        </apex:outputPanel></fieldset>
+    </apex:form>
+
+</apex:page>

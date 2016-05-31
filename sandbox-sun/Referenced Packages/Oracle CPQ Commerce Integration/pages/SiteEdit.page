@@ -1,0 +1,38 @@
+<apex:page standardController="BigMachines__Configuration_Record__c" extensions="BigMachines.BigMachinesEditSiteController">
+    <apex:sectionHeader title="{!$ObjectType.BigMachines__Configuration_Record__c.Label} Edit" subtitle="{!BigMachines__Configuration_Record__c.Name}" />
+    <apex:form >
+        <apex:PageMessages id="messages" />
+        <apex:pageBlock title="BigMachines Site Edit" mode="Edit">
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton value=" Save " action="{!save}" />
+                <apex:commandButton value=" Cancel " action="{!cancel}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Information">
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__bm_site__c}"/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.Name}"/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__Uses_SSL__c}"/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__Is_Primary__c}"/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__process_id__c}"/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__Description__c}"/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__action_id_copy__c}"/>
+                <apex:outputLabel value=""/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__action_id_open__c}"/>
+                <apex:outputLabel value=""/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__document_id__c}"/>
+                <apex:outputLabel value=""/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__version_id__c}"/>
+                <apex:outputLabel value=""/>
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__process__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" collapsible="true" showHeader="true" title="BigMachines API Administrator">
+                <apex:inputField value="{!BigMachines__Configuration_Record__c.BigMachines__API_Login__c}" rendered="{!canEditPassword}" />
+                <apex:outputField value="{!BigMachines__Configuration_Record__c.BigMachines__API_Login__c}" rendered="{!cannotEditPassword}" />
+                <apex:inputSecret value="{!BigMachines__Configuration_Record__c.BigMachines__API_Password__c}" rendered="{!canEditPassword}" />
+                <apex:pageBlockSectionItem rendered="{!cannotEditPassword}">
+                    <apex:outputLabel value="API Admin Password"/> 
+                    <apex:outputText >*****</apex:outputText>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

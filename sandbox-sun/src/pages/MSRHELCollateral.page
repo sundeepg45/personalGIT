@@ -1,0 +1,89 @@
+<apex:page controller="MSController" sidebar="false" showheader="true" standardStylesheets="false" action="{!initWithContent}">
+
+<head>
+<script src="/jslibrary/1333170890000/sfdc/JiffyStubs.js"></script><meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<meta HTTP-EQUIV="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT" />
+
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<title>Selling Cloud with Attitude</title>
+<apex:include pageName="RHELSiteCSS"/>
+<span id="j_id0:j_id4"></span>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a class="logo-redhat" href="http://www.redhat.com">Red Hat</a>
+        <a class="logo-product" href="MSRHELHome">Red Hat Enterprise Linux</a>
+        <div class="title"><strong>Do the math.</strong> <br />Migrate to Red Hat<sup>&reg;</sup> Enterprise Linux<sup>&reg;</sup> and save.</div>
+        
+        <ul id="nav-main">
+            <li id="home"><a href="MSRHELHome">&nbsp;Home</a></li>
+            <li id="nav2"><a href="MSRHELSiteTraining">Train to sell</a></li>
+            <li id="nav3"><a id="selected" href="MSRHELCollateral">Engage Customers</a></li>
+            <li id="nav4"><a href="MSRHELMarketing">Build a campaign</a></li>
+            <li id="nav5"><a href="MSRHELTechDetails">Access technical resources</a></li>
+            <li class="last" id="nav6"><a href="MSRHELSolutions">Sell RHEL + Partner solutions</a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+  <div id="content-inner">
+    <div class="container">
+      <div id="content-primary">
+        <h2>Engage Customers:</h2> 
+        <p>
+          Explore this area to find the latest Red Hat Enterprise Linux
+          product family collateral, price guides, SKU information,
+          whitepapers, demos, videos and case studies.
+        </p>
+      </div>
+      <div id="content-secondary">
+        <div class='section'>
+          <h4>Collateral and whitepapers</h4>
+            <c:MSSection pageController="{!this}" sectionKey="Collateral and Whitepapers">
+                <ul class="links-list presentations-list">
+                <c:MSSectionList pageController="{!this}" sectionKey="Collateral and Whitepapers"/>
+                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Collateral and Whitepapers"/></p></strong>
+               </ul>
+            </c:MSSection>
+        </div>
+        <div class='section'>
+          <h4>Pricing and SKU information</h4>
+            <c:MSSection pageController="{!this}" sectionKey="Pricing and Information">
+                <ul class="links-list presentations-list">
+                <c:MSSectionList pageController="{!this}" sectionKey="Pricing and Information"/>
+                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Pricing and Information"/></p></strong>
+               </ul>
+            </c:MSSection>
+        </div>
+        <div class='section'>
+          <h4>Demos, evaluation information and videos</h4>
+            <c:MSSection pageController="{!this}" sectionKey="Demos, Evaluation Information and Videos">
+                <ul class="links-list presentations-list">
+                <c:MSSectionList pageController="{!this}" sectionKey="Demos, Evaluation Information and Videos"/>
+                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Demos, Evaluation Information and Videos"/></p></strong>
+               </ul>
+            </c:MSSection>
+        </div>
+        <div class='section'>
+          <h4>Case studies and customer reference information</h4>
+            <c:MSSection pageController="{!this}" sectionKey="Case Studies and Customer Reference Information">
+                <ul class="links-list presentations-list">
+                <c:MSSectionList pageController="{!this}" sectionKey="Case Studies and Customer Reference Information"/>
+                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Case Studies and Customer Reference Information"/></p></strong>
+               </ul>
+            </c:MSSection>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright">Copyright &copy; 2012 Red Hat, Inc. All rights reserved.</p>
+    </div>
+</div>  
+</body>
+
+</apex:page>

@@ -1,0 +1,180 @@
+<apex:page standardController="Partner_Registration__c" extensions="PartnerRegLookupsExtension" tabStyle="Partner_Registration__c">
+
+<apex:pageMessages />
+
+<apex:form >
+<apex:pageBlock title="Account Lookup" rendered="{!isEditable}">
+	<apex:pageBlockButtons > 
+	    <apex:commandButton action="{!searchAccounts}" value="Search Accounts" id="SearchAccountsButton"/>
+	    <apex:commandButton action="{!cancel}" value="Back to Registration" id="CancelButton"/>
+	</apex:pageBlockButtons>
+
+	<apex:pageBlockSection columns="1">
+		<apex:pageBlockSectionItem >
+			<apex:outputText value="Matched Account:"/>
+			<apex:outputPanel >
+				<apex:outputText value="(none)" rendered="{!ISNULL(customerAccount)}"/>
+				<apex:outputPanel rendered="{!NOT(ISNULL(customerAccount))}">
+				<a target="_blank" href="/{!customerAccount.Id}">{!customerAccount.Name}</a>
+				<apex:outputText value=" - {!customerAccount.AccountClassification__c} - {!customerAccount.BillingCountry} - {!customerAccount.Owner.Name}" rendered="{!NOT(ISNULL(customerAccount))}"/>
+				</apex:outputPanel>
+			</apex:outputPanel>
+		</apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="Matched Opportunity:"/>
+            <apex:outputPanel >
+                <apex:outputText value="(none)" rendered="{!ISNULL(attachedOpp)}"/>
+                <apex:outputPanel rendered="{!NOT(ISNULL(attachedOpp))}">
+                <a target="_blank" href="/{!attachedOpp.Id}">{!attachedOpp.Name}</a>
+                &nbsp; &nbsp; <apex:commandButton action="{!clearOpp}" value="Clear" id="ClearOppButton"/>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem >
+			<apex:outputText value="Provided Customer Name:"/>
+			<apex:outputText value="{!Partner_Registration__c.Company_Name__c}"/>
+		</apex:pageBlockSectionItem>
+		<apex:pageBlockSectionItem >
+			<apex:outputText value="Account Name:"/>
+			<apex:inputText value="{!accountName}" required="true"/>
+		</apex:pageBlockSectionItem>
+	</apex:pageBlockSection>
+
+</apex:pageBlock>
+
+<apex:pageBlock rendered="{!NOT(ISNULL(accountMatches))}">
+	<apex:pageBlockSection columns="2">
+	<apex:dataTable value="{!accountMatches}" var="account" id="accountMatchesTable" rowClasses="odd,even" styleClass="list" rendered="{!NOT(ISNULL(accountMatches))}">
+		<apex:column >
+		    <apex:facet name="header">{!$ObjectType.Account.Fields.Name.Label}</apex:facet>
+	        <apex:commandLink reRender="accountDetail">{!account.Name}
+          		<apex:param name="accountId" value="{!account.id}"/>
+	        </apex:commandLink>
+	        <!-- 
+			<apex:outputText value="{!account.Name}"/>
+			-->
+		</apex:column>
+		<apex:column >
+		    <apex:facet name="header">Classification</apex:facet>
+			<apex:outputText value="{!account.AccountClassification__c}"/>
+		</apex:column>
+		<apex:column >
+			<apex:facet name="header">Named?</apex:facet>
+			<apex:outputText value="{!IF(account.Named_Account__c, 'Yes','No')}"/>
+		</apex:column>
+		<apex:column >
+			<apex:facet name="header">State/Province</apex:facet>
+			<apex:outputText value="{!account.BillingState}"/>
+		</apex:column>
+		<apex:column >
+			<apex:facet name="header">Country</apex:facet>
+			<apex:outputText value="{!account.BillingCountry}"/>
+		</apex:column>
+		<apex:column >
+			<apex:facet name="header">Owner</apex:facet>
+			<apex:outputText value="{!account.Owner.Name}"/>
+		</apex:column>
+	</apex:dataTable>
+
+	<!-- second column -->
+	<apex:outputPanel id="accountDetail">
+		<apex:pageBlockSection columns="1" title="Account Details" collapsible="false">
+		<!-- 
+			<apex:image width="150" style="float:right" rendered="{!NOT(ISNULL(logoAttachmentId))}" value="{!URLFOR($Action.Attachment.Download, logoAttachmentId)}"/>
+		-->
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="{!$ObjectType.Account.Fields.Name.Label}"/>
+				<apex:outputText value="{!account.Name}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="{!$ObjectType.Account.Fields.Id.Label}"/>
+				<apex:outputText value="{!account.Id}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="{!$ObjectType.Account.Fields.AccountClassification__c.Label}"/>
+				<apex:outputText value="{!account.AccountClassification__c}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="{!$ObjectType.Account.Fields.Global_Region__c.Label}"/>
+				<apex:outputText value="{!account.Global_Region__c}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Billing Address"/>
+				<apex:outputPanel >
+					<apex:outputText value="{!account.BillingStreet}"/> <br />
+					<apex:outputText value="{!account.BillingCity}"/> , &nbsp;
+					<apex:outputText value="{!account.BillingState}"/> &nbsp;
+					<apex:outputText value="{!account.BillingPostalCode}"/>
+				</apex:outputPanel>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="{!$ObjectType.Account.Fields.OracleAccountID__c.Label}"/>
+				<apex:outputText value="{!account.OracleAccountID__c}"/>
+			</apex:pageBlockSectionItem>
+			<hr />
+		    <apex:commandButton action="{!attachAccount}" value="Select this Account" id="UseAccountButton"/>
+		</apex:pageBlockSection>
+		
+		
+		 
+		<apex:pageBlockSection columns="1" title="Opportunities" collapsible="false">
+		    <apex:dataTable value="{!opportunities}" var="opp" id="oppMatchesTable" rowClasses="odd,even" styleClass="list" rendered="{!NOT(ISNULL(opportunities))}">
+		        <apex:column >
+		            <apex:facet name="header">{!$ObjectType.Opportunity.Fields.Name.Label}</apex:facet>
+		            <apex:commandLink reRender="oppDetail">{!opp.name}
+		                <apex:param name="oppId" value="{!opp.id}"/>
+		            </apex:commandLink>
+		        </apex:column>
+                <apex:column >
+                    <apex:facet name="header">Product Family</apex:facet>
+                    <apex:repeat value="{!opp.primaryBU}" var="bu">
+                        <apex:outputText value="{!bu}"/><br />
+                    </apex:repeat>
+                </apex:column>
+		    </apex:dataTable>
+		</apex:pageBlockSection>
+		<br />
+
+        <apex:outputPanel id="oppDetail">
+        <apex:pageBlockSection columns="1" title="Opportunity Details" collapsible="false">
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.Opportunity.Fields.Name.Label}"/>
+               <a target="_blank" href="/{!opportunity.Id}">{!opportunity.Name}</a>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Partner"/>
+               <a target="_blank" href="/{!opportunity.PartnerAccount}">{!opportunity.PartnerAccount.Name}</a>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Owner"/>
+               <a target="_blank" href="/{!opportunity.OwnerId}">{!opportunity.Owner.Name}</a>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Stage"/>
+               <apex:outputText value="{!opportunity.StageName}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Country of Order"/>
+               <apex:outputText value="{!opportunity.Country_of_Order__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Close Date"/>
+               <apex:outputText value="{!opportunity.CloseDate}"/>
+            </apex:pageBlockSectionItem>
+            <hr />
+            <apex:commandButton action="{!attachOpp}" value="Select this Opportunity (reject registration)" id="UseOppButton" onclick="if(!confirm('Are you sure you want to reject?')) return false;" />
+        </apex:pageBlockSection>
+        </apex:outputPanel>
+
+	</apex:outputPanel>
+
+	</apex:pageBlockSection>
+</apex:pageBlock>
+
+<apex:pageBlock rendered="{!NOT(isEditable)}">
+	<apex:outputText value="Account and Opportunity may not be changed after approval"/>
+</apex:pageBlock>
+
+</apex:form>
+
+</apex:page>

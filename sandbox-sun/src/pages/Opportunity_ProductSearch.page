@@ -1,0 +1,79 @@
+<apex:page controller="Opportunity_ProductSearchController" showHeader="false" tabStyle="OpportunityLineItem">
+    <style type="text/css">
+        body { margin: 10px; }
+        
+        .info {
+        	display: block;
+        	font-weight: bold;
+        	color: darkred;
+        	margin: 15px;
+        	text-align: center;
+        }
+    </style>
+    
+    <script language="javascript">
+        function selectProduct() {
+            var pricebookEntryId;
+            var productCode;
+            //var entries = document.getElementsByClassName('priceBookEntry');
+            var entries = document.getElementsByTagName('input');
+            
+            // which product was selected
+            for (i=0; i < entries.length; i++) {
+                if (entries[i].checked == true) {
+                    pricebookEntryId = entries[i].value;
+                    productCode = entries[i].getAttribute("productcode");
+                    break;
+                }
+            }
+            
+            // set text values in the opening window
+            
+            //alert("entries: " + entries + "\npricebookEntryId: " + pricebookEntryId + "\nproductCode: " + productCode + "\nwindow.opener.objProductCode: " + window.opener.objProductCode);
+            
+            window.opener.objProductCode.value = productCode;
+            window.opener.objPricebookEntryId.value = pricebookEntryId;
+            
+            window.close();
+        }
+    </script>
+  
+    <apex:form id="frmResults">
+        <apex:sectionHeader title="{!priceBookName}"/>
+        <apex:pageMessages /> 
+      
+        <apex:outputLabel value="Enter keywords to find matching products" style="display:block; margin-bottom:10px;"/>
+        <apex:inputText value="{!searchTerm}"/>
+        <apex:commandButton value="Find Products" action="{!search}" reRender="searchResults" status="searchStatus" style="margin-bottom:25px;"/>
+        
+        <apex:actionStatus id="searchStatus">
+            <apex:facet name="start">
+                <apex:image value="/img/loading.gif" />
+            </apex:facet>
+        </apex:actionStatus>
+        
+        <apex:pageBlock id="searchResults">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Select Product" onClick="selectProduct();"/> 
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockTable value="{!priceBookEntries}" var="entry">
+                <apex:column >
+                    <input type="radio" class="priceBookEntry" id="pricebookEntryId" name="pricebookEntryId" value="{!entry.Id}" productcode="{!entry.ProductCode}" /> 
+                </apex:column>
+                <apex:column headerValue="Product Name">
+                    <apex:outputText value="{!entry.Name}"/>
+                </apex:column>
+                <apex:column headerValue="Product Code">
+                    <apex:outputText value="{!entry.ProductCode}"/>
+                </apex:column>
+                <apex:column headerValue="Product Description">
+                    <apex:outputText value="{!entry.Product2.Description}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            
+            <apex:outputText styleClass="info" value="No matching products were found for the key word {!searchTerm}" rendered="{!if (priceBookEntries.size = 0, true, false)}"/>
+        </apex:pageBlock>
+
+    </apex:form> 
+</apex:page>

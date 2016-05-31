@@ -1,0 +1,22 @@
+<apex:page standardController="Opportunity">
+<apex:form >
+  
+ <p><b>{!$Label.Close_Opportunity_Requested_by_Partner_tittle}</b><br /></p>
+ 
+        <p>    <apex:outputField value="{!opportunity.name}"/></p>
+            
+          <p>  <apex:outputField value="{!opportunity.closeDate}"/></p>
+         <p>   <apex:outputField value="{!Opportunity.StageName}"/></p>
+       
+
+   
+  <p><b>{!$Label.Close_Opportunity_Requested_by_Partner}</b><br />
+  <apex:inputCheckbox value="{!Opportunity.Close_Opportunity_Requested_by_Partner__c}" disabled="{!Opportunity.Close_Opportunity_Requested_by_Partner__c}"/>
+  </p>
+   
+
+  <apex:commandButton value="Save" action="{!Save}"/>
+  
+  </apex:form><br />
+   
+  </apex:page>

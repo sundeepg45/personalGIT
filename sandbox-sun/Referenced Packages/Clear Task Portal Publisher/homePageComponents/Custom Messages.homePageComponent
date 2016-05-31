@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HomePageComponent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <body>&lt;IFRAME height=300 border=0 src=&quot;/apex/APPR_PUB__CustomMessages?tabName=Home&quot; frameBorder=0 width=&quot;100%&quot;&gt;&lt;/IFRAME&gt;</body>
+    <pageComponentType>htmlArea</pageComponentType>
+    <width>wide</width>
+</HomePageComponent>

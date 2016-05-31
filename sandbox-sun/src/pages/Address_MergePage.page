@@ -1,0 +1,168 @@
+<!--
+/*
+*--------------------------------RH C360 Project------------------------------------------------
+* @Name             Address_Merge
+* @author           Neha Jaiswal
+* @date             
+* @description      Address Merge page 
+* ----------------------------------------------------------------------------------------------
+* Modification Log:
+* ----------------------------------------------------------------------------------------------
+* Developer                      Date                    Description                 
+* ---------                      ----                    -----------                 
+* Neha Jaiswal                15-5-2014                Created      
+*-----------------------------------------------------------------------------------------------
+*/
+-->
+
+<apex:page controller="Address_Merge" id="mergeAddress" sidebar="true">
+<apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+<apex:stylesheet value="{!$Page.CommonStyleSheets}" />
+<apex:sectionHeader title="Merging Addresses"/>
+
+<head>
+<style>
+    oppAddressTableStyle {
+         margin: 1em;
+         border-collapse: collapse;
+     }
+     th{
+         font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+     }
+     td,th {
+         
+         padding: .3em;
+         border: 1px #ccc solid;
+     }
+     
+     thead {
+         background: #FF3300;
+     }
+       
+     #clickme tr.clicked {
+         background: #eee;
+     }
+     
+</style>
+</head>
+ <!--
+  /*
+   Description: Section to display error messages
+  */
+  -->
+  <apex:form rendered="{!pageErrorVisible}">
+    <apex:pageblock >
+    <apex:pageMessage summary="{!exceptionMessage}" severity="error"/>
+    </apex:pageblock>>
+  </apex:form>
+  
+<apex:form >
+    <apex:pageBlock >
+       <div align="center">
+           <table border="1"  align="center" cellpadding="0" cellspacing="0" id="oppMergeTable" styleClass="oppMergeTable">
+               <tr>   
+                                <th>Master Record</th>
+                                <td><input type="radio" name="Master" id="a1" onchange="selectAllRadios(this.id)" value="Id;{!addressMergeDetailList[0].Id}"/></td> 
+                                <td><input type="radio" name="Master" id="b1" onchange="selectAllRadios(this.id)" value="Id;{!addressMergeDetailList[1].Id}" /></td>      
+                </tr>
+                <tr>
+                                <th>Address Line 1</th>
+                                <td>{!addressMergeDetailList[0].Address_Line1__c}</td>
+                                <td>{!addressMergeDetailList[1].Address_Line1__c}</td>
+                </tr>
+                <tr>
+                                <th>Address Line 2</th>
+                                <td>{!addressMergeDetailList[0].Address_Line2__c}</td>
+                                <td>{!addressMergeDetailList[1].Address_Line2__c}</td>
+                </tr>
+                <tr>
+                                <th>Address Line 3</th>
+                                <td>{!addressMergeDetailList[0].Address_Line3__c}</td>
+                                <td>{!addressMergeDetailList[1].Address_Line3__c}</td> 
+                </tr>
+                <tr>
+                                <th>Address Line 4</th>
+                                <td>{!addressMergeDetailList[0].Address_Line4__c}</td>
+                                <td> {!addressMergeDetailList[1].Address_Line4__c}</td> 
+                </tr>
+                <tr>
+                                <th>City</th>
+                                <td>{!addressMergeDetailList[0].City__c}</td>
+                                <td>{!addressMergeDetailList[1].City__c}</td> 
+                </tr>
+                <tr>
+                                <th>County</th>
+                                <td>{!addressMergeDetailList[0].County__c}</td>
+                                <td>{!addressMergeDetailList[1].County__c}</td> 
+                </tr>
+                <tr>
+                                <th>Province</th>
+                                <td>{!addressMergeDetailList[0].Province__c}</td>
+                                <td>{!addressMergeDetailList[1].Province__c}</td> 
+                </tr>
+                <tr>
+                                <th>State</th>
+                                <td>{!addressMergeDetailList[0].State__c}</td>
+                                <td>{!addressMergeDetailList[1].State__c}</td> 
+                </tr>
+                <tr>
+                                <th>Country</th>
+                                <td>{!addressMergeDetailList[0].Country__c}</td>
+                                <td>{!addressMergeDetailList[1].Country__c}</td> 
+                </tr>
+                <tr>
+                                <th>Postal Zip Code</th>
+                                <td>{!addressMergeDetailList[0].Zip_Postal_Code__c}</td>
+                                <td>{!addressMergeDetailList[1].Zip_Postal_Code__c}</td> 
+                </tr>
+            </table> 
+        </div>
+        <br/>
+        <br/>
+        <div align="center">
+           <button type="button" onclick="mergeAddress()" class="buttonClass" >Merge Address</button>
+           <apex:commandButton value="Cancel" action="{!Cancel}" style="width:100px;"/>            
+        </div>
+   </apex:pageBlock>
+</apex:form>
+<apex:form >
+   <apex:actionFunction name="mergeAllAddress" action="{!OnMergeButtonClicked}" reRender="mergePanel">
+     <apex:param name="addressFieldSelectedString" value="addressFieldSelectedString" />
+   </apex:actionFunction>
+   <apex:outputPanel id="mergePanel" />
+</apex:form>
+<script>  
+ function selectAllRadios(selectedRadioVal){
+    var addressFieldArray = new Array("Master");
+    if(selectedRadioVal == 'a1'){
+            document.getElementById('a1').checked = true;
+    }else{
+            document.getElementById('b1').checked = true;
+    }
+}
+
+ function mergeAddress(){
+    var addressFieldArray = new Array("Master");
+    var addressFieldSelected = new Array() ;
+    if ($('input[name='+addressFieldArray[0]+']:checked').length == 0) {
+        alert('Please select the master record');
+        return;
+    }
+     else 
+       {
+           var action=confirm('This is a non reciprocal one time process and cannot be rolled back. Do you want to continue and merge the selected records?');
+           if (action)
+           {
+            addressFieldSelected.push($('input[name='+addressFieldArray[0]+']:checked').val());
+            addressFieldSelectedString = addressFieldSelected.toString();
+            mergeAllAddress(addressFieldSelectedString);
+            }
+            else
+            {
+            
+            }
+  }
+  
+  }
+</script>
+</apex:page>

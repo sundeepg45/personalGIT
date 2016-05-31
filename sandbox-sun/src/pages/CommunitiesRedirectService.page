@@ -1,0 +1,19 @@
+<apex:page standardStyleSheets="false" showHeader="false" sidebar="false" controller="CommunitiesRedirectService">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js" type="text/javascript"/>
+	<script>
+		$j = jQuery.noConflict();
+		var myURL;
+		var communityURL;
+		$j(document).ready(function (){
+			myURL= location.hostname;
+			communityURL = document.getElementById("community-url").value;
+			console.log("current URL: " + myURL);
+			console.log("community URL: " + communityURL);
+
+			if(myURL != communityURL){
+				window.top.location.href = "//" + communityURL;
+			}
+		});
+	</script>
+	<input type="hidden" value="{!commURL}" id="community-url"/>
+</apex:page>

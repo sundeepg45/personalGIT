@@ -1,0 +1,161 @@
+<apex:page controller="TabUIController" extensions="StrategicPlan_SolutionControllerExtn" showChat="false" showHeader="false" sidebar="false">
+    <apex:form >
+        <apex:commandButton action="{!displayId}" style="display:none" immediate="true" value="displayId" id="displayId"/>
+        <!-- apex:actionFunction action="{!displayId}" name="displaySolution2" status="loadingDetails" rerender="solution" oncomplete="document.getElementById('solution').style.display='block';" -->
+        <apex:actionFunction action="{!displayId}" name="displaySolution2" status="loadingDetails" rerender="solution" oncomplete="document.getElementById('{!$Component.displayId}').click();">
+            <apex:param name="solutionId" assignTo="{!activeId}" value="" />
+            <apex:param name="activeTab" assignTo="{!activeTab}" value="StrategicPlan_Solution__c" />
+        </apex:actionFunction>
+        <script type="text/javascript">
+            function displaySolution(solutionId) {
+                var element = document.getElementById('solution');
+                var inputs = element.getElementsByTagName('textarea');
+                if(inputs && inputs.length != 0) {
+                    alert('{JSENCODE($!Label.StrategicPlan_EditInProgress)}');
+                }
+                else {
+                    element.style.display='none';
+                    displaySolution2(solutionId,'StrategicPlan_Solution__c');
+                }
+            }
+        </script>
+        <!-- script type="text/javascript">
+            // displays the product lookup dialog
+            function productSearch() {
+                var opportunityId = '{X!opportunityId}';
+                var searchTerm = objProductCode.value;
+                var page = '/apex/Opportunity_ProductSearch?opportunityId=' + opportunityId + '&search=' + searchTerm;
+                var pageTitle = 'Product_Search';
+                var objWin = window.open(page, pageTitle,'left=400, top=200, width=1024, height=600, menubar=no, resizable=yes, scrollbars=yes, status=no');
+            }
+        </script -->
+        <c:QueriedList sequenceNumber="{!sequenceNumber}"
+            object="StrategicPlan_Solution__c"
+            fields="SolutionNumber__c,Name,BusinessUnit__c,StrategyNumber__c,Strategy__c"
+            sortFields="SolutionNumber__c,Name,,StrategyNumber__c,Strategy__c"
+            labels=",,,,"
+            conditions="Strategy__r.StrategicPlan__c='{!strategicPlanId}'"
+            order="SolutionNumber__c"
+            recordsPerPage="50"
+            actionFunction="displaySolution"
+            panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;"
+            rendered="{!NOT(ISBLANK(strategicPlanId))}" />
+        <apex:actionStatus startText="{!$Label.StrategicPlan_LoadingDetails}" id="loadingDetails"/>
+    </apex:form>
+    <div id="solution">
+        <apex:outputPanel id="solution">
+            <apex:form id="form">
+                <apex:sectionHeader title="{!$ObjectType.StrategicPlan_Solution__c.Label}" subtitle="{!IF(ISBLANK(id),'New Solution',Solution.Name)}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}"/>
+                <apex:pageBlock title="{!$Label.StrategicPlan_SolutionDetailTitle}" mode="{!IF(mode='view','inlineEdit','edit')}" >
+                    <apex:pageMessages id="pageMessages"/>
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!newRecord}" id="newButton" value="{!$Label.StrategicPlan_NewSolution}" rendered="{!AND(mode='view',isCreateable)}" />
+                        <apex:commandButton action="{!editRecord}" id="editButton" value="{!$Label.Edit}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isUpdateable)}" />
+                        <apex:commandButton action="{!deleteRecord}" id="deleteButton" value="{!$Label.Delete}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isDeletable)}" />
+                        <apex:commandButton action="{!cloneRecord}" id="cloneButton" value="{!$Label.Clone}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isCreateable)}" />
+                        <apex:commandButton action="{!saveSolution}" id="saveButton" value="{!$Label.Save}" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(AND(mode='new',isCreateable),AND(NOT(ISBLANK(id)),isUpdateable))}" />
+                        <apex:commandButton action="{!cancelRecord}" id="cancelButton" value="{!$Label.cancel}" immediate="true" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}"/>
+                    </apex:pageBlockButtons>
+                    <apex:outputPanel layout="block" style="display:none" rendered="{!AND(mode!='view',NOT(ISBLANK(Solution.StrategicPlan__c)))}">
+                        <apex:inputField value="{!Solution.StrategicPlan__c}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}">
+                        <apex:pageBlockSection columns="1" collapsible="false" showHeader="true" title="{!$Label.StrategicPlan_SolutionDetailsHeader}">
+                            <apex:outputText value="{!$Label.StrategicPlan_SolutionDetailsInstructions}"/>
+                        </apex:pageBlockSection>                    
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Solution.Status__c}" rendered="{!mode='view'}" id="solutionStatusOutput"/>
+                            <apex:inputField value="{!Solution.Status__c}" required="true" rendered="{!mode!='view'}" id="solutionStatusInput"/>
+                            <apex:outputField value="{!Solution.BusinessUnit__c}" rendered="{!mode='view'}" id="businessUnitOutput"/>
+                            <apex:inputField value="{!Solution.BusinessUnit__c}" rendered="{!mode!='view'}" id="businessUnitInput"/>
+                            <apex:outputField value="{!Solution.Name}" rendered="{!mode='view'}" id="solutionNameOutput"/>
+                            <apex:inputField value="{!Solution.Name}" required="true" rendered="{!mode!='view'}" id="solutionNameInput" style="width:100%" />
+                            <apex:outputField value="{!Solution.SolutionNumber__c}" id="solutionNumberOutput">
+                                <apex:inlineEditSupport disabled="true"/>
+                            </apex:outputField>
+                            <apex:outputField value="{!Solution.Strategy__c}" rendered="{!mode='view'}" id="solutionStrategyOutput"/>
+                            <apex:inputField value="{!Solution.Strategy__c}" rendered="{!mode!='view'}" id="solutionStrategyInput" style="width:100%" />
+                            <apex:outputField value="{!Solution.StrategyNumber__c}" id="solutionStrategyNumberOutput" />
+                            <apex:outputField value="{!Solution.ProjectedResources__c}" rendered="{!mode='view'}" id="solutionProjectedResourcesOutput"/>
+                            <apex:inputField value="{!Solution.ProjectedResources__c}" required="true" rendered="{!mode!='view'}" id="solutionProjectedResourcesInput" style="width:100%" />
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Solution.SolutionDescription__c}" rendered="{!mode='view'}" id="solutionDescriptionOutput"/>
+                            <apex:inputField value="{!Solution.SolutionDescription__c}" rendered="{!mode!='view'}" id="solutionDescriptionInput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(Solution.CreatedById))}">
+                                <apex:outputLabel value="{!$Label.CreatedBy}" for="createdBy"/>
+                                <apex:outputPanel layout="inline" id="createdBy">
+                                    <apex:outputField value="{!Solution.CreatedById}" id="solutionCreatedByOutput" />
+                                    <apex:outputText value=", {!Solution.CreatedDate}" id="solutionCreatedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(Solution.LastModifiedById))}">
+                                <apex:outputLabel value="{!$Label.LastModifiedBy}" for="lastModifiedBy"/>
+                                <apex:outputPanel layout="inline" id="lastModifiedBy">
+                                    <apex:outputField value="{!Solution.LastModifiedById}" id="solutionModifiedByOutput" />
+                                    <apex:outputText value=", {!Solution.LastModifiedDate}" id="solutionModifiedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                </apex:pageBlock>
+                <apex:pageBlock title="{!$ObjectType.StrategicPlan_Action__c.LabelPlural}" mode="detail" id="actions" rendered="{!NOT(ISBLANK(Id))}">
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!newAction}" id="newAction" value="{!$Label.StrategicPlan_NewAction}" immediate="true" rendered="{!AND(mode='view',isCreateable)}" />
+                    </apex:pageBlockButtons>
+                    <c:QueriedList object="StrategicPlan_Action__c"
+                        fields="Name,ActionSubject__c,AssignedTo__c,Status__c,Start__c,End__c,RelatedTo__c"
+                        sortFields="Name,ActionSubject__c,AssignedTo__r.Name,Status__c,Start__c,End__c,RelatedTo_Number__c"
+                        labels=",,,,,,"
+                        conditions="Solution__c='{!Id}' and Subject__c='Strategic Plan Solution'"
+                        order="Name,ActionSubject__c,RelatedTo_Number__c"
+                        recordsPerPage="50"
+                        actionField="Name"
+                        panelClass=""
+                        styleClass=""
+                        panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;"
+                        rendered="{!NOT(ISBLANK(Id))}" />
+                </apex:pageBlock>
+            </apex:form>
+            <apex:outputPanel layout="block" id="Opportunities" rendered="{!AND(NOT(ISBLANK(Id)),mode='view')}">
+                <apex:form id="opportunitiesForm">
+                    <apex:pageBlock title="{!$ObjectType.Opportunity.LabelPlural}" mode="detail">
+                        <apex:pageBlockButtons location="top">
+                            <apex:commandButton action="{!createOpportunity}" id="createOpportunityButton" value="{!$Label.StrategicPlan_CreateOpportunity}" immediate="true" rendered="{!isCreateable}" />
+                            &#160;
+                            <apex:commandButton action="/apex/SolutionOpportunity_Manage?id={!Id}" id="manageOpportunityButton" value="{!$Label.StrategicPlan_ManageOpportunities}" immediate="true" rendered="{!isCreateable}" />
+                            <apex:outputPanel layout="block" id="solutionOpportunity" style="display:inline-block" rendered="false">
+                                <div style="display:inline-block"><apex:outputLabel value="{!$Label.StrategicPlan_FindOpportunity}" for="findOpportunity"/></div>
+                                <div style="display:inline-block"><apex:inputField required="false" value="{!solutionOpportunity.Opportunity__c}" id="findOpportunity"/></div>
+                                <div style="display:inline-block"><apex:commandButton action="{!linkOpportunity}" id="linkOpportunityButton" value="{!$Label.StrategicPlan_LinkOpportunity}" status="refreshInProgress" rerender="Opportunities" /></div>
+                            </apex:outputPanel>
+                        </apex:pageBlockButtons>
+                        <apex:pageMessages id="pageMessages"/>
+                        <c:QueriedList sequenceNumber="{!sequenceNumber}"
+                            var="spso"
+                            labelVar="columnName"
+                            object="StrategicPlan_SolutionOpportunity__c"
+                            fields="{!IF($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,',','')}OpportunityLink__c,AccountLink__c,StageName__c,Amount__c,CloseDate__c,StrategicPlan_Solution__c"
+                            sortFields="{!IF($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,',','')}Opportunity__r.Name,Opportunity__r.Account.Name,StageName__c,Amount__c,CloseDate__c,StrategicPlan_Solution__r.Name"
+                            labels="{!IF($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,$Label.StrategicPlan_ActionColumn+',','')}{!$ObjectType.Opportunity.Label},{!$ObjectType.Account.Label},{!$ObjectType.Opportunity.Fields.StageName.Label},{!$ObjectType.Opportunity.Fields.Amount.Label},{!$ObjectType.Opportunity.Fields.CloseDate.Label},{!$ObjectType.StrategicPlan_Solution__c.Label}"
+                            conditions="StrategicPlan_Solution__c='{!Id}'"
+                            order="CloseDate__c,StrategicPlan_Solution__r.Name,Opportunity__r.Account.Name,Opportunity__r.Name,Amount__c,Id"
+                            recordsPerPage="50"
+                            panelClass=""
+                            styleClass=""
+                            panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;">
+                            <apex:commandLink action="{!unlinkOpportunity}" value="{!$Label.StrategicPlan_Unlink}" immediate="true"  onclick="return confirm('{!JSINHTMLENCODE($Label.StrategicPlan_ConfirmUnlinkOpportunity)}');" status="refreshInProgress" rendered="{!AND(columnName='Action',$ObjectType.StrategicPlan_SolutionOpportunity__c.deletable)}">
+                                <apex:param name="solutionOpportunityId" assignTo="{!solutionOpportunityId}" value="{!record.Id}" />
+                            </apex:commandLink>
+                        </c:QueriedList>
+                        <apex:actionStatus startText="{!$Label.StrategicPlan_RefreshInProgress}" id="refreshInProgress"/>
+                    </apex:pageBlock>
+                </apex:form>
+            </apex:outputPanel>
+        </apex:outputPanel>
+    </div>
+</apex:page>

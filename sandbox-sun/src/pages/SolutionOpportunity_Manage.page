@@ -1,0 +1,64 @@
+<apex:page controller="SolutionOpportunity_SetController" showHeader="true" sidebar="true">
+    <apex:sectionHeader title="{!$Label.StrategicPlan_OppManager}"
+        subtitle="{!solution.Name} ({!solution.StrategicPlan__r.Name})" />
+    <apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+        <apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+        <apex:outputLink value="/{!solution.Id}">
+            <apex:outputText value="{!$Label.StrategicPlan_BackToSolution}: " />
+            <apex:outputText value="{!solution.Name} ({!solution.StrategicPlan__r.Name})"/>
+        </apex:outputLink>
+    </apex:outputPanel>
+    <apex:form id="form">
+        <apex:pageBlock mode="edit" title=" ">
+            <apex:facet name="header">&nbsp;</apex:facet>
+            <apex:pageMessages />
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.StrategicPlan_Search}    " for="search"/>
+                    <apex:outputPanel id="search">
+                        <apex:inputText value="{!searchString}" size="20">
+                            <apex:actionSupport action="{!updateSearchString}" event="onchange" rerender="form" status="statusLoading" />
+                        </apex:inputText>
+                        <apex:commandButton value="{!$Label.StrategicPlan_GoButton}"/>
+                        <apex:commandButton value="{!$Label.StrategicPlan_FinishButton}" action="{!cancel}"/>
+                        <br/>{!$Label.StrategicPlan_SearchInstruction}
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="{!$Label.StrategicPlan_SearchResults}" columns="1">
+                <apex:pageBlockTable value="{!solutionOpportunityPagination}" var="so">
+                    <apex:column headerValue="{!$Label.StrategicPlan_ActionColumn}">
+                        <apex:commandLink action="{!so.linkOpportunity}" rendered="{!ISBLANK(so.solutionOpportunity.Id)}" rerender="form">{!$Label.StrategicPlan_Link}</apex:commandLink>
+                        <apex:commandLink action="{!so.unlinkOpportunity}" rendered="{!AND($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,NOT(ISBLANK(so.solutionOpportunity.Id)))}" rerender="form">{!$Label.StrategicPlan_Unlink}</apex:commandLink>
+                    </apex:column>
+                    <apex:column value="{!so.SolutionOpportunity.Opportunity__c}" />
+                    <apex:column headerValue="{!$ObjectType.Account.Fields.Name.Label}" value="{!so.SolutionOpportunity.Opportunity__r.AccountId}"/>
+                    <apex:column value="{!so.SolutionOpportunity.Opportunity__r.PONumber__c}"/>
+                    <apex:column value="{!so.SolutionOpportunity.Opportunity__r.OracleOrderNumber__c}"/>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons rendered="{!OR(opportunityRecords.HasPrevious,opportunityRecords.HasNext)}">
+                <apex:outputPanel layout="none">
+                    <apex:commandLink action="{!first}" rendered="{!opportunityRecords.HasPrevious}">First</apex:commandlink>
+                    <apex:outputText rendered="{!NOT(opportunityRecords.HasPrevious)}" value="First"/>&nbsp;
+                </apex:outputPanel>
+                <apex:outputPanel layout="none">
+                    <apex:commandLink action="{!previous}" rendered="{!opportunityRecords.HasPrevious}">Previous</apex:commandlink>
+                    <apex:outputText rendered="{!NOT(opportunityRecords.HasPrevious)}" value="Previous"/>&nbsp;
+                </apex:outputPanel>
+                <apex:outputPanel layout="none">
+                    <apex:commandLink action="{!next}" rendered="{!opportunityRecords.HasNext}">Next</apex:commandlink>
+                    <apex:outputText rendered="{!NOT(opportunityRecords.HasNext)}" value="Next"/>&nbsp;
+                </apex:outputPanel>
+                <apex:outputPanel layout="none">
+                    <apex:commandLink action="{!last}" rendered="{!opportunityRecords.HasNext}">Last</apex:commandlink>
+                    <apex:outputText rendered="{!NOT(opportunityRecords.HasNext)}" value="Last"/>&nbsp;
+                </apex:outputPanel>
+                <apex:outputText value="({0} of {1})">
+                    <apex:param value="{!opportunityRecords.PageNumber}"/>
+                    <apex:param value="{!pageCount}"/>
+                </apex:outputText>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

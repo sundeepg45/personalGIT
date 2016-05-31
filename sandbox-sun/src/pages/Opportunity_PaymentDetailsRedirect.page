@@ -1,0 +1,36 @@
+<apex:page standardController="Opportunity" extensions="Opportunity_PaymentDetailsController" tabStyle="Opportunity" showHeader="false" sidebar="false" action="{!redirect}">
+<script type="text/javascript">
+	function setOldValue(element) {
+		if(element != null) {
+			element.oldValue = element.value;
+		}
+	}
+
+	function confirmChange(element) {
+		var retval = true;
+		if({!IF(OR(ISBLANK(opp.Credit_Card_Number__c),ISBLANK(opp.Desired_Operating_Unit__c)),'false','true')} && element && element.confirmedChange != true) {
+			var oldValue = element.oldValue;
+			if(oldValue != element.value) {
+				element.confirmedChange = retval = confirm('{! JSENCODE($Label.CC_Clear_Warning_1)}');
+				if(! retval) {
+					element.value = oldValue;
+				}
+			}
+		}
+		return retval;
+	}
+</script>
+	<apex:pageMessages />
+	<apex:form >
+		<apex:pageBlock mode="edit" title="Select Desired Operating Unit">
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton id="cancel" value="{!$Label.CC_Cancel}" onclick="top.window.close();" immediate="true"/>
+				<apex:commandButton id="next" value="Next" action="{!redirect}"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection title="Desired Value" columns="1" id="ccDetails">
+				<apex:outputText value="{!$Label.CC_OU_Instructions}" label="{!$Label.CC_Note}"/>
+				<apex:inputField value="{!opportunity.Operating_Unit__c}" required="true" onfocus="setOldValue(this);" onchange="if(! confirmChange(this)){return false;}" />
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

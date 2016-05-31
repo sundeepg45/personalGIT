@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Content_Collection__c$Name</field>
+    </columns>
+    <columns>
+        <field>Content_Collection__c.Related_Reference_Contents__r$Reference_Content__c.Reference_Content_Type_Name__c</field>
+    </columns>
+    <columns>
+        <field>Content_Collection__c.Related_Reference_Contents__r$Reference_Content__c.Title__c</field>
+    </columns>
+    <columns>
+        <field>Content_Collection__c.Related_Reference_Contents__r$Reference_Content__c.Name</field>
+    </columns>
+    <columns>
+        <field>Content_Collection__c.Related_Reference_Contents__r$Name</field>
+    </columns>
+    <description>Content Collections with Content</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Content_Collection__c$Collection__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Content Collections with Content</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Content_Collections_with_Content__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <sortColumn>Content_Collection__c.Related_Reference_Contents__r$Reference_Content__c.Reference_Content_Type_Name__c</sortColumn>
+    <sortOrder>Asc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>Content_Collection__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

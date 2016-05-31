@@ -1,0 +1,43 @@
+<apex:page standardController="SFDC_Channel_Account_Plan__c" extensions="MDF_Calculate">
+    <apex:stylesheet value="{!$Resource.Common_EmbeddedPageStylesheet}"/>
+    
+    <div id="BusinessPlan_MDFStatistics"><apex:pageBlock >
+        <apex:pageBlockSection columns="2">
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Funds_Available_Q1__c.Label}" />
+                <apex:outputText value="{!AllocatedBudget1}" styleClass=" BusinessPlan_MDFStatistics_MDFFundsAvailableQ1" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Executed_Q1__c.Label}" />
+                <apex:outputText value="{!ExecutedBudget1}" styleClass=" BusinessPlan_MDFStatistics_MDFExecutedQ1" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem > 
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Funds_Available_Q2__c.Label}"  />
+                <apex:outputText value="{!AllocatedBudget2}" styleClass=" BusinessPlan_MDFStatistics_MDFFundsAvailableQ2" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Executed_Q2__c.Label}"/>
+                <apex:outputText value="{!ExecutedBudget2}" styleClass=" BusinessPlan_MDFStatistics_MDFExecutedQ1" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Funds_Available_Q3__c.Label}"/>
+                <apex:outputText value="{!AllocatedBudget3}" styleClass=" BusinessPlan_MDFStatistics_MDFFundsAvailableQ3" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Executed_Q3__c.Label}"/>
+                <apex:outputText value="{!ExecutedBudget3}" styleClass=" BusinessPlan_MDFStatistics_MDFExecutedQ1" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Funds_Available_Q4__c.Label}"/>
+                <apex:outputText value="{!AllocatedBudget4}" styleClass=" BusinessPlan_MDFStatistics_MDFFundsAvailableQ3" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.MDF_Executed_Q4__c.Label}"/>
+                <apex:outputText value="{!ExecutedBudget4}" styleClass=" BusinessPlan_MDFStatistics_MDFExecutedQ1" />
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+    </apex:pageBlock></div>
+</apex:page>

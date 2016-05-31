@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <aggregates>
+        <calculatedFormula>RowCount</calculatedFormula>
+        <datatype>number</datatype>
+        <developerName>FORMULA1</developerName>
+        <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
+        <masterLabel>Emails Synced</masterLabel>
+        <scale>0</scale>
+    </aggregates>
+    <buckets>
+        <bucketType>text</bucketType>
+        <developerName>BucketField_8000866</developerName>
+        <masterLabel>Day Email Sent</masterLabel>
+        <nullTreatment>n</nullTreatment>
+        <sourceColumnName>Activity.Day_Activity_Created__c</sourceColumnName>
+        <useOther>false</useOther>
+        <values>
+            <sourceValues>
+                <sourceValue>1 Sunday</sourceValue>
+            </sourceValues>
+            <value>1 Sunday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>2 Monday</sourceValue>
+            </sourceValues>
+            <value>2 Monday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>3 Tuesday</sourceValue>
+            </sourceValues>
+            <value>3 Tuesday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>4 Wednesday</sourceValue>
+            </sourceValues>
+            <value>4 Wednesday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>5 Thursday</sourceValue>
+            </sourceValues>
+            <value>5 Thursday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>6 Friday</sourceValue>
+            </sourceValues>
+            <value>6 Friday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>7 Saturday</sourceValue>
+            </sourceValues>
+            <value>7 Saturday</value>
+        </values>
+    </buckets>
+    <chart>
+        <backgroundColor1>#FFFFFF</backgroundColor1>
+        <backgroundColor2>#FFFFFF</backgroundColor2>
+        <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <axisBinding>y</axisBinding>
+            <column>FORMULA1</column>
+        </chartSummaries>
+        <chartType>VerticalColumnStacked</chartType>
+        <enableHoverLabels>true</enableHoverLabels>
+        <expandOthers>true</expandOthers>
+        <groupingColumn>BucketField_8000866</groupingColumn>
+        <legendPosition>Right</legendPosition>
+        <location>CHART_TOP</location>
+        <secondaryGroupingColumn>CREATED_DATE</secondaryGroupingColumn>
+        <showAxisLabels>true</showAxisLabels>
+        <showPercentage>false</showPercentage>
+        <showTotal>false</showTotal>
+        <showValues>false</showValues>
+        <size>Medium</size>
+        <summaryAxisRange>Auto</summaryAxisRange>
+        <textColor>#000000</textColor>
+        <textSize>12</textSize>
+        <titleColor>#000000</titleColor>
+        <titleSize>18</titleSize>
+    </chart>
+    <columns>
+        <field>SUBJECT</field>
+    </columns>
+    <columns>
+        <field>EMAIL</field>
+    </columns>
+    <filter>
+        <criteriaItems>
+            <column>TASK_TYPE</column>
+            <operator>equals</operator>
+            <value>Email</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>SUBJECT</column>
+            <operator>startsWith</operator>
+            <value>← Email:</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Activity.Created_by_Cirrus_Insight__c</column>
+            <operator>equals</operator>
+            <value>1</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>CREATED_BY</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>BucketField_8000866</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Week</dateGranularity>
+        <field>CREATED_DATE</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Email Sync Received by Day, Week, &amp; User</name>
+    <params>
+        <name>closed</name>
+        <value>closed</value>
+    </params>
+    <params>
+        <name>type</name>
+        <value>t</value>
+    </params>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Activity</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>CREATED_DATE</dateColumn>
+        <interval>INTERVAL_LAST30</interval>
+    </timeFrameFilter>
+</Report>

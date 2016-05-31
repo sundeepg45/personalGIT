@@ -1,0 +1,66 @@
+<apex:page standardController="Account" extensions="AccountMergeSetController" recordSetVar="selectedAccounts" showHeader="true" tabStyle="Account">
+	<script>
+		function changeValue(input,elementId) {
+			document.getElementById(elementId).value = input.value;
+		}
+	</script>
+	<apex:sectionHeader title="{!$Label.Account_Merge_Title}" />
+	<apex:pageMessages />
+	<apex:form id="mergeForm">
+		<apex:inputHidden value="{!defaultAccountId}" id="DefaultAccountId" />
+		<apex:pageBlock title="{!$Label.Account_Merge_Section1}" mode="edit" >
+			<apex:pageBlockButtons location="both">
+				<apex:commandButton action="{!mergeAccounts}" id="mergeButton" value="{!$Label.Account_Merge_Merge_Button}" disabled="{!OR(ISNULL(accounts),accounts.size < 2,accounts.size > accountMergeLimit)}"/>
+				<apex:commandButton action="{!cancel}" id="cancelButton" value="{!$Label.cancel}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1">
+				<apex:outputText value="{!$Label.Account_Merge_Help}" rendered="{!(IF(ISNULL(accounts),0,accounts.size) > 1)}"/>
+				<apex:outputText value="{!$Label.Account_Merge_Note}" rendered="{!(IF(ISNULL(accounts),0,accounts.size) > 1)}"/>
+				<apex:outputText value="{!$Label.Account_Merge_No_Records}" rendered="{!OR(ISNULL(accounts),accounts.size = 0)}"/>
+			</apex:pageBlockSection>
+			<apex:outputPanel layout="none" rendered="{!IF(ISNULL(accounts),0,accounts.size) > 0}">
+				<table  class="mergeEntity" border="0" cellpadding="0" cellspacing="0">
+					<tr class="headerRow">
+						<td>&nbsp;</td>
+						<apex:repeat value="{!accounts}" var="account">
+							<th scope="col">&nbsp;<apex:outputField value="{!account.Name}"/>&nbsp;<apex:commandLink action="{!selectAll}" onclick="document.getElementById('{!$Component.defaultAccountId}').value='{!account.Id}'" styleClass="columnHeadActiveWhite">[<apex:outputText value="{!$Label.Account_Merge_Select_All}"/>]</apex:commandLink></th>
+						</apex:repeat>
+					</tr>
+					<apex:repeat value="{!fieldSelectList}" var="fieldSelect">
+						<apex:outputPanel layout="none" rendered="{!ISBLANK(fieldSelect.accountId)}" >
+							<tr>
+								<th scope="row" width="25%">
+									<apex:outputLabel value="{!BLANKVALUE(fieldSelect.fieldSetMember.Label,$Label.Account_Merge_Master_Record)}"/>
+								</th>
+								<apex:repeat value="{!accounts}" var="account">
+									<td width="37%">
+										<apex:outputField value="{!account[fieldSelect.fieldSetMember.fieldPath]}" rendered="{!NOT(ISBLANK(fieldSelect.fieldSetMember.fieldPath))}"/>
+									</td>
+								</apex:repeat>
+							</tr>
+						</apex:outputPanel>
+						<apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(fieldSelect.accountId))}" >
+							<tr class="requiredInput">
+								<th class="brandTertiaryBgr" scope="row" width="25%">
+									<span class="assistiveText">*</span><apex:outputText value="{!BLANKVALUE(fieldSelect.fieldSetMember.Label,'Master Record')}"/>
+									<apex:inputHidden value="{!fieldSelect.accountId}" id="RadioValue" rendered="{!NOT(ISBLANK(fieldSelect.accountId))}" />
+								</th>
+								<apex:repeat value="{!accounts}" var="account">
+									<td width="37%">
+										<apex:outputPanel layout="none" rendered="{!(account.Id!=fieldSelect.accountId)}" >
+											<input name="{!BLANKVALUE(fieldSelect.fieldSetMember.fieldPath,'_masterSelect')}" value="{!account.Id}" type="radio" onclick="changeValue(this,'{!$Component.RadioValue}');" />
+										</apex:outputPanel>
+										<apex:outputPanel layout="none" rendered="{!(account.Id=fieldSelect.accountId)}" >
+											<input name="{!BLANKVALUE(fieldSelect.fieldSetMember.fieldPath,'_masterSelect')}" value="{!account.Id}" type="radio" onclick="changeValue(this,'{!$Component.RadioValue}');" checked="checked" />
+										</apex:outputPanel>
+										<apex:outputField value="{!account[fieldSelect.fieldSetMember.fieldPath]}" rendered="{!NOT(ISBLANK(fieldSelect.fieldSetMember.fieldPath))}"/>
+									</td>
+								</apex:repeat>
+							</tr>
+						</apex:outputPanel>
+					</apex:repeat>
+				</table>
+			</apex:outputPanel>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

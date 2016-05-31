@@ -1,0 +1,29 @@
+<apex:page controller="refedge.ReferenceRefreshController" sidebar="false" tabStyle="Account">
+    <!--<c:POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <script>
+        PORShowLoading();
+        jQuery(document).ready(function(){
+            PORHideLoading();
+        });
+    </script>
+    <apex:form >
+        
+        <apex:pageBlock >
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton rendered="{!updateSobjectFields.size > 0}" value="{!$Label.Save}" action="{!saveTheEditedMappings}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:outputPanel rendered="{!updateSobjectFields.size = 0}">
+                <apex:pageMessage severity="INFO" strength="3" summary="No_Related_records_associated_with_this_Record}"/>
+            
+            </apex:outputPanel>
+            <apex:pageBlockSection rendered="{!updateSobjectFields.size > 0}" columns="1">
+                <apex:repeat value="{!updateSobjectFields}" var="obj">
+                    <apex:inputField value="{!obj[selectedAttMapping.Field_Api_Name__c]}" label="{!obj['name']}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>    
+        </apex:pageBlock>
+    </apex:form>-->
+</apex:page>

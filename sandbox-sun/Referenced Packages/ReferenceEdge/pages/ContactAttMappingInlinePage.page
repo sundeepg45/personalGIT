@@ -1,0 +1,56 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="Contact" extensions="refedge.ContactAttMappingExtension" sidebar="false">
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlock id="pbId" >
+            <apex:pageBlockTable value="{!attMappings}" var="attMapping" rendered="{!attMappings.size > 0}">
+                <apex:column headerValue="{!$Label.Name}">
+                    <apex:commandLink value="{!attMapping.Name}" onclick="window.open('/{!attMapping.Id}')"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Mapped_Field}">
+                    <apex:outputField value="{!attMapping.refedge__Field__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Associated_Filter}">
+                    <apex:outputField value="{!attMapping.refedge__Filter_Label_Name__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Associated_Attribute}">
+                    <apex:outputField value="{!attMapping.refedge__Attribute_Name__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Inheritable}">
+                    <apex:outputField value="{!attMapping.refedge__Inheritable__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Auto_Update}">
+                    <apex:outputField value="{!attMapping.refedge__Auto_update__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Auto_Populate}">
+                    <apex:outputField value="{!attMapping.refedge__Auto_populate__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Auto_Delete}">
+                    <apex:outputField value="{!attMapping.refedge__Auto_delete__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Auto_Add}">
+                    <apex:outputField value="{!attMapping.refedge__Auto_add__c}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:pageMessage severity="Info" strength="2" summary="{!$Label.No_Records_Found}" rendered="{!attMappings.size <=0}"/>  
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

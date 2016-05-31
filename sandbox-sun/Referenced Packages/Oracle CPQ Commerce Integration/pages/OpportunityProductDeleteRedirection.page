@@ -1,0 +1,7 @@
+<apex:page standardController="OpportunityLineItem" action="{!deleteRedirect}" extensions="BigMachines.BigMachinesOpportunityProductController" tabStyle="BigMachines__Quotes__tab">
+    <apex:sectionHeader title="BigMachines Opportunity Product" subtitle="Edit Quote"/>
+    <apex:outputText rendered="false" value="{!OpportunityLineItem.Id}" />
+    <apex:outputText rendered="false" value="{!OpportunityLineItem.OpportunityId}" />
+    <apex:outputText rendered="false" value="{!OpportunityLineItem.BigMachines__Origin_Quote__c}" />
+    <apex:pageMessages />
+</apex:page>

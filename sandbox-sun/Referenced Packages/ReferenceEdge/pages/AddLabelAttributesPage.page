@@ -1,0 +1,878 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, ITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pageId" tabStyle="refedge__Attribute__c" Controller="refedge.AddLabelAttributesController" sidebar="false">
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <apex:outputpanel id="OutputPanel">
+        <script>
+            var tree='{!JSENCODE(childHtml)}';
+            var currentLocation;
+            var parentName;
+            
+            function update() {
+                if(tree!='null'){
+                    parentName=jQuery(currentLocation).parent().parent().attr('id');
+                    jQuery(currentLocation).parent().parent().closest('tr').after(tree);
+                    jQuery(currentLocation).parent().parent().parent().find('.PlusImage').attr('src','{!$Resource.refedge__PlusImage}');
+                    jQuery(currentLocation).parent().parent().parent().find('.MinusImage').attr('src','{!$Resource.refedge__MinusImage}');
+                    jQuery('#plus'+selectedId).css('display','none');
+                    jQuery("#minus"+selectedId).css('display','inline');
+                    jQuery(currentLocation).parent().find('input[type=checkbox]').bind(); 
+                }
+                if(tree=='null'){
+                    jQuery('#plus'+selectedId).css('display','none');
+                    jQuery("#minus"+selectedId).css('display','inline');
+                }
+                ready();
+            }
+        </script> 
+    </apex:outputPanel>      
+        
+    <script>
+        var selectedId = "";
+        var checkedIds = "";
+        var accountMSG = '{!JSENCODE(status)}'.replace('@@@1', 'Account');
+        var contactMSG = '{!JSENCODE(status)}'.replace('@@@1', 'Contact');
+        PORShowLoading();
+        jQuery(document).ready(function() {
+            if (!jQuery.trim(jQuery('#idDiv').html()).length) {
+                jQuery('#css-tree').html('{!JSENCODE(treeRoots)}');
+                jQuery(".PlusImage").attr('src', '{!$Resource.refedge__PlusImage}');
+                jQuery(".MinusImage").attr('src', '{!$Resource.refedge__MinusImage}');
+                if (jQuery.isFunction(jQuery.fn.on)) {
+                    jQuery('body').on("click", ".PlusImage", function(ev) {
+                        if (jQuery(this).css('display') == 'none') {
+                            return;
+                        }
+                        jQuery(this).unbind("ev");
+                        jQuery(this).off();
+                        selectedId = (jQuery(this).attr('Id')).substring(4);
+                        var isfilterExists = jQuery(this).parent().children().first().data("filterpresent");
+                        //alert(isfilterExists);
+                        if(isfilterExists == 'undefined')
+                            isfilterExists = false;
+                        currentLocation = jQuery(this);
+                        hitMe(selectedId,isfilterExists);
+                        ev.preventDefault();
+                        return false;
+                    })
+                    jQuery('body').on("click", ".MinusImage", function(ev) {
+                        PORShowLoading();
+                        selectedId = (jQuery(this).attr('Id')).substring(5);
+                        var currentClass = jQuery(this).parent().parent().attr('Id');
+                        if (jQuery(this).parent().parent().attr('class') != null) {
+                            var className = jQuery(this).parent().parent().attr('class').split(' ');
+                            var parentName = className[1];
+                            var level = className[0];
+                        }
+                        var chkForRemove = false;
+                        jQuery("tr").each(function() {
+                            if (!chkForRemove && jQuery(this).attr('Id') == currentClass) {
+                                chkForRemove = true;
+                            } else if (chkForRemove && jQuery(this).attr('class') != null && jQuery(this).attr('class').split(' ')[0] > level) {
+                                jQuery(this).remove();
+                            } else if (chkForRemove && jQuery(this).attr('class') != null) {
+                                return false;
+                            }
+                        });
+                        jQuery('#plus' + selectedId).css('display', 'inline');
+                        jQuery("#minus" + selectedId).css('display', 'none');
+                        PORHideLoading();
+                    })
+                    jQuery('body').on("click", "#selectAll", function(e) {
+                        var parent = jQuery(this);
+                        jQuery('input[type=checkbox]').each(function() {
+                            if (jQuery(parent).is(":checked")) {
+                                if (!jQuery(this).is(':disabled'))
+                                    jQuery(this).attr('checked', 'checked');
+                            } else {
+                                jQuery(this).removeAttr('checked');
+                            }
+                        })
+                    })
+                    jQuery('body').on("click", "input[type=checkbox]", function(g) {
+                        var primary = 'selectAll';
+                        var currentClass = jQuery(this).parent().parent().attr('Id');
+                        if (jQuery(this).parent().parent().attr('class') != null) {
+                            var className = jQuery(this).parent().parent().attr('class').split(' ');
+                            var parentName = className[1];
+                            var level = className[0];
+                        }
+                        if (jQuery(this).attr('Id') != primary && jQuery(this).is(":checked")) {
+                            var chkForRemove = false;
+                            jQuery("tr").each(function() {
+                                if (!chkForRemove && jQuery(this).attr('Id') == currentClass) {
+                                    chkForRemove = true;
+                                } else if (chkForRemove && jQuery(this).attr('class') != null && jQuery(this).attr('class').split(' ')[0] > level) {
+                                    jQuery(this).find('td input[type=checkbox]').attr("checked", "checked");
+                                } else if (chkForRemove) {
+                                    return false;
+                                }
+                            });
+                        }
+                        if (jQuery(this).attr('Id') != primary && !jQuery(this).is(":checked")) {
+                            jQuery('#selectAll').removeAttr('checked');
+                            var currentClass = jQuery(this).parent().parent().attr('Id');
+                            if (jQuery(this).parent().parent().attr('class') != null) {
+                                var className = jQuery(this).parent().parent().attr('class').split(' ');
+                                var parentName = className[1];
+                                var level = className[0];
+                            }
+                            var chkForRemove = false;
+                            jQuery("tr").each(function() {
+                                if (!chkForRemove && jQuery(this).attr('Id') == currentClass) {
+                                    chkForRemove = true;
+                                } else if (chkForRemove && jQuery(this).attr('class') != null && jQuery(this).attr('class').split(' ')[0] > level) {
+                                    jQuery(this).find('td input[type=checkbox]').removeAttr('checked');
+                                } else if (chkForRemove) {
+                                    return false;
+                                }
+                            });
+                        } else {
+                            var flagChk = true;
+                            jQuery('input[type=checkbox]').each(function() {
+                                if (jQuery(this).attr('Id') != primary && !jQuery(this).is(":checked")) {
+                                    flagChk = false;
+                                }
+                            })
+                            if (flagChk == true) {
+                                jQuery('#selectAll').attr('checked', 'checked');
+                            }
+                        }
+                    })
+                } else {
+                    jQuery('.PlusImage').live("click", function(ev) {
+                        if (jQuery(this).css('display') == 'none') {
+                            return;
+                        }
+                        jQuery(this).unbind("ev");
+                        jQuery(this).die();
+                        selectedId = (jQuery(this).attr('Id')).substring(4);
+                        var isfilterExists = jQuery(this).parent().children().first().data("filterpresent");
+                        if(isfilterExists == 'undefined')
+                            isfilterExists = false;
+                        currentLocation = jQuery(this);
+                        hitMe(selectedId,isfilterExists);
+                        ev.preventDefault();
+                        return false;
+                    })
+                    jQuery('.MinusImage').live("click", function(ev) {
+                        PORShowLoading();
+                        selectedId = (jQuery(this).attr('Id')).substring(5);
+                        var currentClass = jQuery(this).parent().parent().attr('Id');
+                        if (jQuery(this).parent().parent().attr('class') != null) {
+                            var className = jQuery(this).parent().parent().attr('class').split(' ');
+                            var parentName = className[1];
+                            var level = className[0];
+                        }
+                        var chkForRemove = false;
+                        jQuery("tr").each(function() {
+                            if (!chkForRemove && jQuery(this).attr('Id') == currentClass) {
+                                chkForRemove = true;
+                            } else if (chkForRemove && jQuery(this).attr('class') != null && jQuery(this).attr('class').split(' ')[0] > level) {
+                                jQuery(this).remove();
+                            } else if (chkForRemove && jQuery(this).attr('class') != null) {
+                                return false;
+                            }
+                        });
+                        jQuery('#plus' + selectedId).css('display', 'inline');
+                        jQuery("#minus" + selectedId).css('display', 'none');
+                        PORHideLoading();
+                    })
+                    jQuery('#selectAll').live("click", function(e) {
+                        var parent = jQuery(this);
+                        jQuery('input[type=checkbox]').each(function() {
+                            if (jQuery(parent).is(":checked")) {
+                                jQuery(this).attr('checked', 'checked');
+                            } else {
+                                jQuery(this).removeAttr('checked');
+                            }
+                        })
+                    })
+                    jQuery('input[type=checkbox]').live("click", function(g) {
+                        var primary = 'selectAll';
+                        var currentClass = jQuery(this).parent().parent().attr('Id');
+                        if (jQuery(this).parent().parent().attr('class') != null) {
+                            var className = jQuery(this).parent().parent().attr('class').split(' ');
+                            var parentName = className[1];
+                            var level = className[0];
+                        }
+                        if (jQuery(this).attr('Id') != primary && jQuery(this).is(":checked")) {
+                            var chkForRemove = false;
+                            jQuery("tr").each(function() {
+                                if (!chkForRemove && jQuery(this).attr('Id') == currentClass) {
+                                    chkForRemove = true;
+                                } else if (chkForRemove && jQuery(this).attr('class') != null && jQuery(this).attr('class').split(' ')[0] > level) {
+                                    jQuery(this).find('td input[type=checkbox]').attr("checked", "checked");
+                                } else if (chkForRemove) {
+                                    return false;
+                                }
+                            });
+                        }
+                        if (jQuery(this).attr('Id') != primary && !jQuery(this).is(":checked")) {
+                            jQuery('#selectAll').removeAttr('checked');
+                            var currentClass = jQuery(this).parent().parent().attr('Id');
+                            if (jQuery(this).parent().parent().attr('class') != null) {
+                                var className = jQuery(this).parent().parent().attr('class').split(' ');
+                                var parentName = className[1];
+                                var level = className[0];
+                            }
+    
+                            var chkForRemove = false;
+                            jQuery("tr").each(function() {
+                                if (!chkForRemove && jQuery(this).attr('Id') == currentClass) {
+                                    chkForRemove = true;
+                                } else if (chkForRemove && jQuery(this).attr('class') != null && jQuery(this).attr('class').split(' ')[0] > level) {
+    
+                                    jQuery(this).find('td input[type=checkbox]').removeAttr('checked');
+                                } else if (chkForRemove) {
+                                    return false;
+                                }
+                            });
+                        } else {
+                            var flagChk = true;
+                            jQuery('input[type=checkbox]').each(function() {
+                                if (jQuery(this).attr('Id') != primary && !jQuery(this).is(":checked")) {
+                                    flagChk = false;
+                                }
+                            })
+                            if (flagChk == true) {
+                                jQuery('#selectAll').attr('checked', 'checked');
+                            }
+                        }
+                    })
+                }
+            }
+            PORHideLoading();
+        });
+    
+        function saveFunction(){
+            var isInheritable;
+            if({!isAccount}){
+                isInheritable=jQuery('#inheritable').is(":checked");
+                
+            }
+            checkedIds = '';
+            var primary='selectAll';
+            var flgChk=false;
+            var checkForFilter = true;
+            jQuery('input[type=checkbox]').each(function(){
+                if(jQuery(this).attr('Id')!=primary && jQuery(this).is(":checked") && jQuery(this).attr('Id')!='inheritable')
+                {
+                    flgChk=true;
+                    checkedIds=checkedIds+jQuery(this).attr('Id')+";";
+                    if(jQuery(this).data("filterpresent")==false && checkForFilter)
+                        checkForFilter = false;
+                }
+            })
+            var proceed = true;
+            if(!checkForFilter && {!showFilterNecessaryMessage}){
+                var proceed = confirm('{!$Label.Filter_Not_Attached}');
+            }
+            if(flgChk && proceed){
+                if({!isContact}){
+                    if({!isContact} && !{!isContactReferenceProgramMember} && !{!isContactCandidate}){
+                        jQuery( "#dialogBoxDivCon" ).dialog({
+                            width: '400px',
+                            modal: true,
+                            resizable: false,
+                            draggable: false,
+                            buttons: [{
+                                text: "{!$Label.Candidate}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    if(!{!isAccountReferenceProgramMember} && !{!isAccountCandidate}){
+                                        jQuery( "#dialogBoxDivAccCand" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,false,true,false,true);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,false,true,false,false);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveAttri(checkedIds,isInheritable,false,true,false,false);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Member}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    if(!{!isAccountReferenceProgramMember} && !{!isAccountCandidate}){
+                                        jQuery( "#dialogBoxDivAccMem" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,true,false,true,false);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,true,false,false,false);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveAttri(checkedIds,isInheritable,true,false,false,false);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                }
+                            }]
+                        });
+                        jQuery(".ui-dialog-titlebar").hide();
+                        jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                        return false;
+                    }
+                    else if({!isContact} && !{!isContactReferenceProgramMember} && {!isContactCandidate}){
+                        jQuery( "#dialogBoxDivCon2" ).dialog({
+                            width: '400px',
+                            modal: true,
+                            resizable: false,
+                            draggable: false,
+                            buttons: [{
+                                text: "{!$Label.Candidate}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    if(!{!isAccountReferenceProgramMember} && !{!isAccountCandidate}){
+                                        jQuery( "#dialogBoxDivAccCand" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,false,true,false,true);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,false,true,false,false);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveAttri(checkedIds,isInheritable,false,true,false,false);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Member}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    if(!{!isAccountReferenceProgramMember} && !{!isAccountCandidate}){
+                                        jQuery( "#dialogBoxDivAccMem" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,true,false,true,false);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveAttri(checkedIds,isInheritable,true,false,false,false);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveAttri(checkedIds,isInheritable,true,false,false,false);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                }
+                            }]
+                        });
+                        jQuery(".ui-dialog-titlebar").hide();
+                        jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                        return false;
+                    }
+                    else {
+                        if(!{!isAccountReferenceProgramMember} && !{!isAccountCandidate}){
+                            if({!isContactReferenceProgramMember}){
+                                jQuery( "#dialogBoxDivAccMem" ).dialog({
+                                    width: '400px',
+                                    modal: true,
+                                    resizable: false,
+                                    draggable: false,
+                                    buttons: [{
+                                        text: "{!$Label.Yes}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" );
+                                            PORShowLoading();
+                                            saveAttri(checkedIds,isInheritable,false,false,true,false);
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.No}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                            PORShowLoading();
+                                            saveAttri(checkedIds,isInheritable,false,false,false,false);
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.Cancel}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                        }
+                                    }]
+                                });
+                                return false;
+                            }
+                            else {
+                                jQuery( "#dialogBoxDivAccCand" ).dialog({
+                                    width: '400px',
+                                    modal: true,
+                                    resizable: false,
+                                    draggable: false,
+                                    buttons: [{
+                                        text: "{!$Label.Yes}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" );
+                                            PORShowLoading();
+                                            saveAttri(checkedIds,isInheritable,false,false,false,true);
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.No}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                            PORShowLoading();
+                                            saveAttri(checkedIds,isInheritable,false,false,false,false);
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.Cancel}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                        }
+                                    }]
+                                });
+                                return false;
+                            }
+                        }
+                        else {
+                            PORShowLoading();
+                            saveAttri(checkedIds,isInheritable,false,false,false,false);
+                        }
+                        return false;
+                    }
+                }
+                else {
+                    if({!isAccount} && !{!isAccountReferenceProgramMember}  && !{!isAccountCandidate}){
+                        jQuery( "#dialogBoxDivAcc2" ).dialog({
+                            width: '400px',
+                            modal: true,
+                            resizable: false,
+                            draggable: false,
+                            buttons:[{
+                                text: "{!$Label.Candidate}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    PORShowLoading();
+                                    saveAttri(checkedIds,isInheritable,false,false,false,true);
+                                }
+                           },
+                           {
+                                text: "{!$Label.Member}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    PORShowLoading();
+                                    saveAttri(checkedIds,isInheritable,false,false,true,false);
+                                }
+                           },
+                           {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                }
+                            }]
+                        });
+                        jQuery(".ui-dialog-titlebar").hide();
+                        jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                        return false;
+                    }
+                    else if({!isAccount} && !{!isAccountReferenceProgramMember}  && {!isAccountCandidate}){
+                        jQuery( "#dialogBoxDivAcc" ).dialog({
+                            width: '400px',
+                            modal: true,
+                            resizable: false,
+                            draggable: false,
+                            buttons:[{
+                                text: "{!$Label.Candidate}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    PORShowLoading();
+                                    saveAttri(checkedIds,isInheritable,false,false,false,true);
+                                }
+                           },
+                           {
+                                text: "{!$Label.Member}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    PORShowLoading();
+                                    saveAttri(checkedIds,isInheritable,false,false,true,false);
+                                }
+                           },
+                           {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                }
+                            }]
+                        });
+                        jQuery(".ui-dialog-titlebar").hide();
+                        jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                        return false;
+                    }
+                    else {
+                        PORShowLoading();
+                        saveAttri(checkedIds,isInheritable,false,false,false,false);
+                    }
+                    return false;
+                }
+            }
+            else if(proceed)
+                alert('{!$Label.No_Attribute_Selected}');
+        }
+    </script>
+    
+    <style> 
+        .MinusImage,.PlusImage{
+        width:10px;
+        heigth:10px;
+        padding-top:4px;
+        }        
+        .showPlus,.showMinus{
+        
+        display:inline;
+        position:absolute;
+        }
+        .hideMinus,.hidePlus{
+        
+        display:none;
+        position:absolute;
+        }
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+        jQuery(".ui-icon ui-icon-closethick").removeAttr();
+        .ui-widget-content{
+            border : none !important;
+        }
+        .ui-widget-header{
+            background : none !important;
+            border : none !important;
+            color : black !important;
+        } 
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <apex:sectionHeader title="{!TitleName} {!$Label.Detail}" subtitle="{!$Label.T_Add_New_Attributes}" rendered="{!isFullLicenseAccessible}"/>
+    <apex:outputpanel id="errorPanel" rendered="{!isFullLicenseAccessible}">
+        <apex:pagemessages id="msgId"/>
+    </apex:outputpanel>
+    <apex:outputPanel rendered="{!isFullLicenseAccessible}">
+        <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.AttributeMappingInformation}"/>
+    </apex:outputPanel>
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="hitMe" reRender="OutputPanel"  action="{!getChildrenOfSelectedNode}" oncomplete="update();" status="myStatus">
+            <apex:param name="one" value="" assignTo="{!selectedNodeId}" />
+            <apex:param name="isfilterExistsForParent" value="" assignTo="{!isfilterExistsForParent}" />
+        </apex:actionFunction>
+        <apex:actionFunction name="deleteAttribute" action="{!deleteAttribute}" rerender="refRefreshId,errorPanel,quarantineBlock" oncomplete="PORHideLoading();">
+            <apex:param name="selectedAttrId" assignTo="{!selectedAttributeId}" value=""/>
+        </apex:actionFunction>
+        <apex:actionStatus onstart="PORShowLoading();"  onstop="PORHideLoading();" id="myStatus"/>   
+        <apex:outputPanel id="refRefreshId">
+            <apex:pageBlock rendered="{!refRefresh != null}">
+                <apex:pageblockButtons location="top">
+                    <apex:commandButton value="{!$Label.Done}" action="{!Cancel}"/>
+                </apex:pageblockButtons>
+                <apex:pageBlockSection id="AccountAttrib" rendered="{!AND(isAccount,accountAttributes.size > 0)}" title="{!$Label.T_Associated_Attributes}" columns="1">
+                    <apex:pageBlockTable value="{!accountAttributes}" var="attrib">
+                        <apex:column headerValue="{!$Label.Action}">
+                            <apex:commandLink value="{!$Label.Delete}" onclick="deleteAttribute('{!attrib.Id}');PORShowLoading();return false;" rendered="{!!attrib.refedge__Is_fromMapping__c}">
+                            </apex:commandLink>
+                        </apex:column>
+                        <apex:column headerValue="{!$Label.T_Attribute_Name}">
+                            <apex:outputLabel value="{!attrib.Attribute__r.Name}"></apex:outputLabel>
+                        </apex:column>
+                        <apex:column headerValue="{!$Label.T_Attribute_parent_Name}">
+                            <apex:outputLabel value="{!attrib.Attribute__r.Parent__r.Name}"></apex:outputLabel>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection> 
+               
+                <apex:pageBlockSection id="ContactAttrib" rendered="{!AND(isContact,contactAttributes.size > 0)}" title="{!$Label.T_Associated_Attributes}" columns="1">
+                    <apex:pageBlockTable value="{!contactAttributes}" var="attrib">
+                        <apex:column headerValue="{!$Label.Action}">
+                            <apex:commandLink value="{!$Label.Delete}" rendered="{!AND(!attrib.refedge__Is_fromMapping__c,!attrib.refedge__From_Account__c)}" onclick="deleteAttribute('{!attrib.Id}');PORShowLoading();return false;"  >
+                            </apex:commandLink>
+                        </apex:column>
+                        <apex:column headerValue="{!$Label.T_Attribute_Name}">
+                            <apex:outputLabel value="{!attrib.Attribute__r.Name}"></apex:outputLabel>
+                        </apex:column>
+                        <apex:column headerValue="{!$Label.T_Attribute_parent_Name}">
+                            <apex:outputLabel value="{!attrib.Attribute__r.Parent__r.Name}"></apex:outputLabel>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection> 
+                <apex:outputLabel value="{!$Label.No_associated_Attributes_found}" rendered="{!NOT(OR(AND(isContact,contactAttributes.size > 0),AND(isAccount,accountAttributes.size > 0)))}"/>
+            </apex:pageBlock>
+        </apex:outputPanel>
+        <apex:pageBlock id="blockId">
+            <apex:pageBlockSection title="{!$Label.T_Add_Attributes}" columns="1">
+                <div id="containerDiv">
+                    <table id="css-tree" border="1" cellspacing="0" cellpadding="0"></table>
+               </div>
+            </apex:pageBlockSection>
+            <apex:pageblockButtons >
+                <apex:commandButton value="{!$Label.Save}" onclick="saveFunction();return false;"/>
+                <apex:actionFunction name="saveAttri" action="{!Save1}" reRender="errorPanel" oncomplete="PORHideLoading();">
+                    <apex:param assignTo="{!checkedIds}" name="checkedIds" value=""/>
+                    <apex:param name="two" value="" assignTo="{!isInheritable}"/>
+                    <apex:param assignTo="{!makeContactMember}" value="" name="paramName1"/>
+                    <apex:param assignTo="{!makeContactCandidate}" value="" name="paramName2"/>
+                    <apex:param assignTo="{!makeAccountMember}" value="" name="paramName3"/>
+                    <apex:param assignTo="{!makeAccountCandidate}" value="" name="paramName4"/>
+                </apex:actionFunction>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!Cancel}"/>
+            </apex:pageblockButtons>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!AND(hasAttribRecords,refRefresh == null)}">
+            <apex:pageBlockSection id="AccountAttrib1" rendered="{!AND(isAccount,accountAttributes.size > 0)}" title="{!$Label.T_Associated_Attributes}" columns="1">
+                <apex:pageBlockTable value="{!accountAttributes}" var="attrib">
+                    <apex:column headerValue="{!$Label.T_Attribute_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.T_Attribute_parent_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Parent__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection> 
+           
+            <apex:pageBlockSection id="ContactAttrib1" rendered="{!AND(isContact,contactAttributes.size > 0)}" title="{!$Label.T_Associated_Attributes}" columns="1">
+                <apex:pageBlockTable value="{!contactAttributes}" var="attrib">
+                    <apex:column headerValue="{!$Label.T_Attribute_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.T_Attribute_parent_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Parent__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection> 
+            
+            <apex:pageBlockSection id="LabelAttrib" rendered="{!AND(isLabel,attributeLabels.size > 0)}" title="{!$Label.T_Associated_Attributes}" columns="1">
+                <apex:pageBlockTable value="{!attributeLabels}" var="attrib">
+                    <apex:column headerValue="{!$Label.T_Attribute_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.T_Attribute_parent_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Parent__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection> 
+            
+            <apex:pageBlockSection id="ContentAttrib" rendered="{!AND(isContent,contentAttribute.size > 0)}" title="{!$Label.T_Associated_Attributes}" columns="1">
+                <apex:pageBlockTable value="{!contentAttribute}" var="attrib">
+                    
+                    <apex:column headerValue="{!$Label.T_Attribute_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.T_Attribute_parent_Name}">
+                        <apex:outputLabel value="{!attrib.Attribute__r.Parent__r.Name}"></apex:outputLabel>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection> 
+            
+        </apex:pageBlock>
+        <apex:outputPanel id="quarantineBlock">
+            <apex:pageBlock rendered="{!quarantineUpdates.size >0}">
+                <apex:pageBlockSection id="quarantine" title="{!$Label.Quarantine_Updates}" columns="1">
+                    <apex:pageBlockTable value="{!quarantineUpdates}" var="quarantine">
+                        <apex:column headerValue="{!$Label.Added}">
+                            <apex:outputField value="{!quarantine.refedge__Added__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="{!$Label.Removed}">
+                            <apex:outputField value="{!quarantine.refedge__Removed__c}"/>
+                        </apex:column>
+                        <apex:column value="{!quarantine.refedge__Changed_From__c}">
+                        </apex:column>
+                        <apex:column value="{!quarantine.refedge__Changed_To__c}">
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+       </apex:outputPanel>
+        <div id="dialogBoxDiv" style="display:none;height: 60px; !important;">
+            {!JSENCODE(status)}
+        </div>
+        <div id="dialogBoxDivCon" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Contact_Member_Candidate_Message}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivCon2" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Change_Contact_Candidate_to_Member}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAcc" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Change_Account_Candidate_to_Member}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAcc2" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Account_Member_Candidate_Message}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAccMem" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Account_Member_Message}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAccCand" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Account_Candidate_Message}" escape="false"/>
+        </div>
+    </apex:form>
+</apex:page>

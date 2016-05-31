@@ -1,0 +1,104 @@
+<apex:page controller="LMSLoginController" showHeader="true" sidebar="true">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript"> 
+        $.noConflict(); 
+    
+        jQuery(document).ready(function() {
+            initPage();
+        });
+    
+        function initPage(){
+            if (jQuery('#lmsSSOForm').length > 0){
+                // We have a user, all is hunky dory, rock it
+                jQuery('#lmsSSOForm').submit();
+            } else if (document.getElementById('{!$Component.provisionUserForm}') != null) {
+                // We may need to provision a user
+                if (jQuery('#shouldProvision').val() == 'true') {
+                    // Yup, we indeed need to kick it off
+                    provisionUser(); 
+                }
+            }
+        }
+    
+        function checkSuccess(){
+            if (jQuery("#error").val() == 'false'){
+                location.reload();
+            }
+        }
+    </script>
+    <style>
+        .pbTitle {
+            display: none;
+        }
+    </style>
+    <body>
+        <div style="padding:50px; magin-left:auto; margin-right:auto; text-align:center; font-weight:bold">
+            <apex:outputText id="createForms">
+                <apex:outputText rendered="{! NOT(shouldProvisionUser) && NOT(provisioningUser) && ISNULL(errorMessage) && NOT(caseCreated) && (hasTrack) }">
+                    <form id="lmsSSOForm" action="{!$Label.Red_Hat_LMS_URL}app/SYS_login.aspx" method="POST">
+                        <div style="font-size: 1.5em;">{!$Label.Routing_to_LMS}</div>
+                        <div><br/><img src="/resource/Throbber"/></div>
+                        <input type="hidden" name="RtUserID" id="RtUserID" value="{!ssoUsername}"/>
+                        <input type="hidden" name="time_stamp" id="time_stamp" value="{!Timestamp}"/>
+                        <input type="hidden" name="auth_token" id="auth_token" value="{!AuthToken}"/>
+                        <input type="hidden" name="RU" id="RU" value="{!ReturnURL}"/>
+                    </form>
+                </apex:outputText>
+                <apex:outputText id="provisionStatus" rendered="{! NOT(caseCreated) && (shouldProvisionUser || provisioningUser || NOT(ISNULL(errorMessage))) && (hasTrack) }">
+                    <apex:outputText id="resultsArea">
+                        <apex:form id="provisionUserForm">
+                            <apex:pageBlock >
+                                <apex:pageBlockButtons location="bottom">
+                                    <apex:commandButton rendered="{!NOT(ISNULL(errorMessage))}" value="{!$Label.LMS_Create_Case_Button_Label}" action="{!createLMSDownCase}"/>
+                                </apex:pageBlockButtons>
+                                <apex:pageMessages />
+                                <apex:outputText rendered="{!ISNULL(errorMessage) && shouldProvisionUser}">
+                                    <div style="font-size: 1.5em;">{!$Label.Provisioning_LMS_User}</div>
+                                    <div><br/><img src="/resource/Throbber"/></div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!NOT(ISNULL(errorMessage))}">
+                                    <div style="color:red; font-size: 1.5em;" id="errorMessage">{!$Label.LMS_Error_Provisioning_User}</div>
+                                    <br/>
+                                    <div>{!$Label.LMS_Want_to_Create_Case}</div>
+                                    <div>{!$Label.LMS_Provide_steps_to_reproduce}</div>
+                                    <br/>
+                                    <apex:inputHidden id="hidErrorMessage" value="{!errorMessage}"/>
+                                    <apex:inputTextarea rows="5" cols="100" id="stepsToReproduce" value="{!stepsToReproduce}"/>
+                                    <br/><br/>
+                                </apex:outputText>
+                                <input type="hidden" id="shouldProvision" name="shouldProvision" value="{!shouldProvisionUser}"/>
+                                <input type="hidden" id="provisioning" name="provisioning" value="{!provisioningUser}"/>
+                                <input type="hidden" id="error" name="error" value="{!NOT(ISNULL(errorMessage))}"/>
+                            </apex:pageBlock>
+                            <apex:actionFunction name="provisionUser" action="{!provisionUser}" reRender="provisionUserForm" timeout="120000" oncomplete="window.setTimeout(checkSuccess, 2000);"/>
+                        </apex:form>
+                    </apex:outputText>
+                </apex:outputText>
+                <apex:outputText rendered="{! caseCreated || NOT(hasTrack)}">
+                    <apex:pageBlock >
+                        <div style="padding:20px;">
+                            <apex:outputText id="caseCreated" rendered="{! caseCreated }">
+                                <div>
+                                    {!$Label.LMS_Access_Case_Created_Thank_You}
+                                    <input type="hidden" id="caseId" name="caseId" value="{!caseId}"/>
+                                </div>
+                            </apex:outputText>
+                            <apex:outputText id="hasNoTrack" rendered="{! NOT(hasTrack) }">
+                                <apex:outputText id="hasNoTrackPartner" rendered="{! isPartnerUser }">
+                                    <div style="color:red; font-size: 1.4em;" id="errorMessage">{!$Label.LMS_No_User_Track}</div>
+                                    <br/>
+                                    <div><a href="/apex/Manage_Track">{!$Label.LMS_Select_Track_Link}</a></div>
+                                </apex:outputText>
+                                <apex:outputText id="hasNoTrackInternal" rendered="{! NOT(isPartnerUser) }">
+                                    <div style="color:red; font-size: 1.4em;" id="errorMessageIntenral">{!$Label.LMS_No_Channel_Role}</div>
+                                    <br/>
+                                    <div><a href="/{! me.Id }?noredirect=1">{!$Label.LMS_Go_To_User}</a> &nbsp;|&nbsp; <a href="/setup/ui/recordtypeselect.jsp?ent=Case&retURL=%2F500%2Fo">{!$Label.LMS_Create_A_Case}</a>.</div>
+                                </apex:outputText>
+                            </apex:outputText>
+                        </div>
+                    </apex:pageBlock>
+                </apex:outputText>
+            </apex:outputText>
+        </div>
+    </body>
+</apex:page>

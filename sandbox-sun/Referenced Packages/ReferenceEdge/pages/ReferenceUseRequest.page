@@ -1,0 +1,584 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.ReferenceUseRequest" id="pageId" sidebar="false" tabStyle="RE_Search__tab">
+    
+    <!-- Add CSS-->
+    <apex:outputPanel id="Scripts">
+        <!-- Add JavaScript & Jquery-->
+        <c:POR_ModalLoader id="PORLoader"/>
+        <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+        <style type="text/css">
+            .helpText{
+                    z-index: 1005 !important;
+            }
+            
+            .pbSubheader{
+                background-image : none !important;
+                color: white  !important;
+            }
+            body .bPageBlock .pbBody .pbSubheader{
+                color: white  !important;
+            }
+            .requiredLegend{
+                color: white !important;
+            }
+            .datePicker{z-index : 9999;}  
+            .ui-dialog-titlebar,.ui-widget-header {background-color:#79B4CD; border: 1px solid #79B4CD !important;}
+            .locationError { color: blue; font-weight: strong;}
+        </style>
+    </apex:outputPanel>
+        
+    <script  type="text/javascript">
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        var clickedAccountId = '';
+        var radioOptions = '';
+        var noOfSelectedRecords = 0 ;
+        var oldReferenceabilityName='';
+        var recordCount='';
+        var recordCountNos='';
+        var totalRecordCount='';
+        var isMsgRender = false; 
+        var radioSelect = '';
+        var totalRequest;
+        jQuery(document).ready(function(){
+            var selectObj = document.getElementById('pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall');
+            selectObj.checked = true;
+            checkAll(selectObj, {!selectedAccounts.size});
+            settingNoOfSelectedRecordsAndbg();
+        });
+        
+        function openModal(accId, clickedEleId, oldReferenceability,unspCount, refDays, requestRecordsSize){
+            var editedId = clickedEleId.substring(0, clickedEleId.length-1);
+            document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:refNeededId:selectRefType').value = oldReferenceability;
+            document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:selectDeadlineId').value = (document.getElementById(editedId+'2').innerHTML != 'Click here' ? document.getElementById(editedId+'2').innerHTML : '');
+            document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:notesId:reqNotesId').value = document.getElementById(editedId+'3').innerHTML;
+            
+            oldReferenceabilityName = oldReferenceability;
+            recordCount = unspCount;
+            if(requestRecordsSize == 1){
+                noOfSelectedRecords = 1;
+            }
+            var ele = document.getElementById("pageId:fromId:reqRefUsepbId:modalPbId:radioPbsId:selectedRadioId:1");
+            jQuery("label[for='pageId:fromId:reqRefUsepbId:modalPbId:radioPbsId:selectedRadioId:1']").text("All "+ noOfSelectedRecords +" Selected Records") ; 
+            var firstRadioEle = document.getElementById("pageId:fromId:reqRefUsepbId:modalPbId:radioPbsId:selectedRadioId:0");
+            jQuery(firstRadioEle).attr('checked', true);
+            clickedAccountId = accId;
+            // calculating element id of checkbox of record clicked
+            var len = clickedEleId.length - 4 ;
+            var subStr = clickedEleId.substring(0, len)+'singleselect';
+            var chkbox = document.getElementById(subStr);
+            if(requestRecordsSize > 1){
+                if(noOfSelectedRecords != 0 && chkbox.checked) {
+                    jQuery("#dialogBoxDiv").dialog({
+                        height    : 320,
+                        width     : 600,
+                        modal     : true,
+                        resizable : false,                 
+                    });
+                }else {
+                    alert('{!$Label.select_this_record}');
+                    return false;
+                }
+            }else{
+                jQuery("#dialogBoxDiv").dialog({
+                    height    : 320,
+                    width     : 600,
+                    modal     : true,
+                    resizable : false,                 
+                });
+                var secondRadioElement = document.getElementById("pageId:fromId:reqRefUsepbId:modalPbId:radioPbsId:selectedRadioId:1");
+                jQuery(secondRadioElement).attr('disabled', true);
+            }
+            var id = 'pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:selectDeadlineId' ;
+            var ele = document.getElementById(id) ; 
+            jQuery(ele).removeAttr('onfocus');
+            jQuery("input[title='Deadline']").click(function(e) {
+                DatePicker.pickDate(true, jQuery(this).attr("id"), false);
+                jQuery('.datePicker').removeAttr('style');
+                var l = Math.ceil((jQuery(this).offset()).left) - 10;
+                var r = Math.ceil((jQuery(this).offset()).top) - 90;
+                jQuery('.datePicker').css('display','block').css('left',l+'px').css('top',r+'px');
+                e.stopPropagation();
+            });
+            var errId = 'pageId:fromId:reqRefUsepbId:modalPbId:pmsg' ;
+            var errEle = document.getElementById(errId);
+            var defaultDate = '{!JSENCODE(defaultDate)}';
+            if(document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:selectDeadlineId').value == ''){
+                document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:selectDeadlineId').value = defaultDate;
+            }
+            var deadlineMsg = '{!$Label.Min_deadline_days}';
+            document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:minDeadline').innerHTML = deadlineMsg.replace('@@@', refDays);
+            jQuery(errEle).hide();
+        } 
+        
+        function closeModal(source){
+            checkTheCheckBoxes();
+            if(!isMsgRender && (source=="save") || (source=="cancel") ) {
+              
+                jQuery('input[type="checkbox"]:checked').each(function() {
+                    if(this.id != 'pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall') {
+                        setBackground(true, this);
+                    }
+                });
+                  jQuery("#dialogBoxDiv").dialog( "destroy" );
+            }
+            if(isMsgRender && source=="save") {
+                jQuery('input[type="checkbox"]:checked').each(function() {
+                    if(this.id != 'pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall') {
+                        setBackground(true, this);
+                    }
+                });
+                jQuery("#dialogBoxDiv").css('height',390);
+            }       
+        }
+        
+        function checkTheCheckBoxes(){
+            var accountsSize=document.getElementById('pageId:fromId:reqRefUsepbId:reqDetailId:reqDetailItemId:reqDetailSelectId').value;
+            var recordCounts=totalRecordCount.split(',');
+            var flagForCheck = false;
+            for(var i=0; i < accountsSize; i++){
+                flagForCheck = false;
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect";
+                for(var j=0;j<recordCounts.length;j++){
+                    if(parseInt(document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":recorCountId").value)==parseInt(recordCounts[j])){
+                        document.getElementById(id).checked=true;
+                        flagForCheck = true;
+                    }
+                }
+                if(!flagForCheck)
+                    document.getElementById(id).checked=false;
+                    
+            }
+            var isAllselect = true;
+            for(var i=0; i < accountsSize; i++) {
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect"; // generating key for each checkbox
+                /* if atlealst one checkbox is not checked */
+                if(!document.getElementById(id).checked ) {
+                    isAllselect = false ;
+                    break ;  //loop will break if atlest one check box is not checked 
+                }
+            }
+                
+            if(isAllselect && (accountsSize!=0)) {
+                document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall").checked = true;
+            }
+            else{
+                document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall").checked = false;
+            }
+        }
+        
+        function massUpdateAccounts(){
+            var referenceUseNeeded = document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:refNeededId:selectRefType').value;
+            var deadline = document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:selectDeadlineId').value;
+            var referenceNotes = document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:notesId:reqNotesId').value;
+            radioSelect = '';
+            /*for(i = 0; i < radioOptions.length; i++) 
+            if(radioOptions [i].checked) {
+                radioSelect = radioOptions[i].value;
+            }
+            if(radioSelect!='The Record Clicked'){*/
+                recordCountNos='';
+                var accountsSize=document.getElementById('pageId:fromId:reqRefUsepbId:reqDetailId:reqDetailItemId:reqDetailSelectId').value;
+                var tempArray=totalRecordCount.split(',');
+                for(var i=0;i<tempArray.length;i++){
+                    recordCountNos=recordCountNos+tempArray[i]+',';
+                }
+                recordCountNos=recordCountNos.substr(0,(recordCountNos.length-1)); 
+            /*}
+            else{
+                recordCountNos='';
+                recordCountNos=recordCount;
+            } */   
+            updateAccounts(referenceUseNeeded, deadline, referenceNotes, clickedAccountId, radioSelect,oldReferenceabilityName,recordCountNos);
+        }
+        
+        //this method is Use for Checked for all Chekboxes
+        function checkAll(cb, size){
+            totalRecordCount='';             
+            for(var i=0; i < size; i++) {
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+ i +":singleselect"; // generating key for each checkbox
+                document.getElementById(id).checked = cb.checked;
+                if(cb.checked)
+                    totalRecordCount=totalRecordCount+document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":recorCountId").value+',';
+                var ele = document.getElementById(id) ;
+                setBackground(cb.checked, ele);
+            }
+            if(cb.checked) {
+                noOfSelectedRecords = size;
+            } else {
+                noOfSelectedRecords = 0 ;
+            }
+        }
+        
+        //this method is called on click of checkbox if all check boxes are selected than selectAll checkbox will be checked
+        function selectOrDeselectAll(cb, size) {
+            var selectAllid = document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall");
+            //if select all checkbox is chechked 
+            if(document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall").checked) {  
+                document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall").checked = cb.checked;
+            } else {
+                var isAllselect = true;
+                for(var i=0; i < size; i++) {
+                    var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect"; // generating key for each checkbox
+                    /* if atlealst one checkbox is not checked */
+                    if(!document.getElementById(id).checked ) {
+                        isAllselect = false ;
+                        break ;  //loop will break if atlest one check box is not checked 
+                    }
+                }
+                if(isAllselect) {
+                    document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall").checked = true;
+                }
+            }
+            totalRecordCount='';
+            for(var i=0; i < size; i++) {
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect"; // generating key for each checkbox
+                /* if atlealst one checkbox is not checked */
+                if(document.getElementById(id).checked ) {
+                    totalRecordCount=totalRecordCount+document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":recorCountId").value+',';
+                    
+                }
+            }
+            var CheckedOrUnchecked = cb.checked ;     
+            setBackground(CheckedOrUnchecked,cb);
+            if(cb.checked) {
+                noOfSelectedRecords ++;
+            } else {
+                noOfSelectedRecords -- ;
+            }
+        }
+        
+        function validateSelection(size){
+            var hasChecked = false;
+            if (size <= 0){
+                alert('{!$Label.submit_atleast_one_request}');
+                return false;
+            }
+            PORShowLoading();
+            /*var ids2 ='' ;
+            for(var i=0; i < size; i++) {
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect"; 
+                var id2 = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":selectsingleHidden";
+                if(document.getElementById(id).checked ) {
+                    if(ids2 == '') {
+                        ids2 = document.getElementById(id2).value ;
+                    } else {
+                        ids2 = ids2+','+document.getElementById(id2).value ;
+                    }
+                }
+            }          
+            bind(ids2);*/
+            
+        }
+        
+        function setBackground(CheckedOrUnchecked, ele) {
+            if(CheckedOrUnchecked == true) {
+                //ele.closest('tr').css("background-color","#e3f3ff");
+                ele.closest('tr').children[4].style.backgroundColor = '#e3f3ff';
+                if(ele.closest('tr').children[5].innerHTML == '')
+                    ele.closest('tr').children[5].innerHTML = 'Click here';
+                ele.closest('tr').children[5].style.backgroundColor = '#e3f3ff';
+            }else {
+                ele.closest('tr').children[4].style.backgroundColor = '#FFFFFF';
+                ele.closest('tr').children[5].style.backgroundColor = '#FFFFFF';
+                if(ele.closest('tr').children[5].innerHTML == 'Click here')
+                    ele.closest('tr').children[5].innerHTML = '';
+            }
+        } 
+        
+        function settingNoOfSelectedRecordsAndbg() {
+            //checkTheCheckBoxes();
+            noOfSelectedRecords = 0 ;
+            jQuery('input[type="checkbox"]:checked').each(function() { 
+                totalRecordCount='';
+                if(this.id != 'pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:selectall') {
+                    noOfSelectedRecords ++ ;
+                    setBackground(true, this);
+                }
+            });
+            var accountsSize=document.getElementById('pageId:fromId:reqRefUsepbId:reqDetailId:reqDetailItemId:reqDetailSelectId').value;
+            for(var i=0; i < accountsSize; i++) {
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect"; 
+                if(document.getElementById(id).checked ) {
+                    totalRecordCount=totalRecordCount+document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":recorCountId").value+',';
+                }
+            }
+            PORHideLoading();
+        }
+        
+        function ChkaddNewAccount(currCount){
+            PORShowLoading();
+            var accsize=document.getElementById("accuntSize").value;
+            if(parseInt(accsize)>currCount){
+                document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:reqDetailItemId:reqDetailSelectId").value=accsize;
+                alert('{!$Label.Remove_Unneeded_functionality}');
+                PORHideLoading();
+            }
+            else
+                addNewAccount(currCount);
+        }
+        function removeAccountFromList(accId,UnspDelAccCount){
+            totalRecordCount = '';
+            var accountsSize=document.getElementById('pageId:fromId:reqRefUsepbId:reqDetailId:reqDetailItemId:reqDetailSelectId').value;
+            for(var i=0; i < accountsSize; i++) {
+                var id = "pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":singleselect"; 
+                if(document.getElementById(id).checked ) {
+                    totalRecordCount=totalRecordCount+document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:pbtAccount:"+i+":recorCountId").value+',';
+                }
+            }
+            deleteAccountFromList(accId,UnspDelAccCount);
+        }
+        
+    </script>
+    <apex:outputPanel id="resetDeadLine">
+        <script>
+            function setDeadline(){
+                document.getElementById('pageId:fromId:reqRefUsepbId:modalPbId:modalPbbId:deadlineId:selectDeadlineId').value = '{!JSENCODE(refDeadline)}';
+            }
+        </script>
+    </apex:outputPanel>
+    <!-- Message -->
+    <apex:pageMessages id="msgId"/>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="fromId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction name="addNewAccount" immediate="true"  oncomplete="checkTheCheckBoxes();settingNoOfSelectedRecordsAndbg();"  action="{!addAccounts}" reRender="msgId,reqDetailId,pbtAccount,reqRefUsepbId,Scripts">
+            <apex:param name="noOfaccounts" value="" assignTo="{!noOFAccounts}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="deleteAccountFromList" immediate="true" action="{!removeAccountFromList}" oncomplete="PORHideLoading();checkTheCheckBoxes();settingNoOfSelectedRecordsAndbg();" reRender="msgId,reqDetailId,genInfoId,genNote,additionalinfoId,reqRefUsepbId" >
+            <apex:param name="accountToRemove" value="" assignTo="{!accountIdToRemoveFromList}" />
+            <apex:param name="recordCount" value="" assignTo="{!unspecifiefAccDelCount}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="updateAccounts"  immediate="true" action="{!selectAndUpdate}" oncomplete="closeModal('save');" reRender="genNote,reqDetailId, pmsg, genInfoId, additionalinfoId,refId">
+            <apex:param name="p1" assignTo="{!param1}" value="" />
+            <apex:param name="p2" assignTo="{!param2}" value="" />
+            <apex:param name="p3" assignTo="{!param3}" value="" />
+            <apex:param name="p4" assignTo="{!param4}" value="" />
+            <apex:param name="p5" assignTo="{!selectedValue}" value="" />
+            <apex:param name="p6" assignTo="{!oldReferenceability}" value=""/>
+            <apex:param name="p7" assignTo="{!recordCounts}" value=""/>
+        </apex:actionFunction>  
+        <apex:actionFunction name="changeMinimumDeadline" action="{!changeMinimumDeadline}" onComplete="setDeadline();"  status="status" reRender="msgId,resetDeadLine,minDeadline">
+            <apex:param name="param" assignTo="{!referenceType}" value=""/>
+        </apex:actionFunction> 
+        <!-- Page  Block-->
+        <apex:pageBlock id="submittedId"  rendered="{!isSubmitted}">
+            <apex:pageMessage summary="{!$Label.Request_submitted}" severity="INFO" strength="3" /> 
+            <apex:commandButton value="{!$Label.Back_to_Opportunity}" action="{!returnOpportunity}" rendered="{!NOT(ISBLANK(opportunityId))}"/> 
+            <apex:commandButton value="{!$Label.Back_to_Case}" action="{!returnCase}" rendered="{!NOT(ISBLANK(caseId))}"/> 
+            <apex:commandButton value="{!$Label.Back_to_RF_Search}" action="{!returnOpportunity}" rendered="{!AND(ISBLANK(opportunityId),ISBLANK(caseId))}"/> 
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="{!$Label.Request_Reference_Use}" id="reqRefUsepbId"  mode="Edit" rendered="{!NOT(isSubmitted)}">
+            <!-- Command Buttons Page Block Section-->
+            <apex:pageBlockButtons id="refReqPpbId">
+                <apex:commandButton value="{!$Label.Submit_Request}" onClick="validateSelection({!selectedAccounts.size});" action="{!submitRequest}" id="submitBtnId" reRender="fromId,msgId" oncomplete="PORHideLoading();"/>
+                <apex:commandButton value="{!$Label.Cancel}" immediate="true" action="{!cancelRequest}" id="cancelBtnId"/>
+                <span style="float:right;"> 
+                    <a target="_blank" href="{!URLFOR($Resource.RFSearchHelp,'ReferenceRequestUse.html')}"><img class="helpOrb" src="/s.gif"/> </a>
+                </span>
+            </apex:pageBlockButtons>
+            
+            <!-- Opportunity Details Page  Block Section-->
+            <apex:pageBlockSection title="{!$Label.Opportunity_Information}" id="opInfopbsId" rendered="{!IF(ISBLANK(opportunityId), false,true)}">
+                <apex:outputField value="{!opportunity.AccountId}" label="{!$Label.Opportunity_Account}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Opportunity_Name}" for="oppName"/>
+                    <apex:outputLink value="/{!opportunity.Id}" id="oppName">
+                        <apex:outputText value="{!opportunity.Name}"/>
+                    </apex:outputLink>
+                </apex:pageBlockSectionItem>               
+            </apex:pageBlockSection>
+            <!-- Case Details Page  Block Section-->
+            <apex:pageBlockSection title="{!$Label.Case_Information}" id="caseInfopbsId" rendered="{!IF(ISBLANK(caseId), false,true)}">
+                <apex:outputField value="{!caseObj.AccountId}" label="{!$Label.Case_Account}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.CaseNumber.Label}" for="caseNo"/>
+                    <apex:outputLink value="/{!caseObj.Id}" id="caseNo">
+                        <apex:outputText value="{!caseObj.CaseNumber}"/>
+                    </apex:outputLink>
+                </apex:pageBlockSectionItem>               
+            </apex:pageBlockSection>
+            <!-- Account & Request Details Page  Block Section-->
+            <apex:pageBlockSection title="{!$Label.Request_Details}" id="reqDetailId"  columns="1">
+                <apex:pageBlockSectionItem id="reqDetailItemId">
+                    <apex:outputLabel value="{!$Label.References_Needed}"/>
+                    <apex:selectList value="{!noOFAccounts}"  size="1" id="reqDetailSelectId" onchange="ChkaddNewAccount(this.value)">
+                        <apex:selectOptions value="{!Accounts}"/>
+                    </apex:selectList> 
+                </apex:pageBlockSectionItem>     
+                <input type="Hidden" value="{!selectedAccounts.size}" id="accuntSize"/> 
+                <Script>
+                    document.getElementById("pageId:fromId:reqRefUsepbId:reqDetailId:reqDetailItemId:reqDetailSelectId").value={!JSENCODE(noOFAccounts)};
+                    isMsgRender = {!isMessageRender} ; 
+                </Script>
+                <apex:outputPanel rendered="{!selectedAccounts.size > 0}">
+                    <apex:pageBlockTable value="{!selectedAccounts}" var="selAccWrap" id="pbtAccount">
+                        <apex:column style="width:50px;" id="headerFooterId">
+                            <!-- Header-->
+                            <apex:facet name="header">
+                                <apex:inputCheckBox id="selectall" onclick="checkAll(this, {!selectedAccounts.size})"/>
+                            </apex:facet>
+                            <!-- Inner Check Boxes with Records-->
+                            <apex:inputCheckBox id="singleselect" value="{!selAccWrap.isSelected}" onclick="selectOrDeselectAll(this, {!selectedAccounts.size})"/>
+                            <apex:inputhidden value="{!selAccWrap.acc.Id}" id="selectsingleHidden"/>
+                            <apex:inputhidden value="{!selAccWrap.recordCount}" id="recorCountId"/>
+                        </apex:column> 
+                        <apex:column style="width:150px;" headerValue="{!$Label.Action}" >
+                            <apex:commandLink value="{!$Label.Delete}" onclick="PORShowLoading();removeAccountFromList('{!JSENCODE(selAccWrap.acc.Account__r.id)}',{!selAccWrap.recordCount}); return false;"/>
+                        </apex:column>
+                        <apex:column style="width:200px;" headerValue="{!$Label.Account_Requested}">
+                            <apex:outputText value="{!selAccWrap.Accountname}" rendered="{!selAccWrap.Accountname != 'Unspecified'}"/>
+                            <apex:outputText value="{!selAccWrap.unspecifiedLabel}" rendered="{!selAccWrap.Accountname == 'Unspecified'}"/>
+                        </apex:column>
+                        <apex:column style="width:200px;" headervalue="{!$Label.Owner}" > 
+                            <apex:outputField value="{!selAccWrap.acc.refedge__Reference_Owner__c}" rendered="{!IF(selAccWrap.acc.refedge__Reference_Owner__c != NULL, true, false)}"/>
+                            <apex:outputField value="{!selAccWrap.acc.Account__r.OwnerId}" rendered="{!AND(IF(selAccWrap.acc.refedge__Reference_Owner__c == NULL, true, false),selAccWrap.acc.refedge__Account__c != NULL)}"/>
+                        </apex:column>
+                        <apex:column style="{!IF(AND(isDeadlineRefBlank,selAccWrap.referenceType == ''), 'width:200px;background-color: rgb(250, 176, 176) !important;','width:200px;')}" value="{!referTypeNameId[selAccWrap.referenceType]}" id="prm1" onclick="openModal('{!JSENCODE(selAccWrap.acc.Account__r.id)}', '{!JSENCODE($Component.prm1)}','{!JSENCODE(selAccWrap.referenceType)}',{!selAccWrap.recordCount}, {!JSENCODE(refTypeDeadlineMap[selAccWrap.referenceType])}, {!selectedAccounts.size});">
+                            <apex:facet name="header"><div class="requiredInput"><div class="requiredBlock"></div>{!$Label.Reference_Type_Needed}</div></apex:facet>
+                        </apex:column>
+                        <apex:column style="{!IF(AND(isDeadlineRefBlank,selAccWrap.deadLineDate == ''), 'width:200px;background-color: rgb(250, 176, 176) !important;','width:200px;')}" value="{!selAccWrap.deadLineDate}" id="prm2" onclick="openModal('{!JSENCODE(selAccWrap.acc.Account__r.id)}', '{!JSENCODE($Component.prm2)}','{!JSENCODE(selAccWrap.referenceType)}',{!selAccWrap.recordCount},{!JSENCODE(refTypeDeadlineMap[selAccWrap.referenceType])}, {!selectedAccounts.size});">
+                            <apex:facet name="header"><div class="requiredInput"><div class="requiredBlock"></div>{!$Label.Deadline}</div></apex:facet>
+                        </apex:column>
+                        <apex:column style="width:200px;" headervalue="{!$Label.Request_Notes}" value="{!selAccWrap.notes}" id="prm3" onclick="openModal('{!JSENCODE(selAccWrap.acc.Account__r.id)}','{!JSENCODE($Component.prm3)}','{!JSENCODE(selAccWrap.referenceType)}',{!selAccWrap.recordCount}, {!JSENCODE(refTypeDeadlineMap[selAccWrap.referenceType])}, {!selectedAccounts.size});"/>
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!NOT(selectedAccounts.size > 0)}">
+                    <apex:pageMessage summary="{!$Label.Reference_Use_Request_select_Account}" strength="3" severity="Info"/>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="genNote">
+                <apex:outputLabel value="{!genNotes}"  rendered="{!showGenNotes}"/>
+            </apex:pageBlockSection>    
+            
+            <!-- General information-->
+            <apex:outputPanel id="genInfoId" >
+                <apex:pageBlockSection title="{!$Label.General_information}" columns="1" rendered="{!AND(isGenInfoDisplay, refUseAttr.AttributeLabels.size > 0)}">                 
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >&nbsp;</apex:outputLabel>
+                        <apex:commandLink style="color:#1797C0"  action="{!selectRefUseAttr}" value="{!$Label.Select_And_Edit}" id="theCommandLink"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:repeat value="{!refUseAttr.AttributeLabels}" var="label">
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel >{!label.Name} <apex:outputText style="color : #CC0000;" value="{!IF(refUseAttr.mapRequiredLabel[label.Id],' | ','')}"/> </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:variable value="0" var="rowOrder"/>
+                                <apex:repeat value="{!refUseAttr.mapAttributesLabels[label]}" var="attr">
+                                <apex:outputText rendered="{!VALUE(rowOrder) > 0}">, </apex:outputText> {!attr.attributeLabel.Attribute__r.Name} 
+                                <apex:variable value="{!VALUE(rowOrder)+1}" var="rowOrder"/>
+                                </apex:repeat>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                    </apex:repeat>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            <apex:outputPanel id="additionalinfoId" >
+                <apex:repeat value="{!referNamesOfFields}" var="refId"  >
+                    <apex:pageBlockSection title="{!SUBSTITUTE($Label.Additional_Information, '@@@', referTypeNameId[refId])}">
+                        <apex:outputLabel >{!mapReferenceType[refId].Note__c}</apex:outputLabel>
+                        <apex:outputLabel value=""/>
+                        <apex:repeat value="{!additionalFieldsInfo[refId]}" var="addObj">
+                            <apex:repeat value="{!referNamesOfFields[refId]}" var="fieldInfo">
+                                <apex:pageblockSectionItem rendered="{!AND(fieldInfo.Visible__c,fieldInfo.Required__c)}">
+                                    <apex:outputLabel value="{!$ObjectType.refedge__Reference_Request_Additional_Info__c.fields[fieldInfo.Name].label}" />
+                                    <apex:outputPanel layout="block" styleClass="requiredInput" >
+                                    <div class="requiredBlock"></div>
+                                        <apex:inputField value="{!addObj[fieldInfo.Name]}" />
+                                    </apex:outputPanel>
+                                </apex:pageblockSectionItem>
+                                <apex:inputField rendered="{!AND(fieldInfo.Visible__c,NOT(fieldInfo.Required__c))}" value="{!addObj[fieldInfo.Name]}"/> 
+                            </apex:repeat>
+                        </apex:repeat>
+                    </apex:pageBlockSection> 
+                </apex:repeat>
+            </apex:outputPanel>
+            <!-- Div of Modal box-->
+            <div id="dialogBoxDiv" title="{!$Label.Edit}" style="display:none;">
+                <div class = "waitingSearchDiv" id = "el_loading" style="display:none;"> 
+                    <div class = "waitingHolder">
+                        <img class = "waitingImage" src = "/img/loading32.gif" title = "{!$Label.Please_Wait}" />
+                        <span class = "waitingDescription">{!$Label.Loading}</span>
+                    </div>
+                </div>  
+                
+                <apex:pageBlock id="modalPbId">
+                    <apex:pageMessages id="pmsg"/>
+                    
+                    <apex:pageBlockSection columns="1" id="modalPbbId">
+                        <apex:pageBlockSectionItem id="refNeededId">
+                            <apex:outputLabel value="{!$Label.Reference_Type_Needed}" />
+                            <apex:outputPanel styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                                <apex:selectList size="1" value="{!referenceType}" onChange="changeMinimumDeadline(this.value);" id="selectRefType" style="width:250px">
+                                    <apex:param value="this.oldValue" assignTo="{!oldReferenceability}" name="previousValue" />
+                                    <apex:selectOptions value="{!referenceabilityTypes}"/>
+                                </apex:selectList>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem id="deadlineId">
+                            <apex:outputLabel value="{!$Label.Deadline}" />
+                            <apex:outputPanel styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                                <apex:inputText title="{!$Label.Deadline}" value="{!deadline}" id="selectDeadlineId" />   
+                                <apex:outputLabel id="minDeadline" value="{!minDeadlineLabel}" /> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem id="notesId" helpText="{!$Label.Request_Notes_helpText}">
+                            <apex:outputLabel value="{!$Label.Request_Notes}"/> 
+                            <apex:inputtextArea Title="{!$Label.Notes}" value="{!notes}" id="reqNotesId" style="width: 257px;height: 89px;"/>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                    <!-- 
+                    <apex:pageBlockSection columns="1" id="radioPbsId">
+                        <apex:selectRadio id="selectedRadioId" layout="pagedirection" label="{!$Label.Apply_changes_to}" value="{!selectedValue}">
+                            <apex:selectOption itemValue="The Record Clicked" itemLabel="{!$Label.The_Record_Clicked}" />
+                            <apex:selectOption itemValue="All Selected Records" itemLabel="{!$Label.All_Selected_Records}"/>
+                        </apex:selectRadio>
+                        <script>
+                            radioOptions = document.getElementsByName('{!JSENCODE($Component.selectedRadioId)}');
+                        </script>
+                    </apex:pageBlockSection>
+                     -->
+                    <apex:pageBlockButtons location="bottom">
+                        <apex:commandButton value="{!$Label.Save}" onclick="massUpdateAccounts();return false;" />
+                        <apex:commandButton value="{!$Label.Cancel}" onclick="closeModal('cancel');return false;" />
+                    </apex:pageBlockButtons>   
+                    <apex:actionstatus id="status" >
+                        <apex:facet name="start" >
+                            <div class = "waitingSearchDiv" id = "el_loading" > 
+                                <div class = "waitingHolder" >
+                                    <img class = "waitingImage" src = "/resource/1447657355000/{!nameSpace}LoaderSpinner" width="60" height="60"/>
+                                </div>
+                            </div>
+                        </apex:facet>
+                    </apex:actionstatus>     
+                     
+                </apex:pageBlock>
+            </div> 
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

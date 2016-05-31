@@ -1,0 +1,35 @@
+<apex:page controller="PDFReportController"
+    showHeader="false"
+    sidebar="false"
+    showChat="false"
+    id="report"
+    renderAs="pdf"
+    applyBodyTag="false"
+    standardStylesheets="false">
+    <head>
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/zen-componentsCompatible.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/zen-componentsCompatible.css -->
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/elements.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/elements.css -->
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/common.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/common.css -->
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dStandard.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dStandard.css" />
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom0.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom0.css" />
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom1.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom1.css" />
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom2.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom2.css" />
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/extended.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/extended.css -->
+      <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/setup.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/setup.css -->
+      <apex:stylesheet value="{!urlfor($Resource.Reports, '/Reports.css')}"/>
+      <style> 
+        body { font-family: 'Arial Unicode MS'; font-size: 8.5pt; }
+        .companyName { font: bold 30px; color: red; }
+         @page { size:landscape; }
+      </style>
+    </head>
+    <body>
+      <!-- apex:sectionHeader title="{!$CurrentPage.parameters.Title}" subtitle="{!$CurrentPage.parameters.SubTitle}"/ -->
+      <apex:pageBlock >
+        <div class="bGeneratedReport" id="generatedReport">
+          <apex:outputText escape="false" value="{!innerHTML}"/>
+        </div>
+        <apex:pageMessages id="pageMessages"/>
+      </apex:pageBlock>
+    </body>
+</apex:page>

@@ -1,0 +1,24 @@
+<apex:page controller="CommunitiesFeaturedHeadlinesController" standardStylesheets="false" showHeader="false" sidebar="false">
+    <head>
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerRegResources, 'partnerRegResources/partner-reg-header-styles.css')}" />
+    </head>
+
+    <div id="headlineDiv">
+        <span id="{!LEFT(headline.id,15)}">
+            <apex:outputPanel id="buttonDiv" rendered="{!headline.Include_Button__c}">
+                <span id="headlineTextWithButton">
+                    <i class="fa fa-exclamation-triangle"></i>{!headline.Communities_Featured_Headline_Labels__r[0].Headline_Label__c}
+                </span>
+                <a href="{!headline.Button_URL__c}" class="uppercase btn ease" target="_blank"> {!headline.Communities_Featured_Headline_Labels__r[0].Button_Label__c} </a>
+                <span id="headline-with-button">
+
+                </span>
+            </apex:outputPanel>
+            <apex:outputPanel id="text-only-div" rendered="{!!headline.Include_Button__c}">
+                <span id="headlineText">
+                    <i class="fa fa-exclamation-triangle"></i>{!headline.Communities_Featured_Headline_Labels__r[0].Headline_Label__c}
+                </span>
+            </apex:outputPanel>
+        </span>
+    </div>
+</apex:page>

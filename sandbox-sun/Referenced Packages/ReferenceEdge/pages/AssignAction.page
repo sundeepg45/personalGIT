@@ -1,0 +1,101 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+ <apex:page Controller="refedge.AssignActionController" sidebar="false" tabStyle="refedge__Hit_List__c">
+    <!-- Add JavaScript & Jquery-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessages id="msgId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}"/>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction name="Cancel" action="{!cancel}" reRender="msgId"/>
+        <apex:pageBlock id="pbId">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Assign}" action="{!assignHitRecord}"/>
+                <apex:commandButton value="{!$Label.Cancel}" onclick="Cancel();return false;"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!allAccountReq}" var="reqWrap" id="specPbtRequest">
+                <apex:column id="actionId" headerValue="{!$Label.Action}">
+                    <apex:inputCheckbox disabled="{!Or(AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable'),AND(reqWrap.isUR,reqWrap.unspec.refedge__Specified_Account__c != Null),AND(NOT(reqWrap.isUR),OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed',reqWrap.rra.refedge__Account_Request_Status__c == 'Completed',CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'))))}" value="{!reqWrap.isSelected}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Type}">
+                     <apex:outputPanel id="typePanel" rendered="{!OR(reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable'))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr});return false;">
+                    <apex:outputField id="typePanelField" value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!!(reqWrap.isUR)}">
+                    </apex:outputField>
+                    <apex:outputField value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!(reqWrap.isUR)}">
+                    </apex:outputField>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                     <a href="#" style="pointer-events: none; color : grey;">{!reqWrap.rra.Reference_Type_Needed__r.Name}</a>
+                    </apex:outputPanel>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Account}" >
+                    <apex:outputField value="{!reqWrap.rra.refedge__Account__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                       <apex:outputPanel id="editLinkDisableOp2" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                       <a href="#" style="pointer-events: none; color : grey;">{!reqWrap.rra.Account__r.Name}</a>
+                   </apex:outputPanel>
+                    <apex:outputText value="" rendered="{!(reqWrap.isUR)}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Deadline}">
+                    <apex:outputField value="{!reqWrap.rra.refedge__Deadline__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                         <apex:outputText style="color : grey;" value="{!TEXT(MONTH(reqWrap.rra.refedge__Deadline__c))+'/'+TEXT(DAY(reqWrap.rra.refedge__Deadline__c))+'/'+TEXT(YEAR(reqWrap.rra.refedge__Deadline__c))}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                    <apex:outputField value="{!reqWrap.unSpec.refedge__Deadline__c}" rendered="{!(reqWrap.isUR)}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Process}">
+                    <apex:outputPanel Id="processId" onclick="processMessage('{!JSENCODE(reqWrap.Id)}',true);return false;" rendered="{!NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}">
+                        <apex:outputText id="processText" value="{!reqWrap.processStatus}" rendered="{!reqWrap.processStatus == 'Managed'}"/>
+                        <apex:outputField Id="inlineProcessId" value="{!reqWrap.rra.refedge__Process__c}" rendered="{!reqWrap.processStatus != 'Managed'}">
+                        </apex:outputField>
+                    </apex:outputpanel>
+                    <apex:outputPanel rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}">
+                        <apex:outputText style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'color : grey;', '')}" value="{!reqWrap.processStatus}"/>
+                    </apex:outputPanel>
+                 </apex:column>
+                 <apex:column headerValue="{!$Label.Status}">
+                     <apex:outputPanel id="statusPanel" rendered="{!OR(reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable'))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr});return false;">
+                         <apex:outputField id="ArstatusField" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!!(reqWrap.isUR)}"/>
+                         <apex:outputField id="UrstatusField" value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!(reqWrap.isUR)}"/>
+                     </apex:outputPanel>
+                     <apex:outputPanel rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                          <apex:outputField value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                          <apex:outputText style="color : grey;" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                     </apex:outputPanel>
+                 </apex:column>
+                 <apex:column headerValue="{!$Label.Project_Owner}">
+                      <apex:outputPanel id="ownerPanel" rendered="{!OR(reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable'))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,true,{!reqWrap.isUr});return false;">                           
+                          <apex:outputField id="ownerField" value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!!(reqWrap.isUR)}"/>
+                          <apex:outputField value="{!reqWrap.unSpec.refedge__Project_Owner__c}" rendered="{!(reqWrap.isUR)}"/>
+                      </apex:outputPanel>
+                      <apex:outputPanel rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                          <apex:outputField value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                          <apex:outputText style="color : grey;" value="{!reqWrap.rra.Project_Owner__r.Name}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                      </apex:outputPanel>
+                 </apex:column>
+                 <apex:column headerValue="{!$Label.Notes}" >
+                     <apex:outputpanel rendered="{!!(reqWrap.isUR)}">
+                         <a href="/{!reqWrap.rra.Id}" style="{!IF(reqWrap.rra.Account_Request_Status__c == 'Unavailable', 'pointer-events: none; color : grey;', '')}" id="{!reqWrap.rra.Id}" onblur="LookupHoverDetail.getHover('{!reqWrap.rra.Id}').hide();" onfocus="LookupHoverDetail.getHover('{!reqWrap.rra.Id}', '/{!reqWrap.rra.Id}/m?retURL=%2F{!reqWrap.rra.Id}&isAjaxRequest=1').show();" onmouseout="LookupHoverDetail.getHover('{!reqWrap.rra.Id}').hide();" onmouseover="LookupHoverDetail.getHover('{!reqWrap.rra.Id}', '/{!reqWrap.rra.Id}/m?retURL=%2F{!reqWrap.rra.Id}&isAjaxRequest=1').show();">{!$Label.Note}</a>
+                     </apex:outputpanel>
+                      <apex:outputpanel rendered="{!(reqWrap.isUR)}">
+                         <a href="/{!reqWrap.unSpec.Id}" id="{!reqWrap.unSpec.Id}" onblur="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}').hide();" onfocus="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}', '/{!reqWrap.unSpec.Id}/m?retURL=%2F{!reqWrap.unSpec.Id}&isAjaxRequest=1').show();" onmouseout="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}').hide();" onmouseover="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}', '/{!reqWrap.unSpec.Id}/m?retURL=%2F{!reqWrap.unSpec.Id}&isAjaxRequest=1').show();">{!$Label.Note}</a>
+                     </apex:outputpanel>
+                 </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

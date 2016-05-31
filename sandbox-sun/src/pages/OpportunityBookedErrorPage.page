@@ -1,0 +1,3 @@
+<apex:page standardController="Opportunity_Header_Staging__c" extensions="OpportunityBookedErrorClass" showHeader="false" sidebar="false"  action="{!showErrorMessage}">
+    <apex:pageMessages />
+</apex:page>

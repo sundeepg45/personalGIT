@@ -1,0 +1,109 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page showHeader="false" sidebar="false" controller="refedge.InvitationContactsLookupController" id="pgLookup" cache="true">
+    <apex:pageMessages id="pgMsg"/>
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <!-- Script-->
+    <script>
+        PORShowLoading();
+        //return value to the calling window
+        window.returnValue = null;
+        var returnedArray = new Array();
+        function callParent(conIds, EmailIds) {
+            
+            // Get the user agent string
+            var deviceAgent = navigator.userAgent;
+            var ios = deviceAgent.toLowerCase().match(/(iphone|ipod|ipad)/);
+            var winMain = window.opener;
+            if (null == winMain){
+                winMain = window.parent.opener;
+            }
+            winMain.closePopup(conIds, EmailIds);  
+        }
+        
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <apex:form id="frmLookup" style="margin-left:1%" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader id="shLookup" title="{!$Label.Lookup}"/>
+        <apex:outputPanel id="opSearch" >
+            <apex:inputText id="firstName" value="{!searchText}" html-placeholder="{!$Label.Search}..."/>&nbsp; 
+            <apex:commandButton id="btnGo" value="{!$Label.Go}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" action="{!search}" reRender="pgMsg,pbLookup, opMessage"/>
+            <apex:commandButton value="{!$Label.New}" action="{!createNewContact}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"  reRender="pgMsg,pbLookup, opMessage"/>
+            <br />
+            <apex:outputLabel value="{!$Label.Lookup_search_message}" />
+            <br />
+            <br />
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="opMessage" >
+            <apex:outputLabel style="color:red;" value="{!$Label.Search_maximun_rows_message}"  rendered="{!contactListWrapper.size > 200}"/>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="pbLookup">
+            <apex:pageBlock mode="edit" rendered="{!NOT(isNewContact)}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="{!$Label.Save}" action="{!setEmailIds}" oncomplete="javascript:callParent('{!JSENCODE(selectedConIds)}','{!JSENCODE(selectedEmailIds)}');return false;"/>
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection columns="1">
+                    
+                    <apex:pageBlockTable rendered="{!contactListWrapper.size >0}" value="{!contactListWrapper}" var="subItem">
+                        <apex:column >
+                            <apex:inputCheckbox value="{!subItem.isSelected}" />
+                        </apex:column>
+                        <apex:column headervalue="{!$Label.Contact_Name}">
+                            <apex:outputField value="{!subItem.contact.Name}" />
+                        </apex:column>
+                        <apex:column headervalue="{!$Label.Email_Id}">
+                            <apex:outputField value="{!subItem.contact.Email}" />
+                        </apex:column>
+                    </apex:pageBlockTable>
+                    
+                    <apex:pageBlockSectionItem rendered="{!contactListWrapper.size = 0}" >
+                        <apex:outputLabel style="color:red;" value="{!$Label.No_Records_Found}"></apex:outputLabel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection> 
+            </apex:pageBlock>
+            <apex:pageBlock rendered="{!isNewContact}">
+                <apex:pageBlockButtons location="bottom">
+                    <apex:commandButton value="{!$Label.Save}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"  action="{!saveNewContact}" reRender="pgMsg,pbLookup, opSearch"/>
+                    <apex:commandButton value="{!$Label.Cancel}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"  action="{!cancelNewContact}" immediate="true" reRender="pgMsg,pbLookup"/>
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!newContact.FirstName}"/>
+                    <apex:inputField value="{!newContact.LastName}"/>
+                    <apex:inputField value="{!newContact.Email}" required="true"/>
+                    <apex:inputField value="{!newContact.Phone}"/>
+                    <apex:inputField value="{!newContact.Birthdate}"/>
+                    <apex:inputField value="{!newContact.Fax}"/>
+                    <apex:inputField required="true" value="{!newContact.AccountId}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:outputPanel>
+        
+        <script>
+            jQuery(".pageTitleIcon").attr("src","{!URLFOR($Resource.refedge__RESearchFilterIcons, 'search-icon.png')}");
+            jQuery("body .bPageTitle .ptBody h1.noSecondHeader").attr("style","font-weight:bold");
+        </script>
+    </apex:form>
+</apex:page>

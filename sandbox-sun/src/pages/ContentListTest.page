@@ -1,0 +1,8 @@
+<apex:page >
+<youtube>QRwtcfaQnBM</youtube>
+  <!-- Begin Default Content REMOVE THIS -->
+  <h1>Congratulations</h1>
+<iframe width="400" height="200" src="http://www.youtube.com/embed/SI30vK-D6L4" frameborder="0" allowfullscreen="true" scale="showall"></iframe>
+  This is your new Page
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

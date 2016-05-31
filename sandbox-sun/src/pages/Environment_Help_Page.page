@@ -1,0 +1,53 @@
+<apex:page id="EnvironmentHelpPage" showHeader="false" sidebar="false" showChat="false" readOnly="true">
+<apex:pageBlock >
+<center><font size="5">Environment Help</font></center>
+<br></br> 
+<b>Planning:</b>
+<br></br> 
+To document this Account Infrastructure Profile, first identify how many 
+distinct environments exist for this account. Consider multiple locations, multiple sectors, 
+or divisions to be covered by this account. Enter any infrastructure facts for this specific account 
+only (unless the sales rep or sales manager directs otherwise).
+<br></br><br></br>
+<b>Creating Environments:</b>
+<br></br> 
+Next, determine which environments have similar attributes (such as hardware, software) that you can combine 
+into one environment. Otherwise, enter each environment separately.
+<br></br><br></br>
+<b>Naming the individual environments:</b>
+<br></br>
+Plan a naming convention for the different profiles. Recommended: Name the 
+environment with the internal name that the account uses for that infrastructure area. 
+Example: Environment name _location_SA last name.
+<br></br><br></br>
+<font size="3">Section Information</font>
+<dl>
+<dt>Hardware Installed</dt>
+<dd>- Enter details on current hardware platforms that the account uses.</dd>
+<br></br>
+<dt>Storage Components</dt>
+<dd>- Enter details on enterprise storage components that the account uses.</dd>
+<br></br>
+<dt>Virtualization Environment</dt>
+<dd>- Enter details on virtualization products used by this account.</dd>
+<br></br>
+<dt>Strategic OS Choice</dt>
+<dd>- Enter details on the strategic operating systems used by this account.</dd>
+<br></br>
+<dt>Application Servers</dt>
+<dd>- Enter details on applications servers, such as Community, Websphere, or Weblogic.</dd>
+<br></br>
+<dt>Additional Middleware</dt>
+<dd>- Enter details on additional Middleware components used at this account. Examples are Rules Engine, Messaging, ESB, or Portal.</dd>
+<br></br>
+<dt>Point Solutions Applications</dt>
+<dd>- Enter information on software applications used by this account. Consider multiple locations, sectors, or divisions on the account. Examples are Web Presence, B2B, Booking System, Warehouse platform, or trading platform.</dd>
+<br></br>
+<dt>Strategic Platforms</dt>
+<dd>- Enter strategic third party software companies, major relationships involved, or large major application deployments with this account.</dd>
+<br></br>
+<dt>Cloud Plans</dt>
+<dd>- Enter where cloud is currently used by this account. Be sure to capture IaaS and PaaS platforms and software components that are currently being used.</dd>
+</dl>
+</apex:pageBlock>
+</apex:page>

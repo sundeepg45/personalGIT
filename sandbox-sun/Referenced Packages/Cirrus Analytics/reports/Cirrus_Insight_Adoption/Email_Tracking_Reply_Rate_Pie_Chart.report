@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <aggregates>
+        <calculatedFormula>(Activity.Reply_Received__c:SUM / RowCount) * 100</calculatedFormula>
+        <datatype>number</datatype>
+        <developerName>FORMULA1</developerName>
+        <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
+        <masterLabel>Reply Rate %</masterLabel>
+        <scale>1</scale>
+    </aggregates>
+    <aggregates>
+        <calculatedFormula>(Activity.Email_Opened__c:SUM / RowCount) * 100</calculatedFormula>
+        <datatype>number</datatype>
+        <developerName>FORMULA2</developerName>
+        <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
+        <masterLabel>Open Rate %</masterLabel>
+        <scale>1</scale>
+    </aggregates>
+    <aggregates>
+        <calculatedFormula>RowCount</calculatedFormula>
+        <datatype>number</datatype>
+        <developerName>FORMULA3</developerName>
+        <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
+        <masterLabel># of Tracked Emails</masterLabel>
+        <scale>0</scale>
+    </aggregates>
+    <buckets>
+        <bucketType>text</bucketType>
+        <developerName>BucketField_21581359</developerName>
+        <masterLabel>Day Email Sent</masterLabel>
+        <nullTreatment>n</nullTreatment>
+        <sourceColumnName>Activity.Day_Activity_Created__c</sourceColumnName>
+        <useOther>false</useOther>
+        <values>
+            <sourceValues>
+                <sourceValue>1 Sunday</sourceValue>
+            </sourceValues>
+            <value>1 Sunday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>2 Monday</sourceValue>
+            </sourceValues>
+            <value>2 Monday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>3 Tuesday</sourceValue>
+            </sourceValues>
+            <value>3 Tuesday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>4 Wednesday</sourceValue>
+            </sourceValues>
+            <value>4 Wednesday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>5 Thursday</sourceValue>
+            </sourceValues>
+            <value>5 Thursday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>6 Friday</sourceValue>
+            </sourceValues>
+            <value>6 Friday</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>7 Saturday</sourceValue>
+            </sourceValues>
+            <value>7 Saturday</value>
+        </values>
+    </buckets>
+    <chart>
+        <backgroundColor1>#FFFFFF</backgroundColor1>
+        <backgroundColor2>#FFFFFF</backgroundColor2>
+        <backgroundFadeDir>Diagonal</backgroundFadeDir>
+        <chartSummaries>
+            <axisBinding>y</axisBinding>
+            <column>FORMULA3</column>
+        </chartSummaries>
+        <chartType>Pie</chartType>
+        <enableHoverLabels>true</enableHoverLabels>
+        <expandOthers>true</expandOthers>
+        <groupingColumn>Activity.Reply_Received__c</groupingColumn>
+        <legendPosition>Right</legendPosition>
+        <location>CHART_TOP</location>
+        <showAxisLabels>false</showAxisLabels>
+        <showPercentage>true</showPercentage>
+        <showTotal>false</showTotal>
+        <showValues>false</showValues>
+        <size>Medium</size>
+        <summaryAxisRange>Auto</summaryAxisRange>
+        <textColor>#000000</textColor>
+        <textSize>12</textSize>
+        <titleColor>#000000</titleColor>
+        <titleSize>18</titleSize>
+    </chart>
+    <columns>
+        <field>SUBJECT</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Sum</aggregateTypes>
+        <field>Activity.Email_Opened__c</field>
+    </columns>
+    <filter>
+        <criteriaItems>
+            <column>Activity.isTracked__c</column>
+            <operator>equals</operator>
+            <value>1</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Activity.Reply_Received__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Week</dateGranularity>
+        <field>CREATED_DATE</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>BucketField_21581359</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Email Tracking Reply Rate Pie Chart</name>
+    <params>
+        <name>closed</name>
+        <value>closed</value>
+    </params>
+    <params>
+        <name>type</name>
+        <value>t</value>
+    </params>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Activity</reportType>
+    <scope>organization</scope>
+    <showDetails>false</showDetails>
+    <timeFrameFilter>
+        <dateColumn>CREATED_DATE</dateColumn>
+        <interval>INTERVAL_LAST30</interval>
+    </timeFrameFilter>
+</Report>

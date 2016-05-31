@@ -1,0 +1,18 @@
+<apex:page standardController="Account"  extensions="PartnerViewController,Account_ControllerExtension" cache="false" readOnly="true">
+    <c:UserRecordAccessFilter record="{!Id}" readAccess="true">
+        <script type="text/javascript">
+            var url='/{!Id}?nooverride=1';
+            try {
+                top.window.location.replace(url);
+            }
+            catch(e) {
+                top.window.location = url;
+            }
+        </script>
+    </c:UserRecordAccessFilter>
+    <c:UserRecordAccessFilter record="{!Id}" readAccess="true" showWithAccess="false">
+        <apex:pageMessage summary="You should contact the owner of this Account if you need further access." severity="info" strength="2"/> 
+        <apex:pageMessages />
+        <apex:detail relatedList="true" relatedListHover="true" subject="{!AccountReadOnlyId}" inlineEdit="false" showChatter="true" oncomplete="location.reload();" rendered="{!NOT(ISBLANK(AccountReadOnlyId))}"/>
+    </c:UserRecordAccessFilter>
+</apex:page>

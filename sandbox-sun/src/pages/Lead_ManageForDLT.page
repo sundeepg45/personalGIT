@@ -1,0 +1,180 @@
+<apex:page controller="Lead_ManageForDLT" tabStyle="Lead" contentType="{!IF(ISBLANK(exportData),'','text/csv')}">
+    <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(exportData))}">{!exportData}</apex:outputPanel>
+
+    <apex:outputPanel id="pbWrapper" layout="none" rendered="{!AND(ISBLANK(exportData))}">
+        <apex:sectionHeader title="{!$ObjectType.Lead.LabelPlural}" subtitle="Manage Import & Export (DLT Solutions)" />
+
+        <apex:pageMessages />
+
+        <apex:form id="pbExportForm">
+            <apex:pageBlock title="Export Leads" mode="Edit">
+                <apex:pageBlockButtons location="top">
+                    <apex:commandButton value="Export {!leadListPrefetchSize} Leads" action="{!exportDocument}" disabled="{!leadListPrefetchSize == 0}" />
+
+                    <apex:actionStatus id="exportStatus">
+                        <apex:facet name="start">
+                            <apex:image value="/img/loading.gif" />
+                        </apex:facet>
+                    </apex:actionStatus>
+
+                    <apex:outputPanel layout="block" style="float: right;">
+                        <apex:outputText value="Preview?" />
+                        <apex:inputCheckbox value="{!exportPreview}" disabled="{!leadListPrefetchSize == 1000}">
+                            <apex:actionSupport event="onchange" rerender="pbWrapper" status="exportStatus" />
+                        </apex:inputCheckbox>
+                    </apex:outputPanel>
+                </apex:pageBlockButtons>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputText value="{!$ObjectType.Lead.Fields.LeadSourceDetail__c.Label}" />
+                        </apex:outputPanel>
+
+                        <apex:outputPanel >
+                            <apex:inputText value="{!exportLeadSource}">
+                                <apex:actionSupport event="onchange" action="{!refreshLeadList}" rerender="pbWrapper" status="exportStatus" />
+                            </apex:inputText>
+                            <apex:outputPanel layout="block" style="font-size: 90%; font-style: italic; padding-bottom: 0.5em;">
+                                Exact match by default. Wildcards (* or %) are supported.
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="2">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputText value="{!$ObjectType.Lead.Fields.CreatedDate.Label}" />
+                        </apex:outputPanel>
+
+                        <apex:outputPanel >
+                            <apex:inputField value="{!exportCreatedMin.ActivityDate}">
+                                <apex:actionSupport event="onchange" action="{!refreshLeadList}" rerender="pbWrapper" status="exportStatus" />
+                            </apex:inputField>
+                            <apex:outputText value=" Start" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputText value="{!$ObjectType.Lead.Fields.LastModifiedDate.Label}" />
+                        </apex:outputPanel>
+
+                        <apex:outputPanel >
+                            <apex:inputField value="{!exportLastModifiedMin.ActivityDate}">
+                                <apex:actionSupport event="onchange" action="{!refreshLeadList}" rerender="pbWrapper" status="exportStatus" />
+                            </apex:inputField>
+                            <apex:outputText value=" Start" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputText >
+                                <!-- No label -->
+                            </apex:outputText>
+                        </apex:outputPanel>
+
+                        <apex:outputPanel >
+                            <apex:inputField value="{!exportCreatedMax.ActivityDate}">
+                                <apex:actionSupport event="onchange" action="{!refreshLeadList}" rerender="pbWrapper" status="exportStatus" />
+                            </apex:inputField>
+                            <apex:outputText value=" End" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputText >
+                                <!-- No label -->
+                            </apex:outputText>
+                        </apex:outputPanel>
+
+                        <apex:outputPanel >
+                            <apex:inputField value="{!exportLastModifiedMax.ActivityDate}">
+                                <apex:actionSupport event="onchange" action="{!refreshLeadList}" rerender="pbWrapper" status="exportStatus" />
+                            </apex:inputField>
+                            <apex:outputText value=" End" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1" title="Preview Exported Leads ({!leadListPrefetchSize} total)" rendered="{!exportPreview}">
+                    <apex:outputPanel style="font-size: 90%">
+                        <apex:pageBlockTable id="exportPreview" value="{!leadList}" var="leadItem" rendered="{!leadListPrefetchSize != 0}">
+                            <apex:column value="{!leadItem.Company}" />
+                            <apex:column value="{!leadItem.FirstName}" />
+                            <apex:column value="{!leadItem.LastName}" />
+                            <apex:column value="{!leadItem.CreatedDate}" />
+                            <apex:column value="{!leadItem.LastModifiedDate}" />
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!leadListPrefetchSize == 0}">No records to display.</apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:form>
+
+        <apex:form id="pbImportForm">
+            <apex:pageBlock title="Import Leads" mode="Edit">
+                <apex:pageBlockButtons location="top">
+                    <apex:commandButton value="Import" action="{!importDocument}" />
+                </apex:pageBlockButtons>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <apex:outputText value="{!$ObjectType.Document.Fields.Name.Label}" />
+                        </apex:outputPanel>
+
+                        <apex:outputPanel >
+                            <apex:inputFile value="{!importAttachment.Body}" filename="{!importAttachment.Name}" contentType="text/csv" accept="csv" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1" title="Import Failures ({!importFailureListSize} of {!importListSize})" rendered="{!importFailureListSize != 0}">
+                    <apex:outputPanel style="font-size: 90%;">
+                        <apex:pageBlockTable value="{!importFailureList}" var="leadItem">
+                            <apex:column headerClass="booleanColumn" styleClass="booleanColumn" width="15">
+                                <apex:facet name="header" />
+                                <apex:image value="/img/msg_icons/error16.png" />
+                            </apex:column>
+
+                            <apex:column value="{!leadItem.Id}" />
+                            <apex:column value="{!leadItem.Company}" />
+                            <apex:column value="{!leadItem.FirstName}" />
+                            <apex:column value="{!leadItem.LastName}" />
+
+                            <apex:column >
+                                <apex:facet name="header">Status</apex:facet>
+                                <apex:outputText value="{!leadItem.Description}" style="color: red;" />
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1" title="Import Successes ({!importSuccessListSize} of {!importListSize})" rendered="{!importSuccessListSize != 0}">
+                    <apex:outputPanel style="font-size: 90%">
+                        <apex:pageBlockTable value="{!importSuccessList}" var="leadItem">
+                            <apex:column headerClass="booleanColumn" styleClass="booleanColumn" width="15">
+                                <apex:facet name="header" />
+                                <apex:image value="/img/msg_icons/confirm16.png" />
+                            </apex:column>
+
+                            <apex:column value="{!leadItem.Id}" />
+                            <apex:column value="{!leadItem.Company}" />
+                            <apex:column value="{!leadItem.FirstName}" />
+                            <apex:column value="{!leadItem.LastName}" />
+
+                            <apex:column >
+                                <apex:facet name="header">Status</apex:facet>
+                                <apex:outputText value="Updated" />
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:form>
+    </apex:outputPanel>
+</apex:page>

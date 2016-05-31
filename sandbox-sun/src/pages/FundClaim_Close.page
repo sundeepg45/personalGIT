@@ -1,0 +1,1 @@
+<apex:page standardController="SFDC_MDF_Claim__c" extensions="FundClaim_Close" action="{!upsertClosedClaim}" />

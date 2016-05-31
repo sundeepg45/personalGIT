@@ -1,0 +1,620 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId"   controller="refedge.MicrositePreviewController"  sideBar="false" showHeader="false" docType="html-5.0" >
+    <apex:pageMessages id="pgmsgId"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/rateit.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/jquery-1.10.2.js')}"/> 
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/jquery.rateit.js')}"/> 
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/bootstrap.js')}"/> 
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+    <!--  <apex:includeScript value="{!URLFOR($Resource.BootstrapFiles,'collapse.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Jplayer, 'Jplayer/css/jplayer.blue.monday.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Jplayer, 'Jplayer/js/jquery.jplayer.min.js')}"/> -->
+    
+    
+    <style>
+        .Center span table tbody tr td div img{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .Center{
+            display:block;
+        }
+        .pbSubheader
+            {
+                background-image : none !important;
+            }
+            .datePicker{z-index : 9999;}  
+            .ui-dialog-titlebar,.ui-widget-header {background-color:#79B4CD; border: 1px solid #79B4CD !important;}
+            .locationError { color: blue; font-weight: strong;}
+            .ImageClass table tbody tr td .sfdc_richtext img{
+                width:100px;
+                height:100px;
+            }
+            
+            span.interviewClass span.interviewClass1 div.ContentDetailsClass  div.imageDiv span.imagePanelClass span table tbody tr td div.sfdc_richtext img{
+                width:100px;
+                height:100px;
+            }
+            .boxclose:before {
+                content: "?";
+            }
+             a.boxclose{
+                float:right;
+                cursor:pointer;
+                color: #fff;
+                border: 1px solid #AEAEAE;
+                border-radius: 30px;
+                background: #605F61;
+                font-size: 31px;
+                font-weight: bold;
+                display: inline-block;
+                line-height: 0px;
+                padding: 11px 3px;       
+            }
+            .dialogButtonClass{
+                margin-left: 3px !important;
+                margin-right: 3px !important;
+                color: #333 !important;
+                border: 1px solid #b5b5b5 !important;
+                border-bottom-color: #7f7f7f !important;
+                background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+                font-weight: bold !important;
+                font-size: .9em !important;
+                -moz-border-radius: 3px !important;
+                -webkit-border-radius: 3px !important;
+                border-radius: 3px !important;
+             }
+             
+            .ui-button-text-only .ui-button-text {
+               padding: .2em 1em !important;
+            }
+    </style>
+    
+    <apex:outputPanel id="downloadContentPanel">
+        <script>
+            var url='';
+            var contentVersionId = '';
+            //Method to download or open Content
+            function downloadContent(refContentId, contentId){
+                var fileType='';
+                // jQuery("#dialogBoxDiv").dialog( "destroy" );
+                var contentUrl='';
+                contentVersionId = contentId;
+                jsUpdateInvitationContent(refContentId);
+            }
+            function CheckForCustomRefContentDiv(){
+
+                if('{!JSENCODE(ContentTypeId)}' == '' || '{!JSENCODE(ContentTypeId)}' == null){
+                    newPage();
+                }
+
+                if('{!JSENCODE(ContentTypeId)}' != '' && '{!JSENCODE(ContentTypeId)}' != null){
+                    if('{!JSENCODE(FileType)}' == 'LINK'){
+                        if ('{!JSENCODE(contentUrl)}'.indexOf("http://")>=0 || '{!JSENCODE(contentUrl)}'.indexOf("https://") >=0){ 
+                            window.open('','_blank').location.href = '{!JSENCODE(contentUrl)}';
+                        }
+                        else{
+                            window.open('','_blank').location.href = 'http://'+'{!JSENCODE(contentUrl)}';
+                        }
+                    }
+                    else if('{!JSENCODE(FileType)}' != 'LINK'){
+                        var contentId = '{!JSENCODE(ContentTypeId)}';
+                        window.open('','_self').location.href = '{!JSENCODE(downloadSiteUrl)}'+contentId;
+                    }
+              }
+            }
+            function downloadTranscript(transcriptId){
+                if(transcriptId != ''){
+                    window.open('','_blank').location.href='{!JSENCODE(downloadSiteUrl)}'+transcriptId;
+                }
+            }
+            //save rating
+            function saveRating(value,refId){
+                var rateValue = jQuery('#'+refId).rateit('value');
+                jsSaveRating(rateValue,refId);  
+            }
+            function openSite(siteUrl){
+                if(siteUrl != '' && siteUrl != null){
+                    if (siteUrl.indexOf("http://")>=0 || siteUrl.indexOf("https://") >=0){ 
+                        window.open('','_blank').location.href = siteUrl;
+                    }
+                    else{
+                        window.open('','_blank').location.href = 'http://'+siteUrl;
+                    }
+                }
+            }
+        </script>    
+    </apex:outputPanel>
+    <html>
+    <body style="background:{!HTMLENCODE(microsite.refedge__Page_Color__c)};">
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="jsUpdateInvitationContent" action="{!updateInvitationContent}" rerender="interviewPanel,downloadContentPanel" oncomplete="CheckForCustomRefContentDiv()">
+            <apex:param name="contentId" value="" assignTo="{!selectedRefContentId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="jsSaveRating" action="{!saveRating}" rerender="downloadContentPanel">
+            <apex:param name="rating" value="" assignTo="{!rating}"/>
+            <apex:param name="refContentId" value="" assignTo="{!refContentId}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="newPage" action="{!newPage}"/>
+
+        <apex:outputPanel styleclass="container" style="background:{!HTMLENCODE(microsite.refedge__Page_Color__c)};display:block"  >
+            <!-- Header -->
+            <div style="background:white;width:100%;margin-top: 30px;float:left;">
+               <apex:outputPanel id="bannerImgId" layout="block" style="background:white;width:100%;float:left;" rendered="{!microsite.refedge__Banner_image__c != null}">
+                   <apex:outputPanel rendered="{!microsite.refedge__Image_Alignment__c != 'Center'}" style="float:{!HTMLENCODE(microsite.refedge__Image_Alignment__c)};margin: -1px 0px -1px 0px;">
+                       <apex:outputField id="imageBannerClass" value="{!microsite.refedge__Banner_image__c}"/>
+                   </apex:outputPanel>
+                   <apex:outputPanel styleClass="Center" rendered="{!microsite.refedge__Image_Alignment__c = 'Center'}" style="margin: -1px 0px -1px 0px;">
+                       <apex:outputField id="imageBannerClass1" value="{!microsite.refedge__Banner_image__c}" />
+                   </apex:outputPanel>
+               </apex:outputPanel>
+               <apex:outputPanel id="headerCopyId" rendered="{!microsite.refedge__Header_Copy__c != null}">
+                    <div style="background:white;width:100%;float:left;padding-left: 10px;color:{!HTMLENCODE(microsite.refedge__Header_Copy_Color__c)}">
+                        <apex:outputPanel rendered="{!microsite.refedge__Header_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: {!HTMLENCODE(microsite.refedge__Header_Copy_Alignment__c)};">
+                            <apex:outputLabel value="{!microsite.refedge__Header_Copy__c}" style="font-size:{!HTMLENCODE(microsite.refedge__Header_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Header_Copy_Alignment__c)};"/> 
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!microsite.refedge__Header_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: {!HTMLENCODE(microsite.refedge__Header_Copy_Alignment__c)};">
+                            <apex:outputLabel value="{!microsite.refedge__Header_Copy__c}" style="font-size:{!HTMLENCODE(microsite.refedge__Header_Copy_Size__c)};"/> 
+                        </apex:outputPanel>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel id="subHeaderCopyId" rendered="{!microsite.refedge__Sub_header_Copy__c != null}">
+                    <div style="background:white;float:left;width:100%;padding-left: 10px;color:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Color__c)}">
+                        <apex:outputPanel rendered="{!microsite.refedge__Sub_Header_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: {!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Alignment__c)};">
+                            <apex:outputLabel value="{!microsite.refedge__Sub_header_Copy__c}" style="font-weight:normal;font-size:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Alignment__c)};"/> 
+                        </apex:outputPanel>
+                        <apex:outputpanel rendered="{!microsite.refedge__Sub_Header_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: {!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Alignment__c)};">
+                            <apex:outputLabel value="{!microsite.refedge__Sub_header_Copy__c}" style="font-weight:normal;font-size:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Size__c)};"/>
+                        </apex:outputpanel>
+                    </div>
+                </apex:outputPanel>
+            </div>
+            
+            <!-- Padding provider div -->
+            <div style="width:100%;height:20px;float:left;"></div>
+            
+            <!-- Main Div -->
+            <div class="panel-group" id="accordion" style="width:100%;cursor:pointer;float:left;background:#EAEAEA;">
+                <!-- Real Contents-->
+                <apex:repeat value="{!contentList}" var="contentWrap" rendered="{!AND(NOT(invitation.refedge__Is_Invitation_Expired__c), contentList.size > 0)}">
+                    <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                        <apex:outputPanel onClick="downloadContent('{!JSENCODE(contentWrap.contentWrpp.refContent.Id)}', '{!JSENCODE(contentWrap.contentWrpp.refContent.refedge__Content_ID__c)}' );return false;"  layout="block" style="width:100%;">
+                            <table style = "">
+                                <tr>
+                                    <td style="padding-top: 5px;padding-left: 10px;">
+                                    <apex:outputText style="font-weight:bold;COLOR:{!HTMLENCODE(microsite.refedge__Document_Title_Color__c)};" value="{!contentWrap.contentWrpp.refContent.refedge__Title__c}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 10px;">
+                                    <apex:outputLabel value="{!$Label.Type}: "  style="font-weight:bold;color:#404040;"/>
+                                    <apex:outputText value=" {!contentWrap.contentWrpp.refContent.Reference_Content_Type__r.refedge__Name__c} "/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 10px;">
+                                    <apex:outputLabel value="{!$Label.Account}: "  style="font-weight:bold;color:#404040;"/>
+                                    <apex:outputText value=" {!refContentAccounts[contentWrap.contentWrpp.refContent.Id]} "/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </apex:outputPanel>
+                        
+                        <!-- Sharing & Rating-->
+                        <div class="panel-heading" style="height:36px;background: white;">
+                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;" href="#collapseShare{!HTMLENCODE(contentWrap.contentWrpp.refContent.Id)}">
+                                <apex:image width="16px" height="16px" url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'ShareImage.gif')}" rendered="{!contentWrap.contentWrpp.refContent.refedge__Allow_Social_Sharing__c}"/>
+                                <apex:outputLabel style="cursor:pointer;COLOR:#7F7F7F;" value="{!microsite.refedge__Share_Link_Copy__c}" rendered="{!contentWrap.contentWrpp.refContent.refedge__Allow_Social_Sharing__c}"/>
+                            </a>
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseRate{!HTMLENCODE(contentWrap.contentWrpp.refContent.Id)}" style="float:right;">
+                                <apex:image width="16px" height="16px" url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'RateImage.gif')}"/>
+                                <apex:outputLabel style="cursor:pointer;COLOR:#7F7F7F;" value="{!microsite.refedge__Rate_Link_Copy__c}"/>
+                            </a>
+                        </div>
+                    
+                        <!-- Rate -->
+                        <div id="collapseRate{!contentWrap.contentWrpp.refContent.Id}" style="" class="panel-collapse collapse">
+                            <div id="rateDiv{!contentWrap.contentWrpp.refContent.Id}" class="panel-body"  style="border-top:0px;">
+                                <span class="rateit" onClick="saveRating(this.value,'{!JSENCODE(contentWrap.contentWrpp.refContent.Id)}');return false;"  style="float:right;" id="{!contentWrap.contentWrpp.refContent.Id}"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Sharing -->
+                        <div id="collapseShare{!contentWrap.contentWrpp.refContent.Id}" style="" class="panel-collapse collapse">
+                            <div class="panel-body" >
+                                
+                                <!-- link on Shared-->
+                                <apex:outputPanel onclick="javascript:window.location='mailto:?subject=Here is some interesting information&body={!URLENCODE(contentWrap.link)}'" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'mail.png')}" width="24" height="24"/>
+                                    <B>Mail</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel onclick="window.open('','_blank').location.href='https://twitter.com/intent/tweet?source=webclient&text={!URLENCODE(contentWrap.link)}'; return false;" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'twitter.png')}" width="24" height="24"/> 
+                                    <B>Twitter</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel onclick="window.open('','_blank').location.href='http://www.linkedin.com/shareArticle?mini=true&url={!URLENCODE(contentWrap.link)}&title=Here is some interesting information&summary='; return false;" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'linkedin.png')}" width="24" height="24"/>
+                                    <B>LinkedIn</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel onclick="window.open('','_blank').location.href='http://www.facebook.com/share.php?u={!URLENCODE(contentWrap.link)}&t='; return false;" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'facebook.png')}" width="24" height="24"/>
+                                    <B>Facebook</B>
+                                </apex:outputPanel>
+                                
+                                <!-- Content on Preview link on Invitation Wizard -->
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'mail.png')}" width="24" height="24"/>
+                                    <B>Mail</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'twitter.png')}" width="24" height="24"/> 
+                                    <B>Twitter</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'linkedin.png')}" width="24" height="24"/>
+                                    <B>LinkedIn</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'facebook.png')}" width="24" height="24"/>
+                                    <B>Facebook</B>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </apex:repeat>
+                
+                <!-- Dummy Content on Mircosite link on Mircosite Detail Page -->
+                <apex:variable value="{!0}" var="count"/>
+                <apex:repeat value="{!count}"  rendered="{!AND(ISNULL(selectedRefContents), ISNULL(key), count = 0)}">
+                    <apex:variable var="count" value="{!count + 1}"/>
+                    <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                        <apex:outputPanel layout="block" style="width:100%;">
+                            <table style = "">
+                                <tr>
+                                    <td style="padding-top: 5px;padding-left: 10px;">
+                                    <apex:outputText style="font-weight:bold;COLOR:{!HTMLENCODE(microsite.refedge__Document_Title_Color__c)};" value="{!$Label.Example_reference_content_title}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 10px;">
+                                    <apex:outputLabel value="{!$Label.Type}: "  style="font-weight:bold;color:#404040;"/>
+                                    <apex:outputText value=" {!$Label.Example_Content_Type}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left: 10px;">
+                                    <apex:outputLabel value="{!$Label.Account}: "  style="font-weight:bold;color:#404040;"/>
+                                    <apex:outputText value=" {!$Label.Example_Account_name}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </apex:outputPanel>
+                        
+                        <!-- Sharing & Rating-->
+                        <div class="panel-heading" style="height:36px;background: white;">
+                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;" href="#collapseShare000000000000000000">
+                                <apex:image width="16px" height="16px" url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'ShareImage.gif')}"/>
+                                <apex:outputLabel style="cursor:pointer;COLOR:#7F7F7F;" value="{!microsite.refedge__Share_Link_Copy__c}" />
+                            </a>
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseRate000000000000000000" style="float:right;">
+                                <apex:image width="16px" height="16px" url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'RateImage.gif')}"/>
+                                <apex:outputLabel style="cursor:pointer;COLOR:#7F7F7F;" value="{!microsite.refedge__Rate_Link_Copy__c}"/>
+                            </a>
+                        </div>
+                    
+                        <!-- Rate -->
+                        <div id="collapseRate000000000000000000" style="" class="panel-collapse collapse">
+                            <div id="rateDiv" class="panel-body"  style="border-top:0px;">
+                                <span class="rateit" style="float:right;"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Sharing -->
+                        <div id="collapseShare000000000000000000" style="" class="panel-collapse collapse">
+                            <div class="panel-body" >
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'mail.png')}" width="24" height="24"/>
+                                    <B>Mail</B>
+                                </apex:outputPanel>
+                                
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'twitter.png')}" width="24" height="24"/> 
+                                    <B>Twitter</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'linkedin.png')}" width="24" height="24"/>
+                                    <B>LinkedIn</B>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;">
+                                    <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'facebook.png')}" width="24" height="24"/>
+                                    <B>Facebook</B>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                </apex:repeat>
+                
+                <div style="clear:both;"></div>
+                
+                <apex:outputPanel rendered="{!invitation.refedge__Is_Invitation_Expired__c}" layout="block">
+                    <apex:pageMessage summary="{!$Label.Link_Expired}" severity="Info" strength="3" />
+                </apex:outputPanel>
+                
+                <apex:outputPanel rendered="{!AND(NOT(ISNULL(invitation)), NOT(invitation.refedge__Is_Invitation_Expired__c), contentList.size = 0)}" layout="block">
+                    <apex:pageMessage summary="{!$Label.Content_deactivated}" severity="Info" strength="3" />
+                </apex:outputPanel>
+            </div> 
+        
+            <!-- Footer-->
+        
+             <div style="float:left;width:100%;padding-left: 10px;color:{!HTMLENCODE(microsite.Footer_Copy_Color__c)}">
+                
+                 <apex:outputPanel rendered="{!microsite.refedge__Footer_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: center;">
+                     <apex:outputLabel style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Footer_Copy_Alignment__c)};" rendered="{!microsite.refedge__Footer_Link__c == NULL}" value="{!microsite.refedge__Footer_Copy__c}"/>
+                     <apex:commandLink style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Footer_Copy_Alignment__c)};" rendered="{!microsite.refedge__Footer_Link__c != NULL}" value="{!microsite.refedge__Footer_Copy__c}" onClick="openSite('{!microsite.refedge__Footer_Link__c}');return false;"/>
+                 </apex:outputPanel>
+                 <apex:outputpanel rendered="{!microsite.refedge__Footer_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: center;">
+                     <apex:outputLabel style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};" rendered="{!microsite.refedge__Footer_Link__c == NULL}" value="{!microsite.refedge__Footer_Copy__c}"/>
+                     <apex:commandLink style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};" rendered="{!microsite.refedge__Footer_Link__c != NULL}" value="{!microsite.refedge__Footer_Copy__c}" onClick="openSite('{!microsite.refedge__Footer_Link__c}');return false;"/>
+                 </apex:outputpanel>
+             </div>
+             
+        </apex:outputPanel>
+        <apex:outputPanel >
+            <script>
+                jQuery( document ).ready(function() {
+                    
+                    //jQuery('#container').hide();
+                    jQuery('.rateit').each(function(){
+                        var refId = jQuery(this).attr('id');
+                        <apex:repeat value="{!IRCRating}" var="key"> 
+                            if('{!key}' == refId){
+                                jQuery('#'+refId).rateit('value','{!IRCRating[key]}');
+                            }
+                        </apex:repeat>
+                    });
+                    
+                    //Update Invtee to remove "Cross-Site Request Forgery (CSRF)" issue from Security Review ==> Updated : 4 Jan 2014
+                    if({!isPageLoad}){
+                        jsUpdateInvitee();
+                    }
+                });
+                function showDiv(){
+                    document.getElementById('ContentDetailsDiv').style.display = 'block';
+                }
+                function hideDiv(){
+                    document.getElementById('ContentDetailsDiv').style.display = 'none';
+                }
+                function downloadTranscript(transcriptId){
+                    if(transcriptId != '' && transcriptId !='' )
+                        window.open('','_self').location.href = '{!JSENCODE(downloadSiteUrl)}'+transcriptId;
+                }
+            </script>
+        </apex:outputPanel>
+        <apex:actionFunction name="jsUpdateInvitee" action="{!updateInvitee}" rerender="pgmsgId"/>
+        <apex:actionFunction name="playTranscript" action="{!playTranscript}" rerender="pgmsgId,transcriptPlayPanel" oncomplete="JplayerPlayTranscript();">
+            <apex:param name="interviewTopicId" assignTo="{!interviewTopicId}" value=""/>
+        </apex:actionFunction>
+         <apex:outputPanel id="interviewPanel" styleClass="interviewClass">
+            <apex:outputPanel rendered="{!refInterview.size > 0}" styleClass="interviewClass1">
+                <div id="ContentDetailsDiv" class="ContentDetailsClass"  style="z-index:1003;margin:0 auto;position: absolute;top: 35%;left: 30%;display:none;background-color:white;width:400px;height:300px;">
+                    <div>
+                        <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                    </div>
+                     <div id="contentDetails" class="imageDiv" onClick="downloadTranscript('{!JSENCODE(refInterviewRecord.Transcript_Content_Id__c)}');return false;" style="background-color: #f8f8f8;overflow-y:auto;border:2px solid gray;border-radius:1px;width:100%;height:100%;">
+                        <apex:outputPanel id="imagePanel" styleClass="imagePanelClass" style="width:100%;float:left;text-align:center;">
+                            <apex:outputLabel value=""/>
+                            <apex:outputField styleclass="ImageClass" id="imageIds" value="{!refInterviewRecord.refedge__Photograph__c}" /> 
+                        </apex:outputPanel>
+                        <apex:outputPanel style="width:100%;float:left;color:blue;font-weight:bold;font-size:14px;">
+                            <apex:outputLabel value=""/>
+                            <apex:outputField value="{!refInterviewRecord.Reference_Content__r.refedge__Title__c}"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel style="width:100%;float:left;padding-top: 4%;">
+                            <apex:outputLabel value="{!$Label.Account}: "  style="font-weight:bold;color:#404040;"/>
+                            <apex:outputText value=" {!refContentAccounts[refInterviewRecord.refedge__Reference_Content__c]} "/> 
+                        </apex:outputPanel>
+                        <table style="width:100%;float:left;">
+                            <tbody style="width:100%;">
+                                <apex:repeat value="{!refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                    <tr style="width:100%;">
+                                        <td style="width:100%;border: 1px solid #ececec;">
+                                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                <apex:outputLabel style="font-weight:bold;color:#404040;" value="{!interviewTopic.refedge__Question__c}"/>
+                                            </a>
+                                            <apex:commandLink style="float:left;width:20%;" value="{!$Label.play}" rendered="{!AND(interviewTopic.refedge__Content_Id__c != null,interviewTopic.refedge__Content_Id__c!='')}" onclick="playTranscript('{!JSENCODE(interviewTopic.id)}');return false;"/>
+                                            <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse">
+                                                <apex:outputLabel style="font-weight:normal;" value="{!interviewTopic.refedge__Transcript__c}"/>
+                                            </div>
+                                        </td>
+                                    </tr>   
+                                </apex:repeat>
+                            </tbody>
+                       </table> 
+                    </div>
+                   
+                </div>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:outputPanel id="transcriptPlayPanel">
+            <!-- For Displaying Audio And Video -->
+            <script type="text/javascript">
+                var fileType = '{!JSENCODE(transcriptFileType)}';
+                function JplayerPlayTranscript(){
+                    
+                    if(fileType == 'audio/mp3'){
+                        
+                        jQuery(".jp-audio").css("display","block");
+                        jQuery("#jquery_jplayer_1").jPlayer({
+                            ready: function () {
+                              jQuery(this).jPlayer("setMedia", {
+                                mp3: '{!JSENCODE(downloadContentUrl)}'+'{!JSENCODE(transcript.Id)}',
+                              });
+                            },
+                            ended: function (event) {
+                                jQuery("#jquery_jplayer_1").jPlayer("stop", 0);
+                            },
+                            swfPath: "/js",
+                            supplied: "mp3",
+                            cssSelectorAncestor: "#jp_interface_1"
+                          })
+                          .bind($.jPlayer.event.play, function() { // pause other instances of player when current one play
+                               jQuery(this).jPlayer("pauseOthers");
+                        });
+                    }
+                    else{
+                        
+                        jQuery(".jp-video").css("display","block");
+                        jQuery("#jquery_jplayer_2").jPlayer({
+                            ready: function () {
+                              jQuery(this).jPlayer("setMedia", {
+                                mp4: '{!JSENCODE(downloadContentUrl)}'+'{!JSENCODE(transcript.Id)}',
+                                m4v: '{!JSENCODE(downloadContentUrl)}'+'{!JSENCODE(transcript.Id)}'
+                              });
+                            },
+                            ended: function (event) {
+                                jQuery("#jquery_jplayer_2").jPlayer("stop", 0);
+                            },
+                            swfPath: "/js",
+                            supplied: "mp4,m4v",
+                            cssSelectorAncestor: "#jp_interface_2"
+                          })
+                          .bind($.jPlayer.event.play, function() { // pause other instances of player when current one play
+                               jQuery(this).jPlayer("pauseOthers");
+                          });
+                    }
+                } 
+                function closeJplayer(){
+                    jQuery("#jquery_jplayer_2").jPlayer("destroy");
+                    jQuery("#jquery_jplayer_1").jPlayer("destroy");
+                    jQuery(".jp-audio").css("display","none");
+                    jQuery(".jp-video").css("display","none");
+                }
+          </script>
+         
+
+
+          <div>
+               
+           <div class="players" style="z-index:1003;position: absolute;top: 35%;left: 30%;">
+                 <div class="jp-audio" style="display:none;margin-left:35%;">
+                    
+                    <div class="jp-type-single">
+                        <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+                        <div id="jp_interface_1" class="jp-interface">
+                            
+                            <ul class="jp-controls">
+                                <li><a href="#" class="jp-play" tabindex="1">{!$Label.play}</a></li>
+                                <li><a href="#" class="jp-pause" tabindex="1">{!$Label.pause}</a></li>
+                                <li><a href="#" class="jp-stop" tabindex="1">{!$Label.stop}</a></li>
+                                <li><a href="#" class="jp-mute" tabindex="1">{!$Label.mute}</a></li>
+                                <li><a href="#" class="jp-unmute" tabindex="1">{!$Label.unmute}</a></li>
+                            </ul>
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-volume-bar">
+                                <div class="jp-volume-bar-value"></div>
+                            </div>
+                            <div class="jp-current-time"></div>
+                            <div class="jp-duration"></div>
+                        </div>
+                        <div id="jp_playlist_1" class="jp-playlist">
+                            <ul>
+                                <li>{!transcript.Name}
+                                    <apex:commandLink value="{!$Label.Close}" style="float: right;margin-top: -8px;" onclick="closeJplayer();return false;"/>
+                                </li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </div>
+                </div>
+    
+            </div> 
+            <div class="players" style="z-index:1003;position: absolute;top: 35%;left: 30%;">
+                <div class="jp-video jp-video-270p" style="display:none;margin-left:35%;">
+                    
+                    <div class="jp-type-single">
+                        <div id="jquery_jplayer_2" class="jp-jplayer">
+                            
+                        </div>
+                        <div id="jp_interface_2" class="jp-interface">
+                            
+                            <div class="jp-video-play"></div>
+                            <ul class="jp-controls">
+                                <li><a href="#" class="jp-play" tabindex="1">{!$Label.play}</a></li>
+                                <li><a href="#" class="jp-pause" tabindex="1">{!$Label.pause}</a></li>
+                                <li><a href="#" class="jp-stop" tabindex="1">{!$Label.stop}</a></li>
+                                <li><a href="#" class="jp-mute" tabindex="1">{!$Label.mute}</a></li>
+                                <li><a href="#" class="jp-unmute" tabindex="1">{!$Label.unmute}</a></li>
+                            </ul>
+                            <div class="jp-progress">
+                                <div class="jp-seek-bar">
+                                    <div class="jp-play-bar"></div>
+                                </div>
+                            </div>
+                            <div class="jp-volume-bar">
+                                <div class="jp-volume-bar-value"></div>
+                            </div>
+                            <div class="jp-current-time"></div>
+                            <div class="jp-duration"></div>
+                        </div>
+                        <div id="jp_playlist_2" class="jp-playlist">
+                            <ul>
+                                <li>{!transcript.Name}
+                                    <apex:commandLink value="{!$Label.Close}" style="float: right;" onclick="closeJplayer();return false;"/>
+                                </li>
+                                
+                            </ul>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+        
+
+     </apex:outputPanel>
+    </apex:form>
+    
+    </body>
+    </html>
+</apex:page>

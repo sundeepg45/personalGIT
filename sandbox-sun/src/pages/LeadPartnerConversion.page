@@ -1,0 +1,43 @@
+<apex:page standardController="Lead" extensions="LeadPartnerConversion" tabStyle="Lead">
+ <style>
+                h1 {
+                color:#cc0000;
+                font-size:18px;
+                font-size:18px;
+                font-weight:bold;
+                margin:0 0 .7em 0;
+                }
+        </style>
+       
+        <apex:form >
+        <p></p>
+        <p></p>
+        <h1 >Convert Lead to an Opportunity</h1>
+        <p></p>
+        <p></p>
+         <apex:pageMessages />
+         <apex:pageMessage rendered="{!saved=true}" severity="INFO"><apex:outputtext escape="false" value="{!$Label.LeadConversionPageMessage}"/>{!newOpportunity.Id}
+         <apex:outputtext escape="false" value="{!$Label.LeadConversionPageMessage1}"/>
+        </apex:pageMessage>
+        <apex:pageBlock title="{!$Label.LeadConversionPageEnterInfo}" rendered="{!saved=false}">
+            <apex:pageBlockButtons location="bottom" >
+                  <apex:commandButton id="convertLead" value="Convert Lead" action="{!convertLead}"/> 
+                  <apex:commandbutton action="{!Cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection > 
+                <apex:inputfield id="opportunityName" value="{!leadToConvert.Project_Name__c}" required="True" label="{!$Label.OpportunityName}" />
+                <apex:inputfield id="Distributor" value="{!leadToConvert.Distributor__c}" required="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />
+                <p></p>
+                <apex:inputfield id="DistributorOther" value="{!leadToConvert.Distributor_if_other__c}" required="{!IF(leadToConvert.Distributor__c='Other','TRUE','FALSE')}" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />
+                <apex:inputfield id="SalesStage" value="{!leadToConvert.Sales_Stage__c }" required="True" />
+                <p></p>
+                <apex:inputfield id="JBossProducts" value="{!leadToConvert.JBoss_Products__c }" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />
+                <apex:inputfield id="RHEVProducts" value="{!leadToConvert.RHEV_Products__c }" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />
+                <apex:inputfield id="RHELProducts" value="{!leadToConvert.RHEL_Products__c }" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />
+                <apex:inputfield id="CloudProducts" value="{!leadToConvert.Cloud_Products__c }" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />
+                <apex:inputfield id="Comments" value="{!leadToConvert.Partner_Comments__c }" rendered="{!IF(CONTAINS($Profile.Name, 'Partner'),'TRUE','FALSE')}" />           
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        </apex:form>
+ 
+</apex:page>

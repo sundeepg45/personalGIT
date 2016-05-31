@@ -1,0 +1,99 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        <h4><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_App_To_Become_Partner}"/></h4>
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Company_Overview_and_Market}"/></div>
+    </apex:outputPanel>
+
+    <apex:form >
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Company_Description}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputField value="{!Lead.Company_Description__c}"  id="txtCompanyDescription"/>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Limit_2K}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Number_Of_Employees}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputField value="{!Lead.Number_of_Employees__c}"  id="cboNumberEmployees"/>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Total_Annual_Revenue}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputField value="{!Lead.Total_Annual_Revenue__c}"  id="cboTotalRevenue"/>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Target_Market_Size}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!TargetMarketSize}" id="cboTargetMarketSize" size="5" multiselect="true">
+                <apex:selectOptions value="{!TargetMarketSizeOptions}"/>
+            </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Control_Click_Select_Multiple}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Software_Platform}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!SoftwareFocus}" size="5" multiselect="true"  id="cboSoftwareFocus">
+                <apex:selectOptions value="{!SoftwareFocusOptions}" />
+            </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Control_Click_Select_Multiple}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Operating_System_Expertise}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!OperatingSystemSupported}" size="5" multiselect="true"  id="cboOSSupported">
+                <apex:selectOptions value="{!OperatingSystemSupportedOptions}" />
+            </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Control_Click_Select_Multiple}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_If_Other_OS}"/></apex:outputLabel>
+            <apex:inputField value="{!Lead.If_Other_Operating_System__c}"  id="txtOtherOS"/>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Middleware_Supported}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!MiddlewareSupported}" size="5" multiselect="true"  id="cboMiddleware">
+                <apex:selectOptions value="{!MiddlewareSupportedOptions}" />
+            </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Control_Click_Select_Multiple}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_If_Other_Middleware}"/></apex:outputLabel>
+            <apex:inputField value="{!Lead.If_Other_Middleware__c}"  id="txtMiddlewareOther"/>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_App_Types}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!ApplicationTypes}" size="5" multiselect="true"  id="cboAppTypes">
+                <apex:selectOptions value="{!ApplicationTypesOptions}" />
+            </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Control_Click_Select_Multiple}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Additional_Partnerships}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!AdditionalPartnerships}" size="5" multiselect="true" id="cboAddlPartners">
+                <apex:selectOptions value="{!AdditionalPartnershipsOptions}" />
+            </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Control_Click_Select_Multiple}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Other_Partnerships}"/></apex:outputLabel>
+            <apex:inputField value="{!Lead.Other_Partnerships__c}"  id="txtPartnersOther"/>
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Campaign_Promo_Code}"/></apex:outputLabel>
+            <apex:inputField value="{!Lead.Promo_Code__c}" id="txtPromoCode"/>
+        </apex:outputPanel> <apex:outputPanel styleClass="" layout="block">
+            <p><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_This_Will_Submit_Your_Registration}"/></p>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel >
+                <apex:commandButton action="{!registerDemographicsSubmit}" value="{!$Label.Onboarding_RegisterDemographics_Submit_For_Approval}" styleClass="rowbutton" id="buttonSubmitApproval"/>
+                <apex:commandButton action="{!registerDemographicsCancel}" value="{!$Label.Onboarding_RegisterDemographics_Back}" styleClass="rowbutton" id="buttonBack"/>
+            </apex:outputPanel>
+        </apex:outputPanel></fieldset>
+    </apex:form>
+</apex:page>

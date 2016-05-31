@@ -1,0 +1,29 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+    <div id="footer">
+        
+        <div class="grid_9">
+            <div id="footer-nav">
+            <ul class="footer-nav-list">
+                <li><a target="_blank" href="http://www.redhat.com/legal/privacy_statement.html">Privacy policy</a></li>
+                <li><a target="_blank" href="http://www.redhat.com/legal/legal_statement.html">Terms of use</a></li>
+                <li><a target="_blank" href="http://www.redhat.com/about/contact/">Contact us</a></li>
+                <li><a target="_blank" href="http://www.redhat.com/about/">About Red Hat</a></li>
+            </ul>
+            <div class="clear"></div>
+            <p>Copyright  &copy;2012 Red Hat, Inc.</p>
+            </div><!-- /#footer-nav --> 
+        </div><!-- /.grid_9 -->
+        <div class="grid_3 omega">
+            <ul class="social-icons">
+                <li><span>Connect:</span></li>
+                <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/g/connect/twitter-i.png" alt="Twitter" /></a></li>
+                <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/g/connect/facebook-i.png" alt="Facebook" /></a></li>
+                <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/g/connect/youtube-i.png" alt="YouTube" /></a></li>
+                <li><a href="http://www.linkedin.com/groups?home=&gid=2525539" target="_blank"><img src="http://www.redhat.com/g/connect/linkedin-i.png" alt="LinkedIn" /></a></li>
+            </ul>
+        </div><!-- /.grid_3 -->
+        
+    </div><!-- /#footer -->
+
+
+</apex:page>

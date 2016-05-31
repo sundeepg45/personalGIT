@@ -1,0 +1,582 @@
+<apex:page controller="PFController" action="{!loadDetails}"
+    showHeader="false" standardStylesheets="false" sidebar="false"
+    cache="true">
+<!--
+    <apex:stylesheet value="https://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="https://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Finder_Catalog_CSS}" />
+-->
+
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
+    <apex:includeScript value="{!$Resource.PartnerSharedScripts}"/>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!-- CSS Files -->
+    <!--<apex:stylesheet value="{!$Resource.Finder_Catalog_CSS}" />-->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery-ui.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery.flip.min.js')}"></script>
+    <!--
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/all.js')}"></script>
+-->
+    <!--<script type="text/javascript" src="https://maps.google.com/maps/api/js?client=gme-redhatinc&sensor=false"></script>-->
+    <apex:includeScript value="{!$Resource.PartnerSharedScripts}"/>
+
+    <script type="text/javascript">
+        var geocoder;
+        var map;
+        var marker = null;
+        $.noConflict();
+
+        function initialize() {
+            var lat = '{!partner.primaryLocation.Latitude__c}';
+            var lon = '{!partner.primaryLocation.Longitude__c}';
+
+            if (lat != '' && lon != ''){
+		    	jQuery('#map_canvas').show();
+		    	jQuery('#map_note').show();
+                geocoder = new google.maps.Geocoder();
+                var latlng = new google.maps.LatLng(lat, lon);
+                var myOptions = {
+                    zoom: 12,
+                    center: latlng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                }
+                map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+            }
+        }
+    </script>
+    <body id="find-partner">
+        <div class="red-hat-content">
+            <section class="header-band">
+              <c:PartnerFinderHeader /><!-- include partnerFinderHeader until dynamic header is ready to use -->
+              <div id="main-header-wrap">
+                <div class="container">
+                  <div class="content-wrap row">
+                    <h1>{!$Label.PF_detail_section_PartnerFinder}</h1>
+                    <div class="sub-head">{!partner.partnerName}</div>
+                  </div><!-- /.content-wrap /.row -->
+                </div><!-- /.container -->
+              </div><!-- /.main-header-wrap -->
+            </section><!-- /.header-band -->
+            <div class="container">
+                <div id="header">
+                    <!--<div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div>
+                    -->
+					<!--
+                    <div id="login-pre">
+		                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso">{!$Label.Onboarding_Header_Log_In}</a>
+		            </div>
+                    -->
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+
+                <div class="contentIndent clearWrap">
+	                <!-- <h1 id="plBetaTitle">{!$Label.PF_detail_section_PartnerFinder}</h1> -->
+	                <apex:form >
+	                    <div class="locationCrumbs">
+	                        <a href="/finder/" id="breadcrumbsHome">{!$Label.PF_detail_section_PartnerLocator}</a> &gt;
+	                        <a onClick="history.go(-1); return false;" id="breadcrumbsResults" href="#">{!$Label.PC_detail_section_results}</a> &gt;
+	                        <strong><span id="partnerDetailsPageTitle">{!$Label.PF_detail_section_PartnerDetail}</span></strong>
+	                    </div>
+	                </apex:form>
+	            </div>
+
+            </div><!--end-container -->
+
+    		<apex:outputText rendered="{! NOT(ISNULL(partner)) }">
+                <div class="container">
+                    <div id="partnerDetails">
+                        <div class="corner_topleft"></div>
+                        <div class="corner_topright"></div>
+                        <div class="corner_bottomleft"></div>
+                        <div class="corner_bottomright"></div>
+                        <div class="clearWrap" id="partnerDetailsInner">
+                            <!--<div id="firstSection">
+                                <div class="clearWrap" id="partnerTop">
+                                    <apex:image width="150" rendered="{!NOT(ISNULL(partner.logoAttachmentId))}" value="{!URLFOR($Action.Attachment.Download, partner.logoAttachmentId)}"/>
+                                    </div>
+                                    <div id="partnerHead" class="partnerTitle">
+                                        <h1 id="partnerName">
+                                        {!partner.partnerName}<apex:outputText rendered="{!partner.showAlias && partner.partnerAlias != ''}" value=" / {!partner.partnerAlias}"/>
+                                        </h1>
+                                        <apex:outputText rendered="{!NOT(ISNULL(partner.partnerTier) || partner.partnerTier == '')}">
+                                            <div id="partnerDetailsLevel"><label>{!$Label.PF_detail_field_Partner_Level}</label> <span id="partnerLevel" class="inline">{!partner.partnerTier}</span></div>
+                                        <div id="partnerDetailsType"><label>{!$Label.PF_detail_field_Partner_Type}</label> <span id="partnerType" class="inline">{!partner.partnerType}</span></div>
+    		                            </apex:outputText>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <!-- ===========================[ section 2 ]=========================== -->
+                            <section class="partner-details">
+    	                        <div id="secondSection">
+    	                            <div class="row">
+    	                                <div  class="col-xs-12">
+                                            <div class="detailsLogo" id="partnerLogo{!partner.partnerId}">
+                                                <apex:image width="225" rendered="{!NOT(ISNULL(partner.logoAttachmentId))}" value="{!URLFOR($Action.Attachment.Download, partner.logoAttachmentId)}"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-7">
+                                            <h1 id="partnerName">{!partner.partnerTier} {!partner.partnerType}
+                                                <apex:outputText rendered="{!partner.showAlias && partner.partnerAlias != ''}" value=" / {!partner.partnerAlias}"/>
+                                            </h1>
+                                            <apex:outputText rendered="{!NOT(ISNULL(partner.partnerTier) || partner.partnerTier == '')}">
+                                                <div id="partnerDetailsLevel"><label>{!$Label.PF_detail_field_Partner_Level}</label> <span id="partnerLevel" class="inline">{!partner.partnerTier}</span></div>
+                                            <div id="partnerDetailsType"><label>{!$Label.PF_detail_field_Partner_Type}</label> <span id="partnerType" class="inline">{!partner.partnerType}</span></div>
+                                            </apex:outputText>
+                                            <br/>
+    	                                    <div id="partnerDescription"><apex:outputText escape="false" value="{!partner.description}"/></div>
+    	                                    <br/>
+                                            <!--
+    	                                        <ul>
+    	                                        <apex:outputText rendered="{!partner.productCount > 0}">
+    	                                            <li><a id="productsLink" href="/catalog/?partnerId={!partner.partnerId}" target="_blank">{!$Label.PF_detail_section_viewproducts} ({!partner.productCount})</a></li>
+    	                                        </apex:outputText>
+                                             <apex:outputText rendered="{! NOT( ISNULL( partner.Website ) )}">
+    	                                            <li><a id="partnerWebsite" href="{!partner.Website}" target="_blank" style="text-decoration: none">{!$Label.PF_detail_VisitWebsite}</a></li>
+    	                                        </apex:outputText>
+                                                </ul>
+    	                                    <br/>
+                                            -->
+    	                                    <!--<h3><apex:outputLabel styleClass="labelCol" id="countriesOfOperationFieldLabel" value="{!$ObjectType.Account.fields.Additional_Countries_of_Operation__c.label}"/></h3>-->
+    	                              <!-- <h3 id="countriesOfOperationFieldLabel">Countries of Operation</h3>-->
+    	                                    <!--<div>
+    	                                        <span id="countryOfOperation1">
+    	                                            <apex:repeat value="{!partner.countriesOfOperation}" var="val" rendered="{!partner.countriesOfOperation.size > 0}">{!val}<br/></apex:repeat>
+    	                                            <apex:outputText id="countriesOfOperationNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.countriesOfOperation.size == 0}"/>
+    	                                        </span>
+    	                                    </div>
+    	                                    <br/>-->
+    	                                    <!--<!<h3 id="partnerInformationSectionHeader" class="sectionHeading">{!$Label.Business_Plan_Partner_Information}</h3>
+    	                                    <table class="partnerDetailsList">
+    	                                        <tbody>-->
+    	                                            <!-- <tr>
+    	                                                <th><apex:outputLabel value="{!$ObjectType.Account.fields.Industry_Focus__c.label}"/> </th>
+    	                                                <td>
+    	                                                    <span id="industryFocus1">
+    	                                                        <apex:repeat value="{!partner.industryFocus}" var="val" rendered="{!partner.industryFocus.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="industryFocusNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.industryFocus.size == 0}"/>
+    	                                                    </span>
+    	                                                </td>
+    	                                            </tr> -->
+    	                                            <!--<tr>
+    	                                                <th><apex:outputLabel value="{!$ObjectType.Account.fields.Target_Market_Size__c.label}"/> </th>
+    	                                                <td>
+    	                                                    <span id="targetMarketSize1">
+    	                                                        <apex:repeat value="{!partner.targetMarketSize}" var="val" rendered="{!partner.targetMarketSize.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="targetMarketSizeNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.targetMarketSize.size == 0}"/>
+    	                                                    </span>
+    	                                                </td>
+    	                                            </tr>
+    	                                            <tr>
+    	                                                <th><apex:outputLabel value="{!$ObjectType.Account.fields.Application_Types__c.label}"/> </th>
+    	                                                <td>
+    	                                                    <span id="appTypes1">
+    	                                                        <apex:repeat value="{!partner.appTypes}" var="val" rendered="{!partner.appTypes.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="appTypesNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.appTypes.size == 0}"/>
+    	                                                    </span>
+    	                                                </td>
+    	                                            </tr>-->
+                                                <!--<tr>
+    	                                                <th id="partnerSpecializationFieldLabel"><label>{!$Label.Requalification_Specializations}</label></th>
+    	                                                <td>
+    	                                                    <span id="partnerDetailsSpecialization1">
+    	                                                        <apex:repeat value="{!partner.specializations}" var="val" rendered="{!partner.specializations.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="partnerSpecializationsNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.specializations.size == 0}"/>
+    	                                                    </span><br />
+    	                                                </td>
+    	                                            </tr>-->
+                                                <!-- <tr>
+    	                                                <th id="partnerSkillsFieldLabel"><label>{!$Label.Requalification_Partner_Skills}</label></th>
+    	                                                <td>
+    	                                                    <span id="partnerDetailsSkills">
+    	                                                        <apex:repeat value="{!partner.skills}" var="val" rendered="{!partner.skills.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="partnerSkillsNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.skills.size == 0}"/>
+    	                                                    </span><br />
+    	                                                </td>
+    	                                            </tr> -->
+                                                    <!--<apex:outputPanel rendered="{!partner.programs.size > 0}">
+    	                                            <tr>
+    	                                            	<th id="partnerProgramsFieldLabel"><label>{!$Label.Requalification_Partner_Programs}</label></th>
+    	                                            	<td>
+    	                                            		<span id="partnerDetailsPrograms">
+    	                                            			<apex:repeat value="{!partner.programs}" var="program">{!program.Name}<br /></apex:repeat>
+    	                                            		</span>
+    	                                            	</td>
+    	                                            </tr>
+                                                    </apex:outputPanel>
+    	                                            <tr>
+    	                                            <th><apex:outputLabel value="{!$ObjectType.Account.fields.Hardware_Focus__c.label}"/> </th>-->
+    	                                               <!-- <th>Hardware Focus</th>-->
+    	                                                <!--<td>
+    	                                                    <span id="hardwareFocus1">
+    	                                                        <apex:repeat value="{!partner.hardwareFocus}" var="val"  rendered="{!partner.hardwareFocus.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="hardwareFocusNP" value="{!$Label.PF_detail_field_notprovided}"  rendered="{!partner.hardwareFocus.size == 0}"/>
+    	                                                    </span> <br />
+    	                                                </td>
+    	                                            </tr>
+    	                                            <tr>
+    	                                            <th><apex:outputLabel value="{!$ObjectType.Account.fields.Hardware_Platform__c.label}"/> </th>-->
+    	                                            <!--    <th>Hardware Platform</th>-->
+    	                                                <!--<td>
+    	                                                    <span id="hardwarePlatform1">
+    	                                                        <apex:repeat value="{!partner.hardwarePlatform}" var="val" rendered="{!partner.hardwarePlatform.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="hardwarePlatformNP" value="{!$Label.PF_detail_field_notprovided}"  rendered="{!partner.hardwarePlatform.size == 0}"/>
+    	                                                    </span> <br />
+    	                                                </td>
+    	                                            </tr>
+    	                                            <tr>
+    	                                            <th><apex:outputLabel value="{!$ObjectType.Account.fields.Software_Focus__c.label}"/> </th>-->
+    	                                              <!--  <th>Software Focus</th>-->
+    	                                                <!--<td>
+    	                                                    <span id="softwareFocus2">
+    	                                                        <apex:repeat value="{!partner.softwareFocus}" var="val" rendered="{!partner.softwareFocus.size > 0}">{!val}<br/></apex:repeat>
+    	                                                        <apex:outputText id="softwareFocusNP" value="{!$Label.PF_detail_field_notprovided}"  rendered="{!partner.softwareFocus.size == 0}"/>
+    	                                                    </span> <br />
+    	                                                </td>
+    	                                            </tr>
+    	                                            <tr>
+    	                                                <th><apex:outputLabel styleClass="labelCol" value="{!$ObjectType.Account.fields.Number_of_Technical_Certifications__c.label}"/></th>
+    	                                                <td>
+    	                                                    <span id="techCertCount">
+    	                                                        <apex:outputText value="{!partner.techCertCount}"/>
+    	                                                    </span> <br />
+    	                                                </td>
+    	                                            </tr>
+    	                                            <tr>
+    	                                                <th><apex:outputLabel styleClass="labelCol" value="{!$ObjectType.Account.fields.Number_of_Sales_Certifications__c.label}"/></th>
+    	                                                <td>
+    	                                                    <span id="salesCertCount">
+    	                                                        <apex:outputText value="{!partner.salesCertCount}"/>
+    	                                                    </span> <br />
+    	                                                </td>
+    	                                            </tr>
+    	                                        </tbody>
+    	                                    </table>-->
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <div class="callout">
+                                                        <!-- <apex:outputLabel styleClass="labelCol" value="{!$ObjectType.Account.fields.Number_of_Technical_Certifications__c.label}"/> -->
+                                                        <apex:outputLabel styleClass="labelCol" value="{!$Label.PF_Technical_Accreditation}"/>
+                                                        <span id="techCertCount" class="number">
+                                                            <apex:outputText value="{!partner.techCertCount}"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <div class="callout">
+                                                        <!-- <apex:outputLabel styleClass="labelCol" value="{!$ObjectType.Account.fields.Number_of_Sales_Certifications__c.label}"/> -->
+                                                        <apex:outputLabel styleClass="labelCol" value="{!$Label.PF_Sales_Accreditation}"/>
+                                                        <span id="salesCertCount" class="number">
+                                                            <apex:outputText value="{!partner.salesCertCount}"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+    	                                <div class="col-xs-5">
+    	                                    <div id="primaryLocation">
+    	                                        <h2>{!$Label.PF_detail_section_PrimaryLocation}</h2>
+    	                                        <span id="addressLineOne">{!partner.primaryLocation.Street__c}</span><br />
+    	                                        <span id="addressLineTwo">{!partner.primaryLocation.City__c}, {!partner.primaryLocation.State_Province__c} {!partner.primaryLocation.Country__c} {!partner.primaryLocation.Postal_Code__c}</span><br />
+    	                                        <span id="partnerPhone">{!partner.primaryLocation.Phone__c}</span> <br />
+    	                                    </div>
+                                            <ul class="list-unstyled partner-support">
+                                                <li class="phone">
+                                                    <apex:outputText id="accountPhone" value="{!partner.accountPhone}" rendered="{! NOT( ISNULL( partner.accountPhone ) )}"/>
+                                                </li>
+                                                <li class="email">
+                                                    <apex:outputText rendered="{! NOT( ISNULL( partner.companyEmail ) )}">
+                                                        <a id="partnerEmail" href="mailto:{!partner.companyEmail}" target="_blank" >{!partner.companyEmail}</a>
+                                                    </apex:outputText>
+                                                </li>
+                                                <li class="url">
+                                                    <apex:outputText rendered="{! NOT( ISNULL( partner.Website ) )}">
+                                                        <a id="partnerWebsite" href="{!partner.Website}" target="_blank">{!partner.displayWebsite}</a>
+                                                        <br/><br/>
+                                                    </apex:outputText>
+                                                </li>
+                                            </ul><!--/.list-unstyled /.partner-support-->
+    	                                    <div id="map_canvas" style="display:none; height:300px; width: 100%;"></div>
+    	                                    <div id="map_note" class="map_note" style="display:none;"><i class="fa fa-info-circle"></i>{!$Label.PF_Search_Map_Note}</div>
+                                            <div style="float:left; width: 190px;" class="below-map-details">
+                                                <apex:outputLabel value="{!$ObjectType.Account.fields.Industry_Focus__c.label}"/><br/>
+                                                <span id="industryFocus1">
+                                                    <apex:repeat value="{!partner.industryFocus}" var="val" rendered="{!partner.industryFocus.size > 0}">{!val}<br/>
+                                                    </apex:repeat>
+                                                    <apex:outputText id="industryFocusNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.industryFocus.size == 0}"/>
+                                                </span>
+                                            </div>
+                                            <div style="float:right; width: 190px;" class="below-map-details">
+                                                <label>{!$Label.Requalification_Specializations}</label><br/>
+                                                <span id="partnerDetailsSpecialization1">
+                                                    <apex:repeat value="{!partner.specializations}" var="val" rendered="{!partner.specializations.size > 0}">{!val}<br/>
+                                                    </apex:repeat>
+                                                    <apex:outputText id="partnerSpecializationsNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.specializations.size == 0}"/>
+                                                </span>
+                                                <br/>
+                                                <label>{!$Label.Requalification_Partner_Skills}</label><br/>
+                                                <span id="partnerDetailsSkills">
+                                                    <apex:repeat value="{!partner.skills}" var="val" rendered="{!partner.skills.size > 0}">{!val}<br/>
+                                                    </apex:repeat>
+                                                    <apex:outputText id="partnerSkillsNP" value="{!$Label.PF_detail_field_notprovided}" rendered="{!partner.skills.size == 0}"/>
+                                                </span>
+                                            </div>
+    	                                    <br/>
+    	                                </div>
+    	                            </div>
+    	                        </div>
+                            </section><!-- /.partner-details -->
+                        </div><!-- /#partnerDetailsInner-->
+                    </div><!-- /#partnerDetails-->
+                </div><!--end-container -->
+                <div id="otherLocations">
+                    <div class="container">
+                        <apex:outputText rendered="{! partner.locations.size > 1 && NOT(moreLocations) }">
+                        <h3>{!$Label.PF_detail_section_otherlocation}</h3>
+                        <table>
+                            <tr>
+                            <apex:variable value="{!0}" var="index" />
+                            <apex:repeat value="{!partner.locations}" var="loc">
+                                <td rendered="{! index < 3}">
+                                <apex:outputText rendered="{! NOT(loc.Is_Primary__c) && (index < 3) }">
+                                    {!loc.Name}<br/>
+                                    {!loc.Street__c}<br/>
+                                    {!loc.City__c}, {!loc.State_Province__c} {!loc.Country__c} {!loc.Postal_Code__c}
+                                </apex:outputText>
+                                </td>
+                                <apex:variable value="{! IF( loc.Is_Primary__c, index, index + 1) }" var="index" />
+                            </apex:repeat>
+                            </tr>
+                        </table>
+                        </apex:outputText>
+
+                        <apex:outputText rendered="{! partner.locations.size > 1 && moreLocations }">
+                            <h3>{!$Label.PF_detail_section_otherlocation}</h3>
+                            <apex:repeat value="{!partner.locations}" var="loc">
+                                <apex:outputText rendered="{! NOT(loc.Is_Primary__c) }">
+                                    {!loc.Name}<br/>
+                                    {!loc.Street__c}<br/>
+                                    {!loc.City__c}, {!loc.State_Province__c} {!loc.Country__c} {!loc.Postal_Code__c}<br/><br/>
+                                </apex:outputText>
+                            </apex:repeat>
+                        </apex:outputText>
+                        <apex:form rendered="{! (partner.locations.size > 4) && NOT(moreLocations) }">
+                            <apex:commandButton action="{!moreLocations}" value="{!$Label.PF_More_Locations}" styleClass="btn ease"/>
+                        </apex:form>
+                    </div><!--end-container -->
+                </div><!-- /#otherLocations -->
+			</apex:outputText>
+	   		<apex:outputText rendered="{! ISNULL(partner) }">
+		   		<div>
+		   			{! $Label.PF_No_Partner_Details}
+		   		</div>
+	   		</apex:outputText>
+            <div id="shell-bottom-simple">
+                <div class="wrap">
+
+                    <div id="footer">
+                        <div id="footer-nav">
+                            <ul class="social-icons">
+                                <li><span>Connect:</span></li>
+                                <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                                <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                                <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                                <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                            </ul>
+                            <ul class="footer-nav-list">
+                                <li>{!$Label.Onboarding_Copyright}</li>
+                                <li>|</li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">{!$Label.Onboarding_Privacy_Policy}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">{!$Label.Onboarding_Terms_Of_Use}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">{!$Label.Onboarding_Patent_Promise}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">{!$Label.Onboarding_Careers_Link}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">{!$Label.Onboarding_Trademark_guidelines}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_About_Red_Hat}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">{!$Label.Onboarding_Contact_us}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">{!$Label.Onboarding_Site_map}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">{!$Label.Onboarding_FAQs}</a></li>
+
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">{!$Label.Onboarding_Supplier_requirements}</a></li>
+                            </ul>
+                        </div>  <!-- Legal Nav -->
+                    </div><!-- / Footer -->
+                </div>
+            </div><!-- end-shell-bottom-simple -->
+
+            <!--<c:PartnerFinderFooter/>--><!-- include partnerFinderFooter until dynamic Footer is ready to use -->
+
+        </div><!--end-red-hat-content -->
+    </body>
+    <style>
+        .labelCol {
+            font-weight:bold;
+        }
+        #find-partner .red-hat-content .header-band{
+            height: auto !important;
+            padding-bottom: 40px !important;
+        }
+        .locationCrumbs{
+            margin-top: 5px;
+        }
+        .partner-details{
+            padding: 3.333em 0 4.444em;
+            font-size: 1.286em;
+            letter-spacing: 0;
+            line-height: 1.556em;
+        }
+        .partner-details h2, #partnerName{
+            font-size: 1.222em;
+            font-family: 'Overpass Bold';
+            text-transform: uppercase;
+            margin: 0 0 28px;
+        }
+        #artnerDetailsLevel{
+            padding-top: 10px;
+        }
+        .partner-details .detailsLogo{
+            margin-bottom: 45px;
+        }
+        #partnerName{
+            margin-top: 0;
+        }
+        .callout{
+            background-color: #F0F0F0;
+            padding: 20px 50px 15px;
+            text-align: center;
+        }
+        .callout label{
+            color: #cc0000;
+            font-size: 1em;
+            font-family: 'Overpass Bold';
+            margin: 0 0 5px;
+            line-height: normal;
+            text-transform: uppercase;
+            width: 190px;
+        }
+        .callout .number{
+            font-size: 3.333em;
+            font-family: 'Overpass Bold';
+            line-height: 1em;
+        }
+        .partner-support li{
+            margin-bottom: 15px;
+            height: 56px;
+            line-height: 56px;
+        }
+        .partner-support li span, .partner-support li a{
+            color: #333 !important;
+            padding-left: 72px;
+            text-decoration: none;
+        }
+        .partner-support li a:hover{
+            text-decoration: underline;
+        }
+        .partner-support .phone{
+            background: url("{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/phone-icon-gray.png')}") no-repeat 0 50%;
+        }
+        .partner-support .email{
+            background: url("{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/email-icon-gray.png')}") no-repeat 0 50%;
+        }
+        .partner-support .url{
+            background: url("{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/url-icon-gray.png')}") no-repeat 0 50%;
+        }
+        #map_canvas{
+            margin-top: 35px;
+        }
+        #map_note{
+            margin-bottom: 20px;
+            background: #F0F0F0;
+            padding: 0 10px;
+        }
+        #map_note i{
+            color: #5181e8;
+            margin-right: 5px;
+        }
+        .below-map-details label{
+            font-size: 1em;
+            font-family: 'Overpass Bold';
+            text-transform: uppercase;
+            line-height: 1.556em;
+            margin-bottom: 0;
+        }
+        #otherLocations{
+            padding: 4.286em 0 2.857em;
+            background-color: #f7f7f7;
+        }
+        #otherLocations h3{
+            font-size: 1.571em;
+            font-family: 'Overpass Bold';
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+        #otherLocations h4{
+            font-size: 1.571em;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        #otherLocations table{
+            width: 100%;
+        }
+        #otherLocations .btn{
+            margin-top: 60px;
+        }
+        .red-hat-content .header-wrapper {
+            background: none !important;
+        }
+        .nav.navbar-nav a{
+            cursor: pointer;
+        }
+        .red-hat-content .secondary-nav li > a.logo{
+            padding: 1px 0 0 0 !important;
+        }
+    </style>
+
+    <script type="text/javascript">
+        initialize();
+        var bounds = new google.maps.LatLngBounds();
+        var locCount = 0;
+        <apex:repeat value="{!partner.locations}" var="loc">
+            bounds.extend(new google.maps.LatLng('{!loc.Latitude__c}', '{!loc.Longitude__c}'));
+            addMarker('{!loc.Longitude__c}', '{!loc.Latitude__c}',
+                '{!JSENCODE(loc.Name)}',
+                '<b>{!JSENCODE(loc.Name)}</b><br/>' +
+                '{!JSENCODE(loc.Street__c)}, {!JSENCODE(loc.City__c)}<br/>' +
+                '{!JSENCODE(loc.State_Province__c)}, {!JSENCODE(loc.Country__c)}');
+            locCount++;
+        </apex:repeat>
+        if (locCount > 1) {
+            map.setCenter(bounds.getCenter());
+            map.fitBounds(bounds);
+        }
+    </script>
+
+</apex:page>

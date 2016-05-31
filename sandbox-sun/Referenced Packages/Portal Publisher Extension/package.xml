@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Portal Publisher Extension</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <namespacePrefix>APPR_PUB_XT</namespacePrefix>
+    <types>
+        <members>LocalizedCustomMessageController</members>
+        <members>NewButtonOverrideController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>MultiLangCustomMessages</members>
+        <members>NewButtonOverride</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>APPR_PUB__Headline_Link_Group__c.Language__c</members>
+        <members>APPR_PUB__Headline_Link__c.Language__c</members>
+        <members>APPR_PUB__Headline__c.Language_Code__c</members>
+        <members>APPR_PUB__Headline__c.Language__c</members>
+        <members>Headline_Link_Group_Translation__c.Headline_Link_Group__c</members>
+        <members>Headline_Link_Group_Translation__c.Language_Code__c</members>
+        <members>Headline_Link_Group_Translation__c.Language__c</members>
+        <members>Headline_Link__c.Headline_Link__c</members>
+        <members>Headline_Link__c.Language_Code__c</members>
+        <members>Headline_Link__c.Language__c</members>
+        <members>Headline_Link__c.Link_Display_Name__c</members>
+        <members>Headline_Link__c.URL__c</members>
+        <members>Headline_Translation__c.Description__c</members>
+        <members>Headline_Translation__c.Group_Header__c</members>
+        <members>Headline_Translation__c.Headline__c</members>
+        <members>Headline_Translation__c.Image_Path__c</members>
+        <members>Headline_Translation__c.Image_Url__c</members>
+        <members>Headline_Translation__c.Language_Code__c</members>
+        <members>Headline_Translation__c.Language__c</members>
+        <members>Headline_Translation__c.Link_Header__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Headline_Link_Group_Translation__c</members>
+        <members>Headline_Link__c</members>
+        <members>Headline_Translation__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Translated Custom Messages</members>
+        <name>HomePageComponent</name>
+    </types>
+    <types>
+        <members>APPR_PUB__Headline_Link_Group__c-Headline Link Group Layout with Translations</members>
+        <members>APPR_PUB__Headline_Link__c-Headline Link Layout with Translations</members>
+        <members>APPR_PUB__Headline__c-Multi Group Headline Layout with Translations</members>
+        <members>APPR_PUB__Headline__c-Multi Line Headline Layout with Translations</members>
+        <members>APPR_PUB__Headline__c-Single Line Headline Layout with Translations</members>
+        <members>Headline_Link_Group_Translation__c-Headline Link Group Translation Layout</members>
+        <members>Headline_Link__c-Headline Link Translation Layout</members>
+        <members>Headline_Translation__c-Multi Group Layout</members>
+        <members>Headline_Translation__c-Multi Line Layout</members>
+        <members>Headline_Translation__c-Single Line Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>Headline_Link_Group_Translation__c.All</members>
+        <members>Headline_Link__c.All</members>
+        <members>Headline_Translation__c.All</members>
+        <name>ListView</name>
+    </types>
+    <types>
+        <members>Headline_Translation__c.Multi_Group</members>
+        <members>Headline_Translation__c.Multi_Line</members>
+        <members>Headline_Translation__c.Single_Line</members>
+        <name>RecordType</name>
+    </types>
+    <version>33.0</version>
+</Package>

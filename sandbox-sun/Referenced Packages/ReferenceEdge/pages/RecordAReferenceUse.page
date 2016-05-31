@@ -1,0 +1,139 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RecordAReferenceUseExtension" sidebar="false">
+    <apex:pageMessages id="pgmsgId"/>
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    
+    <apex:outputPanel id="jsPanel">
+        <script>
+            var isContactReferenceable = {!contactReferenceability};
+            var isContactSelected = {!isContactSelected}; 
+            var accountMSG = '{!JSENCODE(status)}'.replace('@@@1', '{!$Label.Account}');
+            var contactMSG = '{!JSENCODE(status)}'.replace('@@@1', '{!$Label.Contact}');
+            function showPopup(){
+                if(isContactSelected && !isContactReferenceable){
+                    var where_to= confirm(contactMSG);
+                    if (where_to){
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else if({!!accountReferenceability}){
+                    var where_to= confirm(accountMSG);
+                    if (where_to){
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+            }
+        </script>
+    </apex:outputPanel>
+    
+    <!-- Form -->
+    <apex:form id="formId"  rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader title="{!$Label.Record_A_Reference_Use}" subtitle="{!$Label.Record_a_Reference}"/>
+        <apex:actionFunction name="jsFindReferenceStatus" oncomplete="PORHideLoading();"  immediate="true" action="{!getReferenceStatus}" rerender="jsPanel,howDidPbsId">
+            <apex:param assignTo="{!selectedContact}" value="" name="paramName"/>
+        </apex:actionFunction>
+        <apex:actionFunction reRender="pgmsgId, unsuccessfulPanel"  immediate="true" name="displayTextArea" oncomplete="PORHideLoading();">
+            <apex:param assignTo="{!feedbackSelected}" value="" name="paramName"/>
+        </apex:actionFunction>
+        <apex:pageBlock id="blockId" title="{!$Label.Record_A_Reference_Use}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}" action="{!saveContent}" onclick="return showPopup();"/> 
+                <apex:commandButton value="{!$Label.Cancel}" immediate="true" action="{!cancel}"/>
+                <apex:commandButton value="{!$Label.Save_and_New}" action="{!saveAndNew}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection id="SectionId" columns="1">
+                <apex:pageBlockSectionItem id="refType">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Reference_Request_Account__c.fields.refedge__Reference_Type_Needed__c.Label}" />
+                    <apex:outputPanel styleClass="requiredInput" layout="block" >
+                        <div class="requiredBlock"></div>
+                        <apex:selectList size="1" value="{!refReqAccountObject.refedge__Reference_Type_Needed__c}" id="selectRefType" style="width:250px" required="true">
+                            <apex:selectOptions value="{!referenceabilityTypes}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:inputField id="Opportunity1" value="{!refReqObject.refedge__Opportunity__c}" rendered="{!OR(fromAccount, fromContact)}"/> 
+                <apex:outputField id="Opportunity2" value="{!refReqObject.refedge__Opportunity__c}" rendered="{!fromOpportunity}"/>
+                 
+                <apex:pageBlockSectionItem id="Contact">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Reference_Request_Account_Contact__c.fields.refedge__Contact__c.Label}" />
+                    <apex:selectList size="1" readonly="{!fromContact}" value="{!refReqAccContactObject.refedge__Contact__c}" id="ContactId" onchange="PORShowLoading();jsFindReferenceStatus(this.value);">
+                        <apex:selectOptions value="{!associatedContacts}"/>                 
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                
+                <apex:outputField id="Account" value="{!refReqAccountObject.refedge__Account__c}"/>
+                <apex:inputField id="Comment" value="{!refReqAccountObject.refedge__Request_Notes__c}" label="{!$Label.Notes}"/>
+                <apex:inputField id="ActivityDate" value="{!refReqAccountObject.refedge__Activity_Date__c}" required="true"/>
+            </apex:pageBlockSection>
+            <apex:outputPanel id="howDidPbsId">
+                <apex:pageBlockSection title="{!$Label.How_did_it_go}"  columns="1" rendered="{!selectedContact != null}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.refedge__Reference_Request_Account_Contact__c.fields.refedge__Feedback_Status__c.Label}" />
+                        <apex:outputPanel styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:selectList size="1" value="{!refReqAccContactObject.refedge__Feedback_Status__c}" style="width:250px" required="true" onChange="PORShowLoading();displayTextArea(this.value);return false;">
+                                <apex:selectOptions value="{!feedbackOption}"/>
+                            </apex:selectList>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:outputPanel id="unsuccessfulPanel" >
+                        <apex:outputPanel style="padding-left:18%;" rendered="{!feedbackSelected == useCompleted}">
+                            <h3>{!$Label.sorry_what_happened}</h3><br/>
+                            <div style="padding-left:18%;">
+                            <apex:pageBlockSectionItem id="whatHappenPbsmsgId" dataStyleClass="padding-left:18%;">
+                                <apex:outputPanel styleClass="requiredInput" layout="block" >
+                                <div class="requiredBlock"></div>
+                                    <apex:inputTextarea cols="50" rows="5" value="{!refReqAccContactObject.refedge__Feedback_Response__c}" />    
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            </div>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel style="padding-left:18%;" rendered="{!feedbackSelected == useCompleted_Success}">
+                            <h3>That's great! Any highlights you want to share?</h3><br/>
+                            <div style="padding-left:18%;">
+                            <apex:pageBlockSectionItem id="successPbsmsgId" dataStyleClass="padding-left:18%;">
+                                <apex:outputPanel layout="block" >
+                                    <apex:inputTextarea cols="50" rows="5" value="{!refReqAccContactObject.refedge__Feedback_Response__c}" />    
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

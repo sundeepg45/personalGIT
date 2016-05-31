@@ -1,0 +1,85 @@
+<apex:component controller="RecordTypeSelectController" selfClosing="true">
+	<apex:attribute name="ent" description="The entity key of the object." type="String" required="true" assignTo="{!entityKey}"/>
+	<apex:attribute name="apiName" description="The API Name of the object." type="String" required="true" assignTo="{!objectApiName}"/>
+	<apex:attribute name="retURL" description="The return URL." type="String" required="false" assignTo="{!returnURL}"/>
+	<apex:attribute name="save_new_url" description="The URL to edit/create the new object" type="String" required="false" assignTo="{!saveURL}"/>
+	<apex:sectionHeader title="{!IF(OR(ISBLANK(recordId),isClone),'New '+objectLabel,objectLabel+' Record Type Change')}" subtitle="{!IF(OR(ISBLANK(recordId),isClone),'Select '+objectLabel+' Record Type',recordName)}" rendered="{!ISBLANK(redirectURL)}"/>
+	<apex:outputPanel layout="none" rendered="{!AND(ISBLANK(redirectURL),OR(ISBLANK(recordId),isClone))}">
+		<p>Select a record type for the new {!LOWER(objectLabel)}.</p>
+	</apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!AND(ISBLANK(redirectURL),NOT(OR(ISBLANK(recordId),isClone)))}">
+		<p>
+			Use this page to change the record type for this {!LOWER(objectLabel)}.
+		</p>
+		<p>
+			When changing the record type for a record, existing picklist values do not change automatically.
+			We recommend updating existing picklist values on the record where appropriate. 
+		</p>
+	</apex:outputPanel>
+	<apex:form id="pbForm" >
+		<apex:actionFunction name="redirect" action="{!redirect}" rendered="{!NOT(ISBLANK(redirectURL))}"/>
+		<apex:pageBlock title="Select {!IF(ISBLANK(recordId),objectLabel,'New')} Record Type" mode="edit" id="Edit" rendered="{!ISBLANK(redirectURL)}">
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!selectRecordType}" value="Continue" disabled="{!NOT(isManagedProfile)}"/>
+				<apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+				<apex:actionStatus id="statusLoading">
+					<apex:facet name="start">
+						<apex:outputPanel style="vertical-align: text-bottom;">
+							<apex:image value="/img/loading.gif" />
+						</apex:outputPanel>
+					</apex:facet>
+				</apex:actionStatus>
+			</apex:pageBlockButtons>
+			<apex:pageMessages />
+			<apex:pageBlockSection columns="1" rendered="{!OR(ISBLANK(recordId),isClone)}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Record Type of new record" for="recordTypeId"/>
+					<apex:selectList value="{!recordTypeId}" size="1" id="recordTypeId" required="true">
+						<apex:selectOptions value="{!recordTypeOptions}" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection columns="1" rendered="{!NOT(OR(ISBLANK(recordId),isClone))}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Transfer this {!objectLabel}" for="transfer"/>
+					<apex:outputText value="{!recordName}" id="transfer"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Current Record Type" for="currentRecordType"/>
+					<apex:outputText value="{!currentRecordType.Name}" id="currentRecordType"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="New Record Type" for="recordTypeId"/>
+					<apex:selectList value="{!recordTypeId}" size="1" id="recordTypeId" required="true">
+						<apex:selectOptions value="{!recordTypeOptions}" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+	<apex:outputPanel layout="none" rendered="{!ISBLANK(redirectURL)}">
+		<h3>Available {!objectLabel} Record Types</h3>
+	</apex:outputPanel>
+	<apex:pageBlock rendered="{!ISBLANK(redirectURL)}">
+		<apex:pageBlockTable value="{!recordTypes}" var="rt" columns="2">
+			<apex:column value="{!rt.Name}"/>
+			<apex:column value="{!rt.Description}"/>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+	<apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(redirectURL))}">
+		<script>
+			if(! {!ISBLANK(redirectURL)}) {
+				try {
+//					alert('{!JSENCODE(redirectURL)}');
+					top.window.location.replace('{!JSENCODE(redirectURL)}');
+				} catch(e1) {
+					try {
+						top.window.location = '{!JSENCODE(redirectURL)}';
+					} catch(e2) {
+						redirect();
+					}
+				}
+			}
+		</script>
+	</apex:outputPanel>
+</apex:component>

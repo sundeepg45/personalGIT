@@ -1,0 +1,29 @@
+<apex:page standardController="Opportunity" extensions="ApexPages_Message_ControllerExtension,OrderManagementControllerExtension" action="{!validateOrder}" showHeader="false" sidebar="false">
+<script type="text/javascript">
+function confirmPO() {
+	return (! {!isPurchaseOrderPaymentType})||confirm('Please confirm the attached Purchase Order matches the Customer Information in Salesforce.com. Once confirmed, click "OK" button to submit the order.');
+}
+</script>
+	<apex:sectionHeader title="Submit Order" subtitle="{!Opportunity.Name}" />
+	<apex:form id="form">
+		<apex:pageBlock title="Submit Order" mode="View">
+			<apex:pageBlockButtons location="both">
+				<apex:commandButton onclick="return confirmPO()" value="Agree" action="{!updateSubmitOrder}" rendered="{!NOT(hasErrorMessages)}" />
+				<apex:commandButton onclick="top.window.close()" value="Cancel" />
+			</apex:pageBlockButtons>
+			<apex:pageMessages rendered="{!hasErrorMessages}" />
+			<apex:pageBlockSection rendered="{!NOT(hasErrorMessages)}" columns="1">
+By claiming commission for this opportunity, I hereby certify that I understand
+and have complied with Red Hat's commission requirements and policies, and that
+the content I submit is accurate and complete to the best of my knowledge.  I
+understand and agree that any failure to comply with the standard set forth in
+this certification may result in disciplinary action up to and including my
+dismissal.
+			</apex:pageBlockSection>
+			<apex:pageBlockSection rendered="{!showResubmitMessage}" columns="1">
+Please correct the items noted above. Once you have confirmed all opportunity
+detail is complete and accurate, please resubmit.
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

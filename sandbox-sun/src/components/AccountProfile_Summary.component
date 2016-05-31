@@ -1,0 +1,56 @@
+<apex:component controller="AccountProfile_ComponentController">
+	<apex:attribute name="accountProfile" description="Account Profile" type="Account_Profile__c" required="false" assignto="{!Account_Profile}" />
+	<apex:attribute name="partnerProfile" description="Partner Profile" type="Partner_Profile__c" required="false" assignto="{!Partner_Profile}" />
+	<apex:outputPanel layout="block" styleClass="pbSubheader tertiaryPalette">
+		<h3>SUMMARY <span class="titleSeparatingColon">:</span></h3>
+	</apex:outputPanel>
+	<div class="pbSubsection">
+		<table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+				<apex:componentBody />
+				<apex:outputPanel layout="none" rendered="{!NOT(ISNULL(Account_Profile))}">
+					<tr>
+						<td class="labelCol" >Account’s Open Source Maturity :</td>
+						<td class="dataCol" >
+							<c:OutputString value="{!Account_Profile.Account_s_Open_Source_Maturity__c}">&#160;</c:OutputString>
+						</td>
+						<td>&#160;</td>
+					</tr>
+					<tr>
+						<td class="labelCol" >Assessment Summary :</td>
+						<td class="dataCol" >
+							<apex:repeat value="{!AssessmentSummaryList}" var="assessmentSummary" first="0" rendered="{!AssessmentSummaryCount>1}" rows="{!IF(AssessmentSummaryCount>0,AssessmentSummaryCount-1,0)}">
+								<apex:outputText value="{!assessmentSummary.Assessment_Summary__c}, " />
+							</apex:repeat>
+							<apex:repeat value="{!AssessmentSummaryList}" var="assessmentSummary" first="{!IF(AssessmentSummaryCount>0,AssessmentSummaryCount-1,0)}">
+								<apex:outputText value="{!assessmentSummary.Assessment_Summary__c}" />
+							</apex:repeat>
+						</td>
+						<td>&#160;</td>
+					</tr>
+				</apex:outputPanel>
+				<apex:outputPanel layout="none" rendered="{!NOT(ISNULL(Partner_Profile))}">
+					<tr>
+						<td class="labelCol">Partner’s Open Source Maturity :</td>
+						<td class="dataCol">
+							<c:OutputString value="{!Partner_Profile.Partner_s_Open_Source_Maturity__c}">&#160;</c:OutputString>
+						</td>
+						<td >&#160;</td>
+					</tr>
+					<tr>
+						<td class="labelCol">Assessment Summary : </td>
+						<td class="dataCol">
+							<apex:repeat value="{!PartnerAssessmentSummaryList}" var="partnerAssessmentSummary" first="0" rendered="{!PartnerAssessmentSummaryCount>1}" rows="{!IF(PartnerAssessmentSummaryCount>0,PartnerAssessmentSummaryCount-1,0)}">
+								<apex:outputText value="{!partnerAssessmentSummary.Partner_Assessment_Summary__c}, " />
+							</apex:repeat>
+							<apex:repeat value="{!PartnerAssessmentSummaryList}" var="partnerAssessmentSummary" first="{!IF(PartnerAssessmentSummaryCount>0,PartnerAssessmentSummaryCount-1,0)}">
+								<apex:outputText value="{!partnerAssessmentSummary.Partner_Assessment_Summary__c}" />
+							</apex:repeat>
+						</td>
+						<td >&#160;</td>
+					</tr>
+				</apex:outputPanel>
+			</tbody>
+		</table>
+	</div>
+</apex:component>

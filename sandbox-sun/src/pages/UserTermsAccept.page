@@ -1,0 +1,80 @@
+<apex:page controller="UserTermsAcceptController" showHeader="false" sidebar="false" action="{!init}">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>{!$Label.Feature_Access_Agreement}</title>
+
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/all.js')}"></script>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if IE 9]>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css" rel="stylesheet')}" />
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+
+</head>
+<div id="doc-body-div" class="red-hat-content">
+    <div class="container">
+        <div id="header-text">
+          <h2>{!$Label.Feature_Access_Desc}</h2>
+        </div>
+        <div id="inline-document">
+          <object type="application/pdf" height="400" id="text_content" width="100%" data="/servlet/servlet.FileDownload?file={!agreementDoc.Id}"></object>
+        </div>
+        <div id="accept-section">
+          <h2 class="declined-message"><apex:outputText value="{!$Label.Feature_Access_Declined_Message}" rendered="{!termsDeclined}"><i class="fa fa-exclamation-circle"></i>
+</apex:outputText></h2>
+          <br />
+          <apex:form styleClass="button-container">
+              <apex:commandButton action="{!acceptTerms}" value="{!$Label.Accept}" styleClass="ease"/>
+              <apex:commandButton action="{!declineTerms}" value="{!$Label.Decline}" styleClass="previous ease"/>
+          </apex:form>
+        </div>
+    </div>
+</div>
+<style>
+    #inline-document{
+        border-bottom: 2px solid #555;
+    }
+    #accept-section{
+        padding-bottom: 40px;
+    }
+    #accept-section .declined-message{
+        width: 800px;
+        margin: 20px auto 0;
+    }
+    #accept-section .declined-message i{
+        float: left;
+        color: #c00;
+        margin-right: 10px;
+    }
+    .button-container{
+        text-align: center;
+    }
+    .button-container .btn{
+        margin-right: 10px;
+    }
+</style>
+</apex:page>

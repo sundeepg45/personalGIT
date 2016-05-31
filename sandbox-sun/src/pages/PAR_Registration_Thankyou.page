@@ -1,0 +1,5 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt" tabStyle="Partner_Registration__c" >
+        <apex:pageMessages />
+        <apex:outputLink value="/{!acct.Id}"><apex:outputText value=" {!acct.Name}"/></apex:outputLink>
+    
+</apex:page>

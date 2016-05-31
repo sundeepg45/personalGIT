@@ -1,0 +1,25 @@
+<apex:page standardController="Opportunity" showHeader="false" sidebar="false">
+<script type="text/javascript">
+function reloadOppAndClose() {
+	try {
+		top.window.opener.location.reload();
+	}
+	catch(e) {
+		top.window.opener.location.hash = '#reload';
+	}
+	top.window.close();
+}
+</script>
+	<apex:sectionHeader title="Submit Order Success" subtitle="{!Opportunity.Name}" />
+	<apex:form id="form">
+		<apex:pageBlock title="Submit Order Success" mode="View">
+			<apex:pageBlockButtons location="both">
+				<apex:commandButton onclick="reloadOppAndClose()" value="Close" />
+			</apex:pageBlockButtons>
+			<apex:pageMessages />
+			<apex:pageBlockSection >
+Your order was placed successfully.
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

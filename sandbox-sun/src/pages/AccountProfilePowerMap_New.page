@@ -1,0 +1,18 @@
+<apex:page standardController="Account_Profile_Power_Map__c" extensions="AccountProfilePowerMap_ControllerExtn" cache="false" readOnly="true"  showChat="false" showHeader="false" sidebar="false">
+	<script type="text/javascript">
+		var redirectURL='/{!objectPrefix}/e?' + 
+			'{!IF(OR(ISBLANK(accountProfileFieldId),ISBLANK(accountProfile.Id)),'','CF'+accountProfileFieldId+'='+URLENCODE(accountProfile.Name)+'&')}' +
+			'{!IF(OR(ISBLANK(accountProfileFieldId),ISBLANK(accountProfile.Id)),'','CF'+accountProfileFieldId+'_lkid='+accountProfile.Id+'&')}' +
+			'{!IF(OR(ISBLANK(accountFieldId),ISBLANK(accountProfile.Account__c)),'','CF'+accountFieldId+'='+URLENCODE(accountProfile.Account__r.Name)+'&')}' +
+			'{!IF(OR(ISBLANK(accountFieldId),ISBLANK(accountProfile.Account__c)),'','CF'+accountFieldId+'_lkid='+accountProfile.Account__c+'&')}' +
+			'saveURL=%2F{!accountProfile.Id}%23AccountObjectives_target&'+
+			'retURL=%2F{!accountProfile.Id}%23AccountObjectives_target&'+
+			'nooverride=1';
+//		alert(redirectURL);
+		try {
+			top.window.location.replace(redirectURL);
+		} catch(e1) {
+			top.window.location = redirectURL;
+		}
+	</script>
+</apex:page>

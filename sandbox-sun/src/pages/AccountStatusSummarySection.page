@@ -1,0 +1,24 @@
+<apex:page standardController="Account" extensions="AccountStatusSummaryController">
+
+	<apex:pageBlock >
+		<apex:pageBlockSection rendered="{!hasState}">
+			<apex:pageBlockSectionItem rendered="{!myPartnerState.Legal_Blocked__c}">
+				<apex:outputLabel value="Blocked by Legal"/>
+				<apex:outputLabel value="FCPA Failure" style="color:red"/>
+			</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+		<apex:pageBlockSection >
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Primary Program & Tier"/>
+				<apex:outputPanel >
+					<apex:outputText value="{!myAccount.Finder_Partner_Type_Name__c}"/>&nbsp;/&nbsp;<apex:outputText value="{!myAccount.Finder_Partner_Tier_Name__c}"/>
+				</apex:outputPanel>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Requal Status"/>
+				<apex:outputText value="{!myAccount.RequalStatus__c}"/>
+			</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+
+</apex:page>

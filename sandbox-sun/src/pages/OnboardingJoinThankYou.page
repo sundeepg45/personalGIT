@@ -1,0 +1,179 @@
+<apex:page standardController="Lead" extensions="OnboardingController" sidebar="false">
+
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Thank You</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="join">
+
+  <div class="red-hat-content">
+
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">Redhat Partner Portal</a>
+            </div><!-- /.col-xs-5 -->
+            <div class="col-xs-7">
+              <div class="description">Application Submitted</div>
+            </div><!-- /.col-xs-7 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+
+    <div class="join-content-wrap user-signup">
+      <div class="container">
+        <div class="row">
+          <div class="content-wrapper">
+            <apex:form >
+              <div class="row">
+                <div class="col-xs-12">
+                  <h1 class="request-problem">Thank you</h1>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+                  <!--<p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor
+                  auctor. Duis mollis, est non commodo luctus. <a href="#" class="more inline">Learn More</a></p>-->
+
+
+
+
+
+
+                  <!--  BEGIN PAGE CONTENT  -->
+
+                    <apex:outputPanel layout="none">
+                        <!--
+                        <h4><apex:outputText value="{!$Label.Onboarding_JoinThankYou_Application_To_Join_Company_Part1}"/>  {!Lead.Company}  <apex:outputText value="{!$Label.Onboarding_JoinThankYou_Application_To_Join_Company_Part2}"/></h4>
+                        <br/>
+                        -->
+                        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_JoinThankYou_Your_App_Is_Submitted}"/></div>
+                         <p>
+                            <apex:outputText rendered="{!NOT(IsCCP)}" value="{!$Label.Onboarding_JoinThankYou_Thank_You_For_Your_Interest}"/>
+                            <apex:outputText rendered="{!isCCP}" value="{!$Label.Onboarding_JoinThankYou_Thank_You_For_Your_Interest_CCP}"/>
+                        </p>
+
+
+                        <!-- PRINT APPLICATION ..
+                        <p><apex:outputLink value="#">Print your application</apex:outputLink></p>
+                        -->
+
+                        <!--  EMAIL CONFIRMATION ..
+                        <apex:outputPanel rendered="{!NOT(isCCP)}">
+                            <p>
+                                <apex:outputText rendered="{!IsEmailValidated}" value="{!$Label.Onboarding_JoinThankYou_Confirmation_OEM_SI}"/>
+                                <apex:outputText rendered="{!NOT(IsEmailValidated)}" value="{!$Label.Onboarding_JoinThankYou_Confirmation_Email_Will_Be_Sent}"/>
+                            </p>
+                        </apex:outputPanel>
+                        -->
+
+
+                        <apex:outputPanel rendered="{!isCCP}">
+                            <p>
+                                <apex:outputText rendered="{!isCCP}" value="{!$Label.Onboarding_RegisterThan_You_Email_Confirming_Your_App_CCP}"/>
+                            </p>
+                        </apex:outputPanel>
+
+
+
+                        <apex:outputPanel rendered="{!isCCP}">
+                            <p>
+                                <apex:outputText rendered="{!IsCCP}" value="{!$Label.Onboarding_JoinThankYou_CCP_Terms_Follow_Up}" />
+                            </p>
+                            <br/>
+                        </apex:outputPanel>
+
+
+                        <!-- BEST REGARDS..
+                        <p>
+                            <apex:outputText value="{!$Label.Onboarding_JoinThankYou_Best_Regards}"/>
+                        </p>
+                        <br/>
+                        -->
+
+                        <p>
+                            <apex:outputText rendered="{!NOT(isCCP)}" value="{!$Label.Onboarding_JoinThankYou_The_Partner_Program}"/>
+                            <apex:outputText rendered="{!isCCP}" value="{!$Label.Onboarding_JoinThankYou_The_Partner_Program_CCP}"/>
+                        </p>
+                    </apex:outputPanel>
+
+
+                    <!--  END PAGE CONTENT  -->
+
+
+
+
+                  </div><!-- /.col-xs-12 -->
+                </div><!-- /.row -->
+
+
+
+
+
+
+
+            </apex:form>
+          </div><!-- /.content-wrapper -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.join-content-wrap /.user-signup -->
+
+     <c:Onboarding_Footer />
+
+  </div> <!--  red-hat-content -->
+
+  </body>
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .hasMotif {
+        margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+    .leadTab .brdPalette {
+      border: none !important;
+    }
+  </style>
+</apex:page>

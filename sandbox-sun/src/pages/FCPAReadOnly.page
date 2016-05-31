@@ -1,0 +1,11 @@
+<apex:page standardController="PartnerRequalification__c" >
+    <apex:stylesheet value="{!$Resource.Common_EmbeddedPageStylesheet}"/>
+    <apex:form >
+    	<apex:pageBlock >
+        	<apex:pageBlockSection columns="2" >
+                <apex:outputField id="txt_FCPA1" value="{!PartnerRequalification__c.FCPAActInGovernmentPosition__c}"/>
+                <apex:outputField id="txt_FCPA2" value="{!PartnerRequalification__c.FCPAConvictedOfCrime__c}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock> 
+    </apex:form>        
+</apex:page>

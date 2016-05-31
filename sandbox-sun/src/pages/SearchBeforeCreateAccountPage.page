@@ -1,0 +1,397 @@
+<apex:page standardController="Account" id="mainPage" extensions="AccountSearchBeforeCreateController">
+    <script>
+
+
+    </script>
+    <apex:outputPanel id="pageMessages">
+        <apex:pageMessages />
+    </apex:outputPanel>
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables_themeroller.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.min.js')}" />
+    <apex:stylesheet value="{!$Page.CommonStyleSheets}" />
+    <apex:includeScript value="{!$Page.CommonScripts}" />
+
+    <!-- Loading component -->
+        <c:loadingComponent />
+    <!-- Loading component End -->
+    <div style="display:none" id="selectedCountry"></div>
+    <apex:form id="formid">
+         <apex:actionFunction name="searchCDHPartyDetails" action="{!searchCDHParty}" oncomplete="setDataTableAction()" status="loadStatus" reRender="renderResults,actionButtons,pageMessages" />
+         <apex:actionFunction name="searchTypeSelect" action="{!searchTypeSelection}"  status="loadStatus" reRender="renderResults,searchFieldsLayout,searchButtons,addressInfo,PBid" />
+
+         <apex:pageblock title="{!$Label.Search_For_Account}" id="PBid" mode="edit" >
+            <apex:pageblockbuttons location="bottom" rendered="{!searchComponentRenderFlag}" id="searchButtons" >
+                <input type="button" class="btn" onclick="validateData('{!selectedSearchOption}')" value="{!$Label.Search_Account_from_MDM}" />
+                <apex:panelGroup id="actionButtons" >
+                    <apex:panelGroup rendered="{!IF(showButtons == true,true,false)}">
+                        <input type="button" class="btn" onclick="getPicklistValuesAndShowPopup('CDHParty')" value="{!$Label.Create_Account_from_MDM}" />
+                        <input type="button" class="btn" onclick="getPicklistValuesAndShowPopup('NormalSalesAccont','{!selectedSearchOption}')" value="{!$Label.Create_New_Account}" />
+                    </apex:panelGroup>
+                </apex:panelGroup>
+                <apex:commandButton action="{!Cancel}" value="{!$Label.Cancel_Button_Value}" />
+
+            </apex:pageblockbuttons>
+            <div id="SearchSelect">
+                <apex:pageBlockSection id="searchSelectOptions" columns="1">
+                    <apex:selectRadio label="Select Search Type" value="{!selectedSearchOption}" id="selectSearchOption"   onchange="displaySearch()" layout="pagedirection" >
+                        <apex:selectOptions value="{!searchOptionList}" />
+                    </apex:selectRadio>
+                </apex:pageBlockSection>
+            </div>
+
+            <div id="searchingFields">
+            <apex:outputPanel id="searchFieldsLayout" rendered="{!searchComponentRenderFlag}">
+                <apex:pageblocksection id="partyInfo" title="{!$Label.Account_Information}" collapsible="false" columns="1"  >
+                        <apex:pageblockSectionItem id="partyNumber" rendered="{!partyNumberComponentRenderFlag}">
+                            <apex:outputLabel value="{!$Label.Party_Number}" for="accPhId" />
+                            <apex:outputPanel >
+                                <div class="requiredInput" >
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputtext value="{!PartyNo}" id="accPhId" tabindex="1" onkeypress="return onKeyup_TxtFieldcom(event);" />
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageblockSectionItem>
+                        <apex:pageblockSectionItem id="partyName" rendered="{!partyNameComponentRenderFlag}" >
+                            <apex:outputLabel value="{!$Label.Account_Name}" for="accid" />
+                            <apex:outputPanel >
+                                <div class="requiredInput" >
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputtext value="{!AccName}" id="accid" tabindex="2" onkeypress="return onKeyup_TxtFieldcom(event);"/>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageblockSectionItem>
+                        <apex:pageblockSectionItem id="aliasName" rendered="{!partyNameComponentRenderFlag}">
+                            <apex:outputLabel value="{!$Label.Account_Alias}" for="aliasid" />
+                            <apex:outputPanel >
+                                <apex:inputCheckbox value="{!AliasFlag}" id="aliasid" tabindex="3" onkeypress="return onKeyup_TxtFieldcom(event);" title="Please check this option for Local Language search." />
+                            </apex:outputPanel>
+                        </apex:pageblockSectionItem>
+                        <apex:pageblockSectionItem id="dunsNumber" rendered="{!dunsNoComponentRenderFlag}"  >
+                            <apex:outputLabel value="{!$Label.DUNS_Number}" for="dunsNumberid" />
+                                <apex:outputPanel >
+                                    <div class="requiredInput" >
+                                        <div class="requiredBlock"></div>
+                                        <apex:inputtext value="{!StrDUNSNumber}" id="dunsNumberid" tabindex="4" onkeypress="return onKeyup_TxtFieldcom(event);"/>
+                                    </div>
+                                </apex:outputPanel>
+                        </apex:pageblockSectionItem>
+                </apex:pageblocksection>
+
+                 <apex:pageblocksection id="addressInfo" title="{!$Label.Account_Address_Information}"  collapsible="false"  columns="1" rendered="{!partyNameComponentRenderFlag}" >
+                        <apex:pageblocksectionItem >
+                            <apex:outputlabel value="{!$Label.Street_Address}" for="Addressid"/>
+                            <apex:inputtextarea value="{!Street}" id="Addressid" cols="30" rows="3" tabindex="5" onkeypress="return onKeyup_TxtFieldcom(event);"/>
+                        </apex:pageblocksectionItem>
+
+                        <apex:pageblocksectionitem id="citySection" >
+                            <apex:outputLabel for="strCityid" value="{!$Label.City_for_VF}"></apex:outputLabel>
+                            <apex:outputPanel >
+                                <div class="requiredInput" >
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputtext value="{!city}"  id="strCityid" tabindex="6" onkeypress="return onKeyup_TxtFieldcom(event);"/>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageblocksectionitem>
+                        <apex:pageblocksectionitem id="countrySection" >
+                            <apex:outputLabel for="acc17country" value="{!$Label.Country_for_VF}"></apex:outputLabel>
+                            <apex:outputPanel >
+                                <div class="requiredInput" >
+                                    <div class="requiredBlock"></div>
+                                    <apex:selectList onchange="getAllState(this.value)" id="countryList" value="{!country}" size="1" multiselect="false" tabindex="7" onkeypress="return onKeyup_TxtFieldcom(event);">
+                                        <apex:selectOptions value="{!countryCodeSelectList}"/>
+                                    </apex:selectList>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageblocksectionitem>
+
+                        <apex:outputPanel id="stateText">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td width="18%" align="right"><apex:outputLabel style="margin-left:144px" styleClass="labelCol" rendered="{!If(stateList.size < 2,true,false)}" for="strStateid" value="{!$Label.State_Province}"></apex:outputLabel></td>
+                                    <td ><apex:inputtext style="margin-left:3px" rendered="{!If(stateList.size < 2,true,false)}" value="{!state}" id="strStateid" tabindex="8" onkeypress="return onKeyup_TxtFieldcom(event);"/></td>
+                                </tr>
+                                <tr>
+                                    <td width="18%" align="right"><apex:outputLabel style="margin-left:144px" styleClass="labelCol" rendered="{!If(stateList.size > 2,true,false)}" for="strStateid" value="{!$Label.State_Province}"></apex:outputLabel></td>
+                                    <td><apex:selectList style="margin-left:3px" rendered="{!If(stateList.size > 2,true,false)}" onkeypress="return onKeyup_TxtFieldcom(event);" id="stateSelectList" value="{!state}" size="1" multiselect="false" tabindex="9">
+                                            <apex:selectOptions value="{!stateList}"/>
+                                        </apex:selectList>
+                                    </td>
+                                </tr>
+                            </table>
+                        </apex:outputPanel>
+                        <apex:pageblocksectionitem >
+                            <apex:outputLabel for="strpostalcodeid" value="{!$Label.Postal_Code}"></apex:outputLabel>
+                            <apex:inputtext value="{!postalcode}" id="strpostalcodeid" tabindex="10" onkeypress="return onKeyup_TxtFieldcom(event);"/>
+                        </apex:pageblocksectionitem>
+
+
+                </apex:pageblocksection>
+            </apex:outputPanel>
+            </div>
+        </apex:pageblock>
+
+        <apex:outputpanel id="renderResults">
+        <apex:outputpanel rendered="{!DisplayMDMResults}" id="MDMopid">
+            <apex:pageBlock id="mdmresultid">
+
+                <apex:pageBlockTable id="datatable" styleClass="dataTable1" value="{!searchResultsWrapperList}" var="wrapvar">
+                    <apex:column >
+                             <input type="radio" name="selectParty" value="{!wrapvar.rowNum}" id="{!wrapvar.rowNum}"
+                                    onclick="changeValue(this,'{!$Component.RadioButtonValue}');" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Account_Name}</apex:facet>
+                        {!wrapvar.partyName}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Party_Number}</apex:facet>
+                        {!wrapvar.partyNumber}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Partner_Type}</apex:facet>
+                        {!wrapvar.partyType}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.DUNS_Number}</apex:facet>
+                        {!wrapvar.DUNSNumber}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Identifying_Address}</apex:facet>
+                        {!wrapvar.IdentifyingAddress}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Account_Tax_Reference_ID}</apex:facet>
+                        {!wrapvar.TaxReference}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Phone}</apex:facet>
+                        {!wrapvar.phone}
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.SBC_Partner_Classification_Code}</apex:facet>
+                        <apex:repeat value="{!wrapvar.partnerCodes}" var="PartnerClassificationCode" id="partnerCodes">
+                            <apex:outputText value="{!PartnerClassificationCode}" id="ClassificationCode"/><br/>
+                        </apex:repeat>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Account_View_Sales_Accounts}</apex:facet>
+                        <a href="javascript:void(0)" onclick="showSalesAccountForCDH('{!wrapvar.relatedLinks}')">{!if(len(wrapvar.relatedLinks)>1,'View','')}</a>
+                    </apex:column>
+                </apex:pageBlockTable>
+
+            </apex:pageBlock>
+            <apex:inputHidden value="{!SelAccId}" id="RadioButtonValue" />
+        </apex:outputpanel>
+
+        <apex:outputpanel rendered="{!NoResultsDisplay}">
+            <font color="red">{!$Label.Alert_Text}</font>
+        </apex:outputpanel>
+    </apex:outputpanel>
+    <apex:outputPanel id="renderPanel" />
+
+
+    <apex:actionFunction name="redirectAccountUrl" status="loadStatus" action="{!redirectAccountUrl}" reRender="pageMessages">
+        <apex:param name="selectedCDHAccount" id="selectedCDHAccount" value="" />
+        <apex:param name="recordTypeId" id="recordTypeId" value="" />
+    </apex:actionFunction>
+    </apex:form>
+    <apex:form >
+        <apex:actionFunction name="getStateList" action="{!getAllStates}" reRender="stateText">
+            <apex:param name="countryName" id="countryName" value="" />
+        </apex:actionFunction>
+    </apex:form>
+    <!-- Popup Code -->
+    <div class = "RH_bg-fade"></div>
+    <div class = "RH_modal-window">
+        <div class = "RH_modal-head">
+            <!--------- Popup Group Member Header ----------->
+            <div class = "modal-group-header RH_left" id = "RH_header">
+                Sales Accounts
+            </div>
+            <!--------- End Group Member Header ---------
+            <a class = "modal-close" href = "javascript: void(0);" onclick = "hideModal()"></a> -->
+        </div>
+        <!--------- Popup Group Member Content ----------->
+        <div class = "RH_modal-content" id = "RH_body">
+            <div id="SalesAccountTable"></div>
+        </div>
+
+        <!--------- End Popup Group Member Content ----------->
+        <div class = "RH_modal-btm">
+            <!--------- Popup Popup Group Member Footer ----------->
+           <div class = "modal-footer" id = "RH_footer">
+                <button type = "button" class="RH_closePopup"  id="closePopup" >Close</button>
+                <button type = "button" class="RH_closePopup"  id="continuePopup" >Continue</button>
+                <button type = "button" class="RH_closePopup" style="margin-left:10px;" id="clearPopup" >Cancel</button>
+           </div>
+           <!--------- End Popup Popup Group Member Footer ----------->
+        </div>
+     </div>
+     <!--------- End Popup ----------->
+    <script>
+        function displaySearch()
+        {
+            searchTypeSelect();
+        }
+
+        function onKeyup_TxtFieldcom(e)
+            {
+               // alert('Enter');
+                var keynum;
+                if(window.event) // IE
+                {
+                   // alert(e.keyCode);
+                    keynum = e.keyCode;
+                }
+                if(keynum == 13)
+                {
+
+                   // alert('Enter1');
+                    validateData('{!selectedSearchOption}');
+                    //alert('Enter2');
+                    return false;
+                }
+        }
+        // get available record type in Picklist and show it in popup
+        function getPicklistValuesAndShowPopup(AccountType,radioButtonValue){
+            var AccountName = '';
+            if (radioButtonValue == '3'){
+                AccountName = document.getElementById('mainPage:formid:PBid:partyInfo:partyName:accid').value;
+			}
+            if(AccountType != 'NormalSalesAccont'){
+                if ($('input[name=selectParty]:checked').length == 0) {
+                    alert('Please select a party');
+                    return;
+                }
+            }
+            var accountTypes = removeQuotes('{!AccountRecordTypesJSON}');
+            var taskList = "<select id='recordTypeId' Enabled='true' >";
+            for (var i = 0; i < accountTypes.length; i++) {
+                taskList += "<option value="+accountTypes[i].recordTypeId+">"+accountTypes[i].recordTypeName+"</option>";
+            }
+            taskList += "</select>";
+            $('#RH_header').html('Select RecordType');
+            $("#SalesAccountTable").html(taskList);
+            $('#closePopup').css('display','none');
+            $('#clearPopup').css('display','block');
+            $("#continuePopup").css('display','block');
+            $("#continuePopup").attr('onclick','').unbind('click');
+            $('.RH_modal-window').css('width','400px');
+            $('.RH_modal-window').css('margin-left','-200px');
+            $('#SalesAccountTable').css('margin-left','25%');
+            showModel();
+            $("#clearPopup").click(function(){
+                $('.RH_modal-window').css('display','none');
+                $('.RH_bg-fade').fadeOut('slow');
+                $('body').css('overflow','auto');
+            });
+            $("#continuePopup").click(function(){
+                $("#continuePopup").attr('onclick','').unbind('click');
+                console.log($('#recordTypeId').val());
+                recordTypeId = $('#recordTypeId').val();
+                if(AccountType == 'NormalSalesAccont'){
+                    if (radioButtonValue == '3'){
+                        redirectString = '/001/e?retURL=%2F001%2Fo&RecordType='+recordTypeId+'&acc2='+AccountName+'&nooverride=1';
+                    }
+                    else{
+                        redirectString = '/001/e?retURL=%2F001%2Fo&RecordType='+recordTypeId+'&nooverride=1';
+                    }
+                    navigateToUrl(redirectString,null,'new');
+                    $('.RH_modal-window').css('display','none');
+                    $('.RH_bg-fade').fadeOut('slow');
+                    $('body').css('overflow','auto');
+                }else{
+                    var selectedCDHAccount = $('input[name=selectParty]:checked').val();
+                    console.log('Select Account---'+selectedCDHAccount);
+                    redirectAccountUrl(selectedCDHAccount,recordTypeId);
+                    $('.RH_modal-window').css('display','none');
+                    $('.RH_bg-fade').fadeOut('slow');
+                    $('body').css('overflow','auto');
+                }
+            });
+        }
+
+        // remove quote from json string
+        function removeQuotes(mystring) {
+
+            newString = mystring.replace(/&(lt|gt|quot);/g, function (m, p) {
+                //console.log(p);
+                return (p == "lt") ? "<" : ((p == "gt") ? ">" : "\"");
+            });
+
+            //var newJ= $.parseJSON(newString);
+            var  newJ = eval ("(" + newString+ ")");
+            return newJ;
+        }
+
+        function getAllState(countryName){
+            if(countryName != '--None--'){
+                countryNameArray = countryName.split(',');
+                countryName = countryNameArray[1];
+                $('#selectedCountry').html(countryName);
+                getStateList(countryName);
+            }else{
+                $('#selectedCountry').html('');
+            }
+        }
+
+        function changeValue(input, textid) {
+            document.getElementById(textid).value = input.value;
+            //alert('id===='+document.getElementById(textid).value);
+        }
+        // remove quate from json string
+        function removeQuotes(mystring) {
+
+            newString = mystring.replace(/&(lt|gt|quot);/g, function (m, p) {
+                //console.log(p);
+                return (p == "lt") ? "<" : ((p == "gt") ? ">" : "\"");
+            });
+
+            var  newJ = eval ("(" + newString+ ")");
+            return newJ;
+        }
+
+        function validateData(radioButtonValue){
+
+
+            if (radioButtonValue == '3'){
+                if(document.getElementById('mainPage:formid:PBid:addressInfo:countrySection:countryList').value == '--None--' || document.getElementById('mainPage:formid:PBid:addressInfo:countrySection:countryList').value== ''){
+                        alert("Party Name, City and Country are mandatory fields to search by Party Name.");
+                        return;
+                    }
+
+                    if(document.getElementById('mainPage:formid:PBid:addressInfo:citySection:strCityid').value == ''){
+                        alert("Party Name, City and Country are mandatory fields to search by Party Name.");
+                        return;
+                    }
+
+                    if(document.getElementById('mainPage:formid:PBid:partyInfo:partyName:accid').value == '' ){
+                        alert("Party Name, City and Country are mandatory fields to search by Party Name.");
+                        return;
+                    }
+
+            }
+            else if (radioButtonValue == '1'){
+                if(document.getElementById('mainPage:formid:PBid:partyInfo:partyNumber:accPhId').value == '')
+                {
+                    alert("Please enter Party Number for searching for Party.");
+                    return;
+                }
+            }
+            else if (radioButtonValue == '2'){
+                if(document.getElementById('mainPage:formid:PBid:partyInfo:dunsNumber:dunsNumberid').value == '')
+                {
+                    alert("Please enter DUNS Number for searching for Party.");
+                    return;
+                }
+            }
+
+            searchCDHPartyDetails();
+
+        }
+
+    </script>
+
+</apex:page>

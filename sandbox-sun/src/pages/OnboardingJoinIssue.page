@@ -1,0 +1,200 @@
+<apex:page sidebar="false" controller="OnboardingJoinController" action="{!initIssuesPage}">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Join</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="join">
+
+  <div class="red-hat-content">
+
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+            </div><!-- /.col-xs-5 -->
+            <div class="col-xs-7">
+              <div class="description">{!$Label.ONB_Join_an_existing_Red_Hat_partner_portal_account}</div>
+            </div><!-- /.col-xs-7 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+
+    <div class="join-content-wrap user-signup">
+      <div class="container">
+        <div class="row">
+          <div class="content-wrapper">
+            <apex:form >
+              <div class="row">
+                <div class="col-xs-12">
+                  <h1 class="request-problem"><span class="fa fa-exclamation-circle"></span>{!$Label.ONB_further_action_required}</h1>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+
+
+              <!-- Inactive User Error -->
+              <!-- skip showing the Inactive user case submission content for Unaffiliated-CCP not agreed to terms-->
+                 <apex:outputPanel id="InactiveUserError" styleClass="OnboardingError" rendered="{!(HasInactiveUserError && !IsCCP && !isEmbeddedPartner) ||
+                                                                                                    (HasInactiveUserError && IsCCP && isEmbeddedPartner
+                                                                                                      && IsAgreedToTerms)}">
+                    <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+                        <apex:outputPanel >
+                            <apex:outputLabel value="{!$Label.Onboarding_ErrorUserIsInactive_User_Inactive}"/>
+
+                            <!--  "Submit For Activation" -->
+                            <apex:commandButton action="{!activateUserSubmit}" value="{!$Label.Onboarding_ErrorUserIsInactive_Submit_For_Activation}" styleClass="rowbutton ease" >
+                                <apex:param name="federation-id" value="{!FederationId}" assignTo="{!FederationId}" />
+                            </apex:commandButton>
+
+                            <!--  Cancel  -->
+                            <apex:commandButton action="{!activateUserCancel}" value="{!$Label.Onboarding_ErrorUserIsInactive_Cancel}" styleClass="rowbutton ease" />
+                        </apex:outputPanel>
+                    </apex:outputPanel></fieldset>
+
+                 </apex:outputPanel>
+
+
+
+             <!-- Contact has no User Error -->
+                 <apex:outputPanel id="ContactNoUserError" styleClass="OnboardingError" rendered="{!HasNoUserError}">
+                     <apex:outputLabel value="{!$Label.Onboarding_Error_ContactNoUser}" />
+
+                     <p><apex:outputText value="{!$Label.Onboarding_ErrorUserIsMissing_Would_You_Like_To_Submit_Request}"/></p>
+
+                     <!--<apex:form >-->
+                     <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+                         <apex:outputLabel >&nbsp;</apex:outputLabel>
+                         <apex:outputPanel >
+
+                             <!--  Submit For Activation  -->
+                             <apex:commandButton action="{!convertContactSubmit}" value="{!$Label.Onboarding_ErrorUserIsMissing_Submit_For_Activation}" styleClass="rowbutton ease" id="buttonSubmitForActivation2">
+                                 <apex:param name="federation-id" value="{!federationId}" assignTo="{!federationId}" />
+                             </apex:commandButton>
+                             <apex:commandButton action="{!convertContactCancel}" value="{!$Label.Onboarding_ErrorUserIsMissing_Cancel}" styleClass="rowbutton ease" id="buttonBack"/>
+                         </apex:outputPanel>
+                         </apex:outputPanel></fieldset>
+                     <!--</apex:form>-->
+
+                 </apex:outputPanel>
+
+
+              <!-- User Exists Error -->
+                 <apex:outputPanel id="UserExistsError" styleClass="OnboardingError" rendered="{!HasUserExistsError}">
+                    <apex:outputLabel value="{!$Label.ONB_user_already_exists}" />
+                 </apex:outputPanel>
+
+
+              <!-- Show 'Pending terms In-active(Unaffiliated) CCP/CCSP partner' the following message -->
+                 <apex:outputPanel id="PendingTermsCCPPartner" styleClass="OnboardingError" rendered="{!AND(IsCCP, !IsAgreedToTerms)}">
+                          <apex:outputLabel value="{!$Label.Onboarding_Error_CCP_Pending_terms_Can_Not_Login}" escape="false"/>
+                 </apex:outputPanel>
+
+              <!-- Show 'Pending terms In-active(Unaffiliated) Embedded partner' the following message -->
+                  <apex:outputPanel id="PendingTermsEmbeddedPartner" styleClass="OnboardingError" rendered="{!(isEmbeddedPartner && NOT(IsAgreedToTerms))}">
+                  <apex:outputLabel value="{!$Label.Onboarding_Error_Embedded_Pending_terms_Can_Not_Login}" escape="false"/>
+                  </apex:outputPanel>
+
+
+           <!--  Onboarding Case Exists Error  -->
+                  <apex:outputPanel id="CaseStatus" rendered="{!HasOnboardingCase}">
+
+                    <p><apex:outputLabel value="{!$Label.Onboarding_DisplayCaseStatus_Case_Exists}"/></p>
+
+                    <h2>{!$Label.ONB_case_details}</h2>
+                    <table>
+                        <!--
+                      <tr>
+                        <td class="table-title">Request Date: </td>
+                        <td><apex:outputText value="{!OnboardingCase.CreatedDate}" /></td>
+                      </tr>
+                        -->
+                      <tr>
+                        <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Issue_Type}"/>:</td>
+                        <td><apex:outputText value="{!OnboardingCase.Issue_Type__c}"/></td>
+                      </tr>
+                      <tr>
+                         <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Number}"/>:</td>
+                         <td><apex:outputText value="{!OnboardingCase.CaseNumber}"/></td>
+                      </tr>
+                      <tr>
+                         <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Status}"/>:</td>
+                         <td><apex:outputText value="{!OnboardingCase.Status}" /></td>
+                      </tr>
+                       <tr>
+                         <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Email}"/>:</td>
+                         <td><apex:outputLink value="mailto:{!OnboardingCaseEmail}?Subject=Case%20{!OnboardingCase.CaseNumber}" ><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Contact_Case_Owner}" /></apex:outputLink></td>
+                      </tr>
+                    </table>
+
+                    </apex:outputPanel>
+
+
+                  </div><!-- /.col-xs-12 -->
+                </div><!-- /.row -->
+
+
+                <!--  END PAGE CONTENT  -->
+
+
+
+
+
+            </apex:form>
+          </div><!-- /.content-wrapper -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.join-content-wrap /.user-signup -->
+
+     <c:Onboarding_Footer />
+
+  </div> <!--  red-hat-content -->
+
+  </body>
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+  </style>
+</apex:page>

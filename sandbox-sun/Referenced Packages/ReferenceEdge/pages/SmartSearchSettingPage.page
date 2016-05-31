@@ -1,0 +1,69 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.SmartSearchSettingController"  sideBar="false" id="pageId" tabStyle="refedge__Custom_Settings__c" >
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_the_Custom_Setting_Page}" action="{!returnCustomSettings}"/><br/>
+        </div>
+        <apex:outputPanel id="pbId">
+            <apex:pageBlock rendered="{!NOT(isAttMapping)}">
+                <apex:pageMessage summary="{!$Label.You_do_not_have_any_mapped_attributes}" strength="3" severity="Info"/>   
+            </apex:pageBlock>
+            <apex:pageBlock title="{!$Label.Smart_Search_Settings}" rendered="{!isAttMapping}">
+                
+                <apex:outputText value="{!$Label.Page_Information}"/>
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="{!$Label.Edit}" rendered="{!NOT(isEdit)}" action="{!editSettings}" reRender="pgmsgId, pbId,inputBlk" />
+                    <apex:commandButton value="{!$Label.Save}" rendered="{!isEdit}"  action="{!saveSettings}" reRender="pgmsgId, pbId,inputBlk"/>
+                    <apex:commandButton value="{!$Label.Cancel}" rendered="{!isEdit}" action="{!returnSettings}" reRender="pgmsgId, pbId,inputBlk"/>
+                </apex:pageBlockButtons>
+                
+                <apex:outputPanel id="inputBlk">
+                    <apex:pageBlockSection id="sec1" columns="1">
+                        <apex:outputPanel layout="block" style="width:100%;float:left;">
+                        <apex:pageBlockTable value="{!filterList}" var="filter" style="width:69%;float:left;">
+                            <apex:column style="{!IF(NOT(filter.refedge__Required__c), 'color : lightgray;', '')}" headerValue="{!$Label.Filter_Name}" value="{!filter.refedge__Label__c}"/>
+                            <apex:column headerValue="{!$Label.SS_Active}">
+                                <apex:inputField value="{!filter.refedge__Visible__c}" rendered="{!AND(isEdit,filter.refedge__Required__c)}"/>
+                                <apex:outputField value="{!filter.refedge__Visible__c}" rendered="{!AND(!isEdit,filter.refedge__Required__c)}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.SS_Ref_Search}" value="{!filter.refedge__Ref_Search_Coverage__c}"/>
+                            <apex:column headerValue="{!$Label.SS_Program}" value="{!filter.refedge__Program_Coverage__c}"/>
+                        </apex:pageBlockTable>
+                        <apex:outputPanel layout="block" style="padding: 15px;width:28%;float:left;">
+                            <apex:outputText value="{!$Label.SS_Two_numbers}" style="text-decoration:underline;"/><br/><br/>
+                            <apex:outputText value="{!$Label.SS_Ref_Search}" style="font-weight:bold;"/>
+                            <apex:outputText value=" {!$Label.SS_Ref_Program_Member}"/><br/><br/>
+                            <apex:outputText value="{!$Label.SS_Program}" style="font-weight:bold;"/>
+                            <apex:outputText value=" {!$Label.SS_Total_Number}"/><br/><br/>
+<!--                            <apex:outputText value="{!$Label.SS_Program}" style="font-weight:bold;"/> -->
+                            <apex:outputText value=" Content will be pre-filtered when accessing RefSearch from an Opportunity so that only Content tagged with the matching sales stage will be shown."/><br/><br/>
+                        </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

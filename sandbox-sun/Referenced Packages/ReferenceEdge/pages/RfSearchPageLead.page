@@ -1,0 +1,1066 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RfSearchController" sidebar="false" id="pageId" tabStyle="Search_Refs__tab" docType="html-5.0" >
+    
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Sction Header-->
+    <apex:sectionHeader title="{!IF(refMatch, $Label.Reference_Match, $Label.Reference_Search)}"  help="RfSearchHelpPage"  rendered="{!isFullLicenseAccessible}"/>
+    
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    
+    <!-- Add Style-->
+
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__Jplayer, 'Jplayer/css/jplayer.blue.monday.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__Jplayer, 'Jplayer/js/jquery.jplayer.min.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    
+    <style>
+       a.boxclose{
+            float: right;
+            margin-top: -24px;
+            cursor: pointer;
+            color: #fff;
+            border: 1px solid #AEAEAE;
+            border-radius: 16px;
+            background: #605F61;
+            font-size: 23px;
+            font-weight: bold;
+            display: inline-block;
+            line-height: 0px;
+            padding: 10px 3px;     
+        }
+        .sfdc_richtext img{
+            width:100px;
+            height:100px;
+        }
+        .collapse {
+            display: none;
+        }
+        .boxclose:before {
+            content: "?";
+        
+        }
+        .helpOrb{
+            display:none;
+        }
+        
+        //Start Bound 3 Req
+       jQuery(".ui-icon ui-icon-closethick").removeAttr();
+        .ui-widget-content{
+            border : none !important;
+        }
+        .ui-widget-header{
+            background : none !important;
+            border : none !important;
+            color : black !important;
+        } 
+        .showButton {
+            display : inline;
+        }
+        .hideButton {
+            display : none;
+        }
+        
+        .showButton {
+            display : inline;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-top-colors: none;
+            
+            background: url("/img/alohaSkin/btn_sprite.png") repeat-x scroll right top #E8E8E9;
+            border-color: #B5B5B5 #B5B5B5 #7F7F7F;
+            border-image: none;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            color: #333333;
+            font-size: 0.9em;
+            font-weight: bold;
+            font-family: Arial,Helvetica,sans-serif;
+            margin: 1px;
+            padding: 2px 3px !important; 
+        }
+
+         a{
+            color: black ;
+            text-decoration: underline;
+        }
+        body{
+            font-size: 12px ;
+            line-height: 1.1;
+        }
+        .btn{
+            line-height: 1.128571429;
+        }
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-family: Arial,Helvetica,sans-serif !important;
+            font-weight:bold ;
+            line-height: 1.1;
+        }   
+    </style> 
+    
+    <!-- Add JavaScript & Jquery-->
+    <script language="javascript" type="text/javascript">
+        var lastRecordId = '';
+        var lastClickedObj = '';
+        jQuery(".content img").css("background-image","none");
+        jQuery(".content img").attr("src","{!URLFOR($Resource.RESearchFilterIcons, 'search-icon.png')}");
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        function openSite(siteUrl){
+            if(siteUrl != '' && siteUrl != null){
+             if (siteUrl.indexOf("http://")>=0 || siteUrl.indexOf("https://") >=0){ 
+                 window.open('','_blank').location.href = siteUrl;
+             }
+             else{
+                 window.open('','_blank').location.href = 'http://'+siteUrl;
+             }
+            }
+        }
+       
+        //-----------------------------------------------------------------------------------------------------//
+        //this method is Use to check & uncheck all checkbox with header checkbox.
+        //-----------------------------------------------------------------------------------------------------//
+        function selectAllChk(cb, selectSingleBlockId, size, noticeId){
+            var selectSingleId = 'input:checkbox[id*='+ selectSingleBlockId +']';
+            
+            if(jQuery(cb).attr("checked")){
+                if(size > 0){
+                    for(var i=0; i < size; i++) {
+                        if(noticeId == 'accountNoticeId')
+                            var id = "pageId:formId:accountPbId:accountPbsId:pbtAccount:"+i+":accountNoticeId";
+                        if(noticeId == 'contactNoticeId')
+                            var id = "pageId:formId:contactPbId:contactPbsId:pbtContact:"+i+":contactNoticeId";
+                        if(document.getElementById(id).innerHTML == '{!$Label.Limit_Reached}'){
+                            alert('{!$Label.Limit_Reached_Message}');
+                            break;
+                        }
+                    }
+                }
+                if(selectSingleBlockId == 'selectSingleContentPbtId'){
+                   jQuery(selectSingleId).each(function(){
+                        if(jQuery(this).attr('disabled') != 'disabled')
+                           jQuery(this).attr('checked','checked');
+                    });
+                }
+                else{
+                    jQuery(selectSingleId).attr('checked', 'checked');
+                }
+                    
+                   
+            }
+            else 
+                jQuery(selectSingleId).removeAttr('checked');  
+        }
+        
+        //-----------------------------------------------------------------------------------------------------//
+        //this method is Use uncheck header checkbox.
+        //-----------------------------------------------------------------------------------------------------//
+        function deSelectAllChk(selectAllBlockId){
+            var selectAllId = 'input:checkbox[id*='+ selectAllBlockId +']';
+            jQuery(selectAllId).removeAttr('checked');  
+        }
+        
+        //-----------------------------------------------------------------------------------------------------//
+        //this method is Use to check & uncheck header checkbox.
+        //-----------------------------------------------------------------------------------------------------//
+        function enableDisable(cb, selectSingleBlockId, selectAllBlockId, limit ){
+            var selectSingleId = 'input:checkbox[id*='+ selectSingleBlockId +']';
+            var selectAllId = 'input:checkbox[id*='+ selectAllBlockId +']';
+            
+            if(!jQuery(cb).attr("checked")){
+                
+                jQuery(selectAllId).removeAttr('checked');
+            }
+            else{
+                if(limit == '{!$Label.Limit_Reached}'){
+                    alert('{!$Label.Limit_Reached_Message}');
+                }
+                if(jQuery(selectSingleId+":checked").length == jQuery(selectSingleId).length)
+                    jQuery(selectAllId).attr('checked', 'checked');
+                else
+                    jQuery(selectAllId).removeAttr('checked');
+            }
+        }
+        
+        //-----------------------------------------------------------------------------------------------------//
+        //this method call on click of search button
+        //-----------------------------------------------------------------------------------------------------//
+        function doSearch() {
+            var searchText = jQuery('input:text[id*=inputTextId]').val();
+            if (searchText.length ==1) {
+                alert('{!$Label.Atleast_two_characters}');
+                return false;
+            }
+            else {
+                PORShowLoading();
+                searchRecord(searchText);
+            }
+        }
+        
+        //Send selected Accounts
+        function sendSelectedIdsAccount(size,showMoreLink,button){
+            var ids2='';
+            var count=0;
+            if(showMoreLink){
+                callShowMoreLink(ids2,true,false,false);
+            }else{
+                if(button == 'previous'){
+                    accountPrevious();
+                }
+                else if(button == 'next'){
+                    accountNext();
+                }
+            }
+            return false;
+        }
+        
+        //Send selected Contents
+        function sendSelectedIdsContent(size,showMoreLink,button){
+            var ids2='';
+            var count=0;
+            if(showMoreLink){
+                for(var i=0; i < size; i++) {
+                
+                     var id = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":selectSingleContentPbtId"; 
+                     var id2 = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":selectSingleContentIdHidden"; 
+                     if(document.getElementById(id).checked ) {
+                         count = count+1;
+                         if(ids2 == '') {
+                             ids2 = document.getElementById(id2).value ;
+                         } else {
+                             ids2 = ids2+','+document.getElementById(id2).value ;
+                         }
+                     }
+                }
+                callShowMoreLink(ids2,false,false,true);
+            }
+            else{
+                if(button == 'previous'){
+                    contentPrevious(ids2);
+                }
+                else if(button == 'next'){
+                    contentNext(ids2);
+                }
+            }
+            return false;
+        }
+        
+        //-----------------------------------------------------------------------------------------------------//
+        //this method call on mouse over on Image 
+        //-----------------------------------------------------------------------------------------------------//
+        var IE = document.all?true:false;
+        var tempX = 0;
+        var tempY = 0;
+
+        function showDiv(contentId, refconId, e) {     
+            if (IE) { 
+                tempX = e.clientX + document.body.scrollLeft;
+                tempY = e.clientY + document.body.scrollTop;
+            } 
+            else {  
+                tempX = e.pageX;
+                tempY = e.pageY;
+            } 
+            fetchContentItem(contentId, refconId);
+        }
+        function showDivOncompleteAction() {
+            document.getElementById('pageId:formId:dvContentDetails').style.display = 'block';
+            document.getElementById('pageId:formId:dvContentDetails').style.left = tempX+'px';
+            document.getElementById('pageId:formId:dvContentDetails').style.top = (tempY-100)+'px';
+        }
+        
+        //-----------------------------------------------------------------------------------------------------//
+        //this method call on mouse out on Image 
+        //-----------------------------------------------------------------------------------------------------//
+        function hideDiv() {
+            document.getElementById('pageId:formId:dvContentDetails').style.display = 'none';
+        }
+        
+        //Method to open Link
+        function openLinkContent(contentUrl) {
+            if (contentUrl.indexOf("http://")>=0 || contentUrl.indexOf("https://")>=0) 
+                window.open('','_blank').location.href = contentUrl;
+            else
+                window.open('','_blank').location.href = 'http://'+contentUrl;
+        }
+        function showHideTab(Id){
+            
+            if(Id == 'filterBasicId'){
+                document.getElementById('filterBasicId').style.display = 'block';
+                document.getElementById('filterOrderId').style.display = 'none';
+            }
+            if(Id == 'filterOrderId'){
+                document.getElementById('filterBasicId').style.display = 'none';
+                document.getElementById('filterOrderId').style.display = 'block';
+            }
+        }
+    </script>
+    
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="searchRecord" action="{!search}" reRender="accountOpId, contactOpId, contentOpId, inputTextId, pageMsgId" oncomplete="PORHideLoading();">
+            <apex:param name="searchParam" value="" assignTo="{!inputTextValue}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="callShowMoreLink" action="{!callShowMoreLink}" reRender="accountOpId, contactOpId, contentOpId" oncomplete="PORHideLoading();">
+             <apex:param name="selectedIds" value="one" assignTo="{!selectedId}"/>
+             <apex:param name="accountParam" value="" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+             <apex:param name="contactParam" value="" assignTo="{!contactSearch.showMoreContactRecords}"/>
+             <apex:param name="contentParam" value="" assignTo="{!contentSearch.showMoreContentRecords}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="contentPrevious" rerender="contentOpId" action="{!contentSearch.previous}" onComplete="PORHideLoading();">
+            <apex:param name="selectedIds" value="" assignTo="{!selectedId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="contentNext" rerender="contentOpId" action="{!contentSearch.next}" onComplete="PORHideLoading();">
+            <apex:param name="selectedIds" value="" assignTo="{!selectedId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionfunction name="accountPrevious" reRender="accountOpId" action="{!accountSearch.previous}" oncomplete="PORHideLoading();" />
+        
+        <apex:actionFunction name="accountNext" reRender="accountOpId" action="{!accountSearch.next}" oncomplete="PORHideLoading();"/>
+        
+        <apex:actionFunction name="fetchContentItem"  action="{!contentSearch.fetchHoverContentItem}" reRender="pgmsgId, dvContentDetails" oncomplete="showDivOncompleteAction();">
+            <apex:param name="contId" value="" assignTo="{!contentSearch.hoverContentId}"/>
+            <apex:param name="refContId" value="" assignTo="{!contentSearch.hoverRefContentId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="downloadContentFiles" reRender="pgmsgId" action="{!contentSearch.downloadContents}" >
+            <apex:param name="contIds" value="" assignTo="{!contentSearch.selectContentDocumentId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="downloadSingleContent" reRender="pgmsgId" action="{!contentSearch.singleContentDownload}" />
+        
+        <!-- Start Bound 3 Req -->
+       <!--  <apex:actionFunction name="playTranscript" action="{!playTranscript}" rerender="pgmsgId,transcriptPlayPanel" oncomplete="JplayerPlayTranscript();">
+            <apex:param name="interviewTopicId" assignTo="{!interviewTopicId}" value=""/>
+        </apex:actionFunction> -->
+        <apex:actionFunction name="showAll" action="{!showAll}"  reRender="contactOpId,accountOpId,pgmsgId" oncomplete="PORHideLoading();"/>
+        <!-- End Bound 3 Req -->
+        
+        <!-- Main Div -->
+        <div style="width:'100%';border:'0';" id="mainDivId">
+            <!-- Left Div -->
+            <div style="float: left; width: 15%; valign:'top';"> 
+                <div style="float: left; min-height: 90px; width: 90%; background-color:#CFEEF8; border-radius:5px;">  
+                    <div style="float: left; height: 25px; width: 100%; background-color:#1797C0; font-weight: bold; color: white; border-radius:5px;line-height:25px;">&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.Filter_Your_Results}</div>
+                    {!$Label.use_the_filters}<br/>
+                    <apex:commandLink value="{!$Label.View_All_Filters}" action="{!goToViewAllFilterResults}"/><br/>
+                    <apex:commandLink value="{!$Label.Clear_Filters}" action="{!clearFilters}"/><br/>
+                    <apex:commandLink value="{!$Label.Advance_Filters}" action="{!gotoAdvancedFilter}"/><br/>
+                </div>   
+                <div style="height:20px;clear:both; "></div>
+                <apex:outputPanel id="filterPanel">
+                <apex:outputPanel id="filterBasicId" rendered="{!isBasicSearchViewSelected}">
+                    <apex:repeat value="{!basicFilterList}" var="filter">
+                        <!-- Referenceability Div --> 
+                        <apex:outputPanel rendered="{!AND(showAccount,filter.refedge__Field_API_Name__c=='Referenceability',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Referenceability}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalReferenciability}" />
+                                </div>
+                                <apex:repeat value="{!referenceabilityWrapper.selectedReferenceabilityTypes}" var="ref">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!ref.refType.Name}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToReferencibiltyresults}" />
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        <!--  Related Mapping Div -->
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__From_Mapping__c,OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div style="float:left;width:100%;border-radius:5px;">
+                                <div style="float:left;width:100%;border-radius:5px;">
+                                    <apex:repeat value="{!attributeResults[filter.refedge__Field_API_Name__c]}" var="attRecord">
+                                        <div>
+                                            <B><apex:outputLabel value="{!attRecord.Filter_Label_Name__c}"/></B> <br/>
+                                            <div> 
+                                                <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearMappings}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                                </apex:commandLink>
+                                            </div>
+                                            <apex:repeat value="{!relatedMappingController.mappingSelectedValues[attRecord.Id]}" var="ref">
+                                                <div>
+                                                    <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                                    {!ref}
+                                                </div>
+                                            </apex:repeat> 
+                                             <apex:commandLink value="{!$Label.See_All}" action="{!goToTheRelatedSearch}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                             </apex:commandLink>
+                                        </div>   
+                                        <div style="height:15px;">
+                                        </div> 
+                                    </apex:repeat>
+                                </div>
+                            </div>  
+                        </apex:outputPanel> 
+                        <!-- Content Languages Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__Field_API_Name__c=='Content Language',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Language}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentLanguages}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentLanguages}" var="contLang">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contLang.contentLanguageName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentLanguageResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div>
+                        </apex:outputPanel>
+                        <!-- Content Types Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch), filter.refedge__Field_API_Name__c=='Content Types',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Types}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentTypes}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentTypes}" var="contentType">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contentType.contentTypeName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentTypeResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        
+                        <!-- Attributes Div -->
+                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(filter.refedge__Field_API_Name__c)),NOT(filter.refedge__From_Mapping__c),NOT(ISNULL(filter.refedge__Field_API_Name__c)), filter.refedge__Field_API_Name__c != 'Content Types', filter.refedge__Field_API_Name__c != 'Content Language', filter.refedge__Field_API_Name__c != 'Referenceability',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div><B>{!filter.Label__c}</B>
+                                    <div > 
+                                        <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalAttribute}">
+                                            <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                        </apex:commandLink>
+                                    </div>
+                                    <apex:repeat value="{!attributeWrapper.mapAttributesLabels[filter.refedge__Field_API_Name__c]}" var="attr">
+                                        <div>
+                                            <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                            {!attr.attributeLabel.Attribute__r.Name}
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                                <apex:commandLink action="{!goToAttributeResults}" value="{!$Label.See_All}" >
+                                    <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                </apex:commandLink>                        
+                                <div style="height:15px;">
+                                </div>
+                        </apex:outputPanel>
+                    </apex:repeat>
+                    <apex:commandLink value="{!$Label.more}" style="color:#0070c0;" action="{!changeBasicFilterView}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" rendered="{!isShowMoreLink}" reRender="filterPanel"></apex:commandLink>
+                </apex:outputPanel>
+                <apex:outputPanel id="filterOrderId" rendered="{!!isBasicSearchViewSelected}">
+                    <apex:repeat value="{!filterList}" var="filter">
+                        <!-- Referenceability Div --> 
+                        <apex:outputPanel rendered="{!AND(showAccount,filter.refedge__Field_API_Name__c=='Referenceability')}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Referenceability}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalReferenciability}" />
+                                </div>
+                                <apex:repeat value="{!referenceabilityWrapper.selectedReferenceabilityTypes}" var="ref">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!ref.refType.Name}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToReferencibiltyresults}" />
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        <!--  Related Mapping Div -->
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__From_Mapping__c)}">
+                            <div style="float:left;width:100%;border-radius:5px;">
+                                <div style="float:left;width:100%;border-radius:5px;">
+                                    <apex:repeat value="{!attributeResults[filter.refedge__Field_API_Name__c]}" var="attRecord">
+                                        <div>
+                                            <B><apex:outputLabel value="{!attRecord.Filter_Label_Name__c}"/></B> <br/>
+                                            <div> 
+                                                <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearMappings}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                                </apex:commandLink>
+                                            </div>
+                                            <apex:repeat value="{!relatedMappingController.mappingSelectedValues[attRecord.Id]}" var="ref">
+                                                <div>
+                                                    <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                                    {!ref}
+                                                </div>
+                                            </apex:repeat> 
+                                             <apex:commandLink value="{!$Label.See_All}" action="{!goToTheRelatedSearch}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                             </apex:commandLink>
+                                        </div>   
+                                        <div style="height:15px;">
+                                        </div> 
+                                    </apex:repeat>
+                                </div>
+                            </div>  
+                        </apex:outputPanel> 
+                        <!-- Content Languages Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__Field_API_Name__c=='Content Language')}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Language}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentLanguages}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentLanguages}" var="contLang">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contLang.contentLanguageName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentLanguageResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div>
+                        </apex:outputPanel>
+                        <!-- Content Types Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch), filter.refedge__Field_API_Name__c=='Content Types')}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Types}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentTypes}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentTypes}" var="contentType">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contentType.contentTypeName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentTypeResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        
+                        <!-- Attributes Div -->
+                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(filter.refedge__Field_API_Name__c)),NOT(filter.refedge__From_Mapping__c),NOT(ISNULL(filter.refedge__Field_API_Name__c)), filter.refedge__Field_API_Name__c != 'Content Types', filter.refedge__Field_API_Name__c != 'Content Language', filter.refedge__Field_API_Name__c != 'Referenceability')}">
+                            <div><B>{!filter.Label__c}</B>
+                                    <div > 
+                                        <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalAttribute}">
+                                            <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                        </apex:commandLink>
+                                    </div>
+                                    <apex:repeat value="{!attributeWrapper.mapAttributesLabels[filter.refedge__Field_API_Name__c]}" var="attr">
+                                        <div>
+                                            <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                            {!attr.attributeLabel.Attribute__r.Name}
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                                <apex:commandLink action="{!goToAttributeResults}" value="{!$Label.See_All}" >
+                                    <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                </apex:commandLink>                        
+                                <div style="height:15px;">
+                                </div>
+                        </apex:outputPanel>
+                    </apex:repeat>
+                    <apex:commandLink value="{!$Label.less}" style="color:#0070c0;" onclick="PORShowLoading();" oncomplete="PORHideLoading();" action="{!changeBasicFilterView}" rendered="{!isShowMoreLink}" reRender="filterPanel"></apex:commandLink>
+                </apex:outputPanel>
+                </apex:outputPanel>  
+            </div>
+            
+            <!-- Right Div -->
+            <div style="float: left; width: 85%; valign:'top';" id="refMatchId">    
+                <apex:inputText maxlength="100" style="width:250px;" id="inputTextId" value="{!tempTextValue}"/> &nbsp;
+                <apex:commandButton value="{!$Label.Search}" onclick="doSearch();return false;"/>
+
+                <br/><br/>
+                
+                <!-- Accounts Page Block -->
+                <apex:outputPanel id="accountOpId">
+                    <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(accountSearch.showMoreAccountRecords,showAccount)}" reRender="accountOpId, contactOpId, contentOpId"/>
+                    <apex:pageBlock id="accountPbId" title="{!$Label.Accounts} ({!IF(accountSearch.accountSize>2000, TEXT(2000)+'+', accountSearch.accountSize)})" rendered="{!AND(NOT(OR(contactSearch.showMoreContactRecords,contentSearch.showMoreContentRecords)),showAccount)}">
+                        <apex:pageBlockSection columns="1" id="accountPbsId">
+                            <apex:outputPanel rendered="{!accounts.size == 0}">
+                                    <apex:pageMessage summary="{!$Label.No_matches_found}" severity="Warning" strength="3" />
+                            </apex:outputPanel>
+                            <apex:pageBlockTable value="{!accounts}" var="accWrap" id="pbtAccount" rendered="{!AND(accounts!= null, accounts.size > 0)}">
+                                
+                                <apex:column id="headerFooterId2" headerValue="{!$Label.Action}" style="width:8%;" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputLink style="font-weight:bold;" onClick="checkUnspecSelected('', '{!JSENCODE(accWrap.acc.refedge__Account__c)}', ''); return false;">{!$Label.Assign}</apex:outputLink> | 
+                                    <apex:commandLink style="font-weight:bold;" value=" {!$Label.Hit}" onClick="checkForRadioSelected(true,false,'{!JSENCODE(accWrap.acc.Account__r.Id)}',null);return false;" rendered="{!AND(refMatch,NOT(isthisBasic))}" >
+                                    </apex:commandLink>
+                                </apex:column>  
+                                <apex:column headerValue="{!$Label.Account_Name}">
+                                    <apex:outputLink value="/{!accWrap.acc.refedge__Account__c}">{!accWrap.acc.Account__r.name}</apex:outputLink>
+                                </apex:column>
+                                <apex:column headervalue="{!$Label.Owner}" value="{!accWrap.acc.Account__r.OwnerId}" rendered="{!IF(accWrap.acc.refedge__Reference_Owner__c == NULL, true, false)}"/>  
+                                <apex:column headervalue="{!$Label.Owner}" value="{!accWrap.acc.refedge__Reference_Owner__c}" rendered="{!IF(accWrap.acc.refedge__Reference_Owner__c != NULL,true,false)}"/>
+                                <apex:column headervalue="{!$Label.Referenceability}" value="{!accWrap.acc.refedge__Referenceability__c}" /> 
+                                <apex:column headervalue="{!$Label.Attributes}" value="{!accWrap.acc.refedge__Attributes__c}" /> 
+                                <apex:column headervalue="{!$Label.Last} {!RULPeriodLength} {!$Label.days}" value="{!accWrap.acc.refedge__Default_Period_Completed_Uses__c}" /> 
+                                <apex:column headervalue="{!$Label.T_Last_Used}" value="{!accWrap.acc.refedge__RUL_Last_Activity_Date__c}" /> 
+                                <apex:column headervalue="{!$Label.Notice}">
+                                    <apex:outputText id="accountNoticeId" value="{!IF(accWrap.acc.refedge__Account_Level_RUL__c, IF(accWrap.acc.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''),IF(accWrap.acc.refedge__Is_Contact_Limit_Reached__c, $Label.Limit_Reached,''))}" style="color:red;"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Assigned}" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputText value="{!accWrap.relatedAR}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Hit_List}"   rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputText rendered="{!accWrap.hitListCount!=0}" value="{!accWrap.hitListCount}"/>
+                                    <apex:outputText rendered="{!accWrap.hitListCount==0}" value="{!accWrap.hitListCount}"/>
+                                </apex:column>
+                            </apex:pageBlockTable>
+                           
+                            <apex:actionRegion >
+                                <apex:commandLink style="font-weight: bold;" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',true,'link');return false;"  value="{!$Label.Show_More}"  rendered="{!AND(accountSearch.isAccountLimitExceed, NOT(accountSearch.showMoreAccountRecords),NOT(refMatch))}"  />
+                                <apex:commandLink style="font-weight: bold;" onclick="PORShowLoading();" action="{!callShowMoreLink}" value="{!$Label.Show_More}"  rendered="{!AND(accountSearch.isAccountLimitExceed, NOT(accountSearch.showMoreAccountRecords),refMatch)}"  >
+                                    <apex:param name="accountParam" value="true" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+                                    <apex:param name="contactParam" value="false" assignTo="{!contactSearch.showMoreContactRecords}"/>
+                                    <apex:param name="contentParam" value="false" assignTo="{!contentSearch.showMoreContentRecords}"/>
+                                </apex:commandLink>
+                            </apex:actionRegion>
+                            
+                            <apex:outputPanel id="pagingPanel" >
+                                <apex:actionRegion >
+                                    <apex:outputPanel rendered="{!AND(accountSearch.showMoreAccountRecords, accounts.size > 0)}">
+                                    <table border="0" align="center">
+                                        <tr> 
+                                            <td align="center">
+                                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!accountSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                                <apex:commandLink value="{!$Label.Previous_Page}" reRender="accountPbId" rendered="{!accountSearch.pageIndex > 1}" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',false,'previous');return false;" /> 
+                                                &nbsp;&nbsp;
+                                                <apex:outputText >
+                                                    {!(accountSearch.pageIndex * accountSearch.pageLimit)+1-accountSearch.pageLimit}-{!(accountSearch.pageIndex * accountSearch.pageLimit) - (accountSearch.pageLimit - accounts.size)}
+                                                </apex:outputText>
+                                                &nbsp;&nbsp;
+                                                <apex:commandLink value="{!$Label.Next_Page} " reRender="accountPbId" rendered="{!accountSearch.isNextRender}" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',false,'next');return false;" />&nbsp; 
+                                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!accountSearch.isNextRender}" width="5px" height="8px"/>
+                                            </td>                                                  
+                                        </tr>
+                                    </table>   
+                                    </apex:outputPanel> 
+                                </apex:actionRegion> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>  
+                </apex:outputPanel> 
+                
+                <!-- Contents Page Block -->
+                <apex:outputPanel id="contentOpId" rendered="{!NOT(refMatch)}">
+                    <apex:outputPanel id="transcriptPlayPanel">
+                    <script>
+                        function downloadContents(size, pageBlockNo, selectSingleContentPbtId){
+                            var hasChecked = false;
+                            var selectedContentIds = '' ;
+                            var hasLinkUrl = false;
+                            <apex:repeat value="{!contentSearch.mapContent}" var="key">
+                                if({!key} != {!contentSearch.pageIndex}){
+                                    <apex:repeat value="{!contentSearch.mapContent[key]}" var="contentList">
+                                        if({!contentList.isSelected} ){
+                                            hasChecked = true;
+                                        }
+                                        if('{!contentList.contentVersion.FileType}' == 'LINK')
+                                            hasLinkUrl = true;
+                                        
+                                    </apex:repeat>
+                                }
+                            </apex:repeat>
+                            
+                            for(var i=0; i < size; i++) {
+                                var id = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":"+selectSingleContentPbtId; 
+                                if(document.getElementById(id).checked ) {
+                                    hasChecked = true;
+                                    break ;  
+                                }
+                            }
+                            if (hasChecked == false){
+                                alert('{!$Label.Select_Atleast_One_Content}');
+                                return false;
+                            }
+                            if(hasLinkUrl){
+                                alert('{!$Label.Link_Content_Message}');
+                            }
+                            
+                            downloadContentFiles(selectedContentIds); 
+                            return false;
+                        }
+                        var fileType = '{!JSENCODE(transcriptFileType)}';
+                        function JplayerPlayTranscript(contentId){
+                            
+                            window.open('','_self').location.href = '{!JSENCODE(downloadContentUrl)}'+contentId;
+                        } 
+                        function closeJplayer(){
+                            jQuery("#jquery_jplayer_2").jPlayer("destroy");
+                            jQuery("#jquery_jplayer_1").jPlayer("destroy");
+                            jQuery(".jp-audio").css("display","none");
+                            jQuery(".jp-video").css("display","none");
+                        }
+                    </script>
+                    
+                    <div>
+                        <div class="players" style="z-index:1003;position: absolute;top: 35%;left: 30%;">
+                             <div class="jp-audio" style="display:none;margin-left:35%;">
+                                
+                                <div class="jp-type-single">
+                                    <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+                                    <div id="jp_interface_1" class="jp-interface">
+                                        
+                                        <ul class="jp-controls">
+                                            <li><a href="#" class="jp-play" tabindex="1">{!$Label.play}</a></li>
+                                            <li><a href="#" class="jp-pause" tabindex="1">{!$Label.pause}</a></li>
+                                            <li><a href="#" class="jp-stop" tabindex="1">{!$Label.stop}</a></li>
+                                            <li><a href="#" class="jp-mute" tabindex="1">{!$Label.mute}</a></li>
+                                            <li><a href="#" class="jp-unmute" tabindex="1">{!$Label.unmute}</a></li>
+                                        </ul>
+                                        <div class="jp-progress">
+                                            <div class="jp-seek-bar">
+                                                <div class="jp-play-bar"></div>
+                                            </div>
+                                        </div>
+                                        <div class="jp-volume-bar">
+                                            <div class="jp-volume-bar-value"></div>
+                                        </div>
+                                        <div class="jp-current-time"></div>
+                                        <div class="jp-duration"></div>
+                                    </div>
+                                    <div id="jp_playlist_1" class="jp-playlist">
+                                        <ul>
+                                            <li>{!transcript.Name}
+                                                <apex:commandLink value="{!$Label.Close}" style="float: right;margin-top: -8px;" onclick="closeJplayer();return false;"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                
+                        </div> 
+                        <div class="players" style="z-index:1003;position: absolute;top: 35%;left: 30%;">
+                            <div class="jp-video jp-video-270p" style="display:none;margin-left:35%;">
+                                
+                                <div class="jp-type-single">
+                                    <div id="jquery_jplayer_2" class="jp-jplayer">
+                                        
+                                    </div>
+                                    <div id="jp_interface_2" class="jp-interface">
+                                        
+                                        <div class="jp-video-play"></div>
+                                        <ul class="jp-controls">
+                                            <li><a href="#" class="jp-play" tabindex="1">{!$Label.play}</a></li>
+                                            <li><a href="#" class="jp-pause" tabindex="1">{!$Label.pause}</a></li>
+                                            <li><a href="#" class="jp-stop" tabindex="1">{!$Label.stop}</a></li>
+                                            <li><a href="#" class="jp-mute" tabindex="1">{!$Label.mute}</a></li>
+                                            <li><a href="#" class="jp-unmute" tabindex="1">{!$Label.unmute}</a></li>
+                                        </ul>
+                                        <div class="jp-progress">
+                                            <div class="jp-seek-bar">
+                                                <div class="jp-play-bar"></div>
+                                            </div>
+                                        </div>
+                                        <div class="jp-volume-bar">
+                                            <div class="jp-volume-bar-value"></div>
+                                        </div>
+                                        <div class="jp-current-time"></div>
+                                        <div class="jp-duration"></div>
+                                    </div>
+                                    <div id="jp_playlist_2" class="jp-playlist">
+                                        <ul>
+                                            <li>{!transcript.Name}
+                                                <apex:commandLink value="{!$Label.Close}" style="float: right;" onclick="closeJplayer();return false;"/>
+                                            </li>
+                                            
+                                        </ul>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                    </apex:outputPanel>
+                    <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(contentSearch.showMoreContentRecords)}" reRender="accountOpId, contactOpId, contentOpId"/>
+                      
+                    <apex:pageBlock title="{!$Label.Content} ({!IF(contentSearch.contentSize>2000, TEXT(2000)+'+', contentSearch.contentSize)})" id="contentPbId" rendered="{!AND(NOT(OR(accountSearch.showMoreAccountRecords, contactSearch.showMoreContactRecords)),showRefContent)}">
+                        <apex:pageBlockButtons id="contentPbbId" location="top" rendered="{!AND(contents != null, contents.size > 0, isCRMContentUser)}"> 
+                            <apex:commandButton value="{!$Label.Download}" onclick="return downloadContents({!contents.size}, 2, 'selectSingleContentPbtId');" title="Downloads a zip file of the selected content."/>
+                            <apex:commandButton value="{!IF(invitationcontroller.showShareButton,$Label.Share,$Label.Return_to_Invitation)}"  action="{!shareContents}" />
+                        </apex:pageBlockButtons>
+                        
+                        <apex:pageBlockSection columns="1" id="contentPbsId">
+                            <apex:outputPanel rendered="{!contents.size == 0}">
+                                    <apex:pageMessage summary="{!$Label.No_matches_found}" severity="Warning" strength="3" />
+                            </apex:outputPanel>
+                            
+                            <apex:pageBlockTable value="{!contents}" var="contentWrap" id="pbtContent" rendered="{!AND(contents != null, contents.size > 0)}">
+                                <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:inputCheckBox id="selectAllContentPbtId"  onclick="selectAllChk(this, 'selectSingleContentPbtId', null, null)" />
+                                    </apex:facet>
+                                    <apex:inputCheckBox disabled="{!OR(NOT(isCRMContentUser),contentWrap.refContent.refedge__Internal_Use__c)}" id="selectSingleContentPbtId" value="{!contentWrap.isSelected}" onclick="enableDisable(this, 'selectSingleContentPbtId', 'selectAllContentPbtId', null)" />
+                                    <apex:inputhidden value="{!contentWrap.contentVersion.ContentDocumentId}" id="selectSingleContentIdHidden"/>
+                                    <apex:inputhidden value="{!contentWrap.contentVersion.FileType}" id="fileTypeHiddenId"/>
+                                </apex:column> 
+                                
+                                <apex:column headerValue="{!$Label.Share}" style="text-align: center;">
+                                    <apex:outputText value="X" rendered="{!contentWrap.refContent.refedge__Internal_Use__c}" style="color: red;font-weight: bold;font-size: medium;"/>
+                                    <apex:outputText value="" rendered="{!NOT(contentWrap.refContent.refedge__Internal_Use__c)}"/>
+                                </apex:column> 
+                                
+                                <apex:column >
+                                    <apex:image onclick="showDiv('{!JSENCODE(contentWrap.refContent.refedge__Content_ID__c)}', '{!JSENCODE(contentWrap.refContent.Id)}', event);" url="{!URLFOR($Resource.refedge__ExtensionImages, contentWrap.fileTypeImagePath)}" width="16" height="16" style="vertical-align: middle; margin-right: 0.4em;cursor:pointer;" />
+                                </apex:column> 
+                                <apex:column headerValue="{!$Label.Title}" style="min-width:200px;">
+                                    <apex:outputLink value="/{!contentWrap.refContent.Id}" id="contantTitle" target="_blank">
+                                        <apex:outputText value="{!contentWrap.refContent.refedge__Title__c}" rendered="{!isCRMContentUser}"/>
+                                    </apex:outputLink>
+                                    <apex:outputText value="{!contentWrap.refContent.refedge__Title__c}" rendered="{!NOT(isCRMContentUser)}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Type}" value="{!contentWrap.refContent.Reference_Content_Type__r.refedge__Name__c}" /> 
+                                <apex:column headervalue="{!$Label.Account}">
+                                    <apex:outputLink value="{!contentWrap.accountIds}" id="accName" target="_blank">
+                                        <apex:outputText value="{!contentWrap.accountName}"/>
+                                    </apex:outputLink>
+                                </apex:column>
+                                <apex:column headervalue="{!$Label.Publish_Date}"> 
+                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!contentWrap.refContent.refedge__Publish_date__c}" /> 
+                                    </apex:outputText>
+                                </apex:column> 
+                                <apex:column value="{!contentWrap.refContent.refedge__Language__c}" />
+                                <apex:column value="{!contentWrap.refContent.refedge__Attributes__c}" />
+                            </apex:pageBlockTable>   
+                            
+                            <!-- Show more Link-->
+                            <apex:actionRegion >
+                                <apex:commandLink style="font-weight: bold;" value="{!$Label.Show_More}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',true,'link');return false;" rendered="{!AND(contentSearch.isContentLimitExceed, NOT(contentSearch.showMoreContentRecords))}"/>
+                            </apex:actionRegion>
+                            
+                            <!-- Paging Panel--> 
+                            <apex:outputPanel id="pagingPanel" rendered="{!AND(contentSearch.showMoreContentRecords, contents.size > 0)}">
+                                <apex:actionRegion >
+                                <table border="0" align="center">
+                                    <tr> 
+                                        <td align="center">
+                                            <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!contentSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                            <apex:commandLink value="{!$Label.Previous_Page}"  rendered="{!contentSearch.pageIndex > 1}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',false,'previous');return false;" oncomplete="PORHideLoading();"/> 
+                                            &nbsp;&nbsp;
+                                            <apex:outputText >
+                                                {!(contentSearch.pageIndex * contentSearch.pageLimit)+1-contentSearch.pageLimit}-{!(contentSearch.pageIndex * contentSearch.pageLimit) - (contentSearch.pageLimit - contents.size)}
+                                            </apex:outputText>
+                                            &nbsp;&nbsp;
+                                            <apex:commandLink value="{!$Label.Next_Page} " rendered="{!contentSearch.isNextRender}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',false,'next');return false;" oncomplete="PORHideLoading();"/>&nbsp; 
+                                            <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!contentSearch.isNextRender}" width="5px" height="8px"/>
+                                        </td>                                                  
+                                    </tr>
+                                </table>  
+                                </apex:actionRegion>    
+                            </apex:outputPanel>
+                        </apex:pageBlockSection>
+                        
+                        <script language="javascript" type="text/javascript">
+                            deSelectAllChk('selectAllContentPbtId');
+                        </script>
+                    </apex:pageBlock> 
+                </apex:outputPanel>
+                
+                <!-- Div for on Mouse hover -->
+                <apex:outputPanel style="display:none;width:450px;position:absolute;z-index:1000;scroll-y:auto;" id="dvContentDetails">
+                    <apex:pageBlock rendered="{!contentSearch.hoverContentVersion.Id != null}">
+                        <div style="font-size:15px;">
+                            <strong>{!contentSearch.hoverContentVersion.Title}</strong>
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <div style="height:10px;clear:both; "></div>
+                        <apex:pageBlockSection columns="1">
+                            <apex:outputField label="{!$Label.Summary}:" value="{!contentSearch.hoverContentVersion.Description}"/>
+                            <apex:outputField label="{!$Label.File_Size}:" value="{!contentSearch.hoverContentVersion.ContentSize}"/>
+                        </apex:pageBlockSection>
+                        
+                        <apex:pageBlockButtons location="bottom">
+                            <apex:commandButton value="{!$Label.Open}" onclick="openLinkContent('{!JSENCODE(contentSearch.hoverContentVersion.ContentUrl)}'); return false;" rendered="{!contentSearch.hoverContentVersion.FileType = 'LINK'}"/>
+                            <apex:commandButton value="{!$Label.Download}" onclick="downloadSingleContent(); return false;" rendered="{!AND(contentSearch.hoverContentVersion.FileType != 'LINK', isCRMContentUser)}"/>
+                            <apex:commandButton value="{!$Label.View_Details}" onclick="window.open('/{!JSENCODE(contentSearch.hoverRefContentId)}', '_blank'); return false;" rendered="{!isCRMContentUser}"/>
+                        </apex:pageBlockButtons>
+                    </apex:pageBlock>
+                    
+                    <apex:pageBlock rendered="{!AND(contentSearch.hoverContentVersion.Id == null,NOT(contentSearch.customRefContent),contentSearch.refInterview.size = 0) }">
+                        <div style="font-size:15px;">
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <apex:outputLabel value="{!$Label.Content_View_Permission_Message}"/>
+                    </apex:pageBlock>
+                    
+                    <apex:pageBlock rendered="{!AND(contentSearch.hoverContentVersion.Id == null,contentSearch.customRefContent) }">
+                        <div style="font-size:15px;">
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <apex:pageBlockSection rendered="{!contentSearch.refContentFields.size > 0}" columns ="1">
+                            <strong>{!contentSearch.referenceContentTitle}</strong>
+                            <apex:repeat value="{!contentSearch.refContentFields}" var="rcf">
+                                <apex:repeat value="{!contentSearch.customContentTypeFieldsMap}" var="fieldAPIName">
+                                    <apex:outputField style="font-weight:normal;" value="{!rcf[fieldAPIName]}"/>
+                                </apex:repeat>  
+                            </apex:repeat>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                    <apex:outputPanel rendered="{!contentSearch.refInterview.size >0}" layout="block" style="width:100%;height:200px;background-color:white;">
+                        <div style="font-size:15px;">
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <!-- <div style="width:100%;height:100%;overflow-y:auto;background-color:white;">
+                            <apex:outputPanel style="width:100%;float:left;text-align:center;">
+                                <apex:outputLabel value=""/>
+                                <apex:outputField styleclass="ImageClass" id="imageIds" value="{!contentSearch.refInterviewRecord.refedge__Photograph__c}" /> 
+                            </apex:outputPanel>
+                            <apex:outputPanel style="width:100%;float:left;color:blue;font-weight:bold;font-size:14px;">
+                                <apex:outputLabel value=""/>
+                                <apex:outputField value="{!contentSearch.refInterviewRecord.Reference_Content__r.refedge__Title__c}"/>
+                            </apex:outputPanel>
+                            <table style="width:100%;float:left;">
+                                <tbody style="width:100%;">
+                                    <apex:repeat value="{!contentSearch.refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                        <tr style="width:100%;">
+                                            <td style="width:100%;border: 1px solid #ececec;">
+                                                <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                        <apex:outputLabel style="font-weight:bold;color:#404040;" value="{!interviewTopic.refedge__Question__c}"/>
+                                                </a>
+                                                <apex:commandLink style="float:left;width:20%;" value="?" rendered="{!AND(interviewTopic.Content_Id__c != null,interviewTopic.Content_Id__c!='')}" onclick="JplayerPlayTranscript('{!JSENCODE(interviewTopic.Content_Id__c)}');return false;"/>
+                                                <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse">
+                                                    <apex:outputLabel style="font-weight:normal;" value="{!interviewTopic.refedge__Transcript__c}"/>
+                                                </div>
+                                            </td>
+                                        </tr>   
+                                    </apex:repeat>
+                                </tbody>
+                           </table> 
+                        </div>
+                        
+                        
+                          <div style="width:100%;height:100%;overflow-y:auto;background-color:white;">
+                            <apex:outputPanel style="width:100%;float:left;text-align:center;">
+                                <apex:outputLabel value=""/>
+                                <apex:outputField styleclass="ImageClass" id="imageIds" value="{!contentSearch.refInterviewRecord.refedge__Photograph__c}" /> 
+                            </apex:outputPanel>
+                            <apex:outputPanel style="width:100%;float:left;color:blue;font-weight:bold;font-size:14px;">
+                                <apex:outputLabel value=""/>
+                                <apex:outputField value="{!contentSearch.refInterviewRecord.Reference_Content__r.refedge__Title__c}"/>
+                            </apex:outputPanel>
+                            <table style="width:100%;float:left;">
+                                <tbody style="width:100%;">
+                                    <apex:repeat value="{!contentSearch.refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                        <tr style="width:100%;">
+                                            <td style="width:100%;border: 1px solid #ececec;">
+                                                <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                        <apex:outputLabel style="font-weight:bold;color:#404040;" value="{!interviewTopic.refedge__Question__c}"/>
+                                                </a>
+                                                <apex:commandLink style="float:left;width:20%;" value="?" rendered="{!AND(interviewTopic.Content_Id__c != null,interviewTopic.Content_Id__c!='')}" onclick="JplayerPlayTranscript('{!JSENCODE(interviewTopic.Content_Id__c)}');return false;"/>
+                                                <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse">
+                                                    <Apex:outputPanel rendered="{!interviewTopic.refedge__Video_Url_Embed__c != null}">
+                                                        <apex:iframe width="420" height="315" src="{!interviewTopic.refedge__Video_Url_Embed__c}?showinfo=0&rel=0&modestbranding=1"/>
+                                                    </Apex:outputPanel>
+                                                    <apex:outputLabel style="font-weight:normal;" value="{!interviewTopic.refedge__Transcript__c}"/>
+                                                </div>
+                                            </td>
+                                        </tr>   
+                                    </apex:repeat>
+                                </tbody>
+                           </table> 
+                        </div> -->
+                        <div class="panel-group" id="accordion" style="width:100%;float:left;background:#EAEAEA;height:200px;overflow-y:auto;">
+                            <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                                <div id="contentDetails" class="imageDiv" style="background-color: #f8f8f8;overflow-y:auto;border:2px solid gray;border-radius:1px;width:100%;height:100%;">
+                                    <apex:outputPanel layout="block" >
+                                        <apex:outputPanel id="imagePanel" styleClass="imagePanelClass" style="width:100%;float:left;text-align:left;padding-left: 10px;">
+                                            <apex:outputLabel value="" />
+                                            <apex:outputField styleclass="ImageClass" id="imageIds" value="{!contentSearch.refInterviewRecord.refedge__Photograph__c}" />
+                                        </apex:outputPanel>
+                                        <apex:outputPanel style="width:100%;float:left;font-weight:bold;font-size:14px;padding-top: 2%;">
+                                            <apex:outputLabel value="" />
+                                            <apex:outputText style="padding-left: 10px;font-weight:bold;" value="{!contentSearch.refInterviewRecord.Reference_Content__r.refedge__Title__c}" />
+                                        </apex:outputPanel>
+                                       <!--  <apex:outputPanel style="width:100%;float:left;padding-top: 1%;padding-left: 10px;">
+                                            <apex:outputLabel value="{!$Label.Account}: " style="font-weight:bold;" />
+                                            <apex:outputText value=" {!refContentAccounts[refInterviewRecord.Reference_Content__c]} " />
+                                        </apex:outputPanel> -->
+                                    </apex:outputPanel>
+                                    <apex:outputPanel style="width:100%;float:left;padding-left:10px;">
+                                        <div style="float:left;width:100%;">
+                                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrptInfo">
+                                                <apex:outputLabel style="font-weight:bold;cursor:pointer;" value="{!$Label.Reference_Interview_Info}" />
+                                            </a>
+                                        </div>
+                                        <div id="collapseTrnanscrptInfo" style="float:left;width:100%;" class="panel-collapse collapse">
+                                            <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Speaker_info__c.label}" />&nbsp;
+                                            <apex:outputField value="{!contentSearch.refInterviewRecord.refedge__Speaker_info__c}" />
+                                            <br/>
+                                            <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_website__c.label}" />&nbsp;
+                                            <apex:commandLink style="color:blue" value="{!contentSearch.refInterviewRecord.refedge__Org_website__c}" onClick="openSite('{!contentSearch.refInterviewRecord.refedge__Org_website__c}');return false;" />
+                                            
+                                            <!-- <a style="color:blue;" target="_blank" href="{!SECUREURL}{!contentSearch.refInterviewRecord.refedge__Org_website__c}" >{!contentSearch.refInterviewRecord.refedge__Org_website__c}</a> -->
+                                            <br/>
+                                            <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_description__c.label}" />&nbsp;
+                                            <apex:outputField value="{!contentSearch.refInterviewRecord.refedge__Org_description__c}" />
+                                        </div>
+                                    </apex:outputPanel>
+                                    <table style="width:100%;float:left;margin-top:1%;">
+                                        <tbody style="width:100%;">
+                                            <apex:repeat value="{!contentSearch.refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                                <tr style="width:100%;">
+                                                    <td style="width:100%;border: 1px solid #ececec;">
+                                                        <div style="float:left;width:100%;padding-left: 10px;">
+                                                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                                <apex:outputLabel style="font-weight:bold;cursor:pointer;" value="{!interviewTopic.refedge__Question__c}" />
+                                                            </a>
+                                                           <!--  <apex:commandLink style="float:right;font-size: 20px;font-weight: bold;text-decoration: none;" value="?" rendered="{!AND(interviewTopic.Video_URL__c != null,interviewTopic.Video_URL__c!='')}" onclick="downloadTranscript1('{!JSENCODE(interviewTopic.Video_URL__c)}','{!JSENCODE(interviewTopic.Id)}');return false;" /> -->
+                                                        </div>
+                                                        <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse">
+                                                         <Apex:outputPanel rendered="{!interviewTopic.refedge__Video_Url_Embed__c != null}">
+                                                            <apex:iframe width="420" height="315" src="{!interviewTopic.refedge__Video_Url_Embed__c}?showinfo=0&rel=0&modestbranding=1"/>
+                                                        </Apex:outputPanel>
+                                                            <apex:outputLabel style="font-weight:normal;padding-left: 10px;" value="{!interviewTopic.refedge__Transcript__c}" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>

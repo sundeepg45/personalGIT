@@ -1,0 +1,5 @@
+<apex:page standardController="APPR_PUB_XT__Headline_Translation__c" extensions="APPR_PUB_XT.NewButtonOverrideController" action="{!redirect}">
+<apex:form >
+	<apex:inputHidden value="{!newUrl}">{!$Action.Headline_Translation__c.New}"</apex:inputHidden>
+</apex:form>
+</apex:page>

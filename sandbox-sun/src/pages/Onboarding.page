@@ -1,0 +1,205 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false" cache="false" action="{!processRedirects}">
+    <!-- apex:stylesheet value="{!URLFOR($Resource.Onboarding_ScreenCSS)}" / -->
+    <apex:stylesheet value="https://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="https://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Partner_Onboarding_CSS}" />
+    
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+        
+    <div id="container">
+        <div id="shell-top-simple">
+            <div class="wrap">
+                <div id="header">
+                    <div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div><!-- end logo -->
+                    <div id="login-pre">
+                        <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso/logout.html?redirect=/wapps/sfconnector/protected/partner.html">{!$Label.Onboarding_Header_Log_Out}</a>
+                    </div>
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+                <div id="content">
+                    <div id="content-full" style="background: none;">
+                        <div class="col2right">
+                        
+                        <apex:outputPanel layout="none" rendered="{!NOT(isCorporateUser)}">
+                            <p><apex:outputText value="{!$Label.Onboarding_Error_Personal_Account}" escape="false"/></p>
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel layout="none" rendered="{!isCorporateUser}">
+                            <div class="col1 unindent">
+                            <h1><apex:outputText value="{!$Label.Onboarding_Red_Hat_Partner_App}"/></h1>
+                            <apex:outputPanel layout="none" rendered="{!currentPageName == 'DisplayLeadStatus'}">
+                                <p><apex:outputText value="{!$Label.Onboarding_Error_DisplayLeadStatus_1}"/></p>
+                                <p><apex:outputText value="{!$Label.Onboarding_Error_DisplayLeadStatus_2}"/></p>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!currentPageName == 'DisplayCaseStatus'}">
+                                <p><apex:outputText value="{!$Label.Onboarding_Error_DisplayCaseStatus_1}"/></p>
+                                <p><apex:outputText value="{!$Label.Onboarding_Error_DisplayCaseStatus_2}"/></p>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!currentPageName == 'ErrorUserIsInactive'}">
+                                <p><apex:outputText value="{!$Label.Onboarding_Error_ErrorUserIsInactive}"/></p>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!currentPageName == 'ErrorUserIsMissing'}">
+                                <p><apex:outputText value="{!$Label.Onboarding_Error_ErrorUserIsMissing}"/></p>
+                            </apex:outputPanel>
+                            <apex:outputPanel layout="none" rendered="{!AND(currentPageName == 'JoinOrRegister' || ISBLANK(currentPageName) || currentPageName == 'RegisterPartner' || currentPageName == 'RegisterAgreements' || currentPageName == 'RegisterProfile' || currentPageName == 'RegisterDemographics', NOT(leadCompanyName == ''))}">
+                                <p><apex:outputText value="{!$Label.Onboarding_Fill_Out_App_1}"/></p>
+                                <p><apex:outputText value="{!$Label.Onboarding_Fill_Out_App_2}"/></p>
+                    
+                                <h3><apex:outputText value="{!$Label.Onboarding_Steps_To_Complete}"/></h3>
+                                <ol id="onboardSteps">
+                                    <li class="{!IF(currentStep > 1, 'completed', '')}" style="{!IF(currentStep == 1, 'font-weight: bold;', '')}"><apex:outputText value="{!$Label.Onboarding_Step_To_Complete_1}" escape="false"/></li>
+                                    <li class="{!IF(currentStep > 2, 'completed', '')}" style="{!IF(currentStep == 2, 'font-weight: bold;', '')}"><apex:outputText value="{!$Label.Onboarding_Step_To_Complete_2}"/></li>
+                                    <li class="{!IF(currentStep > 3, 'completed', '')}" style="{!IF(currentStep == 3, 'font-weight: bold;', '')}"><apex:outputText value="{!$Label.Onboarding_Step_To_Complete_3}"/></li>
+                                    <li class="{!IF(currentStep > 4, 'completed', '')}" style="{!IF(currentStep == 4, 'font-weight: bold;', '')}"><apex:outputText value="{!$Label.Onboarding_Step_To_Complete_4}"/></li>
+                                    <li class="{!IF(currentStep > 5, 'completed', '')}" style="{!IF(currentStep == 5, 'font-weight: bold;', '')}"><apex:outputText value="{!$Label.Onboarding_Step_To_Complete_5}"/></li>
+                                </ol>
+                            </apex:outputPanel>
+                            </div>
+                    
+                            <div class="col2">
+                            <div class="resourceDrawer">
+                            <h3><apex:outputText value="{!$Label.Onboarding_Partner_Program_Resources}"/></h3>
+                            <ul>
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/partners/helpdesk/" target="_blank"><apex:outputText value="{!$Label.Onboarding_PPResources_Help}"/></a></li>
+                                <li><a href="Onboarding_PartnerFAQ" target="_blank"><apex:outputText value="{!$Label.Onboarding_PPResources_FAQ}"/></a></li>
+                                <li><a href="Onboarding_PartnerBenefits" target="_blank"><apex:outputText value="{!$Label.Onboarding_PPResources_Benefits}"/></a></li>
+                                <li><a href="{!$Label.Red_Hat_Domain_Name}/partners/helpdesk/" target="_blank"><apex:outputText value="{!$Label.Onboarding_PPResources_Contact}"/></a></li>
+                            </ul>
+                            </div>
+                            </div>
+                        </apex:outputPanel>
+                    
+                        <apex:pageMessages rendered="{!hasErrorMessages}" />
+                     
+                        <apex:outputPanel layout="none" rendered="{!AND(OR(currentPageName == 'JoinOrRegister', ISBLANK(currentPageName)), isCorporateUser)}">
+                            <apex:include pageName="Onboarding_JoinOrRegister" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'JoinConfirm'}">
+                            <apex:include pageName="Onboarding_JoinConfirm" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'JoinThankYou'}">
+                            <apex:include pageName="Onboarding_JoinThankYou" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'RegisterPartner' && isCorporateUser}">
+                            <apex:include pageName="Onboarding_RegisterPartner" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'RegisterAgreements'}">
+                            <apex:include pageName="Onboarding_RegisterAgreements" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'RegisterProfile'}">
+                            <apex:include pageName="Onboarding_RegisterProfile" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'RegisterDemographics'}">
+                            <apex:include pageName="Onboarding_RegisterDemographics" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'RegisterThankYou'}">
+                            <apex:include pageName="Onboarding_RegisterThankYou" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'ErrorUserIsInactive'}">
+                            <apex:include pageName="Onboarding_ErrorUserIsInactive" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'ErrorUserIsMissing'}">
+                            <apex:include pageName="Onboarding_ErrorUserIsMissing" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'DisplayLeadStatus'}">
+                            <apex:include pageName="Onboarding_DisplayLeadStatus" />
+                        </apex:outputPanel>
+                        <apex:outputPanel layout="none" rendered="{!currentPageName == 'DisplayCaseStatus'}">
+                            <apex:include pageName="Onboarding_DisplayCaseStatus" />
+                        </apex:outputPanel>
+                        
+                        <!-- div><apex:outputText value="{!debugparams}" style="border: 1px dotted yellow; padding: 1em;" /></div-->
+                        <!-- div>Page Name: <apex:outputText value="{!currentPageName}" style="border: 1px dotted yellow; padding: 1em;" /></div-->
+
+
+                    </div><!-- end content-full -->
+                </div> <!-- end_content-->
+            </div><!-- end-wrap -->
+        </div><!--end shell-top-simple -->  
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+                    
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>{!$Label.Onboarding_Copyright}</li>
+                            <li>|</li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">{!$Label.Onboarding_Privacy_Policy}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">{!$Label.Onboarding_Terms_Of_Use}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">{!$Label.Onboarding_Patent_Promise}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">{!$Label.Onboarding_Careers_Link}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">{!$Label.Onboarding_Trademark_guidelines}</a></li>
+                            
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_About_Red_Hat}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">{!$Label.Onboarding_Contact_us}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">{!$Label.Onboarding_Site_map}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">{!$Label.Onboarding_FAQs}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">{!$Label.Onboarding_Supplier_requirements}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_Company}</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div>
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+
+    <style type="text/css">
+    .messageTable { width: 100%; border: 2px solid red; margin-bottom: 1em; }
+    .messageTable h4 { color: red; }
+    </style>
+
+    <style type="text/css">
+    table.multiSelectPicklistTable select { width: auto; min-width: 265px; }
+    .simpleRow p { margin: 0; }
+    .simpleRow > label:first-child { display: none; }
+
+    .rowform { position: relative; vertical-align: middle; padding: 0; margin-bottom: 10px; }
+    .rowform .radioButtons label { float: none; width: auto; padding-right: 2em; }
+    .rowform .radioButtons td { padding: 0; width: 200px; }
+    .rowform .radioButtons td input { padding: 0; margin: 0; width: 20px; }
+    .rowform .requiredBlock { background-color:#CC0000; bottom: 1px; left: -5px; position :absolute; top: 1px; width: 3px; display: block; }
+    .rowform .note { margin-left: 5px; }
+
+    .helpIcon:hover {
+        background-position: top right;
+    }
+    
+    .helpIcon {
+        background-position: top left;
+        float:right;
+        margin-top: 5px;
+        right: -20px;
+        background-image: url(/img/help/helpOrbs.gif);
+        width: 20px;
+        height: 15px;
+    }
+    </style>
+
+</apex:page>

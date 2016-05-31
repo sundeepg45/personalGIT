@@ -1,0 +1,3 @@
+<apex:page standardController="SFDC_MDF__c" cache="false" readOnly="true">
+	<c:RecordTypeSelect apiName="SFDC_MDF__c" ent="01I600000001fIs"/>
+</apex:page>

@@ -1,0 +1,105 @@
+<apex:page id="apiAccessPage" showHeader="false" sidebar="false" showChat="false" readOnly="true">
+	<script>
+		// return a parameter value from the current URL
+		function getParam ( name ) {
+			var params = location.search.substr(location.search.indexOf("?")+1);
+			var retval = '';
+			params = params.split('&');
+			// split param and value into individual pieces
+			for (var i=0; i<params.length; i++) {
+				var arr = params[i].split("=");
+				if ( arr[0] == name ) { retval = arr[1]; }
+			}
+			return retval;
+		}
+	</script>
+	<script>
+		var code = getParam('code');
+	</script>
+	<script>
+		function getOauth2Url(client_id) {
+			var host = 'login';
+			if(null != location.href.match(/^https[:]\/\/[a-z0-9.]*cs[0-9]*[.]visual[.]force[.]com\/.*/g)) {
+				host = 'test';
+			}
+			return 'https://'+host+'.salesforce.com/services/oauth2/authorize?response_type=code&client_id='+client_id+'&redirect_uri='+escape('https://'+host+'.salesforce.com/apex/ApiAccess');
+		}
+	</script>
+	<apex:form id="apiAccessForm">
+		<apex:pageBlock id="apiAccessBlock" title="Api Access" mode="edit" >
+			<apex:pageBlockButtons id="apiAccessButtons" location="both">
+				<apex:commandButton id="submitButton" value="Submit" onclick="return apiAccessFormSubmit()" style="display:none"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection id="apiAccessSection" columns="1" >
+				<apex:inputText id="clientIdInput" label="Client Id" style="width:100%;display:none" required="true" />
+				<apex:pageBlockSectionItem id="accessCodeItem">
+					<apex:outputLabel id="accessCodeLabel" value="Access Code" for="accessCodePanel" style="display:none"/>
+					<apex:outputPanel id="accessCodePanel" layout="block" style="display:none" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+	<form id="postToFrame" method="get" action="/services/oauth2/authorize" target="accessFrame">
+		<input id="client_id" name="client_id" type="hidden" />
+		<input id="response_type" name="response_type" type="hidden" value="code" />
+		<input id="redirect_uri" name="redirect_uri" type="hidden" />
+	</form>
+	<script>
+		var host = 'login';
+		if(null != location.href.match(/^https[:]\/\/[a-z0-9.]*cs[0-9]*[.]visual[.]force[.]com\/.*/g)) {
+			host = 'test';
+		}
+		document.getElementById('redirect_uri').value = 'https://'+host+'.salesforce.com/apex/ApiAccess';
+	</script>
+	<div  id="accessFrameDiv"/>
+	<script>
+		var clientIdInput = document.getElementById('{!$Component.apiAccessForm.apiAccessBlock.apiAccessSection.clientIdInput}');
+		function apiAccessFormSubmit() {
+			var accessFrameDiv = document.getElementById('accessFrameDiv');
+			if(accessFrameDiv && clientIdInput) {
+				document.getElementById('client_id').value = clientIdInput.value;
+				accessFrameDiv.innerHTML = '';
+				var url = getOauth2Url(clientIdInput.value);
+				var ifrm = document.createElement('iframe');
+				ifrm.setAttribute('name','accessFrame');
+				ifrm.setAttribute('width','100%');
+				ifrm.setAttribute('height','400');
+				ifrm.style.width="100%";
+				ifrm.style.height="400px";
+//				ifrm.setAttribute('src',url);
+				accessFrameDiv.appendChild(ifrm);
+				document.getElementById('postToFrame').submit();
+			}
+			return false;
+		}
+	</script>
+	<script>
+		function showCode(xcode) {
+			var panel = document.getElementById('{!$Component.apiAccessForm.apiAccessBlock.apiAccessSection.accessCodeItem.accessCodePanel}');
+			if(panel != null) {
+				document.getElementById('{!$Component.apiAccessForm.apiAccessBlock.apiAccessSection.accessCodeItem.accessCodeLabel}').style.display='block';
+				panel.style.display='block';
+				panel.innerHTML= xcode;
+				panel.document.getElementById('accessFrameDiv').innerHTML='';
+			}
+		}
+	</script>
+	<script>
+		if(code) {
+			showCode(code);
+			if(window.parent.showCode) {
+				window.parent.showCode(code);
+			}
+			if(window.top.showCode) {
+				window.top.showCode(code);
+			}
+			if(window.opener.showCode) {
+				window.opener.showCode(code);
+			}
+		}
+		else {
+			document.getElementById('{!$Component.apiAccessForm.apiAccessBlock.apiAccessButtons.submitButton}').style.display = 'block';
+			clientIdInput.style.display = 'block';
+		}
+	</script>
+</apex:page>

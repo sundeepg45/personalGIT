@@ -1,0 +1,807 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+
+<style type="text/css">
+
+body {
+  text-align:center;
+  margin:0;
+  font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-size:13px;
+  color:#333333;
+}
+
+.bodyDiv {
+    padding-top: 0px;
+}
+
+.outerNoSidebar {
+    padding: 0px;
+}
+
+.container {
+  width:960px;
+  margin:0 auto;
+  position:relative;
+  text-align:left;
+}
+
+a img {
+  border:none;  
+}
+
+a {
+  color:#c00;
+  text-decoration:none;  
+}
+
+a.disabled {text-decoration:none; cursor:text;}
+
+h1 {
+  color:#cc0000;
+  font-size:18px;
+  font-weight:bold;
+  margin:0 0 .7em 0;
+}
+
+h2 {
+  color:#4e376b;
+  font-size:18px;
+  font-weight:bold;
+  text-transform:uppercase;
+  margin:0 0 .7em 0;
+}
+
+h3 {
+  color:#4e376b;
+  text-transform: uppercase;
+  font-size: 14px;
+  margin-bottom:0.2em;
+}
+
+h4 {
+  text-transform: uppercase;
+  margin-top: 1em;
+  margin-bottom:0.2em;
+}
+
+a.learn-more {
+{!URLFOR($Resource.RHEV_zip, 'i/12_columns.png')}
+  background:url("{!URLFOR($Resource.CloudSiteLearnMoreArrow)}") no-repeat left center;
+  padding-left:12px;  
+}
+
+ol {
+  list-style:none;
+  margin:0;
+  padding:0;  
+}
+
+ul {
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+ul li {
+  background:url("{!URLFOR($Resource.RHELSiteResources, 'images/ListArrow.png')}") no-repeat left .4em;
+  padding:0 0 0 13px;  
+  margin-left: 0;
+}
+
+/* Header */
+
+#header {
+  background:url("{!URLFOR($Resource.RHELSiteResources, 'images/RHELSiteBgHeaderInt.jpg')}") repeat-x center top;
+  border-bottom: 1px solid #ccc;
+}
+
+#header .container {
+  height: 222px;  
+}
+
+
+.logo-product {
+  background:url("{!URLFOR($Resource.RHELSiteResources, 'images/product-logo.png')}") no-repeat left top;
+  width:268px;
+  height:35px;
+  display:block;
+  top:30px;
+  text-indent:-9999px;
+  overflow:hidden;
+  position:absolute;
+}
+
+.logo-redhat {
+  width:131px;
+  height:42px;
+  background:url("{!URLFOR($Resource.RHELSiteResources, 'images/LogoRedhat.png')}") no-repeat left top;
+  text-indent:-9999px;
+  overflow:hidden;
+  position:absolute;
+  top:28px;
+  right:20px;  
+}
+
+#header .title {
+  display:none;
+  overflow:hidden;
+  position:absolute;
+  top:175px;
+  font-size: 160%;
+  color: #fff;
+}
+
+#header .title strong {
+  text-transform: uppercase;
+  font-size: 160%;
+}
+
+#header .title sup {
+  font-size: 50%;
+}
+
+.scorecard-header {
+  background:url('{!URLFOR($Resource.CloudSiteHeaderRegionalScorecard)}') no-repeat left top;
+  width:146px;
+  height:29px;
+  overflow:hidden;
+  text-indent:-9999px;
+  display:block;
+  margin:0 0 7px 0;
+}
+
+.scorecard {
+  right:14px;
+  top:92px;
+  position:absolute;  
+}
+
+.scorecard ul {
+  margin:0;
+  padding:0;
+  list-style:none;
+  font-weight:bold;
+  color:#cc0000;
+  font-size:15px;  
+  border-top:3px solid #adacab;
+  border-left:3px solid #adacab;
+  background:#ffffff;
+  overflow:hidden;
+  width:254px;
+}
+
+.scorecard li {
+  float:left;
+  width:102px;
+  padding:13px 11px 15px 11px;
+  line-height:1em;
+  background:#ffffff;  
+  border-right:3px solid #adacab;
+  border-bottom:3px solid #adacab;
+  text-align:right;
+}
+
+.scorecard ul .region {
+  color:#acacac;
+  width:74px;
+  float: left;
+  text-align:left;
+}
+
+/* Main Nav */
+
+#nav-main {
+  list-style:none;
+  margin:0;
+  top:160px;
+  left:0;
+  position:absolute;
+}
+
+#nav-main li {
+  float:left;  
+/*  background:url('{!URLFOR($Resource.CloudSiteNavDivider)}') no-repeat right center; */
+  background:none;
+  height:62px;
+  padding-left:0;
+  border-left: 1px solid #ccc;
+  font-weight: bold;
+  margin-left: 0;
+}
+
+#nav-main li.last {
+  background:none;
+  border-right: 1px solid #ccc;  
+}
+
+#nav-main li#home a {
+  width:65px;
+  height: 48px;
+  padding-top: 14px;  
+}
+
+#nav-main li#nav2 a {
+  width:125px;  
+}
+
+#nav-main li#nav3 a {
+  width:170px;  
+}
+
+#nav-main li#nav4 a {
+  width:90px;  
+}
+
+#nav-main li#nav5 a {
+  width:160px;  
+}
+
+#nav-main li#nav6 a {
+  width:180px;  
+}
+
+#nav-main a {
+  color:#000;
+  text-transform:uppercase;
+  text-decoration:none;  
+  font-size:14px;
+  display:block;
+  padding-top:14px;
+  padding-left:20px;
+  height:48px;
+  margin-left: 0;
+  background:url('{!URLFOR($Resource.CloudSiteNavOver)}') no-repeat -9999px -9999px;
+}
+
+#nav-main a:hover,
+#nav-main a#selected,
+#nav-main li.active a {
+  background-position:top center;
+  /* Internet Explorer */
+  *background: #aaaaaa;
+  background: #aaaaaa\0/;
+  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr=#FFeeeeee, endColorstr=#FFaaaaaa);
+  /* Recent browsers */
+  background-image: -webkit-gradient(
+    linear,
+    left top, left bottom,
+    from(#eeeeee),
+    to(#aaaaaa)
+  );
+  background-image: -webkit-linear-gradient(
+    top,
+    #eeeeee,
+    #aaaaaa
+  );
+  background-image: -moz-linear-gradient(
+    top,
+    #eeeeee,
+    #aaaaaa
+  );
+  background-image: -o-linear-gradient(
+    top,
+    #eeeeee,
+    #aaaaaa
+  );
+  background-image: linear-gradient(
+    top,
+    #eeeeee,
+    #aaaaaa
+  );
+}
+
+
+
+#nav-main a strong {
+  display:block;
+  color:#cccccc;  
+  font-size:19px;
+}
+
+/* Content */
+
+#content {
+  background:url('{!URLFOR($Resource.CloudSiteBgBodyRepeat)}') repeat-y center top;
+}
+
+#content-inner {
+  background:url('{!URLFOR($Resource.CloudSiteBgBody)}') no-repeat center top;
+}
+
+#content .container {
+  padding-top:35px;
+  padding-bottom: 20px;
+  overflow:hidden;
+}
+
+#content-primary {
+  width:280px;
+  float:left;
+ 
+/*
+  width:100%;
+  float:left;
+*/
+}
+
+#content-secondary {
+  width:625px;
+  float:right;
+  padding-right:20px;
+}
+
+#content-blocks {
+  list-style:none;
+  margin:0;
+  padding:0;  
+  width:652px;
+}
+
+#content-blocks li {
+  width:272px;
+  height:163px;
+  float:left;
+  background:url('/resource/1318971142000/CloudSiteItemBox') no-repeat left top;
+  padding:22px 14px 0 20px;
+  margin-right:20px;
+  margin-bottom:20px;
+  position:relative;
+}
+
+#content-blocks a.learn-more {
+  position:absolute;
+  bottom:16px;
+  right:14px;  
+}
+
+#content-primary h2 strong {
+  font-size:28px;
+  color:#333333;
+  display:block;
+}
+
+#content-primary p {
+  font-size:15px;
+  color:#666666;
+  margin:0 0 1em 0;
+}
+
+#content-primary p.quote {
+  margin:0 0 1em 0;  
+}
+
+#content-primary p.quote-source {
+  font-size:12px;
+  margin:0 0 1.5em 0;  
+}
+
+#content-primary #content-links {
+  list-style:none;
+  margin:0;
+  padding:0 0 30px 0;  
+}
+
+#content-primary #content-links li {
+  margin:0 0 9px 0;
+  background:none;
+  padding:0;
+}
+
+#content-primary #content-links a {
+  background:url('{!URLFOR($Resource.CloudSiteSideButtonSprite)}') no-repeat 0 -43px;
+  width:215px;
+  height:34px;
+  line-height:34px;
+  padding:0 12px;
+  color:#ffffff;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:14px;
+  text-transform:uppercase;
+  display:block;
+}
+
+#content-primary #content-links li#take-test a {
+  background-position:0 0;  
+}
+
+#content-secondary .section {
+  float:left;
+  overflow:hidden;
+  width:100%;
+  margin:0 4% 15px 0;
+}
+
+.letter-list {
+  list-style:none;
+  margin:0 0 2em 0;
+  padding:0;  
+}
+
+.letter-list li {
+  padding:0 0 0 23px;
+  margin:0 0 13px 0;
+  color:#666666;
+  font-size:15px;
+}
+
+/* links list */
+
+.links-list {
+    padding:0;
+    margin:0;
+    list-style:none;    
+}
+
+ul.links-list, ul.links-list-new-resources {
+    padding:16px 0 16px 34px;
+    border-bottom:1px solid #d7d7d7;
+}
+
+
+ul.links-list li, ul.links-list-new-resources li {
+    padding:0;
+    border:none;    
+    clear: both;
+    margin: 0 0 7px;
+    min-height: 16px;
+    overflow: hidden;
+    padding-left: 13px;
+    background:url('{!URLFOR($Resource.CloudSiteBulletList)}') no-repeat 0 .4em;
+    padding:0 0 0 13px; 
+}
+
+ul.links-list li a, ul.links-list-new-resources li a {
+    display: inline-block; /* ms */
+    float: left;
+    margin-right: 10px;
+    min-height: 16px;
+    max-width: 500px;
+    color:#666666;  
+}
+
+ul.links-list-new-resources li a {
+	margin-right: 2px;
+	max-width: 200px;
+}
+
+ul.links-list li img {
+    display: block;
+    float: left;
+    margin-right: 8px;
+    min-height: 8px;
+    color:#666666;  
+}
+
+
+/* Item List */
+
+.item-list {
+  padding:0;
+  margin:0;
+  list-style:none;  
+}
+
+.item-list li div {
+  padding:16px 0 16px 34px;
+  border-bottom:1px solid #d7d7d7;
+}
+
+.item-list li li {
+  padding:0;
+  border:none;  
+}
+
+.item-list li#number-1 {
+  background:url('{!URLFOR($Resource.CloudSiteNumber1)}') no-repeat 5px 16px;  
+}
+
+.item-list li#number-2 {
+  background:url('{!URLFOR($Resource.CloudSiteNumber2)}') no-repeat 5px 16px;  
+}
+
+.item-list li#number-3 {
+  background:url('{!URLFOR($Resource.CloudSiteNumber3)}') no-repeat 5px 16px;  
+}
+
+.item-list li#number-4 {
+  background:url('{!URLFOR($Resource.CloudSiteNumber4)}') no-repeat 5px 16px;  
+}
+
+.item-list li#number-5 {
+  background:url('{!URLFOR($Resource.CloudSiteNumber5)}') no-repeat 5px 16px;  
+}
+
+.item-list li h2 {
+  color:#cc0000;
+  font-size:16px;
+  font-weight:bold;
+  margin:5px 0;  
+}
+
+.item-list li p {
+  margin:0 0 .7em 0;
+  font-size:14px;
+  clear:both;
+}
+
+.item-list li ul {
+  margin:0;
+  list-style:none;
+  padding:0;
+  color:#666666;
+}
+
+.item-list li ul li {
+    clear: both;
+    margin: 0 0 7px;
+    min-height: 16px;
+    overflow: hidden;
+    padding-left: 13px;
+  background:url('{!URLFOR($Resource.CloudSiteBulletList)}') no-repeat 0 .4em;
+  padding:0 0 0 13px;  
+}
+
+.item-list li ul li a {
+    display: block;
+    float: left;
+    margin-right: 10px;
+    min-height: 16px;
+  color:#666666;  
+}
+
+.item-list li ul li img {
+    display: block;
+    float: left;
+    margin-right: 10px;
+    min-height: 16px;
+    color:#666666;  
+}
+
+
+/* Collateral List */
+
+#collateral-list.item-list li div {
+  padding-left:50px;  
+}
+
+#collateral-list.item-list li ul li a {
+  display:block;
+  float:left;
+  min-height:16px;
+  margin-right:10px;
+}
+
+#collateral-list.item-list li ul {
+  clear:both;
+  width:560px;
+}
+
+#collateral-list.item-list li ul li {
+  clear:both;
+  overflow:hidden;
+  min-height:16px;
+  margin:0 0 7px 0;
+  padding-left:13px;
+}
+
+#collateral-list.item-list li h2,
+#training-list.item-list li h2 {
+  overflow:hidden;
+  line-height:1.1em;
+}
+
+.item-list li h2 span.title {
+  float:left;
+  margin-right:10px;  
+}
+
+#collateral-list.item-list li#major-item {
+  background:url('{!URLFOR($Resource.CloudSiteIconSms)}') no-repeat left 20px;  
+}
+
+#collateral-list.item-list li#whitepapers-item {
+  background:url('{!URLFOR($Resource.CloudSiteIconWhitepaper)}') no-repeat left 20px;  
+}
+
+#collateral-list.item-list li#webinars-item {
+  background:url('{!URLFOR($Resource.CloudSiteIconWebinar)}') no-repeat left 20px;  
+}
+
+#collateral-list.item-list li#blogs-item {
+  background:url('{!URLFOR($Resource.CloudSiteIconBlog)}') no-repeat left 20px;  
+}
+
+#collateral-list.item-list li#architecture-item {
+  background:url('{!URLFOR($Resource.CloudSiteIconArchitectures)}') no-repeat left 20px;  
+}
+
+#collateral-list.item-list li#cookbooks-item {
+  background:url('{!URLFOR($Resource.CloudSiteIconCookbooks)}') no-repeat left 20px;  
+}
+
+/* Links List */
+
+.links-list li {
+  margin:0 0 10px 0;  
+}
+
+.links-list  a {
+  color:#666666;
+}
+
+/* Icons */
+
+.icon {
+  width:16px;
+/*  height:16px; */
+/*  display:block; */
+  float:left;
+  margin-top:4px;
+  margin-right:6px;
+  overflow:hidden;
+  text-indent:-9999px;
+}
+
+.icon-a {
+  background:url('{!URLFOR($Resource.CloudSiteIconA)}') no-repeat left top;
+}
+
+.icon-c {
+  background:url('{!URLFOR($Resource.CloudSiteIconC)}') no-repeat left top;
+}
+
+.icon-b {
+  background:url('{!URLFOR($Resource.CloudSiteIconB)}') no-repeat left top;
+}
+
+.icon-enlarge {
+  background:url('{!URLFOR($Resource.CloudSiteIconMagnifyingGlass)}') no-repeat right top;
+}
+
+.icon-featured {
+  width:8px;
+  height:8px;
+  height:16px;
+  display:block;
+  float:left;
+  margin-top:0px;
+  margin-right:6px;
+  overflow:hidden;
+  text-indent:-9999px;
+  background:url("{!URLFOR($Resource.RHELSiteResources, 'images/s.gif')}") no-repeat right top;
+}
+
+/* What's Working */
+
+ul.conversations-list {
+  padding:0 0 30px 0;  
+}
+
+/* Sub Links */
+
+.sub-links {
+  padding:17px 0 0 0;
+  color:#666666;
+  border-top:1px solid #d7d7d7;
+}
+
+.sub-links a {
+  color:#666666;  
+}
+
+.sub-links h2 {
+  font-size:15px;
+  color:#666666;
+  font-weight:bold;
+  margin:0 0 8px 0;  
+}
+
+.sub-links ul {
+  margin:0;
+}
+
+.sub-links ul li {
+    margin-bottom:.5em;
+}
+
+.upcoming,
+.upcoming h2 {
+  color:#333333;
+}
+
+.upcoming {
+  margin-bottom:30px;  
+}
+
+/* Presentations */
+
+ul.presentations-list {
+  padding: 10px 0px 0px 10px;  
+}
+
+
+/* Footer */
+
+#footer {
+  background-image: -webkit-linear-gradient(top, #444, #222);
+  background-image: -moz-linear-gradient(top, #444, #222);
+  height:47px;
+  margin-top:0px;
+  margin-bottom:0px;
+/*  background:url('/resource/1318971141000/CloudSiteBgFooter') repeat-x;*/
+}
+
+#footer .container {
+  height:47px;  
+}
+
+#footer p.copyright {
+  color:#ffffff;
+  text-transform:uppercase;
+  font-size:10px;
+  font-weight:bold;
+  float:left;
+  line-height:20px;
+  vertical-align:middle;  
+}
+
+.internal-use {
+  margin:0 75px 0 0;
+  padding:0;
+  font-size:10px;
+  font-weight:bold;
+  float:right;
+  text-transform:uppercase;
+  color:#ffffff;
+  line-height:27px;
+  vertical-align:middle;
+}
+
+/* qtip */
+
+.qtip {
+  background:url('{!URLFOR($Resource.CloudSiteTooltipBg)}') no-repeat left top !important;
+  width:192px !important;
+  height:81px !important;  
+  padding-left:22px !important;
+  padding-top:14px !important;
+  color:#666666 !important;
+  font-size:12px !important;
+  padding-right:22px !important;
+  
+}
+
+.qtip-contentWrapper,.qtip-content {background:none !important; margin:0 !important; padding:0 !important; border:none !important;color:#666666 !important;
+  font-size:12px !important;
+}
+
+a.action {
+  width:90%;
+  display:block;
+  padding-top:10px;
+  padding-bottom:10px;
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  color:white;
+  background-color: #4e376a; /* top */
+  margin-top:15px;
+  /* bottom #39284f */
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  text-transform: uppercase;
+  background-image: -webkit-linear-gradient(top, #4e376a, #39284f);
+  background-image: -moz-linear-gradient(top, #4e376a, #39284f);
+  border-bottom:1px solid #7d7685;
+  border-top:1px solid #b7aec3;
+  border-left:1px solid #b7aec3;
+  border-right:1px solid #7d7685;
+
+}
+
+</style>
+
+</apex:page>

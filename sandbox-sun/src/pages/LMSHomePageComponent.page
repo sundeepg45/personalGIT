@@ -1,0 +1,28 @@
+<apex:page controller="LMSHomePageComponentController" sideBar="false" showHeader="false">
+    <style> body { background-color: #EFEFEF; } </style>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript"> 
+        $.noConflict(); 
+    </script>
+    <apex:outputText rendered="{! NOT(hasTrack) && NOT(addingTrack) }">
+	    <script type="text/javascript"> 
+            jQuery(document).ready(function() {
+	        	window.top.location.href = "/apex/Manage_Track?sidenavredirect=true";
+            });
+        </script>
+    </apex:outputText>
+    <div><strong>{!$Label.Partner_Primary_Track_Homepage_Label}</strong></div>
+    <apex:outputText rendered="{! hasTrack }">
+        <div>
+            <span id="track{!contacttrack.Id}">
+                <apex:outputText value="{!contacttrack.Partner_Track__r.Partner_Function__c}"/>&nbsp;/&nbsp;<apex:outputText value="{!contacttrack.Partner_Track__r.Product_of_Interest__c}"/><br/>
+            </span>
+        </div>
+    </apex:outputText>
+    <apex:outputText rendered="{! NOT(hasTrack) }">
+        <div id="notrack">{!$Label.No_Track}</div>
+    </apex:outputText>
+    <div style="padding-top:5px;">
+       <a id="add-more-tracks" onclick="window.top.location.href = '/apex/Manage_Track'; return false;" href="#">{!$Label.Add_Remove_Tracks}</a>
+    </div>
+</apex:page>

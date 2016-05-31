@@ -1,0 +1,300 @@
+<apex:page showHeader="false" standardStylesheets="false">
+    <!--
+    <apex:stylesheet value="http://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="http://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Partner_Onboarding_CSS}" />
+
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    -->
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Red Hat FAQ</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <style>
+    .logo{
+        display: block;
+        width: 300px;
+        height: 50px;
+        text-indent: -9999px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        background-image: url("{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/logo-partner-portal.png')}") !important;
+    }
+        .tech-quick-list{
+            background-color: rgba(255,255,255,0.9);
+            height: auto;
+            overflow: hidden;
+            padding: 1.071em 1.429em;
+        }
+        .tech-quick-list h2{
+            color: #c00;
+            text-transform: uppercase;
+            font-family: "Overpass Bold";
+            font-size: 22px;
+        }
+        .tech-quick-list li{
+            margin-bottom: 8px;
+            color: #333;
+            cursor: pointer;
+        }
+        .tech-quick-list li:hover{
+            color: #000;
+            text-decoration: underline;
+        }
+        .header-band{
+            padding: 20px 0;
+            background: url("{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/header-banner-help-page.jpg')}") no-repeat center center !important;
+            -webkit-background-size: cover !important;
+            -moz-background-size: cover !important;
+            -o-background-size: cover !important;
+            background-size: cover !important;
+        }
+
+        h3{
+            font-family: 'Overpass' !important;
+        }
+        h3{
+            color: #444 !important;
+        }
+        p{
+            font-family: 'Overpass Light' !important;
+        }
+        strong{
+            color: #444;
+            font-family: 'Overpass' !important;
+            font-weight: normal;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+
+          //scroll to section effect\\
+          $('.tech-quick-list .num1').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num1").offset().top
+            }, 800, 'linear');
+          });
+          $('.tech-quick-list .num2').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num2").offset().top
+            }, 800, 'linear');
+          });
+          $('.tech-quick-list .num3').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num3").offset().top
+            }, 800, 'linear');
+          });
+          $('.tech-quick-list .num4').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num4").offset().top
+            }, 800, 'linear');
+          });
+          $('.tech-quick-list .num5').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num5").offset().top
+            }, 800, 'linear');
+          });
+          $('.tech-quick-list .num6').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num6").offset().top
+            }, 800, 'linear');
+          });
+          $('.tech-quick-list .num7').click(function(){
+            $('html,body').animate({
+              scrollTop: $("#content-full .num7").offset().top
+            }, 800, 'linear');
+          });
+        });
+    </script>
+
+
+    <div id="help" class="red-hat-content">
+       <div class="header-band">
+          <div class="container">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <a href="#" class="logo">Redhat Partner Portal</a>
+                        <!--<h1 style="color: rgb(255, 255, 255);">Red Hat</h1>-->
+                        <div class="sub-head">
+                            <h1 style="color: rgb(255, 255, 255); font-family: 'Overpass Bold';">Frequently Asked Questions</h1>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="tech-quick-list">
+                            <div class="col-xs-12">
+                                <h2>Quick Links</h2>
+                                <ul class="list-unstyled">
+                                    <li class="num1"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question1}"/></li>
+                                    <li class="num2"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question2}"/></li>
+                                    <li class="num3"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question3}"/></li>
+                                    <li class="num4"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question4}"/></li>
+                                    <li class="num5"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question5}"/></li>
+                                    <li class="num6"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question6}"/></li>
+                                    <li class="num7"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question7}"/></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+        <!--<div id="container">
+                <div id="shell-top-simple">
+                    <div class="wrap">
+                        <div id="header">
+                            <div id="logo">
+                                    <h1 class="hide">Red Hat</h1>
+                                    <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                        <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                                    </a>
+                            </div>
+                            <div id="login-pre">
+                                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso/logout.html">LOG OUT</a>
+                            </div>
+                            <div id="masthead-simple">
+                                <div class="second-nav-rh" id="secondary-nav">
+                                    <div id="search-wrap">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+            <div id="content">
+                <div id="content-full" style="background: none;">
+
+                    <!--<h1><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Frequently_Asked_Questions}"/></h1>
+                    <ul>
+                    <li><a href="#1"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question1}"/></a></li>
+                    <li><a href="#2"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question2}"/></a></li>
+                    <li><a href="#3"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question3}"/></a></li>
+                    <li><a href="#4"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question4}"/></a></li>
+                    <li><a href="#5"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question5}"/></a></li>
+                    <li><a href="#6"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question6}"/></a></li>
+                    <li><a href="#7"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question7}"/></a></li>
+                    </ul>
+                    -->
+
+                    <h3 class="num1"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question1}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer1}" escape="false"/> </p>
+
+                    <h3 class="num2"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question2}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer2}"/> </p>
+
+                    <h3 class="num3"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question3}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer3}"/></p>
+
+                    <h3 class="num4"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question4}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer4}"/></p>
+
+                    <h3 class="num5"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question5}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer5_Line1}"/><br />
+                    <br />
+                    <apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer5_Line2}"/><br />
+                    <br />
+                    <apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer5_Line3}"/> <br />
+                    <br />
+                    <apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer5_Line4}"/><br />
+                    <br />
+                    <apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer5_Line5}"/> <br />
+                    <br />
+                    <apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer5_Line6}"/></p>
+
+                    <h3 class="num6"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question6}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line1}"/> <br /><br />
+
+                    <strong><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line2}"/></strong>
+                    <ul><li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line3}"/></li></ul>
+                    <strong><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line4}"/></strong>
+                    <ul><li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line5}"/></li></ul>
+                    <strong><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line6}"/></strong>
+                    <ul><li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer6_Line7}"/></li> </ul>
+                    </p>
+
+                    <h3 class="num7"><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Question7}"/></h3>
+
+                    <p ><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line0}"/>
+
+                    <apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line1}"/>
+
+                    <ul>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line2}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line3}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line4}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line5}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line6}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line7}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line8}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line9}"/></li>
+                    <li><apex:outputText value="{!$Label.Onboarding_PartnerFAQ_Answer7_Line10}"/></li></ul></p>
+
+
+                </div><!-- end content-full -->
+            </div> <!-- end_content-->
+            <!--</div><!-- end-wrap -->
+        <!--</div><!--end shell-top-simple -->
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>Copyright &copy;2011 Red Hat, Inc.</li>
+                            <li>|</li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">Privacy Statement</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">Terms of use</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">Patent promise</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">Careers</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">Trademark guidelines</a></li>
+                            <li><a href="">About Red Hat</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">Contact us</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">Site map</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">FAQs</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">Supplier requirements</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div><!-- /.wrap -->
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+    <c:Onboarding_Footer />
+    </div><!--red-hat-content -->
+
+</apex:page>

@@ -1,0 +1,47 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt" tabStyle="Partner_Registration__c" >
+<apex:form >
+    <apex:pageMessages />
+    <apex:pageBlock rendered="{!isFinancesApproved && isEnrolled}">
+        <apex:pageBlockButtons > 
+             <apex:commandButton action="{!save}" value="{!$Label.Save}" id="SaveButton"/>
+             <apex:commandButton action="{!cancel}" value="{!$Label.cancel}" id="CancelButton"/>
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection title="Customer Information" columns="2">
+            <apex:inputField value="{!Partner_Registration__c.Company_Name__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Contact__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Street_1__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Contact_Title__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Street_2__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Contact_Job_Function__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_City__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Contact_Email__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_State__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Contact_Phone__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Country__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Contact_Mobile__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Company_Postal_Code__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Opportunity Detail" columns="2">
+            <apex:inputField value="{!Partner_Registration__c.Project_Description__c}" style="width:100%" />
+            <apex:outputLabel value=""/>
+            <apex:inputField value="{!Partner_Registration__c.Value_Added_Description__c}" style="width:100%"/>
+            <apex:outputLabel value=""/>
+            <apex:inputField value="{!Partner_Registration__c.Product_Family__c}"/>
+            <apex:inputField value="{!Partner_Registration__c.Estimated_Close_Date__c}" showDatePicker="True"/>
+            <apex:inputField value="{!Partner_Registration__c.Project_Budget__c}"/>
+            <apex:outputLabel value=""/>
+            <apex:inputField value="{!Partner_Registration__c.Sizing_Year_1_Subs__c}" />
+            <apex:inputField value="{!Partner_Registration__c.Year_1_Revenue__c}"/>
+        </apex:pageBlockSection>
+
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{!AND(isEnrolled,NOT(isFinancesApproved))}">
+        <apex:outputText value="{!$Label.Financial_Details_Required}."/>
+        See <a href="/apex/PartnerPrograms">{!$Label.Partner_Programs}</a>.
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{!NOT(isEnrolled)}">
+        <apex:outputText value="{!$Label.Enrollment_Required}"/>
+        See <a href="/apex/PartnerPrograms">{!$Label.Partner_Programs}</a>.
+    </apex:pageBlock>
+</apex:form>
+</apex:page>

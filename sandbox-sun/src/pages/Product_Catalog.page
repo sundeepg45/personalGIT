@@ -1,0 +1,166 @@
+<apex:page controller="PCController" showHeader="false" standardStylesheets="false" sidebar="false" cache="true" action="{!OnLoadAction}" expires="1">
+    <apex:stylesheet value="http://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="http://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Finder_Catalog_CSS}" />
+
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    <apex:includeScript value="{!$Resource.PartnerSharedScripts}"/>
+    <script type="text/javascript">
+        var showAdvLink='{!$Label.PF_Search_Section_FilterOptions}';
+        var hideAdvLink = '{!$Label.PF_Search_Section_Hide_FilterOptions}';
+
+        function toggleDetails(id){
+            var tab = jQuery('#' + id.replace('.','\\.'));
+            if (tab.attr('class') == 'cardAssetsOff'){
+                tab.attr('class', 'cardAssetsOn');
+            } else {
+                tab.attr('class', 'cardAssetsOff');
+            }
+        }
+
+        function hideSearchButton(){
+            jQuery('#searchButton').hide();
+        }
+
+        function showSearchButton(){
+            jQuery('#searchButton').show();
+        }
+
+        function initialize(){
+            if (getElementByPartialId('input','.*hidAdvancedSearchOpen').value == 'true'){
+                toggleAdvancedSearch();
+            }
+        }
+    </script>
+    <div id="container">
+        <div id="shell-top-simple">
+            <div class="wrap">
+                <div id="header">
+                    <div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div><!-- end logo -->
+					<div id="login-pre">
+		                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso">LOG IN</a>
+		            </div>
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+                <div id="content">
+                    <div id="content-full" style="background: none;">
+
+					    <div style="overflow:auto">
+					    	<div style="float:left;width=45%"><h1 id="pfTitle">{!$Label.PC_detail_Section_Productcatalog}</h1></div>
+					    	<div class="right-side-link"><a id="pcLink" href="/finder">{!$Label.PC_Find_Partner_Link}</a></div>
+						</div>
+
+						<div id="wrapper">
+						<div id="container" class="clearfix">
+							<apex:form >
+								<div id="top">
+									<apex:messages />
+									<div class="vertical">
+									<label>{!$Label.PC_Search_Label}</label>
+									<apex:inputField id="txtNameOrKeywords" value="{!searchForm.NameOrKeywords__c}"/>
+									<apex:inputHidden id="hidAdvancedSearchOpen" value="{!searchForm.AdvancedSearchOpen__c}"/>
+									</div><!-- /.vertical -->
+									<div class="vertical span2" id="searchButtons">
+										<label class="invisible block">Search submit</label>
+										<apex:commandButton id="btnSearch" action="{!ExecuteSearch}" onclick="startSearch();" value="{!$Label.Custom_Reference_Search_Button}" styleClass="goleft partner-search"/> &nbsp;
+										<div class="finder-links">
+											<a class="trigger" id="filterShowHideLink" href="#" onclick="toggleAdvancedSearch(); return false;">{!$Label.PF_Search_Section_FilterOptions}</a> &nbsp;|&nbsp; <apex:commandLink id="linkClear" action="{!ClearSearch}" value="{!$Label.PF_Search_BTN_Clear}"/>
+										</div>
+									</div><!-- /.vertical -->
+									<div class="vertical span2" id="statusSearching" style="display:none;">
+										<label class="invisible block">Searching Status</label>
+										<label>{!$Label.PF_Loc_MSG_Searching}</label>
+									</div>
+
+								<div class="clear"></div>
+								</div><!-- /#top -->
+								<div id="bottom" style="display:none;">
+									<div class="vertical">
+										<label>{!$ObjectType.PCSearchForm__c.fields.Software_Category__c.label}</label>
+										<apex:inputField id="cboApplicationType" value="{!searchForm.Software_Category__c}"/>
+									</div><!-- /.vertical -->
+                                    <div class="vertical">
+										<label>{!$ObjectType.PCSearchForm__c.fields.Red_Hat_Enterprise_Linux__c.label}</label>
+										<apex:inputField id="cboRHEL" value="{!searchForm.Red_Hat_Enterprise_Linux__c}"/>
+									</div><!-- /.vertical -->
+                                    <div class="vertical">
+										<label>{!$ObjectType.PCSearchForm__c.fields.Global_Region__c.label}</label>
+										<apex:inputField id="cboGlobalRegion" value="{!searchForm.Global_Region__c}"/>
+									</div><!-- /.vertical -->
+									<div class="clear"></div>
+									</div><!-- /#bottom -->
+								<div class="clear"></div>
+							</apex:form>
+							</div><!-- /#container -->
+
+						    <div id="content-block">
+							    <apex:pageBlock id="resultsPane">
+							        <apex:include pageName="PCProductResultsPage" />
+							    </apex:pageBlock>
+							</div>
+						</div><!-- /#wrapper -->
+                	</div>
+                </div> <!-- end_content-->
+            </div><!-- end-wrap -->
+        </div><!--end shell-top-simple -->
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>{!$Label.Onboarding_Copyright}</li>
+                            <li>|</li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">{!$Label.Onboarding_Privacy_Policy}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">{!$Label.Onboarding_Terms_Of_Use}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">{!$Label.Onboarding_Patent_Promise}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">{!$Label.Onboarding_Careers_Link}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">{!$Label.Onboarding_Trademark_guidelines}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_About_Red_Hat}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">{!$Label.Onboarding_Contact_us}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">{!$Label.Onboarding_Site_map}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">{!$Label.Onboarding_FAQs}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">{!$Label.Onboarding_Supplier_requirements}</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div>
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+
+    <style>
+        .labelCol {
+            font-weight:bold;
+        }
+    </style>
+    <script type="text/javascript">
+        initialize();
+    </script>
+</apex:page>

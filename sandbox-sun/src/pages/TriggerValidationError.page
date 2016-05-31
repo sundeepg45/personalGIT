@@ -1,0 +1,11 @@
+<apex:page controller="TriggerValidationException" showHeader="true" sidebar="true">
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText style="font-size:large" value="{!errorMessage}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection rendered="{!hasRecordId}" columns="1">
+            <!-- <apex:outputLink value="/{!recordId}">{!recordMessage}</apex:outputLink> -->
+            <apex:detail subject="{!recordId}" relatedList="false"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+</apex:page>

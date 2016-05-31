@@ -1,0 +1,12 @@
+<apex:page standardController="Account" rendered="{!Account.Count_Of_Identifying_Address__c==0}" >
+    <script language="javascript">  
+        //window.onload=NoIdentifyingAddress();  
+        //function NoIdentifyingAddress(){
+            //alert('Account creation process is not complete. The Sales Account is missing an Identifying Address. Please add an address to the Sales Account to complete this process.');
+        //}
+    </script>
+    <apex:pageBlock >
+        <apex:outputText style="color:red;font-size:12px;" value="Account creation process is not complete. The Sales Account is missing an Identifying Address. Please add an address to the Sales Account to complete this process." />
+        
+    </apex:pageBlock>
+</apex:page>

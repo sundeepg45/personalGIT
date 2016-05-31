@@ -1,0 +1,32 @@
+<apex:page standardController="Agreement__c" extensions="AgreementControllerExt" tabStyle="Agreement__c" >
+<apex:SectionHeader title="New/Edit Agreement" />
+    <apex:form >
+        <apex:pageMessages />
+        <apex:pageBlock >
+            <apex:pageBlockButtons >
+                <apex:commandButton id="actionSave" action="{!saveAgreement}" value="Save"/>
+                <apex:commandButton id="actionCancel" action="{!cancelAgreement}" value="Cancel" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="2" >
+                 <apex:inputField id="agreementName" value="{!agreementInfo.Name}"  required="true" />
+                 <apex:inputField id="agreementType" value="{!agreementInfo.Type__c}" />
+                 <apex:inputField id="agreementVersion" value="{!agreementInfo.Version__c}" required="true" />
+                 <apex:inputField id="agreementActivationDate" value="{!agreementInfo.ActivationDate__c}"  required="true"/>
+                 <apex:inputField id="agreementPartnerProgram" value="{!agreementInfo.Partner_Program__c}"/>
+                 <apex:inputField id="agreementPartnerType" value="{!agreementInfo.PartnerType__c}"/>
+                 <apex:inputField id="agreementExpirationDate" value="{!agreementInfo.ExpirationDate__c}" />
+                 <apex:inputField id="agreementSignatureRequired" value="{!agreementInfo.IsSignatureRequired__c}" />
+                 <apex:inputField id="agreementApprovalStatus" value="{!agreementInfo.ApprovalStatus__c}" required="true" />
+                 <apex:inputField id="agreementIsTermsDocument" value="{!agreementInfo.Is_Terms_Document__c}" required="false" />
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Countries" />
+                    <apex:selectList id="agreementCountries" value="{!agreementCountries}"
+                        size="5" multiselect="true" >
+                        <apex:selectOptions value="{!countries}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

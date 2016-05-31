@@ -1,0 +1,74 @@
+<apex:page controller="BusinessPlan_EditAccountFieldsController" standardStylesheets="false">
+    <style type="text/css">
+        /* Color for the title bar */
+      body
+        {
+        background-color:#F0F0F0 ;
+        border-style:none;
+        border-color:#F0F0F0 ;
+        }
+        
+        .bPageBlock .pbHeader
+        {
+            background-color:#F0F0F0 ;
+            border-style:none;
+            border-color:#F0F0F0 ;
+            
+            
+        }
+        .bPageBlock .pbBody
+        {
+            /* Color for the pageblock background */
+            background-color:#F0F0F0 ;
+            border-style:none;
+            border-color:#F0F0F0 ;
+            
+            
+        }
+      
+
+
+    </style>
+
+    <apex:form >
+        <apex:pageBlock title="{!$Label.BusinessPlanEditAccountInformation}">
+            <apex:pageBlockButtons >
+                <apex:outputText rendered="{!saved}"><script type="text/javascript">top.location = '/{!bpId}';</script></apex:outputText>
+                <apex:commandButton value="{!saveButtonLabel}" action="{!save}"/>
+                <apex:commandButton onclick="history.go(-1);return false;" value="{!$Label.BusinessPlan_Cancel}"/>
+            </apex:pageBlockButtons>            
+            <apex:pageBlockSection >
+                <apex:inputField value="{!account.Phone}" style="font-size:80%"/>              
+                <apex:inputField value="{!account.Fax}" style="font-size:80%"/>                
+                <apex:inputField value="{!account.ShippingStreet}" style="font-size:80%"/>
+                <apex:inputField value="{!account.ShippingCity}" style="font-size:80%"/>                
+                <apex:inputField value="{!account.ShippingState}" style="font-size:80%"/>
+                <apex:inputField value="{!account.ShippingCountry}" style="font-size:80%"/>  
+                 <apex:inputField value="{!account.Offices_Locations__c}" style="font-size:80%"/>
+                 <apex:outputField value="{!account.PartnerStatuses__c}" style="font-size:80%"/>
+
+          
+               <apex:inputField value="{!account.Additional_Partnerships__c}" style="font-size:80%"/>      
+                <apex:inputField value="{!account.Target_Market_Size__c}" style="font-size:80%"/>
+                         
+                
+                <apex:inputField value="{!account.Partner_s_Largest_Customer__c}" style="font-size:80%"/>                
+                <apex:inputField value="{!account.Number_Enrolled_Sales_Cert__c}" style="font-size:80%"/>
+                  <apex:inputField value="{!account.NumberOfEmployeesInWWOrg__c}" style="font-size:80%"/> 
+                  <apex:outputField value="{!account.Total_Partner_Sales_Certifications__c}" style="font-size:80%"/>
+<apex:outputField value="{!account.Total_Partner_Technical_Certifications__c}" style="font-size:80%"/>
+
+                
+                <apex:inputField value="{!account.Software_Focus__c}" style="font-size:80%"/> 
+    <apex:pageBlockSectionItem >
+    <apex:outputLabel value="{!$Label.BusinessPlanCustomerFocus}" for="specializations"/>
+    <apex:outputText value="{!account.Select_Specialization_s__c}" id="specializations" style="font-size:80%"/>
+</apex:pageBlockSectionItem>
+
+
+                              
+            </apex:pageBlockSection>
+       </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

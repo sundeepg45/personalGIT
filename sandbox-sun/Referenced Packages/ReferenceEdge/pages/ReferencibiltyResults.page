@@ -1,0 +1,251 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RfSearchController" sidebar="false" id="pageId" tabStyle="RE_Search__tab">
+    <!-- Message -->
+    <apex:pageMessages />
+    
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    
+    <!-- Sction Header-->
+    <apex:sectionHeader title="{!$Label.RF_Filters}" help="RfSearchHelpPage" />
+    
+    
+    <!-- Add JavaScript & Jquery-->
+    <script language="javascript" type="text/javascript">
+        jQuery(".content img").css("background-image","none");
+        jQuery(".content img").attr("src","{!URLFOR($Resource.RESearchFilterIcons, 'filter-icon.png')}");
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+    </script>
+    
+    <!-- Add CSS-->
+    <style type="text/css">
+        /* ---------------------- Div width -------------------------- */
+        .referenceabilityDiv { 
+            width:1000px;
+        }
+
+        /* ----------Change width here for item container------------- */
+        #referenceabilityUl li { 
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word; 
+        }
+        
+        /* ----------Change width here for item container------------- */
+        .referenceabilityDiv div { 
+            width:950px; 
+            float:left;
+        }
+        
+        .rightImage {
+            display:inline-block; width:15px;
+        }            
+        
+        /* ----------Change item width here -------------------------- */
+        #referenceabilityUl li > * { 
+            //display:table; 
+            table-layout:fixed; 
+            width:250px; 
+            overflow:hidden; 
+        }
+        
+        /* ----------------- Item text aliment ----------------------- */
+        .referenceabilityDiv li { 
+            color:#333; 
+            text-align:left;
+        }
+        
+        .pbTitle{
+            display:none;
+        }
+        .referenceabilityUl1  { 
+             //display:table; 
+             table-layout:fixed; 
+             width:250px; 
+             overflow:hidden; 
+             float : left;
+             list-style-type: none;
+         }   
+         
+    </style>
+    <!-- Form -->
+    <apex:form id="frmId">
+        <!-- Action Fuctions for the Page-->
+        <apex:actionFunction name="selectReferenceabilityType" reRender="opReferenceability,pbsIs" action="{!referenceabilityWrapper.setReferenceabilityTypes}" oncomplete="PORHideLoading();">
+            <apex:param name="param1" value="" assignTo="{!referenceabilityWrapper.referenceabilityTypeId}"/>
+        </apex:actionFunction>  
+        
+        <!-- Page Block -->
+        <apex:pageBlock id="pbId">
+            <!-- Page Block Section -->
+            <apex:PageBlockSection id="pbsId" columns="1">  
+                <apex:outputPanel id="opReferenceability">
+                    <div class="referenceabilitySelectAllDiv">
+                        <apex:outputPanel id="refBlock" layout="block" style="width: 20%;float:right;text-align:right;" rendered="{! referenceabilityWrapper.referenceabilityTypeWrapper != null && referenceabilityWrapper.referenceabilityTypeWrapper.size > 0}">
+                            <div style="text-align:right;"> 
+                                <apex:outputPanel id="iconblockId" layout="block" style="float:left;margin-top: 5px;margin-right: 9px;">
+                                    <span style="float:left;" class="helpButton" id="DeliveryFrequency-_help"> 
+                                        <apex:outputLabel value=""/> 
+                                        <img id="helpImg1" class="helpOrb" src="/s.gif"/> 
+                                        <script>
+                                            sfdcPage.setHelp('DeliveryFrequency', '{!$Label.Any_All_helpText}');
+                                            var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+                                            var isIE7 = (navigator.appVersion.indexOf('MSIE 7.')==-1) ? false : true;
+                                            var helpImg = document.getElementById('helpImg1');
+                                            if(isIE7)
+                                            helpImg.style.marginRight = "6px";
+                                            else if(isIE)
+                                            helpImg.style.marginRight = "0px";
+                                            else
+                                            helpImg.style.marginRight = "3px";                         
+                                        </script> 
+                                    </span>
+                                </apex:outputPanel>
+                                <apex:selectRadio style="float:left;" layout="lineDirection" value="{!filterLogics['Referenceability'].operatorSelected}">
+                                    <apex:selectOptions value="{!logicsWithName}"/>
+                                 </apex:selectRadio>
+                                <div style="float: right;width: 60%;margin-top: 5px;">
+                                    <apex:commandLink style="color:#5C95C4;" value="{!$Label.Select_All}" action="{!referenceabilityWrapper.selectAllReferenceabilityTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opReferenceability,pbsIs"/>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <apex:commandLink style="color:#5C95C4;" value="{!$Label.Clear_All}" action="{!referenceabilityWrapper.clearAllReferenceabilityTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opReferenceability,pbsIs"/>                            
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                        <div style="text-align:left;text-indent:50px;font-size: 150%;">{!$Label.Referenceability} </div>
+                    </div>
+                    
+                    
+                    <div class="referenceabilityDiv">
+                        <div>
+                            <!-- Output Panel for Referenciability records--> 
+                             <apex:outputPanel rendered="{! referenceabilityWrapper.referenceabilityTypeWrapper != null && referenceabilityWrapper.referenceabilityTypeWrapper.size > 0}">
+                                <ul class="referenceabilityUl1">
+                                    <apex:repeat value="{!referenceabilityWrapper.referenceabilityTypeWrapper}" var="referenceabilityType"
+                                        first="0" rows="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3) + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 0, 1,0)}">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!referenceabilityType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectReferenceabilityType('{!JSENCODE(referenceabilityType.refType.Id)}');return false;">
+                                                           <apex:outputLabel value="{!referenceabilityType.refType.Name}" style="font-weight:{!HTMLENCODE(referenceabilityType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>
+                                
+                                <ul class="referenceabilityUl1">
+                                    <apex:repeat value="{!referenceabilityWrapper.referenceabilityTypeWrapper}" var="referenceabilityType"
+                                        first="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3) + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 0, 1,0)}" 
+                                        rows="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3) + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 1, 1,0)}">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!referenceabilityType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectReferenceabilityType('{!JSENCODE(referenceabilityType.refType.Id)}');return false;">
+                                                           <apex:outputLabel value="{!referenceabilityType.refType.Name}" style="font-weight:{!HTMLENCODE(referenceabilityType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>     
+                                
+                                <ul class="referenceabilityUl1">
+                                    <apex:repeat value="{!referenceabilityWrapper.referenceabilityTypeWrapper}" var="referenceabilityType"
+                                        first="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3)*2 + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 0, if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 1,2,1) ,0)}" rows="">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!referenceabilityType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectReferenceabilityType('{!JSENCODE(referenceabilityType.refType.Id)}');return false;">
+                                                           <apex:outputLabel value="{!referenceabilityType.refType.Name}" style="font-weight:{!HTMLENCODE(referenceabilityType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>                                                         
+                            </apex:outputPanel> 
+                            
+                            <!-- Output Panel for No Record found-->  
+                            <apex:outputPanel rendered="{!referenceabilityWrapper.referenceabilityTypeWrapper.size = null || referenceabilityWrapper.referenceabilityTypeWrapper.size = 0 }">                                
+                                <ul class="referenceabilityUl1">                                    
+                                    <li>
+                                        <apex:outputLabel value="{!$Label.No_Data_Found}"/>
+                                    </li>
+                                </ul>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+             </apex:PageBlockSection> 
+            
+            <!-- Page Block Buttons Top-->
+            <apex:pageBlockButtons id="pbbIdTop" location="top" >
+                <div style="width:100%;">
+                    <div style="float:left ; width: 40%;">
+                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_RF_Search}" action="{!backToSearch}" id="backCmdLinkId" />
+                    </div>
+                    
+                    <div style="float:left ; width: 20%;">
+                        <apex:commandButton value="{!$Label.Done}" action="{!backToSearch}" id="doneCmdBtnId"/>
+                    </div>
+
+                    <apex:outputPanel >
+                        <div style="float:left ; width: 40%;text-align:right;">
+                            <apex:repeat value="{!referenceabilityWrapper.alphabets}" var="alpha" id="alphaRptId">&nbsp;&nbsp;
+                                <apex:commandLink style="color:#5C95C4;" action="{!referenceabilityWrapper.showReferenceabilityAlphabet}" value="{!alpha}"  reRender="opReferenceability" onclick="PORShowLoading();"  oncomplete="PORHideLoading();" id="alphaCmdLinkId">
+                                    <apex:param name="alphabet" value="{!alpha}" assignTo="{!referenceabilityWrapper.character}"/>
+                                </apex:commandLink>
+                            </apex:repeat>
+                        </div>
+                    </apex:outputPanel>
+                </div>
+            </apex:pageBlockButtons>
+            <!-- Page Block Buttons Bottom-->
+            <apex:pageBlockButtons id="pbbIdBottom" location="bottom">
+                <div style="width:100%;">
+                    <div style="float:left ; width: 20%;text-indent:40%;">
+                        <apex:commandButton value="{!$Label.Done}" action="{!backToSearch}" id="doneCmdBtnId"/>
+                    </div>
+                </div>
+            </apex:pageBlockButtons>
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

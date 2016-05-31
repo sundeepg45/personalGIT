@@ -1,0 +1,92 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt" action="{!loadRegLineItems}">
+  
+	<style type="text/css">
+	.subtotal{
+		font-weight:bold;
+		font-size: 12;
+	}
+	.footerCol{
+	   border-top: 1px solid 000;
+	}
+	</style>
+  
+  
+        
+<apex:form id="theForm" rendered="{!hasProducts = true}">
+ 
+        <apex:pageBlock >
+            
+            <apex:pageMessages />        
+ 
+           <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveRegLineItems}" value="{!$Label.Partner_Registration_Save}" rendered="{!mdfCalcd = false}" />
+                <apex:commandButton action="{!saveRegLineItems}" value="{!$Label.Partner_Registration_Update}" rendered="{!mdfCalcd = true}" />
+                <apex:commandButton action="{!cancelAllocation}" immediate="true" value="{!$Label.Partner_Registration_Cancel}" />
+            </apex:pageBlockButtons>
+        
+            
+            <apex:pageBlockSection id="pbs" columns="1">
+                
+                <apex:dataTable id="regLineItemTable" value="{!regLineItems}" var="lineItem" cellpadding="4" cellspacing="3" width="100%">
+                
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Partner_Registration_Product_Family}</apex:facet>
+                        <apex:outputText value="{!lineItem.Product_Family__c}" styleClass="product" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Partner_Registration_Line_Item_Amt}</apex:facet>
+                        <apex:outputText value="{0, number,$###,###,##0}">
+                              <apex:param value="{!lineItem.Opportunity_Product_Amount__c}" />
+                        </apex:outputText>   
+                         <apex:facet name="footer">
+                            <apex:outputText value="{0, number,$###,###,##0}" styleClass="subtotal">
+                              <apex:param value="{!oppTotalAmt}" />
+                            </apex:outputText>                           
+                        </apex:facet>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Partner_Registration_Influence_Amt}</apex:facet>
+                        <apex:inputField value="{!lineItem.Influenced_Amount__c}" id="infAmt" styleClass="influenceAmt" />
+                        <apex:facet name="footer">
+                            <apex:outputText value="{0, number,$###,###,##0}"  styleClass="subtotal">
+                              <apex:param value="{!influencedAmtTotal}" />
+                            </apex:outputText>      
+                        </apex:facet>
+                    </apex:column>
+                    <apex:column footerClass="footerCol" rendered="{!mdfCalcd = true}">
+                        <apex:facet name="header">{!$Label.Partner_Registration_MDF_Amount}</apex:facet>
+                        <apex:outputText value="{!lineItem.Total_Allocation__c}" styleClass="mdfAmt" />
+                        <apex:facet name="footer">
+                            <apex:outputText value="{0, number,$###,###,##0}"  styleClass="subtotal">
+                              <apex:param value="{!allocationTotal}" />
+                            </apex:outputText>
+                        </apex:facet>
+                    </apex:column>
+                </apex:dataTable>
+                
+            </apex:pageBlockSection>
+                
+	       <p>
+		        <apex:outputLink value="{! '/' + reg.Id}"><apex:outputText value="{!$Label.Partner_Registration_Return_To_Registration_Record}"/> <b>{!reg.Name}</b></apex:outputLink>
+		    </p>    
+	       
+	        
+    </apex:pageBlock>
+ 
+</apex:form>  
+
+
+<apex:pageBlock rendered="{!hasProducts = false}">            
+    <apex:pageMessages />
+    
+    <p>
+	    <apex:outputLink value="{! '/' + reg.Id}"><apex:outputText value="{!$Label.Partner_Registration_Return_To_Registration_Record}"/> <b>{!reg.Name}</b></apex:outputLink>
+	</p>    
+
+ </apex:pageBlock>         
+    
+
+        
+    
+
+</apex:page>

@@ -1,0 +1,99 @@
+<apex:component controller="AccountComponentController">
+	<apex:attribute name="value" description="Account to show" type="Account" required="true" assignto="{!account}" />
+	<apex:attribute name="showSalesTeam" description="Should the salesteam be displayed" type="Boolean" required="false" default="false" assignto="{!needSalesTeam}" />
+	<apex:attribute name="showProducts" description="Should the products be displayed" type="Boolean" required="false" default="true" assignto="{!needProducts}" />
+	<apex:attribute name="showStage" description="Should the stage be displayed" type="Boolean" required="false" default="false" />
+	<apex:attribute name="showHeader" description="True if the header should be displayed" type="Boolean" required="false" default="true" />
+	<apex:outputPanel rendered="{!showHeader}" layout="block" styleClass="pbSubheader tertiaryPalette">
+		<h3>OPEN OPPORTUNITIES <span class="titleSeparatingColon">:</span></h3>
+	</apex:outputPanel>
+	<div class="pbSubsection">
+		<table style="font-size: 100%;padding-left:1em" class="detailList" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+				<apex:componentBody />
+				<apex:repeat value="{!OpenOpportunityList}" var="opportunity">
+					<apex:outputPanel rendered="{!showStage}" layout="none">
+						<tr bgcolor="#CCCFFF">
+							<td width="30%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Opportunity Name</b></td>
+							<td width="20%" align="left" style="padding-right:5px"><b>Stage</b></td>
+							<td width="20%" align="left" style="padding-right:5px"><b>Amount</b></td>
+							<td width="30%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Close date</b></td>
+						</tr>
+						<tr>
+							<td align="left" class="dataCol" style="padding-right:5px"><c:OutputString value="{!opportunity.Name}">&#160;</c:OutputString></td>
+							<td align="left" class="dataCol" style="padding-right:5px"><c:OutputString value="{!opportunity.StageName}">&#160;</c:OutputString></td>
+							<td align="left" class="dataCol" style="padding-right:5px"><c:OutputCurrency isoCode="{!opportunity.CurrencyIsoCode}" value="{!BLANKVALUE(opportunity.Amount,0)}" /></td>
+							<td align="left" class="dataCol" style="padding-right:5px"><apex:outputField value="{!opportunity.CloseDate}"/></td>
+						</tr>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!NOT(showStage)}" layout="none">
+						<tr>
+							<td width="30%" style="white-spacing:nowrap;padding-right:5px"><b>Opportunity Name</b></td>
+							<td width="20%" style="white-spacing:nowrap;padding-right:5px"><b>Amount</b></td>
+							<td width="30%" style="white-spacing:nowrap;padding-right:5px"><b>Forecast Category</b></td>
+							<td width="20%" style="white-spacing:nowrap;padding-right:5px"><b>Close Date</b></td>
+						</tr>
+						<tr>
+							<td style="padding-right:5px"><c:OutputString value="{!opportunity.Name}">&#160;</c:OutputString></td>
+							<td style="padding-right:5px"><c:OutputCurrency isoCode="{!opportunity.CurrencyIsoCode}" value="{!BLANKVALUE(opportunity.Amount,0)}" /></td>
+							<td style="padding-right:5px"><c:OutputString value="{!opportunity.ForecastCategory}">&#160;</c:OutputString></td>
+							<td style="padding-right:5px"><apex:outputField value="{!opportunity.CloseDate}" /></td>
+						</tr>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!showProducts}" layout="none">
+						<tr>
+							<td colspan="4">
+								<div class="pbSubsection">
+									<table style="font-size: 100%;padding-left:1em" class="detailList" border="0" cellpadding="2" cellspacing="0">
+										<tbody>
+											<tr>
+												<td width="15%" align="left" style="padding-right:5px"><b>Product</b></td>
+												<td width="25%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Product Description</b></td>
+												<td width="10%" align="right" style="padding-right:5px"><b>Quantity</b></td>
+												<td width="15%" align="center" style="white-spacing:nowrap;padding-right:5px"><b>Sales Price</b></td>
+												<td width="15%" align="center" style="white-spacing:nowrap;padding-right:5px"><b>Total Price</b></td>
+												<td width="15%" aligh="left" style="white-spacing:nowrap;padding-right:5px"><b>New or Renewal</b></td>
+											</tr>
+											<apex:repeat value="{!opportunity.OpportunityLineItems}" var="product">
+												<tr>
+													<td style="padding-right:5px"><c:OutputString value="{!product.PricebookEntry.ProductCode}">&#160;</c:OutputString></td>
+													<td style="padding-right:5px"><c:OutputString value="{!product.PricebookEntry.Name}">&#160;</c:OutputString></td>
+													<td align="right" style="padding-right:5px"><c:OutputString value="{!IF(ISBLANK(product.Quantity),'',TEXT(product.Quantity))}">&#160;</c:OutputString></td>
+													<td align="right" style="padding-right:5px"><c:OutputCurrency isoCode="{!product.CurrencyIsoCode}" value="{!BLANKVALUE(product.UnitPrice,0)}" /></td>
+													<td align="right" style="padding-right:5px"><c:OutputCurrency isoCode="{!product.CurrencyIsoCode}" value="{!BLANKVALUE(product.TotalPrice,0)}" /></td>
+													<td style="padding-right:5px"><c:OutputString value="{!product.NewOrRenewal__c}">&#160;</c:OutputString></td>
+												</tr>
+											</apex:repeat>
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!showSalesTeam}" layout="none">
+						<tr>
+							<td colspan="4" style="padding-right:5px"><b>Sales Team</b></td>
+						</tr>
+						<tr>
+							<td align="left" style="padding-right:5px"><b>Team Member</b></td>
+							<td align="left" style="padding-right:5px"><b>Role</b></td>
+							<td>&#160;</td>
+							<td>&#160;</td>
+						</tr>
+						<apex:repeat value="{!opportunity.OpportunityTeamMembers}" var="teamMember">
+							<tr>
+								<td class="dataCol" align="left" style="padding-right:5px"><c:OutputString value="{!teamMember.User.Name}">&#160;</c:OutputString></td>
+								<td class="dataCol" align="left" style="padding-right:5px"><c:OutputString value="{!teamMember.TeamMemberRole}">&#160;</c:OutputString></td>
+								<td>&#160;</td>
+								<td>&#160;</td>
+							</tr>
+						</apex:repeat>
+					</apex:outputPanel>
+					<tr>
+						<td colspan="4">&#160;</td>
+					</tr>
+				</apex:repeat>
+			</tbody>
+		</table>
+	</div>
+</apex:component>

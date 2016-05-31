@@ -1,0 +1,66 @@
+<apex:page controller="PPAdminOverrideController" cache="true" expires="1" action="{!checkContactSet}">
+       
+        <apex:form >
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Partner Points Score Card Reconciliation<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Step 2: Score Card for "<b><a href="/{!currentContact.Id}" target="_blank">{!currentContact.Name}</a></b>"</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+		<apex:pageMessages />
+
+		<div><apex:commandLink action="{!backToSearchResults}" id="backToSearchResults" value="< Back to Search Results"/></div>
+		<br/>
+		<div class="bRelatedList">
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody">
+					<div>Score Card Items for "<b><a href="/{!currentContact.Id}" target="_blank">{!currentContact.Name}</a></b>" from <a href="/{!currentContact.Account.Id}" target="_blank">{! currentContact.Account.Name }</a> ({! currentContact.Account.Finder_Partner_Tier__r.Name} 
+						{! currentContact.Account.Finder_Partner_Type__r.Name})&nbsp;-&nbsp;<apex:commandButton id="addScore" action="{!addScore}" value="Add Missing Score"/></div>
+					<br/>
+					<apex:outputText rendered="{! not(isnull(pointsList)) && pointsList.size > 0}">			
+						<table class="list" border="0" cellspacing="0" cellpadding="0">
+							<thead>
+								<tr class="headerRow">
+									<th>Earned</th>
+									<th>Content Source</th>
+									<th>Subcategory</th>
+									<th>Name</th>
+									<th># Points</th>
+									<th>Status</th>
+									<th>Expiring?</th>
+									<th>Actions</th>
+								</tr>
+							</thead>					
+							<tbody>
+								<apex:repeat var="score" value="{!pointsList}">
+									<tr id="{! score.Id }">
+										<td>
+											<apex:outputText value="{0,date, dd MMM, yyyy}">
+												<apex:param value="{!score.When_Earned__c}"/>
+											</apex:outputText>
+										</td>
+										<td>{!score.Category__c}</td>
+										<td>{!score.Subcategory__c}</td>
+										<td>{!score.Name}</td>
+										<td>{!ROUND(score.Points__c,0)}</td>
+										<td>{!score.Points_Status__c}</td>
+										<td>{!score.Expiring_Soon__c}</td>
+										<td id="delete{! score.Id }">
+											<apex:commandLink id="deleteScore" action="{!deleteScore}" onclick="if(!confirm('Are you sure?')) return false;" value="Delete">
+												<apex:param name="scoreId" value="{! score.Id }"/>
+											</apex:commandLink>
+										</td>
+									</tr>
+								</apex:repeat>
+							</tbody>							
+						</table>
+					</apex:outputText>
+				</div>
+			</div>
+		</div>
+	</apex:form>
+</apex:page>

@@ -1,0 +1,54 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.RefedgeCommunityChatter" sidebar="false">
+    <c:RefedgeCommunityHeader pageHeader="{!$Label.Network_with_your_peers}"/>
+    <apex:pagemessages id="pgMsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isCommunityLicenseAccessible,NOT(IsPageAccessible),isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Contact_must_reference_program_member}" strength="3" severity="Info" rendered="{!AND(IsPageAccessible,NOT(isRefedgeProgramMember))}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <style>
+        .bodyclass{
+            background:lightblue;
+        }
+        
+        .container{
+            width: 50%;
+            margin-left: 10%;
+            margin-right: 10%;
+            margin-top: 1%;
+            border-radius: 5px;
+            padding: 5px;
+            padding-left: 20px;
+        }
+        
+        a{
+            text-decoration: none;
+        }
+    </style>
+    <body class="bodyclass">
+        <apex:outputPanel rendered="{!AND(IsPageAccessible, isRefedgeProgramMember, isCommunityLicenseAccessible)}">
+            <div class="container">
+                <chatter:newsfeed />
+            </div>
+        </apex:outputPanel>
+    </body>
+</apex:page>

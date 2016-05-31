@@ -1,0 +1,1083 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.SF1_InvitationController" docType="html-5.0" showHeader="false" sidebar="false">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessages id="pageMsgId"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__RatingFiles, 'rateit.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+    <apex:stylesheet value="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" /> 
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'collapse.js')}"/>
+    
+    <apex:includeScript value="https://code.jquery.com/ui/1.11.1/jquery-ui.js"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css"/>
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+    
+    <style>
+        .centerDiv {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+        } 
+        
+        .sectionHeader {
+            font-size: 13px;
+            padding: 8px 14px;
+            font-weight: normal;
+            text-transform: uppercase;
+            background-color: #e8eaeb;
+            color: #696e71;
+            width: 100%;
+            margin-top: 10px;
+        } 
+        
+        .datarow {
+            border-top: none;
+            padding: 14px 0;
+            padding-left: 14px;
+        }
+        
+        .databox {
+            background-color: rgba(252, 252, 252, 0.95);
+            border: 1px solid #bbc0c4;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .sf1label {
+            font-family: 'ProximaNovaSoft-Regular','Helvetica Neue';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            padding-top: 8px;
+            display: block;
+            min-width: 100px;
+        } 
+        
+        .sf1input, .sf1textarea {
+           width:100%;
+           font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+           font-size: 15px;
+           color: #3c3d3e;
+           padding: 7px 14px;
+           line-height: 25px;
+           border: 1px solid #cfd0d2;
+           border-radius: 5px;
+           background-color: #e8eaeb;
+           box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+           box-sizing: border-box;
+        }
+        
+        .sf1input:focus, .sf1textarea:focus {
+           border: 1px solid #bbc0c4;
+           background-color: #fff;
+           outline-style: none;
+        }
+        
+        .sf1input[type="checkbox"] {
+            -webkit-appearance: none;
+            display: inline-block;
+            height: 22px;
+            margin: 0 6px 0 0;
+            border: 1px solid #c3c6c9;
+            padding: 0;
+            width: 22px;
+            vertical-align: middle;
+            background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+        }
+        
+        .sf1input[type="checkbox"]:checked {
+            border: 1px solid #2c75a3;
+            background-color: #3b9fdd;
+            -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+            background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        }
+        
+        .sf1input[type="checkbox"]:checked::after {
+            display: block;
+            left: 3px;
+            top: 3px;
+            height: 9px;
+            width: 14px;
+            border-bottom: 4px solid white;
+            border-left: 4px solid white;
+            -webkit-transform: rotate(-45deg);
+            position: relative;
+            content: '';
+        }
+        
+        .selectList {
+            height: auto;
+            background-repeat: no-repeat;
+            background-position: 95% 50%;
+            background-size: 16px 16px,100% 100%;
+            color: #3c3d3e;
+            padding: 7px 14px;
+            line-height: 25px;
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 15px;
+            align-items: center;
+            width: 100%;
+            border: 1px solid #bbc0c4;
+            border-radius: 5px;
+        }
+        
+        .sf1List {
+            margin: 0;
+            display: list-item;
+            padding: 14px;
+            border-bottom: solid 1px #cfd4d9;
+            list-style: none;
+            font-size: 16px;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            color: rgb(60, 61, 62);
+            float:left;
+            width:100%;
+            font-weight: bold;
+            color: #0e7abd
+        }
+        
+        .sf1List:first-child {
+            border-radius:4px 4px 0px 0px;
+        }
+        
+        .sf1List:last-child {
+            border-radius:0px 0px 4px 4px;
+            border-bottom:none;
+        }
+        
+        .sf1button {
+            font-size: 16px;
+            color: #44596c;
+            text-shadow: none;
+            margin: 0;
+            padding: 4px 14px;
+            height: 35px;
+            font-size: 16px;
+            font-family: 'ProximaNovaSoft-Semibold';
+            font-weight: normal;
+            border: 1px solid #bbc0c4;
+            border-radius: 5px;
+            background: -moz-linear-gradient(#ffffff,#f1f1f1);
+            background: -webkit-linear-gradient(#ffffff,#f1f1f1);
+            background: -ms-linear-gradient(#ffffff,#f1f1f1);
+            background: linear-gradient(#ffffff,#f1f1f1);
+            box-shadow: none;
+            text-align: center;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        
+        ol {
+            background-color:rgb(230, 230, 230);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-top:5px;
+            border-radius:4px;
+            border:solid 1px #cfd4d9;
+        }
+        
+        .datarow a {
+            text-decoration: none;
+            color: #0e7abd;
+        }
+        .datarow a:hover {
+            text-decoration: none;
+            color: #0e7abd;
+        }
+        .leftcolumn{
+            text-align:right;
+            width: 30%;
+        }
+        .rightcolumn{
+            text-align:left;
+            width: 60%;
+        }
+        .boldOption{
+            font-weight:normal;
+        }
+        .dateOnlyInput input{
+            width:100% !important;
+        }
+        .dateFormat {
+            display : none !important;
+        }  
+    </style>
+    
+    <script> 
+        //Page Load Jquery
+        var isSubmitted;
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        
+        //Search contact
+        function searchContacts() {
+            var searchText = document.getElementById('pageId:formId:inputContactTextId').value;
+            jsSearchRecord(searchText);
+        }
+
+        //Search user
+        function searchUsers(){
+            var searchText = document.getElementById('pageId:formId:inputUserTextId').value;
+            jsSearchUserRecord(searchText);
+        }
+        
+        //Preview Microsite
+        function previewMicrosite(){
+            var temp = document.getElementById('pageId:formId:microSiteId').value;
+            if(temp.trim() == '')
+                alert('{!$Label.SELECT_MICROSITE}');
+            else
+                jsPreviewMicrosite();
+        }
+        
+        //Set Default Templete
+        function setDefaultTemplate(){
+            var temp = document.getElementById('pageId:formId:microSiteId').value;
+            if(temp.trim() == '')
+                alert('{!$Label.SELECT_MICROSITE}');
+            else
+                jsSetDefaultTemplate();
+        }
+       
+        //Close submit button
+        function completeAction(){
+            if(isSubmitted == 'true'){
+                sforce.one.navigateToSObject('{!invitation.Opportunity__c}','detail');
+            }
+            PORHideLoading();
+        }
+    </script>
+    
+    <apex:outputPanel id="datePanel">
+        <script> 
+            jQuery( document ).ready(function(){
+                var $j = jQuery.noConflict();
+                $j(".deadlineDatePicker").datepicker({
+                    onSelect : function(dateText) {
+                        document.getElementById('pageId:formId:expId').value = dateText;
+                        jQuery('.ui-datepicker').css('display','none');
+                    }
+                });
+                jQuery('.ui-datepicker').css('display','none');
+            });
+            
+            function show(e, currentDiv) {
+                var position = jQuery(currentDiv).position();
+                var IE = document.all?true:false;
+                var tempX,tempY;
+                if (IE) { 
+                    tempX = e.clientX + document.body.scrollLeft;
+                    tempY = e.clientY + document.body.scrollTop;
+                } else {  
+                    tempX = e.pageX;
+                    tempY = e.pageY;
+                }
+                var height = jQuery(currentDiv).css('height');
+                height = parseFloat(height.substring(0,height.indexOf("px")))
+                document.getElementById('ui-datepicker-div').style.left = position.left+'px';
+                document.getElementById('ui-datepicker-div').style.top = (position.top+height)+'px';
+                jQuery('.ui-datepicker').css('display','block');
+                var val = document.getElementById('pageId:formId:expId').value;
+                var date = new Date(val);
+                var $j = jQuery.noConflict();
+                $j(".deadlineDatePicker").datepicker("setDate", date);
+            }
+            
+        </script>
+        
+        <style>
+            .datePicker{
+                display:none !important;
+            }
+            #ui-datepicker-div {
+                position : absolute !important;
+            }
+        </style>
+    </apex:outputPanel>
+    
+    <apex:outputPanel id="submitOpId">
+        <script>
+            isSubmitted = '{!isSubmitted}';
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="jsFillContacts" action="{!fillContacts}" rerender="ceneterOpId, pageMsgId" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="jsFillCoworkers" action="{!fillUsers}" rerender="ceneterOpId, pageMsgId" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="jsPreviewEmail" action="{!previewEmail}" rerender="ceneterOpId, pageMsgId" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="jsPreviewMicrosite" action="{!previewMicrosite}" rerender="ceneterOpId, pageMsgId" oncomplete="PORHideLoading();"/>
+        
+        <apex:actionFunction name="jsSetDefaultTemplate" action="{!setDefaultTemplate}" rerender="ceneterOpId, pageMsgId" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="jsChangeMicrosite" rerender="ceneterOpId, pageMsgId" oncomplete="PORHideLoading();"/>
+        
+        <apex:actionFunction name="jsSearchRecord" action="{!searchContacts}" reRender="contactDivId, pageMsgId">
+            <apex:param name="searchParam" value="" assignTo="{!searchContactText}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="jsSearchUserRecord" action="{!searchUsers}" reRender="userDivId, pageMsgId">
+            <apex:param name="searchParam" value="" assignTo="{!searchUserText}"/> 
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="jsCreateInvitation" action="{!createInvitation}" rerender="ceneterOpId, pageMsgId, submitOpId" oncomplete="completeAction();"/>
+        
+        <body style="background:#f0f1f2;"> 
+            <apex:outputPanel layout="block" styleClass="centerDiv" id="ceneterOpId">
+                <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                    <ul class="buttonList horizontal forceButtonBar">
+                        <li class="buttonItem">
+                            <apex:commandButton value="{!$Label.Submit}"  onclick="PORShowLoading();jsCreateInvitation();return false;" rendered="{!showInvitation}" style="font-family: 'ProximaNovaSoft-Semibold';" styleClass="default one uiBlock uiButton forceActionButton" />
+                        </li>
+                    </ul>
+                </div>
+                
+                <apex:outputPanel style="width:100%;" id="invitationOPId" rendered="{!showInvitation}">
+                    <!-- Section 1 -->
+                    <table style="width:100%;">
+                        <tr> 
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.To_Contacts}"/>
+                                </div>
+                                <div onclick="PORShowLoading();jsFillContacts();return false;" style="position: relative;">
+                                    <span style="display:inline-block; padding-top: 9px;padding-left: 5px;position:absolute;" >
+                                        <i class="icon-search"  style="cursor:pointer;">&nbsp;</i>
+                                    </span>
+                                    <apex:inputText id="contactsId" style="padding-left: 30px;" styleClass="sf1input" value="{!selectedContactNames}" disabled="true"/>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.To_Co_workers}"/>
+                                </div>
+                                <div onclick="PORShowLoading();jsFillCoworkers();return false;" style="position: relative;">
+                                    <span style="display:inline-block; padding-top: 9px;padding-left: 5px;position: absolute;">
+                                        <i class="icon-search"  style="cursor:pointer;">&nbsp;</i>
+                                    </span>
+                                    <apex:inputText id="coworkersId" style="padding-left: 30px;" styleClass="sf1input" value="{!selectedUserNames}" disabled="true"/>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.Subject}"/>
+                                    <apex:outputText style="color : #CC0000;" value=" * "/>
+                                </div>
+                                <div>
+                                    <apex:inputField styleClass="sf1input" value="{!invitation.refedge__Subject__c}" id="subId"/>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- 
+                        <tr>
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.Message}"/>
+                                </div>
+                                <div>
+                                    <apex:inputTextarea styleClass="sf1input" id="textAreaId" value="{!message}"/>&nbsp;&nbsp;
+                                </div>
+                                <div class="sf1label">
+                                    <apex:commandLink value="{!$Label.Preview_E_mail}" onclick="PORShowLoading();jsPreviewEmail();return false;"/>
+                                </div>
+                            </td>
+                        </tr>
+                         -->
+                        <tr>  
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.Message}"/>
+                                </div>
+                                <div>
+                                    <apex:inputField styleClass="sf1input" value="{!invitation.refedge__Message__c}" id="messageId"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Section 2 -->
+                    <div class="sectionHeader">{!$Label.Invitation_Settings}</div> 
+                    <table style="width:100%;">
+                        <tr>
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.Invitation_Name}"/>
+                                </div>
+                                <div>
+                                    <apex:inputField styleClass="sf1input" value="{!invitation.Name}" id="nameId"/>
+                                </div>
+                            </td>
+                        </tr>    
+                        
+                        <tr>
+                            <td class="datarow">
+                                <div>
+                                    <div class="sf1label">
+                                        <apex:outputText value="{!$Label.Invitation_Expiration}"/>
+                                        <apex:outputText style="color : #CC0000;" value=" * "/>
+                                        <apex:outputText value="(max {!TEXT(maximumExpirationDays)} days)" />
+                                    </div>
+                                    <apex:outputPanel layout="block" id="deadline" onClick="show(event,this);return false;">
+                                        <apex:inputField id="expId" styleClass="deadlineDatePicker sf1input" value="{!invitation.refedge__Invitation_Expiration__c}"/>
+                                        <script>
+                                            document.getElementById('pageId:formId:expId').disabled = true;
+                                        </script>
+                                    </apex:outputPanel>
+                                </div>
+                            </td>
+                        </tr> 
+                        
+                        <tr>  
+                            <td class="datarow">
+                                <div class="sf1label">
+                                    <apex:outPutText value="{!$Label.Notes}"/>
+                                </div>
+                                <div>
+                                    <apex:inputField styleClass="sf1input" value="{!invitation.refedge__Notes__c}" id="noteId"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Section 3 -->
+                    <div class="sectionHeader">{!$Label.Microsite}</div>
+                    <table style="width:100%;">
+                        <tr>
+                            <td class="datarow">
+                                <apex:outputPanel id="opBlock3" styleClass="sf1label">
+                                    <apex:outPutText value="{!$Label.Current_Template}"/>
+                                    <apex:outputText style="color : #CC0000;" value=" * "/>
+                                    <apex:commandLink id="defaultTemplateId" style="color:#5C95C4;" value="{!$Label.Save_as_my_default_template}" onclick="PORShowLoading();setDefaultTemplate(); return false;"/>
+                                </apex:outputPanel>
+                                <div>
+                                    <apex:selectList styleClass="selectList" size="1" label="{!$Label.Current_Template}" value="{!invitation.refedge__Microsite__c}" onchange="PORShowLoading();jsChangeMicrosite();return false;" id="microSiteId">
+                                        <apex:selectOptions value="{!microsites}"/>
+                                    </apex:selectList>
+                                </div>
+                                <div class="sf1label">
+                                    <apex:commandLink value="{!$Label.Preview_Microsite}" onclick="PORShowLoading();previewMicrosite(); return false;"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>   
+                </apex:outputPanel>
+                
+                <!-- Contacts -->
+                <apex:outputPanel style="width:100%;" id="contactsOpId"  rendered="{!showContacts}">
+                    <div style="width:100%;height:25px;"></div>
+                    <div>
+                        <center>
+                            <apex:commandLink style="text-decoration: none;" styleClass="sf1button"  action="{!backToInvitation}" value="{!$Label.Back}"/>&nbsp;&nbsp;
+                            <apex:commandLink style="text-decoration: none;" styleClass="sf1button"  action="{!setSelectedContacts}" value="{!$Label.Save}" />
+                        </center>
+                    </div>
+                    
+                    <!-- Padding provider div -->
+                    <div style="width:100%;height:20px;"></div>
+                    
+                    <!--  Search Box -->
+                    <apex:outputPanel style="width:100%;" layout="block" id="searchConOpId">
+                        <div class="form-group">
+                            <apex:inputText style="width:100%;" styleClass="form-control" html-placeholder="{!$Label.Search_Contacts}" id="inputContactTextId" onkeyup="searchContacts();return false;"/>
+                        </div>
+                    </apex:outputPanel> 
+                    
+                    <apex:outputPanel id="contactImageOpId">
+                        <apex:image url="{!URLFOR($Resource.refedge__SF1_StaticResource,'/images/contact_120.png')}" style="background-color: #b76db7;" width="30px" height="30px"/> 
+                        <B>Contacts</B>
+                    </apex:outputPanel>
+                    
+                    
+                    <apex:outputPanel layout="block"  id="contactDivId" >
+                        <div class="full forcePageBlock forceRecordLayout">
+                            <section class="full twoCol forcePageBlockSection forcePageBlockSectionView" >
+                                <ol>
+                                    <apex:repeat value="{!contactListWrapper}" var="contWrap" id="contactRepeatId">
+                                    <li class="sf1List" >
+                                        <div >
+                                            <div style="float:left; width:10%;">
+                                                <apex:inputCheckBox styleClass="sf1input" id="selectContactId" value="{!contWrap.isSelected}"/>
+                                            </div>
+                                            <div style="float:left;width:90%;">
+                                                <apex:outputText style="font-weight: bold;" id="conNameId" value="{!contWrap.con.name}"/><br/>
+                                                <div style="font: small normal;width:100%; color: black;word-wrap: break-word;"  >{!contWrap.con.Email}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    </apex:repeat>
+                                </ol>
+                            </section>
+                        </div>
+                    </apex:outputPanel>
+                </apex:outputPanel>    
+                
+                <!-- Users -->
+                <apex:outputPanel style="width:100%;" id="usersOpId" rendered="{!showUsers}">
+                    <div style="width:100%;height:25px;"></div>
+                    <div>
+                        <center>
+                            <apex:commandLink style="text-decoration: none;" styleClass="sf1button"  action="{!backToInvitation}" value="{!$Label.Back}"/>&nbsp;&nbsp;
+                            <apex:commandLink style="text-decoration: none;" styleClass="sf1button"  action="{!setSelectedUsers}" value="{!$Label.Save}" />
+                        </center>
+                    </div>
+                    
+                    <!-- Padding provider div -->
+                    <div style="width:100%;height:20px;"></div>
+                    
+                    <!--  Search Box -->
+                    <apex:outputPanel layout="block" id="searchUserOpId">
+                        <div class="form-group">
+                            <apex:inputText styleClass="form-control" html-placeholder="Search Users" id="inputUserTextId" onkeyup="searchUsers();return false;"/>
+                        </div>
+                    </apex:outputPanel> 
+                    
+                    <apex:outputPanel id="userImageOpId">
+                        <apex:image url="{!URLFOR($Resource.refedge__SF1_StaticResource,'/images/people_120.png')}" style="background-color: #20AEB8;" width="30px" height="30px"/> 
+                        <B>Users</B>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="block"  id="userDivId" >
+                        <div class="full forcePageBlock forceRecordLayout">
+                            <section class="full twoCol forcePageBlockSection forcePageBlockSectionView" >
+                                <ol>
+                                    <apex:repeat value="{!userListWrapper}" var="usrWrap" id="userRepeatId">
+                                    <li class="sf1List" >
+                                        <div >
+                                            <div style="float:left; width:30px;">
+                                                <apex:inputCheckBox styleClass="sf1input" id="selectUserId" value="{!usrWrap.isSelected}"/>
+                                            </div>
+                                            <div style="float:left;">
+                                                <apex:outputText style="font-weight: bold;" id="userNameId" value="{!usrWrap.user.name}"/><br/>
+                                                <apex:outputText style="font: small normal; color: black;" id="userEmailId" value="{!usrWrap.user.Email}"/>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    </apex:repeat>
+                                </ol>
+                            </section>
+                        </div>
+                    </apex:outputPanel>
+                </apex:outputPanel> 
+                
+                <!-- Mail Preview -->
+                <apex:outputPanel style="width:100%;" id="emailPreviewOpId" rendered="{!showEmailPreview}">
+                    <div style="width:100%;height:25px;"></div>
+                    <div>
+                        <center>
+                            <apex:commandLink style="text-decoration: none;" styleClass="sf1button" action="{!backToInvitation}" value="{!$Label.Back}"/>
+                        </center>
+                    </div>
+                    <!-- Padding provider div --> 
+                    <div style="width:100%;height:20px;float:left;"></div>
+                    
+                    <apex:outputPanel layout="block"  id="mailOpId" >
+                        <div class="sectionHeader">{!$Label.E_mail_Preview}</div>
+                        
+                        <!-- Padding provider div -->
+                        <div style="width:100%;height:20px;float:left;"></div>
+                        <table style="width:100%;">
+                            <tr>
+                                <td class="datarow">
+                                    {!message}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="datarow">
+                                    <apex:outputText styleClass="textStyle" value="{!$Label.Microsite_Link} "/>
+                                    <apex:commandLink style="color: #428bca;" value="{!$Label.Preview_Microsite}" onclick="PORShowLoading();jsPreviewMicrosite(); return false;"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="datarow">
+                                    <apex:outputText value="{!HTMLENCODE(mailExpText)}" escape="false"/>
+                                </td>
+                            </tr>
+                        </table>   
+                    </apex:outputPanel> 
+                </apex:outputPanel> 
+                
+                <!-- Microsite Preview -->
+                <apex:outputPanel style="width:100%;" id="micrositeOpId" rendered="{!showMicrosite}">
+                   
+                    <script>
+                        (function ($) {
+                            $.rateit = {
+                                aria : {
+                                    resetLabel: 'reset rating',
+                                    ratingLabel: 'rating'
+                                }
+                            }
+                        
+                            $.fn.rateit = function (p1, p2) {
+                                //quick way out.
+                                var index = 1;
+                                var options = {}; var mode = 'init';
+                                var capitaliseFirstLetter = function (string) {
+                                    return string.charAt(0).toUpperCase() + string.substr(1);
+                                };
+                        
+                                if (this.length == 0) return this;
+                        
+                        
+                                var tp1 = $.type(p1);
+                                if (tp1 == 'object' || p1 === undefined || p1 == null) {
+                                    options = $.extend({}, $.fn.rateit.defaults, p1); //wants to init new rateit plugin(s).
+                                }
+                                else if (tp1 == 'string' && p2 === undefined) {
+                                    return this.data('rateit' + capitaliseFirstLetter(p1)); //wants to get a value.
+                                }
+                                else if (tp1 == 'string') {
+                                    mode = 'setvalue'
+                                }
+                        
+                                return this.each(function () {
+                                    var item = $(this);
+                        
+                                    //shorten all the item.data('rateit-XXX'), will save space in closure compiler, will be like item.data('XXX') will become x('XXX')
+                                    var itemdata = function (key, value) {
+                        
+                                        if (value != null) {
+                                            //update aria values
+                                            var ariakey = 'aria-value' + ((key == 'value') ? 'now' : key);
+                                            var range = item.find('.rateit-range');
+                                            if (range.attr(ariakey) != undefined) {
+                                                range.attr(ariakey, value);
+                                            }
+                        
+                                        }
+                        
+                                        arguments[0] = 'rateit' + capitaliseFirstLetter(key);
+                                        return item.data.apply(item, arguments); ////Fix for WI: 523
+                                    };
+                        
+                                    //add the rate it class.
+                                    if (!item.hasClass('rateit')) item.addClass('rateit');
+                        
+                                    var ltr = item.css('direction') != 'rtl';
+                        
+                                    // set value mode
+                                    if (mode == 'setvalue') {
+                                        if (!itemdata('init')) throw 'Can\'t set value before init';
+                        
+                        
+                                        //if readonly now and it wasn't readonly, remove the eventhandlers.
+                                        if (p1 == 'readonly' && p2 == true && !itemdata('readonly')) {
+                                            item.find('.rateit-range').unbind();
+                                            itemdata('wired', false);
+                                        }
+                                        //when we receive a null value, reset the score to its min value.
+                                        if (p1 == 'value')
+                                            p2 = (p2 == null) ? itemdata('min') : Math.max(itemdata('min'), Math.min(itemdata('max'), p2));
+                                        if (itemdata('backingfld')) {
+                                            //if we have a backing field, check which fields we should update. 
+                                            //In case of input[type=range], although we did read its attributes even in browsers that don't support it (using fld.attr())
+                                            //we only update it in browser that support it (&& fld[0].min only works in supporting browsers), not only does it save us from checking if it is range input type, it also is unnecessary.
+                                            var fld = $(itemdata('backingfld'));
+                                            if (p1 == 'value') fld.val(p2);
+                                            if (p1 == 'min' && fld[0].min) fld[0].min = p2;
+                                            if (p1 == 'max' && fld[0].max) fld[0].max = p2;
+                                            if (p1 == 'step' && fld[0].step) fld[0].step = p2;
+                                        }
+                        
+                                        itemdata(p1, p2);
+                                    }
+                        
+                                    //init rateit plugin
+                                    if (!itemdata('init')) {
+                        
+                                        //get our values, either from the data-* html5 attribute or from the options.
+                                        itemdata('min', itemdata('min') || options.min);
+                                        itemdata('max', itemdata('max') || options.max);
+                                        itemdata('step', itemdata('step') || options.step);
+                                        itemdata('readonly', itemdata('readonly') !== undefined ? itemdata('readonly') : options.readonly);
+                                        itemdata('resetable', itemdata('resetable') !== undefined ? itemdata('resetable') : options.resetable);
+                                        itemdata('backingfld', itemdata('backingfld') || options.backingfld);
+                                        itemdata('starwidth', itemdata('starwidth') || options.starwidth);
+                                        itemdata('starheight', itemdata('starheight') || options.starheight);
+                                        
+                                        itemdata('value', Math.max(itemdata('min'), Math.min(itemdata('max'), (itemdata('value') || options.value || options.min) )));
+                                        itemdata('ispreset', itemdata('ispreset') !== undefined ? itemdata('ispreset') : options.ispreset);
+                                        //are we LTR or RTL?
+                        
+                                        if (itemdata('backingfld')) {
+                                            //if we have a backing field, hide it, and get its value, and override defaults if range.
+                                            var fld = $(itemdata('backingfld'));
+                                            itemdata('value', fld.hide().val());
+                        
+                                            if (fld.attr('disabled') || fld.attr('readonly')) 
+                                                itemdata('readonly', true); //http://rateit.codeplex.com/discussions/362055 , if a backing field is disabled or readonly at instantiation, make rateit readonly.
+                        
+                        
+                                            if (fld[0].nodeName == 'INPUT') {
+                                                if (fld[0].type == 'range' || fld[0].type == 'text') { //in browsers not support the range type, it defaults to text
+                        
+                                                    itemdata('min', parseInt(fld.attr('min')) || itemdata('min')); //if we would have done fld[0].min it wouldn't have worked in browsers not supporting the range type.
+                                                    itemdata('max', parseInt(fld.attr('max')) || itemdata('max'));
+                                                    itemdata('step', parseInt(fld.attr('step')) || itemdata('step'));
+                                                }
+                                            }
+                                            if (fld[0].nodeName == 'SELECT' && fld[0].options.length > 1) {
+                                                itemdata('min', Number(fld[0].options[0].value));
+                                                itemdata('max', Number(fld[0].options[fld[0].length - 1].value));
+                                                itemdata('step', Number(fld[0].options[1].value) - Number(fld[0].options[0].value));
+                                            }
+                                        }
+                        
+                                        //Create the necessary tags. For ARIA purposes we need to give the items an ID. So we use an internal index to create unique ids
+                                        var element = item[0].nodeName == 'DIV' ? 'div' : 'span';
+                                        index++;
+                                        var html = '<button id="rateit-reset-{{index}}" class="rateit-reset" aria-label="' + $.rateit.aria.resetLabel + '" aria-controls="rateit-range-{{index}}"></button><{{element}} id="rateit-range-{{index}}" class="rateit-range" tabindex="0" role="slider" aria-label="' + $.rateit.aria.ratingLabel + '" aria-owns="rateit-reset-{{index}}" aria-valuemin="' + itemdata('min') + '" aria-valuemax="' + itemdata('max') + '" aria-valuenow="' + itemdata('value') + '"><{{element}} class="rateit-selected" style="height:' + itemdata('starheight') + 'px"></{{element}}><{{element}} class="rateit-hover" style="height:' + itemdata('starheight') + 'px"></{{element}}></{{element}}>';
+                                        item.append(html.replace(/{{index}}/gi, index).replace(/{{element}}/gi, element));
+                        
+                                        //if we are in RTL mode, we have to change the float of the "reset button"
+                                        if (!ltr) {
+                                            item.find('.rateit-reset').css('float', 'right');
+                                            item.find('.rateit-selected').addClass('rateit-selected-rtl');
+                                            item.find('.rateit-hover').addClass('rateit-hover-rtl');
+                                        }
+                        
+                                        itemdata('init', true);
+                                    }
+                        
+                        
+                                    //set the range element to fit all the stars.
+                                    var range = item.find('.rateit-range');
+                                    range.width(itemdata('starwidth') * (itemdata('max') - itemdata('min'))).height(itemdata('starheight'));
+                        
+                                    //add/remove the preset class
+                                    var presetclass = 'rateit-preset' + ((ltr) ? '' : '-rtl');
+                                    if (itemdata('ispreset'))
+                                        item.find('.rateit-selected').addClass(presetclass);
+                                    else
+                                        item.find('.rateit-selected').removeClass(presetclass);
+                        
+                                    //set the value if we have it.
+                                    if (itemdata('value') != null) {
+                                        var score = (itemdata('value') - itemdata('min')) * itemdata('starwidth');
+                                        item.find('.rateit-selected').width(score);
+                                    }
+                        
+                                    //setup the reset button
+                                    var resetbtn = item.find('.rateit-reset');
+                                    if (resetbtn.data('wired') !== true) {
+                                        resetbtn.bind('click', function (e) {
+                                            e.preventDefault();
+                                            resetbtn.blur();
+                                            itemdata('value', itemdata('min'));
+                                            range.find('.rateit-hover').hide().width(0);
+                                            range.find('.rateit-selected').width(0).show();
+                                            if (itemdata('backingfld')) $(itemdata('backingfld')).val(itemdata('min'));
+                                            item.trigger('reset');
+                                        }).data('wired', true);
+                                        
+                                    }
+                                    
+                                    //this function calculates the score based on the current position of the mouse.
+                                    var calcRawScore = function (element, event) {
+                                        var pageX = (event.changedTouches) ? event.changedTouches[0].pageX : event.pageX;
+                        
+                                        var offsetx = pageX - $(element).offset().left;
+                                        if (!ltr) offsetx = range.width() - offsetx;
+                                        if (offsetx > range.width()) offsetx = range.width();
+                                        if (offsetx < 0) offsetx = 0;
+                        
+                                        return score = Math.ceil(offsetx / itemdata('starwidth') * (1 / itemdata('step')));
+                                    };
+                        
+                                    //sets the hover element based on the score.
+                                    var setHover = function (score) {
+                                        var w = score * itemdata('starwidth') * itemdata('step');
+                                        var h = range.find('.rateit-hover');
+                                        if (h.data('width') != w) {
+                                            range.find('.rateit-selected').hide();
+                                            h.width(w).show().data('width', w);
+                                            var data = [(score * itemdata('step')) + itemdata('min')];
+                                            item.trigger('hover', data).trigger('over', data);
+                                        }
+                                    };
+                        
+                                    var setSelection = function (value) {
+                                        itemdata('value', value);
+                                        if (itemdata('backingfld')) {
+                                            $(itemdata('backingfld')).val(value);
+                                        }
+                                        if (itemdata('ispreset')) { //if it was a preset value, unset that.
+                                            range.find('.rateit-selected').removeClass(presetclass);
+                                            itemdata('ispreset', false);
+                                        }
+                                        range.find('.rateit-hover').hide();
+                                        range.find('.rateit-selected').width(value * itemdata('starwidth') - (itemdata('min') * itemdata('starwidth'))).show();
+                                        item.trigger('hover', [null]).trigger('over', [null]).trigger('rated', [value]);
+                                    };
+                        
+                                    if (!itemdata('readonly')) {
+                                        //if we are not read only, add all the events
+                        
+                                        //if we have a reset button, set the event handler.
+                                        if (!itemdata('resetable')) 
+                                            resetbtn.hide();
+                        
+                                        //when the mouse goes over the range element, we set the "hover" stars.
+                                        if (!itemdata('wired')) {
+                                            range.bind('touchmove touchend', touchHandler); //bind touch events
+                                            range.mousemove(function (e) {
+                                                var score = calcRawScore(this, e);
+                                                setHover(score);
+                                            });
+                                            //when the mouse leaves the range, we have to hide the hover stars, and show the current value.
+                                            range.mouseleave(function (e) {
+                                                range.find('.rateit-hover').hide().width(0).data('width', '');
+                                                item.trigger('hover', [null]).trigger('over', [null]);
+                                                range.find('.rateit-selected').show();
+                                            });
+                                            //when we click on the range, we have to set the value, hide the hover.
+                                            range.mouseup(function (e) {
+                                                var score = calcRawScore(this, e);
+                                                var value = (score * itemdata('step')) + itemdata('min');
+                                                setSelection(value);
+                                            });
+                        
+                                            //support key nav
+                                            range.keyup( function (e) {
+                                                if (e.which == 38 || e.which == (ltr ? 39 : 37)) {
+                                                    setSelection(Math.min(itemdata('value') + itemdata('step'), itemdata('max')));
+                                                }
+                                                if (e.which == 40 || e.which == (ltr ? 37 : 39)) {
+                                                    setSelection(Math.max(itemdata('value') - itemdata('step'), itemdata('min')));
+                                                }
+                                            });
+                                          
+                                            itemdata('wired', true);
+                                        }
+                                        if (itemdata('resetable')) {
+                                            resetbtn.show();
+                                        }
+                                    }
+                                    else {
+                                        resetbtn.hide();
+                                    }
+                        
+                                    range.attr('aria-readonly', itemdata('readonly'));
+                                });
+                            };
+                        
+                            //touch converter http://ross.posterous.com/2008/08/19/iphone-touch-events-in-javascript/
+                            function touchHandler(event) {
+                        
+                                var touches = event.originalEvent.changedTouches,
+                                        first = touches[0],
+                                        type = "";
+                                switch (event.type) {
+                                    case "touchmove": type = "mousemove"; break;
+                                    case "touchend": type = "mouseup"; break;
+                                    default: return;
+                                }
+                        
+                                var simulatedEvent = document.createEvent("MouseEvent");
+                                simulatedEvent.initMouseEvent(type, true, true, window, 1,
+                                                      first.screenX, first.screenY,
+                                                      first.clientX, first.clientY, false,
+                                                      false, false, false, 0/*left*/, null);
+                        
+                                first.target.dispatchEvent(simulatedEvent);
+                                event.preventDefault();
+                            };
+                        
+                            //some default values.
+                            $.fn.rateit.defaults = { min: 0, max: 4, step: 1, starwidth: 16, starheight: 16, readonly: false, resetable: true, ispreset: false};
+                        
+                            //invoke it on all .rateit elements. This could be removed if not wanted.
+                            $(function () { $('div.rateit, span.rateit').rateit(); });
+                        
+                        })(jQuery);
+                    </script>
+                    <div style="width:100%;height:25px;"></div>
+                    <div>
+                        <center>
+                            <apex:commandLink style="text-decoration: none;" styleClass="sf1button"  action="{!backToInvitation}" value="{!$Label.Back}"/>
+                        </center>
+                    </div>
+                    
+                    <!-- Header -->
+                    <div style="background:white;margin-top: 30px;float:left;width: 98%;margin-left:8px;">
+                        <apex:outputPanel id="bannerImgId" layout="block" style="background:white;width:100%;float:left;" rendered="{!microsite.refedge__Banner_image__c != null}">
+                            <apex:outputPanel rendered="{!microsite.refedge__Image_Alignment__c != 'Center'}" style="float:{!HTMLENCODE(microsite.refedge__Image_Alignment__c)};margin: -1px 0px -1px 0px;">
+                                <apex:outputField id="imageBannerClass" value="{!microsite.refedge__Banner_image__c}"/>
+                            </apex:outputPanel>
+                            <apex:outputPanel styleClass="Center" rendered="{!microsite.refedge__Image_Alignment__c = 'Center'}" style="margin: -1px 0px -1px 0px;">
+                                <apex:outputField id="imageBannerClass1" styleClass="" value="{!microsite.refedge__Banner_image__c}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <div style="background:white;width:100%;float:left;padding-left: 10px;color:{!HTMLENCODE(microsite.refedge__Header_Copy_Color__c)}">
+                            <apex:outputPanel rendered="{!microsite.refedge__Header_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: center;">
+                                <apex:outputLabel value="{!microsite.refedge__Header_Copy__c}" style="font-size:{!HTMLENCODE(microsite.refedge__Header_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Header_Copy_Alignment__c)};"/> 
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!microsite.refedge__Header_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: center;">
+                                <apex:outputLabel value="{!microsite.refedge__Header_Copy__c}" style="font-size:{!HTMLENCODE(microsite.refedge__Header_Copy_Size__c)};"/> 
+                            </apex:outputPanel>
+                        </div>
+                        <div style="background:white;float:left;width:100%;padding-left: 10px;color:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Color__c)}">
+                            <apex:outputPanel rendered="{!microsite.refedge__Sub_Header_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: {!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Alignment__c)};">
+                                <apex:outputLabel value="{!microsite.refedge__Sub_header_Copy__c}" style="font-weight:normal;font-size:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Alignment__c)};"/> 
+                            </apex:outputPanel>
+                            <apex:outputpanel rendered="{!microsite.refedge__Sub_Header_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: {!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Alignment__c)};">
+                                <apex:outputLabel value="{!microsite.refedge__Sub_header_Copy__c}" style="font-weight:normal;font-size:{!HTMLENCODE(microsite.refedge__Sub_Header_Copy_Size__c)};"/>
+                            </apex:outputpanel>
+                        </div>
+                    </div>
+                    
+                    <!-- Padding provider div -->
+                    <div style="width:100%;height:20px;float:left;padding-left:8px;padding-right:8px;"></div>
+                    <!-- Real Contents-->
+                    <div class="panel-group" id="accordion" style="cursor:pointer;float:left;background:#f0f1f2;padding:8px;width:100%;">
+                    <apex:repeat value="{!contentList}" var="contentWrap">
+                        <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                            <apex:outputPanel layout="block" style="width:100%;">
+                                <table style = "">
+                                    <tr>
+                                        <td style="padding: 5px;padding-left: 10px;">
+                                        <apex:outputText style="font-weight:bold;COLOR:{!HTMLENCODE(microsite.refedge__Document_Title_Color__c)};" value="{!contentWrap.contentWrpp.refContent.refedge__Title__c}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left: 10px;">
+                                        <apex:outputLabel value="{!$Label.Type}: "  style="font-weight:bold;color:#404040;"/>
+                                        <apex:outputText value=" {!contentWrap.contentWrpp.refContent.Reference_Content_Type__r.refedge__Name__c} "/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-left: 10px;">
+                                        <apex:outputLabel value="{!$Label.Account}: "  style="font-weight:bold;color:#404040;"/>
+                                        <apex:outputText value=" {!refContentAccounts[contentWrap.contentWrpp.refContent.Id]} "/>
+                                        </td>
+                                    </tr>
+                                </table> 
+                            </apex:outputPanel>
+                            
+                            <!-- Sharing & Rating-->
+                            <div class="panel-heading" style="height:36px;background: white;">
+                                <a data-toggle="collapse" data-parent="#accordion" style="float:left;" href="#collapseShare{!HTMLENCODE(contentWrap.contentWrpp.refContent.Id)}">
+                                    <apex:image width="16px" height="16px" url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'ShareImage.gif')}" rendered="{!contentWrap.contentWrpp.refContent.refedge__Allow_Social_Sharing__c}"/>
+                                    <apex:outputLabel style="cursor:pointer;COLOR:#7F7F7F;" value="{!microsite.refedge__Share_Link_Copy__c}" rendered="{!contentWrap.contentWrpp.refContent.refedge__Allow_Social_Sharing__c}"/>
+                                </a>
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseRate{!HTMLENCODE(contentWrap.contentWrpp.refContent.Id)}" style="float:right;">
+                                    <apex:image width="16px" height="16px" url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'RateImage.gif')}"/>
+                                    <apex:outputLabel style="cursor:pointer;COLOR:#7F7F7F;" value="{!microsite.refedge__Rate_Link_Copy__c}"/>
+                                </a>
+                            </div>
+                        
+                            <!-- Rate -->
+                            <div id="collapseRate{!HTMLENCODE(contentWrap.contentWrpp.refContent.Id)}" class="panel-collapse collapse">
+                                <div id="rateDiv{!contentWrap.contentWrpp.refContent.Id}" class="panel-body"  style="border-top:0px;">
+                                    <span class="rateit" style="float:right;" id="{!contentWrap.contentWrpp.refContent.Id}"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Sharing -->
+                            <div id="collapseShare{!HTMLENCODE(contentWrap.contentWrpp.refContent.Id)}" class="panel-collapse collapse">
+                                <div class="panel-body" >
+                                    
+                                    <!-- link on Shared-->
+                                    <apex:outputPanel onclick="javascript:window.location='mailto:?subject=Here is some interesting information&body={!URLENCODE(contentWrap.link)}'" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'mail.png')}" width="24" height="24"/>
+                                        <B>Mail</B>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel onclick="window.open('','_blank').location.href='https://twitter.com/intent/tweet?source=webclient&text={!URLENCODE(contentWrap.link)}'; return false;" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'twitter.png')}" width="24" height="24"/> 
+                                        <B>Twitter</B>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel onclick="window.open('','_blank').location.href='http://www.linkedin.com/shareArticle?mini=true&url={!URLENCODE(contentWrap.link)}&title=Here is some interesting information&summary='; return false;" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'linkedin.png')}" width="24" height="24"/>
+                                        <B>LinkedIn</B>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel onclick="window.open('','_blank').location.href='http://www.facebook.com/share.php?u={!URLENCODE(contentWrap.link)}&t='; return false;" style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!ISNULL(selectedRefContents)}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'facebook.png')}" width="24" height="24"/>
+                                        <B>Facebook</B>
+                                    </apex:outputPanel>
+                                    
+                                    <!-- Content on Preview link on Invitation Wizard -->
+                                    <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'mail.png')}" width="24" height="24"/>
+                                        <B>Mail</B>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'twitter.png')}" width="24" height="24"/> 
+                                        <B>Twitter</B>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'linkedin.png')}" width="24" height="24"/>
+                                        <B>LinkedIn</B>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel style="cursor:pointer;margin: 0px 1% 0px 1%;" rendered="{!NOT(ISNULL(selectedRefContents))}">
+                                        <apex:image url="{!URLFOR($Resource.refedge__ContentRatingSharingImages, 'facebook.png')}" width="24" height="24"/>
+                                        <B>Facebook</B>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                        
+                        </div>
+                    </apex:repeat>
+                    </div>
+                    <!-- Footer-->
+                    <div style="float:left;width:100%;padding-left: 10px;color:{!HTMLENCODE(microsite.Footer_Copy_Color__c)}">
+                        <apex:outputPanel rendered="{!microsite.refedge__Footer_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: center;">
+                            <apex:outputLabel style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Footer_Copy_Alignment__c)};" rendered="{!microsite.refedge__Footer_Link__c == NULL}" value="{!microsite.refedge__Footer_Copy__c}"/>
+                            <apex:commandLink style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Footer_Copy_Alignment__c)};" rendered="{!microsite.refedge__Footer_Link__c != NULL}" value="{!microsite.refedge__Footer_Copy__c}" onClick="window.open('{!microsite.refedge__Footer_Link__c}','_blank');return false;"/>
+                        </apex:outputPanel>
+                        <apex:outputpanel rendered="{!microsite.refedge__Footer_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: center;">
+                            <apex:outputLabel style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};" rendered="{!microsite.refedge__Footer_Link__c == NULL}" value="{!microsite.refedge__Footer_Copy__c}"/>
+                            <apex:commandLink style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};" rendered="{!microsite.refedge__Footer_Link__c != NULL}" value="{!microsite.refedge__Footer_Copy__c}" onClick="window.open('{!microsite.refedge__Footer_Link__c}','_blank');return false;"/>
+                        </apex:outputpanel>
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </body>
+    </apex:form>    
+</apex:page>

@@ -1,0 +1,62 @@
+<apex:page controller="MSController" sidebar="false" showHeader="true">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title><apex:outputText escape="false" value="{!$Label.Cloudsite_Page_Title}"/></title>
+<apex:include pageName="CloudSiteCSS"/>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a href="http://www.redhat.com" class="logo-redhat"><apex:outputText escape="false" value="{!$Label.CloudSite_Header_Logo}"/></a>
+        <a href="MSCloudHome" class="logo-selling-cloud"><apex:outputText escape="false" value="{!$Label.CloudSite_Header_Whats_New}"/></a>
+        <div class="title"><apex:outputText escape="false" value="{!$Label.CloudSite_Header_Title}"/></div>
+        
+        <ul id="nav-main">
+            <li id="sa-tech"><a href="MSCloudHome"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Home}"/></a></li>
+            <li id="cloud-training"><a href="MSCloudTraining"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Training}"/></a></li>
+            <li id="collateral"><a href="MSCloudCollateral"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Whitepapers}"/></a></li>
+            <li id="collateral"><a href="MSCloudMarketing"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Campaigns}"/></a></li>
+            <li id="sa-tech" class="last"><a href="MSCloudTechDetails"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Details}"/></a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <div id="content-inner">
+        <div class="container">
+            <div id="content-primary">
+                <h1>{!$Label.CloudSite_Home_Do_You_Know_Clouds}</h1>
+                <p class="leadin">{!$Label.CloudSite_Home_Do_You_Know_Clouds_Answer}</p>
+                <ul id="content-blocks">
+                    <li>
+                        <h2>{!$Label.CloudSite_Home_Training_Materials}</h2>
+                        <p>{!$Label.CloudSite_Home_Training_Materials_Details}</p>
+<a href="MSCloudTraining" class="learn-more">{!$Label.CloudSite_Links_Learn_More}</a>
+                    </li>
+                    <li>
+                        <h2>{!$Label.Cloudsite_Home_Collateral_Whitepapers}</h2>
+                        <p>{!$Label.CloudSite_Home_Collateral_Whitepapers_Desc}</p>
+<a href="MSCloudCollateral" class="learn-more">{!$Label.CloudSite_Links_Learn_More}</a>
+                    </li>
+                </ul>
+            </div>
+            <div id="content-secondary">
+                <h2><apex:outputText escape="false" value="{!$Label.CloudSite_Home_Do_You_Have_What_it_Takes}"/></h2>
+<p>{!$Label.CloudSite_Home_Test_Your_Knowledge}</p>
+             <!-- <ul id="content-links">
+                    <li id="take-test"><a href="https://lmscons.na4.visual.force.com/apex/TrainingContentDetail?id=a2H600000004Kzp&sfdc.override=1">{!$Label.CloudSite_Home_Take_The_Test_Link}</a></li>
+                </ul> -->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright"><apex:outputText escape="false" value="{!$Label.CloudSite_Red_Hat_Copyright}"/></p>
+    </div>
+</div>  
+</body>
+
+
+</apex:page>

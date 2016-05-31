@@ -1,0 +1,57 @@
+<!---------------------------------------------------------------------
+Class Name: SetUpClass
+Date: 4/11/2012
+Author: Santoshi Mishra
+Description: Sets setup data for Dynamic Public Group Package.
+ -------------------------------------------------------------------------> 
+<apex:page controller="APPR_DGRP.SetUpClass" >
+<apex:pageMessages />
+ <apex:form >
+    <apex:pageblock >
+        <apex:pageblockButtons location="top" >
+                <apex:commandButton value="Save" action="{!Save}"/>
+                <apex:commandButton value="Cancel" action="{!Cancel}"/>
+        </apex:pageblockButtons>
+        <apex:SectionHeader title="SetUp Information"/>
+            <apex:pageblocksection columns="1" title="Enable Triggers" >
+                <apex:pageblockSectionItem >
+                    <apex:outputlabel value="Enable Account Trigger"/>
+                    <apex:inputfield value="{!ins.APPR_DGRP__AccountTrigger__c}" />
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem >
+                    <apex:outputlabel value="Enable User Trigger"/>
+                    <apex:inputfield value="{!ins.APPR_DGRP__UserTrigger__c}" />
+                </apex:pageblockSectionItem> 
+                  <apex:pageblockSectionItem >
+                <apex:outputlabel value="BatchSize"/>
+                
+                <apex:inputfield value="{!ins.APPR_DGRP__BatchSize__c}" />
+                </apex:pageblockSectionItem> 
+            </apex:pageblocksection>
+          
+    </apex:pageblock>
+
+    <apex:pageblock >
+        <apex:SectionHeader title="Update Dynamic Groups for Accounts"/>
+            <apex:pageblocksection columns="2" title="Account Settings" >
+                <apex:pageblockSectionItem >
+                    <apex:outputlabel value="Accounts updated from"/>
+                    <apex:inputfield value="{!ins.APPR_DGRP__Last_Execution_Batch_Account_Change__c}" />
+                </apex:pageblockSectionItem> 
+                <apex:commandButton value="Run Account Batch" action="{!accountBatch}"/>
+            </apex:pageblocksection>
+    </apex:pageblock>
+
+    <apex:pageblock >
+        <apex:SectionHeader title="Update Dynamic Groups for Users"/>
+            <apex:pageblocksection columns="2" title="User Settings" >
+                <apex:pageblockSectionItem >
+                    <apex:outputlabel value="Users created from"/>
+                    <apex:inputfield value="{!ins.APPR_DGRP__Last_Execution_Of_Batch__c}" />
+                </apex:pageblockSectionItem> 
+                <apex:commandButton value="Run User Batch" action="{!userBatch}"/>
+            </apex:pageblocksection>
+    </apex:pageblock>
+ 
+ </apex:form>   
+</apex:page>

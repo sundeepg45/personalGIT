@@ -1,0 +1,34 @@
+<apex:page showheader="{!!isEmbedded}" sidebar="{!!isEmbedded}" controller="StorybookContentDisplayController" standardStylesheets="false">
+    <div class="red-hat-content" style="background: none;">
+        <table class="table table-striped">
+        <apex:outputPanel rendered="{!!hideTitle}" layout="none">
+        <tr>
+            <th style="vertical-align: bottom;"><b>{!storybookName}</b> </th>
+        </tr>
+        </apex:outputPanel>
+        <tr>
+            <td style="width:200px"><b>{!$Label.Storybook_Link_Name}</b></td>
+        </tr>
+        <apex:repeat value="{!linkItems}" var="li">
+            <tr>
+                <td id="{!LEFT(li.id,15)}title">
+                   <a href="{!li.URL__c}" target="_blank">
+                     <apex:outputText rendered="{!!li.StoryBook_Link_Labels__r.empty}" value="{!li.StoryBook_Link_Labels__r[0].Label__c}"/>
+                     <apex:outputText rendered="{!li.StoryBook_Link_Labels__r.empty}" value="{!li.Name}"/>
+                    </a>
+                </td>
+            </tr>
+        </apex:repeat>
+
+        <apex:repeat value="{!contentItems}" var="ci">
+            <tr>
+                <td id="{!LEFT(ci.id,15)}title">
+                   <a href="/{!ci.LatestPublishedVersionId}" target="_blank">
+                     <apex:outputText value="{!ci.Title}"/>
+                    </a>
+                </td>
+            </tr>
+        </apex:repeat>
+    </table>
+    </div>
+</apex:page>

@@ -1,0 +1,39 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Custom_Settings__c" extensions="refedge.ChangeAllNLNRequestsController" tabStyle="refedge__Custom_Settings__c" sidebar="false" showheader="false" id="pageId">
+    <script>
+        function showAlert(){
+            var result = window.confirm('{!$Label.ChangeAllNLNRequestMsg}');
+            if(result){
+                save();
+            }
+            else{
+                cancel();
+            }
+        }
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction action="{!saveChanges}" name="save" reRender="formId"/>
+        <apex:actionFunction action="{!cancel}" name="cancel" reRender="formId"/>
+        <apex:outputLabel style="font-weight: bold;  margin-left: 30px;color: #4a4a56;font-size: 91%;font-family: Arial,Helvetica,sans-serif;" value="{!$ObjectType.refedge__Custom_Settings__c.fields.refedge__Consider_No_longer_needed_a_use__c.Label}"/>
+        <apex:inputField id="inputId" style="  margin-left: 15px;" value="{!cs.refedge__Consider_No_longer_needed_a_use__c}" onChange="showAlert();return false;"/>
+    </apex:form>
+</apex:page>

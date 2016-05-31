@@ -1,0 +1,32 @@
+<apex:page standardController="Lead" extensions="rejectionReason">
+    
+ 
+<apex:form id="Formidc" >
+  <apex:pageBlock title="Reasons For Rejection" id="res">        
+       <apex:pageBlockSection title="Select Reason" >       
+                   
+                     <apex:pageBlockSectionItem >
+                         Enter Rejection Reason
+                         <apex:inputField value="{!Lead.Reasons_for_Rejection__c}" required="true"/>                       
+                     </apex:pageBlockSectionItem>
+                          
+                          
+                          
+                          
+                          
+        </apex:pageBlockSection>
+                          <p> </p>                        
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
+         
+         <apex:commandButton action="{!saveLead}" value="OK"  id="SaveReasonButton"/> 
+         
+         
+                  
+  </apex:pageBlock>  
+  
+    <apex:pageMessages />
+   
+</apex:form>
+</apex:page>

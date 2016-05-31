@@ -1,0 +1,16 @@
+<apex:page standardController="Account" extensions="AccountStatusSummaryController">
+
+    <apex:pageBlock >
+        <apex:pageBlockSection >
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Requalification Status" />
+                <apex:outputLabel value="{!myAccount.RequalStatus__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Requalification Date" />
+                <apex:outputField value="{!myAccount.RequalificationDate__c}"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+</apex:page>

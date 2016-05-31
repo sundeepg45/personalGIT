@@ -1,0 +1,112 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.QuestionSettingMatrixController" sidebar="false">
+    <apex:pageMessages id="msgId"/>
+    <c:POR_ModalLoader />
+    <style>
+        table{
+            width:100%;
+        }
+        .orderDiv{
+            border: 1px solid lightblue;
+            width: 15%;
+            text-align: center;
+            margin-left: 36%;
+        }
+    </style>
+    <apex:outputPanel id="opId">
+        <script>
+            jQuery(function() {
+                   jQuery.fn.swap = function(b){ 
+                    b = jQuery(b)[0]; 
+                    var a = this[0]; 
+                    var t = a.parentNode.insertBefore(document.createTextNode(''), a); 
+                    b.parentNode.insertBefore(a, b); 
+                    t.parentNode.insertBefore(b, t); 
+                    t.parentNode.removeChild(t);
+                   
+                    return this; 
+                };
+                    jQuery(".draggable").draggable({
+                       
+                        cursor: 'move',
+                        revert: true,
+                        
+                    });
+                    jQuery(".draggable").droppable({
+                        accept: ".draggable",
+                        tolerance: "intersect",
+                       
+                        drop: function( event, ui ) {
+                            var draggable = ui.draggable, droppable = jQuery(this),
+                                dragPos = draggable.position(), dropPos = droppable.position();
+                            draggable.swap(droppable);
+                            saveThePosition(droppable,draggable); 
+                        }              
+                    });
+               });
+               function saveThePosition(b,a){
+                    var questionOrder='';
+                    var count = 1;
+                    jQuery('.draggable').each(function(){
+                        if(questionOrder == '' && (jQuery(b).attr('class').split(' ')[1] == jQuery(this).attr('class').split(' ')[1] || jQuery(a).attr('class').split(' ')[1]== jQuery(this).attr('class').split(' ')[1]))
+                                questionOrder = count +'_'+jQuery(this).children('.textBox').val()
+                            else if(jQuery(b).attr('class').split(' ')[1] == jQuery(this).attr('class').split(' ')[1] || jQuery(a).attr('class').split(' ')[1]== jQuery(this).attr('class').split(' ')[1])
+                                questionOrder = questionOrder +',' + count +'_'+jQuery(this).children('.textBox').val();
+                        count ++;
+                    });
+                    saveQuestionOrder(questionOrder);
+               }
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="frmId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction name="saveQuestionOrder" action="{!saveQuestionOrder}" rerender="pbId,opId">
+            <apex:param name="questionOrder" assignTo="{!questionOrder}" value=""/>
+        </apex:actionFunction>
+        <apex:pageBlock id="pbId">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Add_Question}" action="{!addQuestion}" rerender="pbId,opId"/>
+                <apex:commandButton value="{!$Label.Save}" action="{!saveQuestions}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}"/>
+                
+            </apex:pageBlockButtons>
+            <table style="border:1px solid black;border-collapse: collapse;">
+                <tr style="border:1px solid black">
+                    <th style="border:1px solid black;padding:5px;">{!$Label.Question_Order}</th>
+                    <th style="border:1px solid black;padding:5px;">{!$Label.English}</th>
+                </tr>
+                <apex:repeat value="{!questWrapper}" var="question">
+                    <tr style="height:30px;"> 
+                        <td style="padding:5px;border:1px solid black;width:10%;">
+                            <div class="orderDiv ">
+                                <apex:outputlabel value="{!question.institueQuestion.refedge__Order__c}"/>
+                            </div>
+                        </td>
+                        <td style="padding:5px;border:1px solid black" class="draggable {!question.institueQuestion.refedge__Order__c}" data-value="{!question.institueQuestion.refedge__Question__c}" >
+                            <apex:inputtext styleClass="textBox" style="border: 1px solid lightblue;width:90%;" value="{!question.institueQuestion.refedge__Question__c}"/>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,14 @@
+<apex:component controller="MSSectionController">
+
+	<apex:attribute name="pageController" description="" type="MSController" required="true" assignTo="{!ctrl}"/>
+	<apex:attribute name="sectionKey" description="" type="String" required="false" assignTo="{!sectionKey}"/>
+	<apex:attribute name="annotation" description="" type="String" required="true" assignTo="{!annotation}"/>
+
+    <apex:repeat value="{!sectionContent}" var="item">
+        <apex:outputPanel layout="none">
+            <apex:outputLink rendered="{!item.content.FileType == 'LINK'}" value="{!item.content.ContentUrl}" target="_blank">{!item.content.Title}</apex:outputLink>
+            <apex:outputLink rendered="{!item.content.FileType != 'LINK'}" value="/{!item.rhcontent.ContentDocumentId__c}">{!item.content.Title}</apex:outputLink>
+        </apex:outputPanel>
+    </apex:repeat>
+    
+</apex:component>

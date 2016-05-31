@@ -1,0 +1,317 @@
+<apex:page controller="PFController" showHeader="false"
+    standardStylesheets="false" sidebar="false" cache="false">
+
+    <head>
+        <script language="javascript">
+            var openinfowindow = null;
+
+            function setMarker(map, lat, lng, name, loc, desc, partnerid, logourl, specializations) {
+                var contentString =
+                  '      <div class="map-wrapper">' +
+                  '        <div class="container bubble-container">' +
+                  '          <div class="map"> '+
+                  '            <div class="map-container"></div> ' +
+                  '            <div class="map-location-info"> ' +
+                  '              <div class="name">' + name + '</div> '+
+                  '              <div class="criteria">' + specializations + '</div> '+
+                  '              <div class="summary"> '+
+                                   desc +
+                  '                <a target="_blank" href="PFPartnerDetail?id=' + partnerid + '" class="more">Learn More</a> '+
+                  '              </div> ';
+                if (logourl != null) {
+                    contentString += '<div class="logo">';
+                    contentString += '<img width="150" src="' + logourl + '"/>';
+                    contentString += '</div>';
+                }
+                contentString +=
+                  '            </div> '+
+                  '          </div> '+
+                  '        </div> '+
+                  '      </div>';
+                var infowindow = new google.maps.InfoWindow({
+                    content: contentString
+                });
+                var latlng = new google.maps.LatLng(lat, lng);
+                var marker = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    title: name
+                });
+                google.maps.event.addListener(marker, 'click', function() {
+                    if (openinfowindow && openinfowindow != null) {
+                        openinfowindow.close();
+                    }
+                    infowindow.open(map, marker);
+                    openinfowindow = infowindow;
+                });
+                google.maps.event.addListener(marker, "mousedown", function() {
+                    if (openinfowindow && openinfowindow != null) {
+                        openinfowindow.close();
+                        openinfowindow = null;
+                    }
+                });
+//                google.maps.event.addListener(marker, "mouseout", function() {
+//                    infowindow.close();
+//                });
+            }
+        </script>
+    </head>
+
+    <span style="display:none;">{!resultPage.size}</span>
+    <apex:outputText rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+        <div class="paginationBlock">
+            <div class="pageIndicator" id="pageIndicatorTop">{!$Label.PF_Page_x} <span id="currentPageTop">{!result.currentPage}</span> {!$Label.PF_Page_X_of} <span id="ofPageTop">{!result.totalPages}</span></div>
+            <apex:include pageName="PFPaginationControl" />
+        </div>
+    </apex:outputText>
+    <apex:outputText rendered="{! NOT(ISNULL(resultPage)) && resultPage.size == 0}" value="{!$Label.PF_result_MSG_noresults}"/>
+    <apex:variable var="cnt" value="{!0}" />
+
+    <div class="resultsTable">
+        <div class="resultsBlock">
+        <apex:form >
+            <apex:repeat value="{!resultPage}" var="partner" id="results">
+                <div class="card col-xs-6" id="businessCard{!partner.partnerId}{!cnt}">
+                    <div class="card-content">
+
+                        <!--<div class="corner_topleft"></div>
+                        <div class="corner_topright"></div>
+                        <div class="corner_bottomleft"></div>
+                        <div class="corner_bottomright"></div>-->
+
+                        <!--<span id="partnerLogo{!partner.partnerId}{!cnt}" class="cardLogo"><apex:image width="150" rendered="{!NOT(ISNULL(partner.logoAttachmentId))}" value="{!URLFOR($Action.Attachment.Download, partner.logoAttachmentId)}"/></span>-->
+                        <div class="cardMain">
+                            <div class="partnerName">
+                                <strong>
+                                	<a id="partnerNameLink{!partner.partnerId}{!cnt}" href="PFPartnerDetail?id={!partner.partnerId}">{!partner.partnerName}<apex:outputText rendered="{!partner.showAlias && partner.partnerAlias != ''}" value=" / {!partner.partnerAlias}"/></a>
+                                </strong>
+                            </div>
+                        </div><!-- /.cardMain -->
+                        <div class="cardBody">
+                            <div class="cardCol1">
+
+                                <div class="cardLogo-container">
+                                    <span id="partnerLogo{!partner.partnerId}{!cnt}" class="cardLogo"><apex:image width="150" rendered="{!NOT(ISNULL(partner.logoAttachmentId))}" value="{!URLFOR($Action.Attachment.Download, partner.logoAttachmentId)}"/></span>
+                                </div>
+
+                                <div class="cardPartnerType">
+                                    <strong>{!$Label.PF_PartnerCard_PartnerType}</strong> <span id="partnerType{!partner.partnerId}{!cnt}"><apex:outputText rendered="{!NOT(ISNULL(partner.partnerType))}"
+                                value="{!partner.partnerType}" /></span>
+                                </div>
+                                <apex:outputText rendered="{! NOT(ISNULL(partner.locationMatch)) }">
+                                    <div class="cardPartnerLocation" id="locationMatch{!partner.partnerId}{!cnt}">
+                                        <strong>{!$Label.PF_result_section_location}</strong> <span id="primaryLocation{!partner.partnerId}{!cnt}">
+                                            <span id="addressLineOne">{!partner.locationMatch.Street__c}</span> <br />
+                                            <span id="addressLineFour">{!partner.locationMatch.City__c}<br/>
+    										<apex:outputText rendered="{!OR(NOT(ISNULL(partner.stateName)), NOT(ISNULL(partner.locationMatch.Postal_Code__c)))}">
+    	                                        {!partner.stateName} {!partner.locationMatch.Postal_Code__c} <br />
+    	                                    </apex:outputText>
+                                            {!partner.countryName} </span> <br />
+                                        </span>
+                                    </div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{! ISNULL(partner.locationMatch) }">
+                                    <div class="cardPartnerLocation" id="locationPrimary{!partner.partnerId}{!cnt}">
+                                        <strong>{!$Label.PF_detail_section_PrimaryLocation}:</strong> <span id="primaryLocation{!partner.partnerId}{!cnt}">
+                                            <span id="addressLineOne">{!partner.primaryLocation.Street__c}</span> <br />
+                                            <span id="addressLineFour">{!partner.primaryLocation.City__c}<br/>
+    										<apex:outputText rendered="{!OR(NOT(ISNULL(partner.stateName)), NOT(ISNULL(partner.primaryLocation.Postal_Code__c)))}">
+    	                                        {!partner.stateName} {!partner.primaryLocation.Postal_Code__c} <br />
+    										</apex:outputText>
+                                            {!partner.countryName} </span> <br />
+                                        </span>
+                                    </div>
+                                </apex:outputText>
+                            </div>
+                            <div class="cardCol2">
+                            	<apex:outputText rendered="{!NOT(ISNULL(partner.partnerTier) || partner.partnerTier == '')}">
+    	                            <div class="cardPartnerLevel">
+    	                                <strong>{!$Label.PF_detail_field_Partner_Level}</strong> <span id="partnerLevel{!partner.partnerId}{!cnt}"><apex:outputText rendered="{!NOT(ISNULL(partner.partnerTier))}" value="{!partner.partnerTier}" /></span>
+    	                            </div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!NOT(ISNULL(partner.accountPhone))}">
+                                    <div class="cardPhone">
+                                    <strong>{!$Label.PF_result_section_phone}</strong> <div id="cardCompanyPhone{!partner.partnerId}{!cnt}"><apex:outputText value="{!partner.accountPhone}"/></div>
+                                    </div>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!NOT(ISNULL(partner.website))}">
+                                    <div class="cardWebsite">
+                                    <a id="cardCompanyWebsite{!partner.partnerId}{!cnt}" target="_blank" href="{!partner.website}"><strong>{!partner.website}<!--{!$Label.Custom_Reference_Company_Website}--></strong></a>
+                                    </div>
+                                </apex:outputText>
+
+                                <apex:outputText rendered="{!NOT(ISNULL(partner.locationMatch))}">
+                                    <apex:outputText rendered="{!NOT(ISNULL(partner.locationMatch.Phone__c))}">
+                                        <div class="cardPhone">
+                                        <strong>{!$Label.PF_result_section_locationphone}</strong> <div id="cardLocationPhone{!partner.partnerId}{!cnt}"><apex:outputText value="{!partner.locationMatch.Phone__c}"/></div>
+                                        </div>
+                                    </apex:outputText>
+                                    <!--
+                                    <apex:outputText rendered="{!NOT(ISNULL(partner.locationMatch.Website__c))}">
+                                        <div class="cardWebsite">
+                                        <a id="cardLocationWebsite{!partner.partnerId}{!cnt}" target="_blank" href="{!partner.locationMatch.Website__c}"><strong>{!partner.locationMatch.Website__c}{!$Label.PF_result_section_locationwebsite}</strong></a>
+                                        </div>
+                                    </apex:outputText>
+                                    -->
+                                </apex:outputText>
+                            </div>
+                            <div class="cardCol3 specializations" id="specializations{!partner.partnerId}{!cnt}">
+                                <apex:outputText rendered="{!partner.specializations.size > 0}">
+                                    <strong>{!$Label.Requalification_Specializations}</strong>
+                                    <apex:repeat value="{!partner.specializations}" var="specialization">
+                                        <div id="specialization{!partner.partnerId}{!cnt}{!specialization}"><apex:outputText value="{!specialization}"/></div>
+                                    </apex:repeat>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!partner.skills.size > 0}">
+                                    <strong>{!$Label.Requalification_Partner_Skills}</strong>
+                                    <apex:repeat value="{!partner.skills}" var="skill">
+                                        <div id="skill{!partner.partnerId}{!cnt}{!skill}"><apex:outputText value="{!skill}"/></div>
+                                    </apex:repeat>
+                                </apex:outputText>
+                            </div>
+                        </div><!-- /.cardBody -->
+
+                        <!-- OLD CARD LOGO PLACE -->
+
+                        <div class="more">
+                                <a id="partnerDetailsLink{!partner.partnerId}{!cnt}" href="PFPartnerDetail?id={!partner.partnerId}" class="btn ease">Details</a>
+                        </div>
+                    </div><!-- close .card-container -->
+                </div><!-- close .col-xs-6 -->
+                <apex:variable var="cnt" value="{!cnt+1}"/>
+            </apex:repeat>
+        </apex:form>
+        </div>
+        <apex:outputText rendered="{!result.ctx.hasProximityResults}">
+                <div class="map_container">
+                    <div id="map_canvas" class="map_canvas"></div>
+                    <div id="map_note" class="map_note">{!$Label.PF_Search_Map_Note}</div>
+                </div>
+                <script type="text/javascript" language="javascript">
+                    var isProximitySearch = {!result.ctx.hasProximityResults};
+                    if (isProximitySearch){
+                        log('It\'s a proximity search!');
+                        var nelat = '{!result.ctx.boundingBox.northeast.latitude}';
+                        var nelon = '{!result.ctx.boundingBox.northeast.longitude}';
+
+                        var swlat = '{!result.ctx.boundingBox.southwest.latitude}';
+                        var swlon = '{!result.ctx.boundingBox.southwest.longitude}';
+
+                        var cenlat = '{!searchForm.Latitude__c}';
+                        var cenlon = '{!searchForm.Longitude__c}';
+                        var cenlon = '{!searchForm.Longitude__c}';
+
+                        var latlng = new google.maps.LatLng(cenlat,cenlon);
+                        var myOptions = {
+                            zoom: 1,
+                            center: latlng,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        }
+                        log('Creating a map at ' + cenlat + ', ' + cenlon);
+                        map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+                        log('Moving map to ' + swlat + ', ' + swlon + ', ' + nelat + ', ' + nelon);
+                        var results = map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng(swlat,swlon),new google.maps.LatLng(nelat,nelon)));
+                        var siteurl = '{!$Site.CurrentSiteUrl}';
+                        if (siteurl == null || siteurl.length == 0) {
+                            siteurl = '/';
+                        }
+                        <apex:repeat value="{!resultPage}" var="partner">
+                            var logourl = null;
+                            if ({!NOT(ISNULL(partner.logoAttachmentId))}) {
+                                 logourl = siteurl + 'servlet/servlet.FileDownload?file={!partner.logoAttachmentId}';
+                            }
+                            setMarker(map, '{!partner.locationMatch.Latitude__c}', '{!partner.locationMatch.Longitude__c}', '{!JSENCODE(partner.partnerName)}',
+                                '{!JSENCODE(partner.locationMatch.Name)}', '{!JSENCODE(partner.briefDesc)}', '{!partner.partnerId}', logourl, '{!partner.specializationsString}');
+                        </apex:repeat>
+                    }
+                </script>
+        </apex:outputText>
+    </div>
+    <div class="paginationBottom">
+        <apex:outputText rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+            <div class="paginationBlock">
+                <div class="pageIndicator" id="pageIndicatorBottom">{!$Label.PF_Page_x} <span id="currentPageBottom">{!result.currentPage}</span> {!$Label.PF_Page_X_of} <span id="ofPageBottom">{!result.totalPages}</span></div>
+                <apex:include pageName="PFPaginationControl" />
+            </div>
+            <br/>
+            <div>Results returned in {!result.msExecutionTime}ms<input type="hidden" name="totalResults" id="totalResults" value="{!result.resultIdList.size}"/></div>
+        </apex:outputText>
+    </div>
+    <style>
+        .card{
+            border: none !important;
+            margin-bottom: 10px;
+        }
+        #content-block, .pbBody{
+            background: #f0f0f0 !important;
+        }
+        #content-block .container{
+            padding: 0px !important;
+            width: 1190px !important;
+        }
+        .col-xs-6 .card-content{
+            background: #fff !important;
+            height: 475px !important;
+            padding: 30px !important;
+        }
+        .cardMain, .cardBody {
+            padding: 0px !important;
+            color: #4c4c4c;
+            font-size: 1.214em;
+        }
+        .cardBody{
+            width: 100% !important;
+            float: left !important;
+        }
+        .cardLogo-container{
+            /*width: 50% !important;*/
+            float: right !important;
+        }
+        .cardLogo {
+            float: none !important;
+            margin: 0 auto 20px auto !important;
+            display: block !important;
+            text-align: center !important;
+            width: 200px !important;
+        }
+        .cardLogo img {
+            max-height: 110px !important;
+            width: 100% !important;
+        }
+        .cardCol1, .cardCol2, .cardCol3 {
+            padding: 0px !important;
+            display: block !important;
+            min-width: 120px !important;
+            width: 100% !important;
+        }
+        .card .more {
+            clear: both;
+            margin: 20px 0 0 0 !important;
+            padding: 25px 0px 0px !important;
+            text-align: left !important;
+        }
+        .partnerName{
+            font-size: 1.571em !important;
+            text-transform: uppercase !important;
+            padding-left: 0px !important;
+            margin-bottom: 20px !important;
+            display: block;
+            overflow: hidden;
+            width: 100%;
+            text-overflow: ellipsis;
+        }
+        .partnerName a{
+            color: #000 !important;
+        }
+        .cardWebsite a:hover{
+            color: #08C0FC !important;
+        }
+        .cardPhone, .cardCol3.specializations, .cardPartnerLevel {
+            display: none !important;
+        }
+        .paginationBlock{
+            padding-left: 15px;
+        }
+    </style>
+
+</apex:page>

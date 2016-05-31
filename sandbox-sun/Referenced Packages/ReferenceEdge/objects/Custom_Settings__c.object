@@ -1,0 +1,1597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>This object holds the custom settings for the app</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>false</enableReports>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Active_Version__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <description>This checkbox denotes that this version of the settings is the active one</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This checkbox denotes that this version of Custom Settings is currently active.</inlineHelpText>
+        <label>Active Version</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Apply_Opportunity_Stage_Filter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Apply Opportunity Stage Filter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Auto_create_delete_Reference_Content__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>When content is added to Salesforce CRM Content a Reference Content record will be automatically created. When content is deleted from Salesforce CRM Content the Reference Content record will be deleted.</inlineHelpText>
+        <label>Auto Create/Delete Reference Content</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Automatically_Assign_Reward_on_Feedback__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Automatically Assign Reward on Feedback?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Automatically_Assign_Rewards__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>At the completion of a reference project (e.g., reference call) the predefined reward points will be automatically assigned to the Contact.</inlineHelpText>
+        <label>Automatically Assign Rewards?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Caution_deadline_window__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Used to define the time frame of the Caution category for Reference Workspace projects.</inlineHelpText>
+        <label>Caution Deadline Window</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Chatter_Enabled__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Is Chatter enabled app-wide?</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Used to enable/disable Chatter notifications.</inlineHelpText>
+        <label>Chatter Enabled</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Check_back_in_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Enables / disables the confirmation Chatter sent to the Opportunity owner when they select a timeframe for checking back in on referenceability of an Account / Contact</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Enables / disables the confirmation Chatter sent to the Opportunity owner when they select a timeframe for checking back in on referenceability of an Account / Contact</inlineHelpText>
+        <label>Check back in Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Check_back_in_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Enables / disables the confirmation email sent to the Opportunity owner when they select a timeframe for checking back in on referenceability of an Account / Contact.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Enables / disables the confirmation email sent to the Opportunity owner when they select a timeframe for checking back in on referenceability of an Account / Contact.</inlineHelpText>
+        <label>Check back in Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Client_Referenceability_check_days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Referenceability Check Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Community_Home_Text__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Community Home Text</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Community_Ref_Activities_Message__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Community Ref Activities Message</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Consider_No_longer_needed_a_use__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Consider “No longer needed” a use?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Create_Nomination__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>When a Reference Lead results in a Reference being provided a new Nomination is created</description>
+        <externalId>false</externalId>
+        <inlineHelpText>When a Reference Lead results in a Reference being provided a new Nomination is created</inlineHelpText>
+        <label>Create Nomination?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Create_Reference_Profile__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>When a Reference Lead results in a Reference being provided a Reference Profile is created</description>
+        <externalId>false</externalId>
+        <inlineHelpText>When a Reference Lead results in a Reference being provided a Reference Profile is created</inlineHelpText>
+        <label>Create Reference Profile?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Critical_Deadline_window__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Used to define the time frame of the Critical category for Reference Workspace projects.</inlineHelpText>
+        <label>Critical Deadline Window</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Current_Version__c</fullName>
+        <caseSensitive>false</caseSensitive>
+        <deprecated>false</deprecated>
+        <description>The version of the software&apos;s settings that this object represents</description>
+        <externalId>true</externalId>
+        <inlineHelpText>The version of the software&apos;s settings that this object represents</inlineHelpText>
+        <label>Current Version</label>
+        <length>16</length>
+        <required>true</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>true</unique>
+    </fields>
+    <fields>
+        <fullName>Days_of_Week__c</fullName>
+        <deprecated>false</deprecated>
+        <description>off Days</description>
+        <externalId>false</externalId>
+        <label>Off Days of Week</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Monday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Tuesday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Wednesday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Thursday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Friday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Saturday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Sunday</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>MultiselectPicklist</type>
+        <visibleLines>4</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Default_Expiration_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Default Expiration Days</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Default_Reference_Accounts_Managed__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>New reference program member accounts will be Managed by default.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>New reference program member accounts will be Managed by default.</inlineHelpText>
+        <label>Default Accounts to Managed?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Default_Referenceablity_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>This is the default status of a newly added Reference Program Member when triggered by the addition of a Referenceability or Attribute.</inlineHelpText>
+        <label>Default Program Membership Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Active</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Caution</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Inactive</fullName>
+                <default>true</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Email_Enabled__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Is email enabled app-wide?</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Used to enable/disable email notifications. Not necessary if Chatter is enabled.</inlineHelpText>
+        <label>Email Enabled</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Enable_Reference_Refresh__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Enables the Profile Update Minder functionality.</description>
+        <externalId>false</externalId>
+        <label>Enable Profile Update Minder</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Escalation_to_Owner_Manager__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of days before a Request deadline that an escalation notification will be sent to the Account/Reference Owner&apos;s manager.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of days before a Request deadline that an escalation notification will be sent to the Account/Reference Owner&apos;s manager.</inlineHelpText>
+        <label>Escalation to Owner’s Manager</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Expiration_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Expiration Days</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Expiration_Timeframe__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Expiration Timeframe</label>
+        <picklist>
+            <picklistValues>
+                <fullName>end of current CY</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>end of current FY</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>end of NEXT CY</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>end of NEXT FY</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>&apos;x&apos; days from award date</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Expire_Rewards__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Expire Rewards?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Feedback_Message_Delay__c</fullName>
+        <deprecated>false</deprecated>
+        <description>number of days after a reference use deadline for the automatic reference use feedback message to be sent (see R57)</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of days after the deadline for a reference activity (e.g., Reference Call)  when a message will be sent to the Requester asking for feedback concerning the activity.</inlineHelpText>
+        <label>Request Feedback</label>
+        <precision>4</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Filter_Order__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;FilterSettingPage?customSettingId=&apos;+ Id , &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <label>Filter Order and Basic Search</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Filtered_Content_Ids__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Filtered Content Ids</label>
+        <length>32768</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Filtered_Content_Tab__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;FilteredContentTab?customSettingId=&apos;+Id, &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <label>Filtered Content Tab</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>General_Notes__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Note that displays on the Account Request form after the request type has been selected.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Note that displays on the Account Request form after the request type has been selected.</inlineHelpText>
+        <label>General Notes</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Include_Weekends__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Include Weekends</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Influitive_API_URL__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Influitive_API_URL__c</description>
+        <externalId>false</externalId>
+        <label>Influitive_API_URL</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Influitive_Auth_Token__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Influitive Auth Token</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Is_Influitive_Integration_Enabled__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Is Influitive Integration Enabled</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Last_Refresh_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates when the last round of Profile Update requests were sent out.</description>
+        <externalId>false</externalId>
+        <label>Last Update Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Launch_Frequency__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Determines the frequency with which requests for Profile Updates are sent using the Automatic Launch.</description>
+        <externalId>false</externalId>
+        <label>Launch Frequency</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Monthly</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Quarterly</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Semi-Annually</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Annually</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Manage_ContentVersion_Custom_Fields__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Manage Content Version Custom Fields</label>
+        <length>32768</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Manage_ContentVersion_Custom_Fields_f__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;ManageContentVersionFields?customSettingId=&apos;+Id, &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Manage Content Version Custom Fields</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Manage_Interview_Questions__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;QuestionSettingMatrix?customSettingId=&apos;+Id, &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <label>Manage Interview Questions</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Manage_Reference_Lead__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;referenceLeadMappingPage?customSettingId=&apos;+ Id , &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Configure Reference Profile Form</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Managed_Reference_Content__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;ReferenceContentTypeSettingMatrix?customSettingId=&apos;+Id+&apos;&amp;isContentSetting=true&apos;, &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <label>Manage Reference Content</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Managed_Request_Opportunity_Threshold__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Any Request related to an Opportunity that is equal to or greater than the amount specified here will automatically be marked as a Managed request and sent to the CRP Team</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Any Request related to an Opportunity with a value that is equal to or greater than the amount specified here will automatically be converted to a Managed Request.</inlineHelpText>
+        <label>Managed Request Opportunity Threshold</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>Managed_to_P2P_Min__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Managed to P2P Min</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Manual_Automatic_Launch__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Manual Launch lets you decide the exact date to request the Profile Updates; with Automatic Launch Profile Updates are sent based on the Launch Frequency.</description>
+        <externalId>false</externalId>
+        <label>Manual/Automatic Launch</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Manual</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Automatic</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Maximum_Expiration_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>The maximum number of days that a Microsite invitation can be active. Users cannot set a date beyond this limit.</inlineHelpText>
+        <label>Maximum Expiration Days</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Microsite_Visit_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Microsite Visit Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Microsite_Visit_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Microsite Visit Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Minimum_Deadline__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Minimum deadline for requests</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The minimum lead time required to fulfill any type of reference Account request. No managed request type may have a lower value.</inlineHelpText>
+        <label>Minimum Lead Time</label>
+        <precision>4</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Minimum_Opportunity_Size_OP__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Minimum Opportunity Size</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>Minimum_Opportunity_Size__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Minimum Opportunity Size</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>Minimum_Sales_Stage__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Sales requests can only be made for Opportunities that are AT or PAST this sales stage.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Sales requests can only be made for Opportunities that are AT or PAST this sales stage.</inlineHelpText>
+        <label>Minimum Sales Stage</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Prospecting</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Qualification</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Needs Analysis</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Value Proposition</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Id. Decision Makers</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Perception Analysis</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Proposal/Price Quote</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Negotiation/Review</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Closed Won</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Closed Lost</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Mixed_manage_request_settings__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Determine what attributes and custom fields will appear on each request type form for managed requests.</description>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;RequestSettingMatrix?customSettingId=&apos;+Id+&apos;&amp;isContentSetting=false&apos;, &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <inlineHelpText>Determine what attributes and custom fields will appear on each request type form for managed requests.</inlineHelpText>
+        <label>Managed Request Settings</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Next_Refresh_launch_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates when the next requests for Profiles Updates will be sent automatically.</description>
+        <externalId>false</externalId>
+        <label>Next Update Launch Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>No_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Days before deadline of no response</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of days before a Request deadline that a notification will be sent to the requester explaining that the Account/Reference Owner has been unresponsive.</inlineHelpText>
+        <label>No Response</label>
+        <precision>4</precision>
+        <required>true</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>No_Response_days__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates the number of days after the &quot;Are they referenceable yet?&quot; notification is sent that the Reference Lead Status will be set to No Response. If no value is entered then the No Reponse date is left blank on the record.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the Number of days after the &quot;Are they referenceable yet?&quot; notification is sent that the Reference Lead Status will be set to No Response. If no value is entered then the No Reponse date is left blank on the record.</inlineHelpText>
+        <label>No Response Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Nomination_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Nomination Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Nomination_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Nomination Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Nomination_Settings__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;NominationSettings?customSettingId=&apos;+ Id , &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Customize the Nomination form including section labels, custom fields and reference activities to be included.</inlineHelpText>
+        <label>Nomination Settings</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Nomination_disposition_window__c</fullName>
+        <defaultValue>1</defaultValue>
+        <deprecated>false</deprecated>
+        <description>This is your goal, in days, for a final disposition on a Nomination.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This is your goal, in days, for a final disposition on a Nomination.</inlineHelpText>
+        <label>Nomination Disposition Goal</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Notification_Settings__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;EmailChatterSettings?customSettingId=&apos;+ Id , &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <label>Notification Settings</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Number_of_request_accounts__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The maximum number of reference accounts that can be requested in a single request.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The maximum number of reference accounts that can be requested in a single request.</inlineHelpText>
+        <label>Max Accounts per Request</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Closed_Won_Stage__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Opportunity Closed Won Stage</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Prospecting</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Qualification</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Needs Analysis</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Value Proposition</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Id. Decision Makers</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Perception Analysis</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Proposal/Price Quote</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Negotiation/Review</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Closed Won</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Closed Lost</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Product_Field_API_Name__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Opportunity Product Field API Name</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Organization_FiscalYearStartMonth__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Organization FiscalYearStartMonth</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>P2P_Approve_Without_Contact__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Allows for approval of a Peer 2 Peer request without selecting a Contact. “Select Inactive Contacts” must also be enabled to enable this functionality.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Allows for approval of a Peer 2 Peer request without selecting a Contact. “Select Inactive Contacts” must also be enabled to enable this functionality.</inlineHelpText>
+        <label>Approve Without Contact</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>P2P_Select_Inactive_Contacts__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Allows the selection of Contacts who are not Reference Program Members for Reference Programs that do not manage referenceable Contacts. Note that no Contact Request record will be created if the Contact is not a Reference Program Member.</inlineHelpText>
+        <label>Select Inactive Contacts</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>PUM_No_Response_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates the number of days after the Profile Update notification is sent that the Profile Update Status will be set to No Response.  If no value is entered then no update to the status occurs.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the number of days after the Profile Update notification is sent that the Profile Update Status will be set to No Response.  If no value is entered then no update to the status occurs.</inlineHelpText>
+        <label>No Response Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Prevent_selection_of_mapped_Attributes__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Prevent selection of mapped attributes in add new Attributes</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Prevent selection of mapped attributes in add new Attributes</inlineHelpText>
+        <label>Prevent selection of mapped Attributes</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Private_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>This checkBox would be helpful for the users who want that the chatter and email post should be private and not public.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Select this checkBox if you want the chatter post should be private.</inlineHelpText>
+        <label>Private Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Process_Update_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Process Update Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Process_Update_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Process Update Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Profile_Update_Reminder_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Profile Update Reminder Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Profile_Update_Reminder_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Profile Update Reminder Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Project_Owner_Update_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Project Owner Update Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Project_Owner_Update_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Project Owner Update Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Quarantine_updates__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Quarantined Refresh updates must be approved by a Reference Manager before they can
+be committed</description>
+        <externalId>false</externalId>
+        <label>Quarantine Updates</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>RLF_Reminder_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the number of days after the &quot;Are they referenceable yet?&quot; notification is sent that a reminder is sent. If no value is entered then no reminder is sent.</inlineHelpText>
+        <label>Reminder Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>RUL_Activities_Contact__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of activities an contact is willing to participate in over a specified amount of time</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of activities for which an Contact is available for during the defined time period.</inlineHelpText>
+        <label>Number of Activities in Period</label>
+        <precision>3</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>RUL_Activities__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of activities an account is willing to participate in over a specified amount of time</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of activities for which an Account is available for during the defined time period.</inlineHelpText>
+        <label>Number of Activities in Period</label>
+        <precision>3</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>RUL_Period_Contact__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The specified period of time for a set number of reference activities (e.g., 3 activities every 90 days).</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The specified period of time for a set number of reference activities (e.g., 3 activities every 90 days).</inlineHelpText>
+        <label>Period Length</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>RUL_Period__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The specified period of time for a set number of reference activities (e.g., 3 activities every 90 days).</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The specified period of time for a set number of reference activities (e.g., 3 activities every 90 days).</inlineHelpText>
+        <label>Period Length</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Reference_Lead_No_Response_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Reference Lead No Response Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Lead_No_Response_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Reference Lead No Response Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Profile_Section_Header__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Reference Profile Section Header</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Reference_Refresh_Settings__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;ReferenceRefreshSettingsPage?customSettingId=&apos;+ Id , &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Profile Update Minder Settings</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Reference_Refresh_Update_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Profile Update Detail Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Refresh_Update_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Profile Update Detail Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Update_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Profile Update Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Update_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Profile Update Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Refresh_Wait_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>A Refresh request will be initiated for any profile that has not been updated in this many
+days. This includes updates to attributes, mapped attributes, and referenceability</inlineHelpText>
+        <label>Update Wait Days</label>
+        <precision>10</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Reminder_to_Owner__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Number of days before deadline that a reminder will be sent to the owner</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of days before a Request deadline that a reminder will be sent to the Account/Reference Owner.</inlineHelpText>
+        <label>Reminder to Owner</label>
+        <precision>4</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Remove_Points_if_Use_will_not_occur__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Remove Points if ‘Use will not occur’</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Approval_Decline_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Approval/Decline Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Approval_Decline_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Approval/Decline Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Escalation_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Escalation Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Escalation_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Escalation Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Feedback_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Feedback Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Feedback_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Feedback Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Managed_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request (Managed) Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Managed_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request (Managed) Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_No_Response_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request No Response Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_No_Response_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request No Response Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Peer2Peer_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request (Peer2Peer) Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Peer2Peer_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request (Peer2Peer) Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Reminder_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Reminder Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Request_Reminder_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Request Reminder Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Review_Refresh_list_prior_to_launch__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Review Update List Prior to Launch</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reviewed_and_Ready_to_Launch__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Manual Launch Profile Update records created but requests are not sent until you check this box.</description>
+        <externalId>false</externalId>
+        <label>Reviewed and Ready to Launch</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reward_Settings__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;RewardSettings?customSettingId=&apos;+ Id , &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <inlineHelpText>Define default reward point values for each reference activity configured.</inlineHelpText>
+        <label>Reward Settings</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Send_reminder_for_automatic__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The number of days before a scheduled automatic Profile Update that a notification is sent to the team reminding them of the upcoming launch date.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>The number of days before a scheduled automatic Profile Update that a notification is sent to the team reminding them of the upcoming launch date.</inlineHelpText>
+        <label>Send Reminder for Automatic</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Send_reminder_for_automatic_cti__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Send reminder for automatic cti</label>
+        <length>18</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Show_Featured_Content_First__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Show Featured Content First</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Show_Matching_Reference_Accounts_link__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Show ‘Matching Reference Accounts’ link?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Show_Matching_Reference_Content_link__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Show ‘Matching Reference Content’ link?</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Smart_Search__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK(&apos;/apex/&apos;+ $Setup.POR_App_Configuration__c.Namespace__c +&apos;SmartSearchSettingPage?customSettingId=&apos;+Id, &apos;Manage&apos;, &apos;_self&apos;)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Smart Search</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Status_Update_Chatter__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Status Update Chatter</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Status_Update_Email__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Status Update Email</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Workspace_Default_View__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Workspace Default View</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>cloneTriggerId__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>cloneTriggerId</label>
+        <length>20</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>Custom Settings</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>Active_Version__c</columns>
+        <columns>Current_Version__c</columns>
+        <columns>Include_Weekends__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <nameField>
+        <label>Custom Settings Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Custom Settings</pluralLabel>
+    <searchLayouts>
+        <excludedStandardButtons>New</excludedStandardButtons>
+    </searchLayouts>
+    <sharingModel>ReadWrite</sharingModel>
+    <validationRules>
+        <fullName>ManagedToPeer2Peer</fullName>
+        <active>true</active>
+        <description>The value cannot be negative.</description>
+        <errorConditionFormula>Managed_to_P2P_Min__c &lt; 0</errorConditionFormula>
+        <errorDisplayField>Managed_to_P2P_Min__c</errorDisplayField>
+        <errorMessage>The value cannot be negative.</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>RUL_Activites</fullName>
+        <active>true</active>
+        <errorConditionFormula>(RUL_Activities__c &gt; 99) || (RUL_Activities__c &lt; 1) || (RUL_Activities_Contact__c &gt; 99) || (RUL_Activities_Contact__c &lt; 1)</errorConditionFormula>
+        <errorMessage>You must specify a number of activities in the period from 1 to 99</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>RUL_Period</fullName>
+        <active>true</active>
+        <errorConditionFormula>(RUL_Period__c  &gt; 365) ||(RUL_Period__c  &lt; 1)</errorConditionFormula>
+        <errorDisplayField>RUL_Period__c</errorDisplayField>
+        <errorMessage>You must specify a number of days in the period from 1 to 365</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>RUL_PeriodContact</fullName>
+        <active>true</active>
+        <description>You must specify a number of days in the period from 1 to 365</description>
+        <errorConditionFormula>(RUL_Period_Contact__c&gt; 365) ||(RUL_Period_Contact__c&lt; 1)</errorConditionFormula>
+        <errorDisplayField>RUL_Period_Contact__c</errorDisplayField>
+        <errorMessage>You must specify a number of days in the period from 1 to 365</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>Reference_profile_and_Nomination_checked</fullName>
+        <active>true</active>
+        <description>Reference profile and Nomination both cannot be checked</description>
+        <errorConditionFormula>Create_Nomination__c  &amp;&amp;  Create_Reference_Profile__c</errorConditionFormula>
+        <errorMessage>Reference Profile and Nomination both cannot be checked.</errorMessage>
+    </validationRules>
+</CustomObject>

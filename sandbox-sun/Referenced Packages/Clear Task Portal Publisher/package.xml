@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Clear Task Portal Publisher</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>Allow business users to quickly and easily publish and update portal content</description>
+    <namespacePrefix>APPR_PUB</namespacePrefix>
+    <types>
+        <members>CustomMessageController</members>
+        <members>CustomMessageExtension</members>
+        <members>GroupController</members>
+        <members>Util</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>GroupComponent</members>
+        <members>linkColor</members>
+        <members>primaryColor</members>
+        <name>ApexComponent</name>
+    </types>
+    <types>
+        <members>CustomMessages</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>Headline_Link_Group__c.Active__c</members>
+        <members>Headline_Link_Group__c.Description__c</members>
+        <members>Headline_Link_Group__c.Headline__c</members>
+        <members>Headline_Link_Group__c.Sort_Order__c</members>
+        <members>Headline_Link__c.Active__c</members>
+        <members>Headline_Link__c.Display_Name__c</members>
+        <members>Headline_Link__c.End_Date__c</members>
+        <members>Headline_Link__c.Headline_Link_Group__c</members>
+        <members>Headline_Link__c.Headline__c</members>
+        <members>Headline_Link__c.Newline__c</members>
+        <members>Headline_Link__c.Open_In_New_Window__c</members>
+        <members>Headline_Link__c.Publish__c</members>
+        <members>Headline_Link__c.Show_New__c</members>
+        <members>Headline_Link__c.Sort_Order__c</members>
+        <members>Headline_Link__c.Start_Date__c</members>
+        <members>Headline_Link__c.URL_Preview__c</members>
+        <members>Headline_Link__c.URL__c</members>
+        <members>Headline__c.Active__c</members>
+        <members>Headline__c.Description__c</members>
+        <members>Headline__c.Group_Header__c</members>
+        <members>Headline__c.Image_Path__c</members>
+        <members>Headline__c.Image_Url__c</members>
+        <members>Headline__c.Link_Header__c</members>
+        <members>Headline__c.Long_Description__c</members>
+        <members>Headline__c.New_Row__c</members>
+        <members>Headline__c.Sort_Order__c</members>
+        <members>Headline__c.Style_Class__c</members>
+        <members>Headline__c.Tab__c</members>
+        <members>Headline__c.Vertical_Stack__c</members>
+        <members>PortalPublisherSettings__c.LinkColor__c</members>
+        <members>PortalPublisherSettings__c.PrimaryColor__c</members>
+        <members>PortalPublisherSettings__c.Resource_Location__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Headline_Link_Group__c</members>
+        <members>Headline_Link__c</members>
+        <members>Headline__c</members>
+        <members>PortalPublisherSettings__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Headline__c</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>Custom Messages</members>
+        <name>HomePageComponent</name>
+    </types>
+    <types>
+        <members>Headline_Link_Group__c-Headline Link Group Layout</members>
+        <members>Headline_Link_Group__c-Portal Layout</members>
+        <members>Headline_Link__c-Headline Link Layout</members>
+        <members>Headline_Link__c-Portal Layout</members>
+        <members>Headline__c-Headline Layout</members>
+        <members>Headline__c-Multi Group Headline Layout</members>
+        <members>Headline__c-Portal Layout</members>
+        <members>Headline__c-Single Line Headline Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>Headline_Link_Group__c.Active</members>
+        <members>Headline_Link_Group__c.All</members>
+        <members>Headline_Link_Group__c.Inactive</members>
+        <members>Headline_Link_Group__c.My_Headline_Groups</members>
+        <members>Headline_Link__c.All</members>
+        <members>Headline_Link__c.My_Headline_Links</members>
+        <members>Headline_Link__c.NotPublished</members>
+        <members>Headline_Link__c.Published</members>
+        <members>Headline__c.ActiveHeadlines</members>
+        <members>Headline__c.All</members>
+        <members>Headline__c.My_Headlines</members>
+        <name>ListView</name>
+    </types>
+    <types>
+        <members>Headline__c.Multi_Group</members>
+        <members>Headline__c.Multi_Line</members>
+        <members>Headline__c.Single_Line</members>
+        <name>RecordType</name>
+    </types>
+    <types>
+        <members>CustomMessagesCSS</members>
+        <members>customAreaSkinZIP</members>
+        <members>jquerySCRIPT</members>
+        <members>lumBrowserDetectSCRIPT</members>
+        <name>StaticResource</name>
+    </types>
+    <types>
+        <members>Headline_Link__c.Headline_or_Headline_Link_Group_Required</members>
+        <members>Headline__c.Enter_Description_or_Long_Description</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>Headline__c.View_Tab</members>
+        <name>WebLink</name>
+    </types>
+    <types>
+        <members>Headline_Link__c.Update_Show_New_Link_to_False</members>
+        <name>WorkflowFieldUpdate</name>
+    </types>
+    <types>
+        <members>Headline_Link__c.Set %22Show New%22 Link to False</members>
+        <name>WorkflowRule</name>
+    </types>
+    <version>33.0</version>
+</Package>

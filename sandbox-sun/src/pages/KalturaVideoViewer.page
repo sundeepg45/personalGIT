@@ -1,0 +1,70 @@
+<apex:page controller="KalturaVideoViewerController" sidebar="false">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <br/>
+    <span id="backLink" style="display:none;"><a href="#" id="backToContent" onClick="history.go(-1); return false;">{! $Label.Kaltura_Back_To_Content}</a></span>
+    <span id="closeLink" style="float:right; display:none;"><a href="#" id="backToContent" onClick="window.close(); return false;">{! $Label.Kaltura_Close_Window}</a></span>
+    <script type="text/javascript">
+        jQuery.noConflict();
+        if (history.length > 1) {
+            jQuery('#backLink').show();
+        } else {
+            jQuery('#closeLink').show();
+        }
+    </script>
+    <br/>
+    <div align="center" style="height:100%">
+        <br/>
+        <script src="https://cdnapisec.kaltura.com/p/739972/sp/73997200/embedIframeJs/uiconf_id/31637091/partner_id/739972"></script>
+        <div id="kaltura_player_1444145854" style="width: 782px; height: 500px;" itemprop="video" itemscope="itemscope" itemtype="http://schema.org/VideoObject">
+            <span itemprop="name" content="{!content.Title}"></span>
+            <span itemprop="description" content="{!content.Description}"></span>
+            <span itemprop="duration" content="212"></span>
+            <span itemprop="thumbnail" content="http://cdnsecakmi.kaltura.com/p/739972/sp/73997200/thumbnail/entry_id/{!rhcontent.KalturaId__c}/version/100000/acv/221"></span>
+            <span itemprop="width" content="782"></span>
+            <span itemprop="height" content="500"></span>
+        </div>
+        <script>
+        kWidget.embed({
+          "targetId": "kaltura_player_1444145854",
+          "wid": "_739972",
+          "uiconf_id": 31637091,
+          "flashvars": {},
+          "cache_st": 1444145854,
+          "entry_id": "{!rhcontent.KalturaId__c}"
+        });
+        </script>
+<!--
+        <object id="kaltura_player_1363024922"
+            name="kaltura_player_1363024922"
+            type="application/x-shockwave-flash"
+            allowFullScreen="true"
+            allowNetworking="all"
+            allowScriptAccess="always"
+            height="500"
+            width="782"
+            bgcolor="#000000"
+            xmlns:dc="https://purl.org/dc/terms/"
+            xmlns:media="https://search.yahoo.com/searchmonkey/media/"
+            rel="media:video"
+            resource="https://cdnapisec.kaltura.com/index.php/kwidget/cache_st/1363024922/wid/_739972/uiconf_id/5912762/entry_id/{!rhcontent.KalturaId__c}"
+            data="https://cdnapisec.kaltura.com/index.php/kwidget/cache_st/1363024922/wid/_739972/uiconf_id/5912762/entry_id/{!rhcontent.KalturaId__c}">
+            <param name="allowFullScreen" value="true" />
+            <param name="allowNetworking" value="all" />
+            <param name="allowScriptAccess" value="always" />
+            <param name="bgcolor" value="#000000" />
+            <param name="flashVars" value="&{FLAVOR}" />
+            <param name="movie" value="https://cdnapisec.kaltura.com/index.php/kwidget/cache_st/1363024922/wid/_739972/uiconf_id/5912762/entry_id/{!rhcontent.KalturaId__c}" />
+            <a href="https://corp.kaltura.com/products/video-platform-features">Video Platform</a>
+            <a href="https://corp.kaltura.com/Products/Features/Video-Management">Video Management</a>
+            <a href="https://corp.kaltura.com/Video-Solutions">Video Solutions</a>
+            <a href="https://corp.kaltura.com/Products/Features/Video-Player">Video Player</a>
+            <a rel="media:thumbnail" href="https://cdnsecakmi.kaltura.com/p/739972/sp/73997200/thumbnail/entry_id/{!rhcontent.KalturaId__c}/width/120/height/90/bgcolor/000000/type/2"></a>
+            <span property="dc:description" content="{! content.Description}"></span>
+            <span property="media:title" content="{! content.Title }"></span>
+            <span property="media:width" content="782"></span>
+            <span property="media:height" content="500"></span>
+            <span property="media:type" content="application/x-shockwave-flash"></span>
+        </object>
+-->
+    </div>
+</apex:page>

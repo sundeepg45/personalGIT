@@ -1,0 +1,257 @@
+<apex:page controller="LinkChannelOppController" tabStyle="Opportunity">
+	<apex:variable var="showErrorMissingTargetOpportunityId" value="{!ISBLANK(targetOpportunityId)}"/>
+	<apex:variable var="showErrorMissingTargetOpportunity" value="{!AND(NOT(ISBLANK(targetOpportunityId)),ISBLANK(targetOpportunity.OpportunityNumber__c))}"/>
+	<apex:variable var="showSourceLookup" value="{!NOT(OR(showErrorMissingTargetOpportunityId,showErrorMissingTargetOpportunity))}"/>
+	<apex:variable var="showErrorTargetOpportunityNotIndirect" value="{!AND(showSourceLookup,NOT(BEGINS(targetOpportunity.FulfillmentChannel__c,'Indirect')))}"/>
+	<apex:variable var="showSourceLineItems" value="{!NOT(OR(ISBLANK(sourceOpportunityNumber),ISNULL(sourceOpportunity.Id)))}"/>
+	<apex:variable var="showTargetLineItems" value="{!showSourceLineItems}"/>
+	<apex:variable var="showSourcePartners" value="{!showSourceLineItems}"/>
+	<apex:variable var="showTargetPartners" value="{!showSourceLineItems}"/>
+	<apex:variable var="showSourceTargetComparison" value="{!AND(showSourceLineItems,showSourceLookup)}"/>
+	<apex:variable var="showErrorMissingSourceOpportunityId" value="{!AND(NOT(ISBLANK(sourceOpportunityNumber)),ISNULL(sourceOpportunity.Id))}"/>
+	<apex:variable var="showErrorSourceOpportunityNotDirect" value="{!AND(showSourceLineItems,NOT(BEGINS(sourceOpportunity.FulfillmentChannel__c,'Direct')))}"/>
+	<apex:variable var="showErrorMismatchedPricebooks" value="{!AND(showSourceLineItems,sourceOpportunity.Pricebook2Id != targetOpportunity.Pricebook2Id)}"/>
+
+	<!-- Target Opportunity lookup page block -->
+	<apex:pageBlock id="sourceLookup" title="Search For Channel Load Opportunity" rendered="{!showSourceLookup}">
+		<apex:form >
+			<apex:pageBlockSection columns="1">
+				<apex:panelGroup >
+					<apex:outputLabel styleClass="labelCol left right">Opportunity Number</apex:outputLabel>
+					<apex:inputText id="sourceOpportunityNumber" value="{!sourceOpportunityNumber}" styleClass="dataInputCol" />
+					<apex:commandButton value="Search" action="{!search}" />
+					<apex:commandButton value="Cancel" action="{!cancel}" />
+				</apex:panelGroup>
+			</apex:pageBlockSection>
+		</apex:form>
+	</apex:pageBlock>
+
+	<apex:pageMessages id="errors"/>
+
+	<!-- Error Messages -->
+	<apex:pageMessage id="errorMissingTargetOpportunityId" severity="error" title="Missing required Target Opportunity ID" rendered="{!showErrorMissingTargetOpportunityId}">
+		<p><strong>Warning</strong>: This usually occurs when the page URL has been edited directly, or this page is being called by a script with a malformed URL. Please
+		recheck the calling script or Salesforce.com configuration. If this error continues, please contact your Salesforce.com administrator.</p>
+		<p>Correct usage:</p>
+		<p>/apex/LinkChannelOpp?targetOpportunityId=&lt;Record ID&gt;</p>
+	</apex:pageMessage>
+
+	<apex:pageMessage id="errorMissingTargetOpportunity" severity="error" title="Invalid Target Opportunity ID" rendered="{!showErrorMissingTargetOpportunity}">
+		<p><strong>Error</strong>: The supplied 'targetOpportunityId' parameter does not match a valid opportunity.</p>
+	</apex:pageMessage>
+
+	<apex:pageMessage id="errorMissingSourceOpportunityId" severity="error" title="No results found for Opportunity Number {!sourceOpportunityNumber}" rendered="{!showErrorMissingSourceOpportunityId}">
+		<p><strong>Error</strong>: Please recheck the opportunity number, and then try searching again.</p>
+	</apex:pageMessage>
+
+	<apex:pageMessage id="errorSourceOpportunityNotDirect" severity="warning" title="Source Opportunity is not a Direct channel" rendered="{!showErrorSourceOpportunityNotDirect}">
+		<p><strong>Warning</strong>: The opportunity you have found is not listed as coming through a Direct fulfillment channel.</p>
+	</apex:pageMessage>
+
+	<apex:pageMessage id="errorTargetOpportunityNotIndirect" severity="warning" title="The Opportunity you are updating currently has a Direct channel" rendered="{!showErrorTargetOpportunityNotIndirect}">
+		<p><strong>Warning</strong>: To return to the original opportunity, please click the 'Cancel' button above.</p>
+	</apex:pageMessage>
+
+	<apex:pageMessage id="errorMismatchedPricebooks" severity="warning" title="The Indirect opportunity and Direct channel opportunity are using different price books" rendered="{!showErrorMismatchedPricebooks}">
+		<p><strong>Warning</strong>: We will attempt to match the products of the Direct channel opportunity with the global price book. 
+		Please ensure the products you expect are listed under the heading "Channel Load Line Items To Be Copied". 
+		To return to the original opportunity, please click the 'Cancel' button above.</p>
+	</apex:pageMessage>
+
+	<!-- Compare source to target -->
+	<apex:pageBlock id="sourceTargetComparison" title="Compare Channel Load Opp to Indirect Opp" rendered="{!showSourceTargetComparison}">
+		<apex:pageBlockButtons location="top">
+			<apex:form >
+				<apex:commandButton value="Save Changes" action="{!saveChanges}" onclick="if (false == confirm ('Copying Opportunity #{!sourceOpportunityNumber} to #{!targetOpportunity.OpportunityNumber__c} ...\n\nThis will overwrite fields and products on the target Opportunity where flagged. The action is irreversible. Are you sure you want to continue?')) return false;" />
+				<apex:commandButton value="Reverse Order" action="{!reverseOrder}" />
+			</apex:form>
+		</apex:pageBlockButtons>
+
+		<p><img src="/img/samples/flag_yellow.gif" style="margin: 1em; float: left;" />
+		   This section shows the differences between the Channel Load Opportunity (on the left hand side) and the 
+		   original Indirect Opportunity (on the right hand side). Changes that will be copied from <strong>left to right</strong>
+		   are marked with an orange flag. Please review the changes below, as well as the list of related Product 
+		   Line-Items to be updated. When satisfied that all changes are correct, you may update the original Indirect 
+		   Opportunity using the 'Save Changes' button above.
+		</p>
+		<p>&nbsp;</p>
+
+		<apex:pageBlockSection columns="3" title="Opportunity Information (Not Copied)">
+			<apex:outputField value="{!sourceOpportunity.OpportunityNumber__c}" style="font-size: 200%" /> 
+			<apex:outputField value="{!targetOpportunity.OpportunityNumber__c}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" />
+
+			<apex:outputField value="{!sourceOpportunity.Name}" /> 
+			<apex:outputField value="{!targetOpportunity.Name}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" />
+
+			<apex:outputField value="{!sourceOpportunity.FulfillmentChannel__c}" />
+			<apex:outputField value="{!targetOpportunity.FulfillmentChannel__c}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" />
+
+			<apex:outputField value="{!sourceOpportunity.Region_of_Order__c}" />
+			<apex:outputField value="{!targetOpportunity.Region_of_Order__c}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" />
+
+			<apex:outputField value="{!sourceOpportunity.Country_of_Order__c}" />
+			<apex:outputField value="{!targetOpportunity.Country_of_Order__c}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" />
+
+			<apex:outputField value="{!sourceOpportunity.OracleOrderNumber__c}" />
+			<apex:outputField value="{!targetOpportunity.OracleOrderNumber__c}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" />
+
+			<apex:outputField value="{!sourceOpportunity.Deal_Registration__c}" rendered="{!targetOpportunity.Deal_Registration__c}"/>
+			<apex:outputField value="{!targetOpportunity.Deal_Registration__c}" rendered="{!targetOpportunity.Deal_Registration__c}"/>
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" rendered="{!targetOpportunity.Deal_Registration__c}"/>
+			<!-- US17551
+			<apex:outputField value="{!sourceOpportunity.NonEntitledEndCustomer__c}" />
+			<apex:outputField value="{!targetOpportunity.NonEntitledEndCustomer__c}" /> 
+			<apex:image url="/img/samples/flag_green.gif" alt="" styleClass="none" /> -->
+		</apex:pageBlockSection>
+
+		<apex:pageBlockSection columns="3" title="Opportunity Information (To Be Copied)">
+			<apex:outputField value="{!sourceOpportunity.CloseDate}" /> 
+			<apex:outputField value="{!targetOpportunity.CloseDate}" /> 
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.CloseDate != targetOpportunity.CloseDate,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.CurrencyIsoCode}" />
+			<apex:outputField value="{!targetOpportunity.CurrencyIsoCode}" />
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.CurrencyIsoCode != targetOpportunity.CurrencyIsoCode,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.AmountText__c}" />
+			<apex:outputField value="{!targetOpportunity.AmountText__c}" />
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.AmountText__c != targetOpportunity.AmountText__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.FinancialPartner__c}" />
+			<apex:outputField value="{!targetOpportunity.FinancialPartner__c}" /> 
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.FinancialPartner__c != targetOpportunity.FinancialPartner__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.Pay_Now__c}" />
+			<apex:outputField value="{!targetOpportunity.Pay_Now__c}" /> 
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Pay_Now__c != targetOpportunity.Pay_Now__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.PONumber__c}" />
+			<apex:outputField value="{!targetOpportunity.PONumber__c}" /> 
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.PONumber__c != targetOpportunity.PONumber__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.ContractStartDate__c}" />
+			<apex:outputField value="{!targetOpportunity.ContractStartDate__c}" />
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.ContractStartDate__c != targetOpportunity.ContractStartDate__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.ContractEndDate__c}" />
+			<apex:outputField value="{!targetOpportunity.ContractEndDate__c}" />
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.ContractEndDate__c != targetOpportunity.ContractEndDate__c,'auto','none')}" />
+
+			<!-- US17608 -->
+			<apex:outputField value="{!sourceOpportunity.Deal_Registration__c}" rendered="{!NOT(targetOpportunity.Deal_Registration__c)}"/>
+			<apex:outputField value="{!targetOpportunity.Deal_Registration__c}" rendered="{!NOT(targetOpportunity.Deal_Registration__c)}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Deal_Registration__c != targetOpportunity.Deal_Registration__c,'auto','none')}" rendered="{!NOT(targetOpportunity.Deal_Registration__c)}"/>
+
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Opportunity Number" for="sourceOpp"/>
+				<apex:outputText id="sourceOpp" value="{!sourceOpportunity.OpportunityNumber__c}"/>
+			</apex:pageBlockSectionItem>
+
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Origin Source Opp" for="targetOpp"/>
+				<apex:outputText id="targetOpp" value="{!targetOpportunity.Channel_Load_Opp__c}"/>
+			</apex:pageBlockSectionItem>
+
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.OpportunityNumber__c != targetOpportunity.Channel_Load_Opp__c,'auto','none')}" />
+		</apex:pageBlockSection>
+
+		<apex:pageBlockSection columns="3" title="Opportunity Information (To Be Recalculated After Copying Product Line-Items)" rendered="false">
+			<apex:outputField value="{!sourceOpportunity.Year1AmountText__c}"/>
+			<apex:outputField value="{!targetOpportunity.Year1AmountText__c}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Year1AmountText__c != targetOpportunity.Year1AmountText__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.Year2AmountText__c}"/>
+			<apex:outputField value="{!targetOpportunity.Year2AmountText__c}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Year2AmountText__c != targetOpportunity.Year2AmountText__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.Year3AmountText__c}"/>
+			<apex:outputField value="{!targetOpportunity.Year3AmountText__c}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Year3AmountText__c != targetOpportunity.Year3AmountText__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.Year4AmountText__c}"/>
+			<apex:outputField value="{!targetOpportunity.Year4AmountText__c}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Year4AmountText__c != targetOpportunity.Year4AmountText__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.Year5AmountText__c}"/>
+			<apex:outputField value="{!targetOpportunity.Year5AmountText__c}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Year5AmountText__c != targetOpportunity.Year5AmountText__c,'auto','none')}" />
+
+			<apex:outputField value="{!sourceOpportunity.Year6AmountText__c}"/>
+			<apex:outputField value="{!targetOpportunity.Year6AmountText__c}"/>
+			<apex:image url="/img/samples/flag_yellow.gif" alt="" styleClass="{!IF(sourceOpportunity.Year6AmountText__c != targetOpportunity.Year6AmountText__c,'auto','none')}" />
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+
+	<apex:pageBlock id="sourceLineItems" rendered="{!showSourceLineItems}">
+		<apex:facet name="header">
+			<h3>&nbsp;Channel Load Line Items To Be Copied</h3>
+		</apex:facet>
+		<apex:pageBlockTable value="{!sourceLineItems}" var="lineItem">
+			<apex:column headerValue="Product" value="{!lineItem.PricebookEntry.Product2.Name}"/>
+			<apex:column value="{!lineItem.NewOrRenewal__c}"/>
+			<apex:column value="{!lineItem.Quantity}"/>
+			<apex:column value="{!lineItem.PricebookEntry.ProductCode}"/>
+			<apex:column value="{!lineItem.UnitPrice}"/>
+			<apex:column value="{!lineItem.TotalPrice}"/>
+			<apex:column value="{!lineItem.Contract_Numbers__c}"/>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+
+	<apex:pageBlock id="targetLineItems" rendered="{!showTargetLineItems}">
+		<apex:facet name="header">
+			<h3>&nbsp;Indirect Opportunity Line Items To Be Deleted</h3>
+		</apex:facet>
+		<apex:pageBlockTable value="{!targetOpportunity.OpportunityLineItems}" var="lineItem">
+			<apex:column headerValue="Product" value="{!lineItem.PricebookEntry.Product2.Name}"/>
+			<apex:column value="{!lineItem.NewOrRenewal__c}"/>
+			<apex:column value="{!lineItem.Quantity}"/>
+			<apex:column value="{!lineItem.PricebookEntry.ProductCode}"/>
+			<apex:column value="{!lineItem.UnitPrice}"/>
+			<apex:column value="{!lineItem.TotalPrice}"/>
+			<apex:column value="{!lineItem.Contract_Numbers__c}"/>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+
+	<apex:pageBlock id="sourcePartners" rendered="{!showSourcePartners}">
+		<apex:facet name="header">
+			<h3>&nbsp;Channel Load Partners To Be Copied</h3>
+		</apex:facet>
+		<apex:pageBlockTable value="{!sourceOpportunity.OpportunityPartners2__r}" var="partner">
+			<apex:column value="{!partner.RelationshipType__c}"/>
+			<apex:column value="{!partner.PartnerName__c}"/>
+			<apex:column value="{!partner.PartnerType__c}"/>
+			<apex:column value="{!partner.PartnerTier__c}"/>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+
+	<apex:pageBlock id="targetPartners" rendered="{!showTargetPartners}">
+		<apex:facet name="header">
+			<h3>&nbsp;Indirect Opportunity Partners To Be Deleted</h3>
+		</apex:facet>
+		<apex:pageBlockTable value="{!targetOpportunity.OpportunityPartners2__r}" var="partner">
+			<apex:column value="{!partner.RelationshipType__c}"/>
+			<apex:column value="{!partner.PartnerName__c}"/>
+			<apex:column value="{!partner.PartnerType__c}"/>
+			<apex:column value="{!partner.PartnerTier__c}"/>
+		</apex:pageBlockTable>
+	</apex:pageBlock>
+
+	<!-- Hide or display flagged row images -->
+	<style type="text/css">
+		td.dataCol img.none { display: none; }
+	</style>
+
+	<!-- Hide all of the product related list buttons and links -->
+	<style type="text/css">
+		input[name="addProd"] { display: none; }
+		input[name="editProd"] { display: none; }
+		input[name="choosePB"] { display: none; }
+		input[name="sort"] { display: none; }
+	</style>
+</apex:page>

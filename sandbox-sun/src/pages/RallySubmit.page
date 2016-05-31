@@ -1,0 +1,40 @@
+<apex:page standardController="Case" extensions="rallyConnectorController" action="{!createStory}">
+
+	<apex:form >
+	<apex:pageBlock title="Submit Case to Rally">
+		<apex:pageBlockButtons >
+			<apex:commandButton id="backToCaseButton" value="Back to Case" action="{!backToCasePage}" />
+			<!-- <apex:commandButton id="submitButton" value="Submit" action="{!createStory}" /> -->
+		</apex:pageBlockButtons>
+		<apex:pageMessages />
+		
+		<apex:pageBlockSection columns="1">
+			<apex:pageBlockSectionItem rendered="{!NOT(ISNULL(jrsp.status))}">
+				<apex:outputText value="Status"/>
+				<apex:outputText value="{!jrsp.status}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem rendered="{!NOT(ISNULL(jrsp.status))}">
+				<apex:outputText value="Project"/>
+				<apex:outputText value="{!jrsp.project}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem rendered="{!NOT(ISNULL(jrsp.status))}">
+				<apex:outputText value="Owner"/>
+				<apex:outputText value="{!jrsp.owner}"/>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem rendered="{!jrsp.status == 'error'}">
+				<apex:outputText value="Message"/>
+				<apex:outputText value="{!jrsp.error}"/>
+			</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+<!-- 
+		<apex:outputPanel rendered="{!NOT(ISNULL(jrsp.status))}">
+			<b>Status:</b> {!jrsp.status} <br /><br />
+		</apex:outputPanel>
+		<apex:outputPanel rendered="{!jrsp.status == 'error'}">
+			<b>Message:</b> {!jrsp.error}
+		</apex:outputPanel>
+		-->
+		 
+	</apex:pageBlock>
+	</apex:form>
+</apex:page>

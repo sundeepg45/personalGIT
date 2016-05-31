@@ -1,0 +1,133 @@
+<apex:page controller="PartnerCertificationsListController" tabStyle="PartnerTraining__c" showHeader="true">
+<apex:stylesheet value="{!$Resource.Partner_Product_Style_Sheet}" />
+
+<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
+<script type="text/javascript">
+    $.noConflict();
+    jQuery(document).ready(function($) {
+        jQuery('input[name="unverifiedCertId"]').each(function(index, domEl) {
+            certId = domEl.value;
+            jQuery.get(
+                "/apex/Validate_Certification",
+                {certId: certId},
+                function(data) {
+                    //
+                    // Since these requests will stack up multithreaded the value of variables like certId will not
+                    // be preserved.  So, we have the service endpoint pass it back to us and we have to parse it out.
+                    //
+                    i = data.indexOf("PartnerTrainingId:");
+                    if (i > 0) {
+                        i += 18;
+                        j = data.indexOf(":", i);
+                        certId = data.substring(i, j);
+                        //document.getElementById('throbber' + certId).style.display = 'none';
+                        if (data.indexOf("Validation Result:Valid") != -1) {
+                            document.getElementById('throbber' + certId).innerHTML = '{!$Label.Requalification_Certifications_Verified}';
+                        }
+                        else if (data.indexOf("Validation Result:Invalid") != -1) {
+                            document.getElementById('throbber' + certId).innerHTML = '{!$Label.Requalification_Certifications_Invalid}';
+                        }
+                        else {
+                            // invalid page result - should be logged somewhere
+                            document.getElementById('throbber' + certId).innerHTML = '?';
+                        }
+                    }
+                }
+            );
+        });
+    });
+</script>
+
+
+<apex:SectionHeader title="{!$Label.Partner_Certification_Title}" />
+<apex:form >
+    <apex:pageMessages />
+    <apex:pageBlock >
+        <apex:pageBlockButtons >
+            <apex:commandButton id="btnCreate" styleClass="md" action="{!createNewCertification}" value="{!$Label.Partner_Certification_Create_New}"/>
+            <apex:commandButton id="btnCancel" action="{!backToAccount}" value="{!$Label.Partner_Certification_Cancel}"/>
+
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection columns="6">
+            <apex:pageBlockTable value="{!certificationList}" var="cert">
+            <!--
+               <apex:column styleClass="actionColumn">
+                  <apex:commandLink rendered="{!NOT(cert.LMSCreated__c)}" action="{!editCertification}" value="{!$Label.Partner_Certification_Button_Edit}" styleClass="actionLink" style="rowbutton">
+                    <apex:param name="redirect-id" assignTo="{!redirectId}" value="{!cert.Id}"/>
+                  </apex:commandLink>
+               </apex:column>
+
+               <apex:column styleClass="actionColumn">
+                  <apex:commandLink onClick="return confirm('{!$Label.Partner_Certification_Are_You_Sure}');" action="{!removeCertification}" value="{!$Label.Partner_Certification_Delete}" styleClass="actionLink" style="rowbutton">
+                    <apex:param name="redirect-id" assignTo="{!redirectId}" value="{!cert.Id}"/>
+                  </apex:commandLink>
+               </apex:column>
+            -->
+               <apex:column >
+                  <apex:facet name="header">
+                      <apex:outputText value="{!$Label.Partner_Certification_Certificate_Number}" />
+                  </apex:facet>
+                {!cert.CertificateNumber__c}
+               </apex:column>
+               <apex:column >
+                  <apex:facet name="header">
+                      <apex:outputText value="{!$Label.Partner_Certification_Certification_Holder}" />
+                  </apex:facet>
+                  <apex:outputText rendered="{!AND(NOT(ISBLANK(cert.Contact__c)),ISBLANK(cert.Certificate_Owner__c))}" value="{!cert.Contact__r.Name}"/>
+                  <apex:outputText rendered="{!NOT(ISBLANK(cert.Certificate_Owner__c))}" value="{!cert.Certificate_Owner__c}"/>
+               </apex:column>
+               <apex:column >
+                  <apex:facet name="header">
+                      <apex:outputText value="{!$Label.Partner_Certification_Certifier}" />
+                  </apex:facet>
+                 <apex:outputText value="{!cert.TrainingType__r.Name}" rendered="{!cert.TrainingType__r != null}"/>
+               </apex:column>
+               <apex:column >
+                  <apex:facet name="header">
+                      <apex:outputText value="{!$Label.Partner_Certification_CertificationType}" />
+                  </apex:facet>
+                   <apex:outputText value="{!cert.Certification__r.Name}" rendered="{!cert.Certification__r != null}"/>
+                   <apex:outputText value="{!cert.Accreditation_Name__c}" rendered="{!cert.Certification__r == null}"/>
+               </apex:column>
+               <apex:column >
+                  <apex:facet name="header">
+                      <apex:outputText value="{!$Label.Partner_Certification_Date_Achieved}" />
+                  </apex:facet>
+                  <apex:outputField value="{!cert.Date_Achieved__c}"/>
+               </apex:column>
+<!--
+               <apex:column >
+                    <apex:facet name="header">Validation</apex:facet>
+                    <apex:outputText style="width:35em" rendered="{!cert.TrainingType__r.Name == 'Red Hat'}">
+                     <a target="_blank" href="{!$Label.Red_Hat_Domain_Name}/wapps/training/certification/verify.html?certNumber={!cert.CertificateNumber__c}">Validate</a>
+                    </apex:outputText>
+                </apex:column>
+-->
+
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Validation}</apex:facet>
+                <apex:outputText style="width:35em" rendered="{!cert.TrainingType__r.Name == 'Red Hat' && cert.RedHatValidated__c == False}">
+                    <div id="throbber{!cert.Id}">
+                         <img src="https://www.redhat.com/g/chrome/throbber_dickie.gif"/>
+                    </div>
+                     <input type="hidden" id="unverifiedCertId{!cert.Id}" name="unverifiedCertId" style="display:none" value="{!cert.Id}"/>
+                </apex:outputText>
+                <apex:outputText style="width:35em" rendered="{!cert.LMSCreated__c == False && cert.TrainingType__r.Name == 'Red Hat' && cert.RedHatValidated__c == True && cert.IsValid__c == True}">
+                    {!$Label.Requalification_Certifications_Verified}
+                </apex:outputText>
+                <apex:outputText style="width:35em" rendered="{!cert.LMSCreated__c == True && cert.IsActive__c == True}">
+                    {!$Label.Requalification_Certifications_Active}
+                </apex:outputText>
+                <apex:outputText style="width:35em" rendered="{!cert.LMSCreated__c == False && cert.TrainingType__r.Name == 'Red Hat' && cert.RedHatValidated__c == True && cert.IsValid__c == False}">
+                    {!$Label.Requalification_Certifications_Invalid}
+                </apex:outputText>
+                <apex:outputText style="width:35em" rendered="{!cert.LMSCreated__c == True && cert.IsActive__c == False}">
+                    {!$Label.Requalification_Certifications_Inactive}
+                </apex:outputText>
+            </apex:column>
+
+           </apex:pageBlockTable>
+       </apex:pageBlockSection>
+    </apex:pageBlock>
+</apex:form>
+</apex:page>

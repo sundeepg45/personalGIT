@@ -1,0 +1,87 @@
+<apex:page controller="MSController" sidebar="false" showHeader="true" action="{!initWithContent}">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{!$Label.CloudSite_Technical_SA_Tech_Details}</title>
+<apex:include pageName="CloudSiteCSS"/>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a href="http://www.redhat.com" class="logo-redhat"><apex:outputText escape="false" value="{!$Label.CloudSite_Header_Logo}"/></a>
+        <a href="MSCloudHome" class="logo-selling-cloud"><apex:outputText escape="false" value="{!$Label.CloudSite_Header_Whats_New}"/></a>
+        <div class="title"><apex:outputText escape="false" value="{!$Label.CloudSite_Header_Title}"/></div>
+        
+        <ul id="nav-main">
+            <li id="sa-tech"><a href="MSCloudHome"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Home}"/></a></li>
+            <li id="cloud-training"><a href="MSCloudTraining"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Training}"/></a></li>
+            <li id="collateral"><a href="MSCloudCollateral"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Whitepapers}"/></a></li>
+            <li id="collateral"><a href="MSCloudMarketing"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Campaigns}"/></a></li>
+            <li id="sa-tech" class="last"><a href="MSCloudTechDetails"><apex:outputText escape="false" value="{!$Label.CloudSite_Links_Details}"/></a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <div id="content-inner">
+        <div class="container">
+            <c:MSSection pageController="{!this}" sectionKey="SA Training Sessions">
+                  <div id="content-primary">
+                        <h1>{!$Label.CloudSite_Technical_SA_Training_Sessions}</h1>
+                        <p class="leadin">{!$Label.Cloudsite_SA_Training_Sessions}</p>
+                        <ul class="links-list presentations-list">
+                        <c:MSSectionList pageController="{!this}" sectionKey="SA Training Sessions"/>
+                        </ul>
+                  </div>
+            </c:MSSection>
+
+            <div id="content-secondary">
+  <h2><apex:outputText escape="false" value="{!$Label.Cloudsite_Training_IDC_Predictions_Heading}"/></h2>
+<p class="quote"><apex:outputText escape="false" value="{!$Label.Cloudsite_Training_IDC_Prediction_1}"/></p>
+
+<p class="quote"><apex:outputText escape="false" value="{!$Label.Cloudsite_Training_IDC_Prediction_2}"/></p>
+
+<p class="quote-source"><apex:outputText escape="false" value="{!$Label.Cloudsite_Training_IDC_Prediction_Quote_Source}"/></p>
+                <ul id="content-links">
+                    <li id="take-test"><a href="https://lmscons.na4.visual.force.com/apex/TrainingContentDetail?id=a2H600000004Kzp&sfdc.override=1" target="_blank">{!$Label.CloudSite_Home_Take_The_Test_Link}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright"><apex:outputText escape="false" value="{!$Label.CloudSite_Red_Hat_Copyright}"/></p>
+    </div>
+</div>  
+</body>
+
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="{!$Resource.CloudSiteJqueryQtipJS}"></script>
+<script type="text/javascript">
+
+// Create the tooltips only on document load
+$(document).ready(function() 
+{
+   // By suppling no content attribute, the library uses each elements title attribute by default
+   $('a[href][title]').qtip({
+      content: {
+         text: false // Use each elements title attribute
+      },
+      style: 'cream',
+      position: {
+      corner: {
+         target: 'topRight',
+         tooltip: 'bottomMiddle'
+      },
+      adjust: { x: -80, y: 0 }
+   }
+ // Give it some style
+   });
+   
+   // NOTE: You can even omit all options and simply replace the regular title tooltips like so:
+   // $('#content a[href]').qtip();
+});
+</script>
+
+</apex:page>

@@ -1,0 +1,179 @@
+<apex:page standardController="Opportunity" extensions="Opportunity_ManagePartners" id="OpportunityManagePartners" sidebar="false" action="{!fillPartnerStatusMaps}">
+    <apex:includeScript value="{!$Resource.Opportunity_ManagePartners}" />
+    <!-- apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" / -->
+    <apex:sectionHeader title="{!$ObjectType.OpportunityPartner__c.LabelPlural}" subtitle="{!Opportunity.Name}" />
+
+    <apex:outputText value="{!partnerTypeMapByRelationshipTypeJS}" escape="false"/>
+    <apex:outputText value="{!partnerTierMapJS}" escape="false"/>
+    <apex:outputText value="{!partnerStatusArrayJS}" escape="false"/>
+    <apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+        <apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+        <apex:outputLink onclick="return PartnerNodes.closeLookup();" value="{!$Page.OpportunityView}?id={!Opportunity.Id}&nooverride=1">
+            <apex:outputText value="Back to Opportunity: " />
+            <apex:outputText value="{!Opportunity.Name}" />
+        </apex:outputLink>
+    </apex:outputPanel>
+
+    <apex:form id="pbForm">
+        <apex:actionFunction rendered="{!needsFillPartnerStatusMaps}" immediate="true" name="fillPartnerStatusMaps" action="{!fillPartnerStatusMaps}" rerender="pbForm" oncomplete="fillPartnerStatusMaps();" />
+        <apex:actionFunction rendered="{!NOT(needsFillPartnerStatusMaps)}" immediate="true" name="fillPartnerStatusMaps" />
+        <apex:pageBlock title="Manage {!$ObjectType.OpportunityPartner__c.LabelPlural}" mode="Edit">
+            <apex:pageBlockButtons location="top">
+                <apex:outputPanel rendered="{!NOT(isEdit)}">
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="New {!$ObjectType.OpportunityPartner__c.Label}" action="{!insertOpportunityPartner}" rerender="pbForm" status="statusLoading" disabled="{!isOppLocked}" />
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="Edit Selected" action="{!editSelected}" rerender="pbForm" status="statusLoading" disabled="{!isOppLocked}" />
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="Remove Selected" action="{!removeSelected}" rerender="pbForm" status="statusLoading" disabled="{!isOppLocked}" />
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!isEdit}">
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="Save" action="{!saveOpportunityPartnerList}" rerender="pbForm" status="statusLoading" disabled="{!isOppLocked}" />
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="Save & Insert" action="{!saveOpportunityPartnerListAndInsert}" rerender="pbForm" status="statusLoading" disabled="{!isOppLocked}" />
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="Save & Return" action="{!saveOpportunityPartnerListAndReturn}" rerender="pbForm" status="statusLoading" disabled="{!isOppLocked}" />
+                    <apex:commandButton onclick="PartnerNodes.closeLookup()" value="Cancel" action="{!cancel}" rerender="pbForm" status="statusLoading" />
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!isFinancialPartnerRequired}">
+                    <p><em><b>A Financial Partner is required.</b></em></p>
+                </apex:outputPanel>
+                <apex:actionStatus id="statusLoading">
+                    <apex:facet name="start">
+                        <apex:outputPanel style="vertical-align: text-bottom;">
+                            <apex:image value="/img/loading.gif" />
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+
+            <apex:pageMessages />
+
+            <apex:pageBlockTable value="{!partnerInfoList}" var="partnerInfo" rendered="{!NOT(partnerInfoListIsEmpty)}">
+                <apex:column styleClass="actionColumn" headerClass="actionColumn">
+                    <apex:facet name="header">
+                        <apex:outputText value="Selected" />
+                    </apex:facet>
+
+                    <apex:outputPanel rendered="{!NOT(isEdit)}">
+                        <apex:inputCheckbox value="{!partnerInfo.isSelected}" />
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!AND(partnerInfo.isEdit,NOT(partnerInfo.isRequired))}" styleClass="actionLink">
+                        <apex:commandLink value="Cancel" action="{!partnerInfo.cancelEdit}" rerender="pbForm" status="statusLoading" immediate="true" />
+                    </apex:outputPanel>
+                </apex:column>
+
+                <!-- Relationship Type -->
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.RelationshipType__c.Label}" />
+                    </apex:facet>
+
+                    <apex:outputField rendered="{!NOT(partnerInfo.isNew)}" value="{!partnerInfo.opportunityPartner.RelationshipType__c}" />
+
+                    <apex:selectList rendered="{!partnerInfo.isNew}" value="{!partnerInfo.opportunityPartner.RelationshipType__c}" size="1" id="relationshipType" onchange="return PartnerNodes.changeRelationshipType(this,'{!partnerInfo.opportunityPartner.RelationshipType__c}');">
+                        <apex:selectOptions value="{!relationshipTypeOptions}" />
+                        <!-- apex:actionSupport action="{!partnerInfo.updateRelationshipType}" event="onchange" rerender="pbForm" status="statusLoading" / -->
+                    </apex:selectList>
+                </apex:column>
+
+                <!-- Partner Type -->
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.PartnerType__c.Label}" />
+                    </apex:facet>
+
+                    <apex:outputLink rendered="{!NOT(partnerInfo.isEdit)}" value="/{!partnerInfo.opportunityPartner.PartnerType__c}">
+                        <apex:outputText value="{!partnerInfo.partnerTypeName}"/>
+                    </apex:outputLink>
+
+                    <apex:selectList rendered="{!partnerInfo.isEdit}" value="{!partnerInfo.PartnerTypeId}" size="1" disabled="{!ISBLANK(partnerInfo.opportunityPartner.RelationshipType__c)}" id="partnerType" onchange="return PartnerNodes.changePartnerType(this,'{!partnerInfo.opportunityPartner.RelationshipType__c}');">
+                        <apex:selectOptions value="{!partnerInfo.partnerTypeOptions}" />
+                        <!-- apex:actionSupport action="{!partnerInfo.updatePartnerType}" event="onchange" rerender="pbForm" status="statusLoading" / -->
+                    </apex:selectList>
+                </apex:column>
+                
+                <!-- Partner Tier -->
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.PartnerTier__c.Label}" />
+                    </apex:facet>
+     
+                    <apex:outputLink rendered="{!NOT(partnerInfo.isEdit)}" value="/{!partnerInfo.opportunityPartner.PartnerTier__c}">
+                        <apex:outputText value="{!partnerInfo.partnerTierName}"/>
+                    </apex:outputLink>
+
+                    <apex:selectList rendered="{!partnerInfo.isEdit}" value="{!partnerInfo.PartnerTierId}" size="1" disabled="{!ISBLANK(partnerInfo.opportunityPartner.RelationshipType__c)}" id="partnerTier"  onchange="return PartnerNodes.changePartnerTier(this,'{!partnerInfo.opportunityPartner.RelationshipType__c}');">
+                        <apex:selectOptions value="{!partnerInfo.partnerTierOptions}" />
+                        <!-- apex:actionSupport action="{!partnerInfo.updatePartnerTier}" event="onchange" rerender="pbForm" status="statusLoading" / -->
+                    </apex:selectList>
+                </apex:column>
+
+                <!-- Partner Sub-Type -->
+                <apex:column >
+                    <apex:facet name="header">
+                        Partner Sub-Type
+                    </apex:facet>
+
+                    <apex:outputLink rendered="{!NOT(partnerInfo.isEdit)}" value="/{!partnerInfo.opportunityPartner.PartnerType__c}">
+                        <apex:outputText value="{!partnerInfo.partnerSubTypeName}"/>
+                    </apex:outputLink>
+
+                    <apex:selectList rendered="{!partnerInfo.isEdit}" value="{!partnerInfo.PartnerSubTypeId}" size="1" disabled="{!NOT(partnerInfo.hasPartnerSubTypes)}" id="partnerSubType"  onchange="return PartnerNodes.changePartnerSubType(this,'{!partnerInfo.opportunityPartner.RelationshipType__c}');">
+                        <apex:selectOptions value="{!partnerInfo.partnerSubTypeOptions}" />
+                        <!-- apex:actionSupport action="{!partnerInfo.updatePartnerSubType}" event="onchange" rerender="pbForm" status="statusLoading" / -->
+                    </apex:selectList>
+                </apex:column>
+
+                <!-- Partners -->
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.Partner__c.Label}" />
+                    </apex:facet>
+
+                    <apex:outputField rendered="{!NOT(partnerInfo.isEdit)}" value="{!partnerInfo.opportunityPartner.Partner__c}" />
+
+                    <apex:outputPanel rendered="{!partnerInfo.isEdit}">
+                        <apex:inputHidden immediate="false" id="partnerStatusId" value="{!partnerInfo.partnerStatusId}"/>
+                        <apex:inputText id="searchText" value="{!partnerInfo.searchText}" onchange="return PartnerNodes.setPartnerStatusId(this,'');" disabled="{!ISBLANK(partnerInfo.opportunityPartner.RelationshipType__c)}"/>
+                        <apex:outputLink id="link" target="_partnerStatusLookup" onclick="return PartnerNodes.openLookupLink(this,this.href,'{!partnerInfo.opportunityPartner.RelationshipType__c}');" style="display: {!IF(ISBLANK(partnerInfo.opportunityPartner.RelationshipType__c),'none','inline')}" value="{!partnerInfo.LookupLink}"    styleClass="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';">
+                            <apex:image styleClass="lookupIcon" title="Partner Status Lookup" value="/s.gif" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';"/>
+                        </apex:outputLink>
+                    </apex:outputPanel>
+                </apex:column>
+                
+                
+                <!-- Partners Contact
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.Partner_Contact__c.Label}" />
+                    </apex:facet>
+
+                    <apex:outputField rendered="{!NOT(partnerInfo.isEdit)}" value="{!partnerInfo.opportunityPartner.Partner_Contact__c}" />
+
+                    <apex:outputPanel rendered="{!partnerInfo.isEdit}">
+                        <apex:inputField value="{!partnerInfo.opportunityPartner.Partner_Contact__c}"/>
+                    </apex:outputPanel>
+                </apex:column>-->
+                
+                            
+                
+                <apex:column >
+                    <apex:facet name="header">
+                        Show All Regions?
+                    </apex:facet>
+
+                    <apex:inputCheckBox rendered="{!partnerInfo.isEdit}" disabled="{!isGlobalRecordType}" value="{!partnerInfo.showAllRegions}" id="showAllRegions"  onchange="return PartnerNodes.changeShowAllRegions(this,'{!partnerInfo.opportunityPartner.RelationshipType__c}');">
+                        <!-- apex:actionSupport action="{!partnerInfo.updateShowAllRegions}" event="onchange" rerender="pbForm" status="statusLoading" / -->
+                    </apex:inputCheckBox>           
+                </apex:column>
+            </apex:pageBlockTable>
+
+            <apex:pageBlockSection rendered="{!partnerInfoListIsEmpty}">
+                No records to display.
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <script type="text/javascript">
+PartnerNodes.recordTypeName='{!JSENCODE(Opportunity.RecordType.Name)}';
+if({!needsFillPartnerStatusMaps}) {
+    fillPartnerStatusMaps();
+}
+    </script>
+</apex:page>

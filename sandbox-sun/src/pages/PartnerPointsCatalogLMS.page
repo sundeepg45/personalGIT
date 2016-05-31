@@ -1,0 +1,137 @@
+<apex:page controller="PartnerPointsLMSController" cache="true" expires="1">
+
+<style type="text/css">
+
+	.pbBody {
+		height: 300px;
+		overflow: scroll;
+	}
+
+	.pbBody.content {
+		height: 250px;
+	}
+
+</style>
+
+
+<div id="mainBlock">
+	<apex:form id="mainForm">
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Partner Points LMS Administration<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">LMS Administration</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+	    <apex:pageMessages />
+		<div><apex:commandLink action="{!backToCatalog}" id="backToCatalog" value="< Back to Catalog"/></div>
+		<br/>
+
+		<div class="filterOverview">
+			<apex:selectList id="selectRegion" value="{!selectedRegion}" multiselect="false" size="1">
+				<apex:selectOption itemValue="Global" itemLabel="Global"/>
+				<apex:selectOption itemValue="NA" itemLabel="NA" itemDisabled="{!AND(userRegion != 'NA', NOT(isGlobalPointAdmin))}"/>
+				<apex:selectOption itemValue="EMEA" itemLabel="EMEA" itemDisabled="{!AND(userRegion != 'EMEA', NOT(isGlobalPointAdmin))}"/>
+				<apex:selectOption itemValue="LATAM" itemLabel="LATAM" itemDisabled="{!AND(userRegion != 'LATAM', NOT(isGlobalPointAdmin))}"/>
+				<apex:selectOption itemValue="APAC" itemLabel="APAC" itemDisabled="{!AND(userRegion != 'APAC', NOT(isGlobalPointAdmin))}"/>
+				<apex:actionSupport event="onchange" rerender="mainForm"/>
+			</apex:selectList> &nbsp; &nbsp;
+	        <apex:selectList id="selectLanguage" value="{!selectedLanguage}" multiselect="false" size="1" disabled="{!selectedRegion == 'Global'}">
+	            <apex:selectOptions value="{!languageOptions}"/>
+	            <apex:actionSupport event="onchange" rerender="mainForm"/>
+	        </apex:selectList> &nbsp; &nbsp;
+	        <apex:selectList id="selectTrack" value="{!selectedTrack}" multiselect="false" size="1">
+	            <apex:selectOptions value="{!availableTracks}"/>
+	            <apex:actionSupport event="onchange" rerender="mainForm"/>
+	        </apex:selectList> &nbsp; &nbsp;	        	        
+			<label for="SearchString">Filter:</label><apex:inputText value="{!titleFilter}" id="searchString"/>
+			<apex:commandButton id="filterButton" value="Apply" action="{!filterButton}"/> &nbsp;&nbsp;
+			<apex:commandButton id="resetFilterButton" value="Reset" action="{!resetFilterButton}"/>
+		</div>
+
+		<br/>
+		<h2>Scored Training (points will be awarded for this training)</h2>
+		<div class="bRelatedList">
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody content">
+					<table id="scoredContentTable" class="list" border="0" cellspacing="0" cellpadding="0">
+						<thead class="rich-table-thead">
+						    <tr class="headerRow"> 
+								<th>Title</th>
+								<td>Course Id</td>
+								<th>Points</th>
+								<th>Actions</th>
+								<th>Status</th>
+						    </tr>
+					    </thead>
+					    <apex:repeat var="contentItem" value="{!contentList}">
+					    <tr id="assignedContentRow_{!contentItem.ppLMSId}" class="dataRow even first">
+					    	<td id="itemTitle_{!contentItem.ppLMSId}">
+					    		<apex:outputText value="{!contentItem.title}"/>
+					    	</td>
+					    	<td align="right" id="itemCourseId_{!contentItem.ppLMSId}">
+					    		<apex:outputText value="{!contentItem.courseId}"/>
+					    	</td>
+					    	<td align="right" id="itemPoints_{!contentItem.ppLMSId}">
+					    		<apex:outputText rendered="{!NOT(ISNULL(contentItem.ppLMSId))}">
+					    			{!contentItem.points}
+					    		</apex:outputText>
+					    	</td>
+					    	<td id="itemCommandLinks_{!contentItem.ppLMSId}">
+								<apex:commandLink action="{!manageButton}" value="Edit" rendered="{!OR(userRegion == selectedRegion, isGlobalPointAdmin)}" >
+									<apex:param name="ppLMSId" value="{!contentItem.ppLMSId}"/>
+								</apex:commandLink> &nbsp; &nbsp;
+								<apex:commandLink action="{!deleteButton}" value="Delete" rendered="{!OR(userRegion == selectedRegion, isGlobalPointAdmin)}">
+									<apex:param name="ppLMSId" value="{!contentItem.ppLMSId}"/>
+								</apex:commandLink>
+								&nbsp; &nbsp;<a href="/{!contentItem.ppLMSId}">View</a>
+							</td>
+							<td id="itemDisabled_{!contentItem.ppLMSId}">
+								<apex:outputText value="disabled" rendered="{!NOT(contentItem.isActive)}"/>
+							</td>
+					    </tr>
+						</apex:repeat>
+					</table>
+				</div>
+			</div>
+
+			<br />
+
+			<h2>Unscored Training (no points currently assigned to this training)</h2>
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody docs">
+					<table id="unscoredContentTable" class="list" border="0" cellspacing="0" cellpadding="0">
+						<thead class="rich-table-thead">
+						    <tr class="headerRow"> 
+								<th>Title</th>
+								<th>Course Id</th>
+								<th>Actions</th>
+						    </tr>
+					    </thead>
+					    <apex:repeat var="unassignedDoc" value="{!unassignedDocs}">
+					    <tr id="unassignedDocRow_{!unassignedDoc.Id}" class="dataRow even first">
+					    	<td id="contentTitle_{!unassignedDoc.Id}">
+					    		<apex:outputText value="{!unassignedDoc.Activity_Name__c}"/>
+					    	</td>
+					    	<td align="right" id="courseId_{!unassignedDoc.Id}">
+					    		<apex:outputText value="{!unassignedDoc.SumTotal_ID__c}"/>
+					    	</td>
+					    	<td id="contentCommandLinks_{!unassignedDoc.Id}">
+								<apex:commandLink action="{!assignButton}" value="Assign" >
+									<apex:param name="contentId" value="{!unassignedDoc.SumTotal_ID__c}"/>
+								</apex:commandLink>
+							</td>
+					    </tr>
+						</apex:repeat>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+	</apex:form>
+</div>
+</apex:page>

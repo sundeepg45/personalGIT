@@ -1,0 +1,14 @@
+<apex:page showheader="false" >
+
+    <apex:stylesheet value="{!$Resource.HomeLocaleCSS}"/>
+
+<apex:outputText value="{!$Label.Top_Banner}" escape="false" />
+    
+<apex:outputText value="{!$Label.Middle_Column_1}" escape="false" />
+<apex:outputText value="{!$Label.Middle_Column_2}" escape="false" />
+<apex:outputText value="{!$Label.Middle_Column_3}" escape="false" />
+
+<apex:outputText value="{!$Label.Bottom_banner}" escape="false" />
+
+
+</apex:page>

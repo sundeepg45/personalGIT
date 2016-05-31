@@ -1,0 +1,440 @@
+<apex:page standardController="PARF_Form__c" extensions="PARFController" showHeader="false" sidebar="false" action="{!init}" cache="false">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+        <meta name="viewport" content="width=1200"/>
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+        <!--CSS Files -->
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+        <!--JS Files -->
+
+        <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+
+    <style>
+        .noSidebarCell, .sidebarCell {
+            padding: 0px !important;
+        }
+        body{
+            margin: 0px !important;
+            background: #F7F7F7;
+        }
+        .bPageBlock .pbHeader > table > tbody > tr > td{
+            padding: 5px 0;
+        }
+        .pbHeader .pbTitle h2{
+            margin: 10px 0;
+        }
+        .bPageFooter{
+            padding: 0px !important;
+            display: none;
+        }
+        .bodyDiv .outerNoSidebar {
+            padding: 0px;
+        }
+        .globalHeaderBar {
+            margin: 0;
+        }
+        .red-hat-content input[type="radio"], .red-hat-content input[type="checkbox"] {
+            margin: 0 5px 4px;
+        }
+        .red-hat-content label {
+            margin-bottom: 0px;
+        }
+        .pbBottomButtons .pbTitle{
+            display: none;
+        }
+        .pbBottomButtons .pbButtonb{
+            text-align: center;
+        }
+        .red-hat-content {
+            background: #f7f7f7;
+        }
+        body .bDetailBlock.bPageBlock, body .individualPalette .bDetailBlock.bPageBlock {
+            margin-bottom: 0px;
+        }
+        .company-info select{
+            width: 48%;
+        }
+        .bPageBlock .detailList .data2Col {
+            padding: 2px 2px 2px 2px;
+        }
+        .bPageBlock .detailList .labelCol {
+            white-space: normal !important;
+        }
+        input, textarea, .red-hat-content select[multiple], .red-hat-content select[size]{
+             border: 1px solid #ccc;
+            width: 100%;
+        }
+        .bPageBlock{
+            border: none !important;
+        }
+        .btn {
+            width: initial;
+        }
+        .pbBottomButtons{
+            margin-top: 0 !important;
+        }
+        .pbSubheader.brandTertiaryBgr.tertiaryPalette {
+            background: #f7f7f7;
+        }
+        .red-hat-content label {
+            /*width: 195px;*/
+        }
+        .apexp .bPageBlock.apexDefaultPageBlock .pbBody .pbSubheader h3 {
+            font-family: 'Overpass Bold';
+        }
+        .radio-btns input{
+            width: 12px;
+        }
+        .radio-btns label{
+            width: 40px;
+            padding-top: 5px;
+            vertical-align: middle;
+        }
+        .required-notification{
+            margin-top: 25px;
+        }
+        .apexp .bPageBlock .detailList .list{
+            margin-bottom: 15px;
+        }
+        .pbButtonb .btn{
+            margin-right: 5px !important;
+            width: 175px !important;
+        }
+        .data2Col.last{
+            text-align: center !important;
+        }
+        .data2Col.last .btn{
+            margin: 10px 0 0 !important;
+            width: auto;
+        }
+        input[type='radio']{
+            border-width: 0px;
+        }
+        .pbButtonb .btn.previous{
+            margin: 0 !important;
+        }
+        .data2Col.last .requiredInput{
+            text-align: left !important;
+         }
+         .dataCol {
+            width: 100% !important;
+        }
+        .FCPA .dataCol{
+            padding-left: 0;
+        }
+        .FCPA .labelCol label{
+            width: 340px !important;
+            margin-bottom: 20px;
+        }
+        .FCPA .data2Col td{
+            text-align: center;
+        }
+        .FCPA textarea{
+            height: 50px;
+        }
+        .FCPA textarea, .FCPA .underlying-facts{
+            width: 725px;
+            max-width: 725px;
+            font-weight: normal;
+        }
+        .FCPA .underlying-facts{
+            text-align: center;
+        }
+        .disti.email {
+            text-align: left;
+        }
+
+    </style>
+
+    <body id="main">
+
+    <div class="red-hat-content">
+
+            <div class="user-header">
+                  <div class="container">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <a href="#" class="logo">{$Label.ONB_Redhat_Partner_Portal}</a>
+                            </div><!-- /.col-xs-5 -->
+                            <div class="col-xs-7">
+                                <div class="description">{!$Label.PARF_Title}</div>
+                            </div><!-- /.col-xs-7 -->
+                        </div><!-- /.row -->
+                  </div><!-- /.container -->
+            </div><!-- /.partner-portal-header -->
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-8 col-xs-offset-2">
+                        <apex:outputPanel id="pageMessages">
+                            <apex:pageMessages />
+                        </apex:outputPanel>
+
+                        <apex:form >
+                            <apex:pageBlock id="buttons">
+
+                                <apex:pageBlockSection title="{!$Label.PARF_PartnerInfo}" columns="1" collapsible="false" rendered="{!isEditable}">
+
+                                    <apex:pageBlockSectionItem >
+                                        <apex:outputLabel for="txtRHRep" value="{!$Label.PARF_RHISVEmbedded_Rep_Text}"/>
+                                        <apex:inputField id="txtRHRep" value="{!parf.RH_ISV_Embedded_Rep__c}"/>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:inputField id="txtAdminContact" value="{!parf.Admin_Contact__c}"/>
+
+                                    <apex:pageBlockSectionItem rendered="{!NOT(isDistributor)}">
+                                        <apex:outputLabel for="distributorDirected" value="{!$Label.CCSPForm_Distributor_Directed}"/>
+                                        <apex:outputPanel >
+                                            <div class="requiredInput">
+                                                <div class="requiredBlock"></div>
+                                                <apex:selectRadio id="distributorDirected" styleClass="radio-btns" value="{!parf.Distributor_Directed__c}" onchange="updateDistributorName();">
+                                                    <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                                    <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                                                </apex:selectRadio>
+                                                <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:pageBlockSectionItem rendered="{!AND(parf.Distributor_Directed__c = 'Yes', NOT(isDistributor))}">
+                                        <apex:outputLabel for="txtEDPName" value="{!$ObjectType.PARF_Form__c.Fields.EDP_Name__c.Label}"/>
+                                        <apex:outputPanel >
+                                            <div class="requiredInput">
+                                                <div class="requiredBlock"></div>
+                                                <apex:inputField id="txtEDPName" value="{!parf.EDP_Name__c}"/>
+                                            </div>
+                                            <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:pageBlockSectionItem rendered="{!AND(parf.Distributor_Directed__c = 'Yes', isDistributor)}">
+                                        <apex:outputLabel for="txtEDPName" value="{!$ObjectType.PARF_Form__c.Fields.EDP_Name__c.Label}"/>
+                                        <apex:outputText id="txtEDPName" value="{!parf.EDP_Name__c}"/>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:pageBlockSectionItem rendered="{!AND(parf.Distributor_Directed__c = 'Yes', NOT(isDistributor))}">
+                                        <apex:outputLabel for="txtEDPEmail" value="{!$ObjectType.PARF_Form__c.Fields.EDP_Email__c.Label}"/>
+                                        <apex:outputPanel >
+                                            <div class="requiredInput">
+                                                <div class="requiredBlock"></div>
+                                                <apex:inputField id="txtEDPEmail" value="{!parf.EDP_Email__c}"/>
+                                            </div>
+                                            <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:pageBlockSectionItem rendered="{!AND(parf.Distributor_Directed__c = 'Yes', isDistributor)}">
+                                        <apex:outputLabel for="txtEDPEmail" value="{!$ObjectType.PARF_Form__c.Fields.EDP_Email__c.Label}"/>
+                                        <apex:outputText id="txtEDPEmail" styleClass="disti email" value="{!parf.EDP_Email__c}"/>
+                                    </apex:pageBlockSectionItem>
+                                    <apex:outputPanel >
+                                    </apex:outputPanel>
+
+                                </apex:pageBlockSection>
+
+                                <apex:pageBlockSection title="{!$Label.PARF_RH_Product_Info_Title}" columns="1" collapsible="false" rendered="{!isEditable}">
+
+                                    <apex:pageBlockSectionItem >
+                                        <apex:outputLabel for="selRHProdDesc" value="{!$ObjectType.PARF_Form__c.Fields.Desired_RH_Prod_Desc__c.Label}"/>
+                                        <apex:outputPanel >
+                                            <apex:selectList id="selRHProdDesc" value="{!DesiredRHProdDesc}" multiselect="true" size="5">
+                                                <apex:selectOptions value="{!DesiredRHProdDescOptions}"/>
+                                            </apex:selectList>
+                                            <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+
+                                </apex:pageBlockSection>
+
+                                <apex:pageBlockSection id="products" title="{!$Label.PARF_Product_Info_Title}" columns="1" collapsible="false" rendered="{!isEditable}">
+
+                                    <apex:pageBlockTable value="{!parfProducts}" var="product" rendered="{!parfProductsExist}">
+                                        <apex:column headerValue="{!$ObjectType.PARF_Product__c.Fields.Product_Name__c.Label}">
+                                            <apex:outputField value="{!product.product.Product_Name__c}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$ObjectType.PARF_Product__c.Fields.Product_Description__c.Label}">
+                                            <apex:outputField value="{!product.product.Product_Description__c}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$ObjectType.PARF_Product__c.Fields.Product_URL__c.Label}">
+                                            <apex:outputField value="{!product.product.Product_URL__c}"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:commandLink action="{!deleteProduct}" value="{!$Label.Delete}" rerender="products, buttons">
+                                                <apex:param name="productToDelete" value="{!product.index}" assignTo="{!productToDelete}"/>
+                                            </apex:commandLink>
+                                        </apex:column>
+                                    </apex:pageBlockTable>
+
+                                    <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                                        <apex:outputLabel for="txtProductName" value="{!$ObjectType.PARF_Product__c.Fields.Product_Name__c.Label}"/>
+                                        <apex:outputPanel >
+                                            <div class="requiredInput">
+                                                <div class="requiredBlock" style="{!productDetailsRequired}"></div>
+                                                <apex:inputText id="txtProductName" value="{!prodName}"/>
+                                            </div>
+                                            <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showProdDetsReqMessage}"/>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                                        <apex:outputLabel for="txtProductDescription" value="{!$ObjectType.PARF_Product__c.Fields.Product_Description__c.Label}"/>
+                                        <apex:outputPanel >
+                                            <div class="requiredInput">
+                                                <div class="requiredBlock" style="{!productDetailsRequired}"></div>
+                                                <apex:inputTextarea id="txtProductDescription" value="{!prodDesc}"/>
+                                            </div>
+                                            <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showProdDetsReqMessage}"/>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+
+                                    <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                                        <apex:outputLabel for="txtProductURL" value="{!$ObjectType.PARF_Product__c.Fields.Product_URL__c.Label}"/>
+                                        <apex:inputText id="txtProductURL" value="{!prodURL}" rendered="{!addingNewProduct}"/>
+                                    </apex:pageBlockSectionItem>
+
+                                    <!-- <apex:pageBlockSectionItem rendered="{!moreProductsAllowed}">
+                                        <input class="btn ease" value="{!$Label.Embedded_Save_Product}" onclick="save();"/> -->
+                                        <!-- <input class="btn ease previous" id="CancelProductButton" value="{!$Label.Cancel}" onclick="cancelproduct();" type="{!if(parfProductsExist, '', 'hidden')}"/> -->
+                                    <!-- </apex:pageBlockSectionItem> -->
+
+                                    <!-- <apex:pageBlockSectionItem rendered="{!AND(moreProductsAllowed, NOT(addingNewProduct))}">
+                                        <input class="btn ease" value="{!$Label.Embedded_Add_Product}" onclick="addProduct();" rendered="{!addingNewProduct}"/>
+                                    </apex:pageBlockSectionItem> -->
+                                    <apex:commandButton styleClass="btn ease" value="{!$Label.Embedded_Save_Product}" action="{!save}" rendered="{!moreProductsAllowed}"/>
+                                </apex:pageBlockSection>
+
+                                <div class="FCPA">
+                                <apex:pageBlockSection columns="2" collapsible="false" rendered="{!isEditable}">
+                                    <apex:outputPanel rendered="{!AND(isGuestUser, OR(NOT(governmentPositionAnswered), NOT(convictedAnswered)))}">
+
+                                        <apex:pageBlockSection title="{!$Label.CCSPForm_FCPA_Compliance}" collapsible="false" columns="1">
+
+                                            <!-- <apex:outputText value="{!$Label.CCSPForm_Ensure_Compliance}"/> -->
+
+                                            <apex:outputText value="{!$Label.Onboarding_RegisterProfile_With_Respect_To_Any_Officer}"/>
+
+                                            <apex:pageBlockSection columns="1" collapsible="false">
+
+                                                <apex:pageBlockSectionItem rendered="{!NOT(governmentPositionAnswered)}">
+                                                    <apex:outputPanel >
+                                                        <apex:outputLabel for="governmentPosition" value="{!$Label.Onboarding_RegisterProfile_Do_They_Act_In_Government_Pos}"/>
+                                                    </apex:outputPanel>
+                                                    <apex:outputPanel >
+                                                        <div class="requiredInput">
+                                                            <div class="requiredBlock" style="{!style}"></div>
+                                                            <apex:selectRadio id="governmentPosition" value="{!parf.Government_Position__c}" onchange="updateUnderlyingFacts();">
+                                                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                                                            </apex:selectRadio>
+                                                        </div>
+                                                        <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                                                    </apex:outputPanel>
+                                                </apex:pageBlockSectionItem>
+                                                <apex:pageBlockSectionItem rendered="{!governmentPositionAnswered}">
+                                                    <apex:outputLabel for="governmentPositionStatic" value="{!$Label.Onboarding_RegisterProfile_Do_They_Act_In_Government_Pos}"/>
+                                                    <apex:outputText id="governmentPositionStatic" value="{!parf.Government_Position__c}"/>
+                                                </apex:pageBlockSectionItem>
+
+                                                <apex:pageBlockSectionItem rendered="{!NOT(convictedAnswered)}">
+                                                    <apex:outputLabel for="convicted" value="{!$Label.Onboarding_RegisterProfile_Have_You_Committed_A_Crime}"/>
+                                                    <apex:outputPanel >
+                                                        <div class="requiredInput">
+                                                            <div class="requiredBlock" style="{!style}"></div>
+                                                            <apex:selectRadio id="convicted" value="{!parf.Convicted__c}" onchange="updateUnderlyingFacts();">
+                                                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                                                            </apex:selectRadio>
+                                                        </div>
+                                                        <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                                                    </apex:outputPanel>
+                                                </apex:pageBlockSectionItem>
+
+                                                <apex:pageBlockSectionItem rendered="{!convictedAnswered}">
+                                                    <apex:outputLabel for="convictedStatic" value="{!$Label.Onboarding_RegisterProfile_Have_You_Committed_A_Crime}"/>
+                                                    <apex:outputText id="convictedStatic" value="{!parf.Convicted__c}"/>
+                                                </apex:pageBlockSectionItem>
+
+                                                <apex:outputPanel id="underlyingFactsSection">
+                                                    <apex:outputPanel rendered="{!underlyingFactsRequired}">
+                                                        <apex:pageBlockSection collapsible="false" columns="1">
+                                                            <apex:pageBlockSectionItem >
+                                                                <apex:outputLabel for="underlyingFacts" styleClass="underlying-facts" value="{!$Label.Onboarding_RegisterProfile_Underlying_Facts}"/>
+                                                            </apex:pageBlockSectionItem>
+                                                            <apex:pageBlockSectionItem >
+                                                                <apex:outputPanel rendered="{!NOT(underlyingFactsProvided)}">
+                                                                    <div class="requiredInput">
+                                                                        <div class="requiredBlock" style="{!style}"></div>
+                                                                        <apex:inputTextarea id="underlyingFacts" value="{!parf.Underlying_Facts__c}"/>
+                                                                    </div>
+                                                                    <apex:outputText style="color:red" value="{!$Label.ONB_Required}" rendered="{!showRequiredMessage}"/>
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!underlyingFactsProvided}">
+                                                                    <apex:outputText value="{!parf.Underlying_Facts__c}"/>
+                                                                </apex:outputPanel>
+                                                            </apex:pageBlockSectionItem>
+                                                        </apex:pageBlockSection>
+                                                    </apex:outputPanel>
+                                                </apex:outputPanel>
+
+                                            </apex:pageBlockSection>
+
+                                        </apex:pageBlockSection>
+
+                                    </apex:outputPanel>
+                                </apex:pageBlockSection>
+                                </div>
+
+                                <apex:pageBlockSection columns="1" collapsible="false" rendered="{!NOT(isDistributor)}">
+                                    <apex:pageBlockSectionItem >
+                                        <apex:outputPanel >
+                                            <div class="requiredInput required-notification">
+                                                <div class="requiredBlock"></div>
+                                                <apex:outputText value="{!$Label.CCSPForm_Indicates_Required}"/>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </apex:pageBlockSectionItem>
+                                </apex:pageBlockSection>
+
+                                <apex:pageBlockButtons location="bottom" rendered="{!isEditable}">
+                                <apex:commandButton id="CancelPARFButton" styleClass="ease previous" action="{!cancel}" value="{!$Label.cancel}" onclick="if(!confirm('{!$Label.Program_Application_Agreement_Are_You_Sure}')) return false;"/>
+                                    <apex:commandButton action="{!submit}" value="{!$Label.Submit}" styleClass="ease" onclick="if(!confirm('{!submitConfirmMessage}')) return false;" rendered="{!OR(parfProductsExist, isDistributor)}"/>
+                                </apex:pageBlockButtons>
+
+                                <apex:pageBlockButtons location="bottom" rendered="{!NOT(isEditable)}">
+                                    <apex:commandButton id="CancelPARFButton" styleClass="ease previous" action="{!cancel}" value="{!$Label.cancel}"/>
+                                </apex:pageBlockButtons>
+
+                                <!-- <apex:actionFunction name="save" action="{!save}" rerender="products, buttons"/> -->
+                                <!-- <apex:actionFunction name="cancelproduct" action="{!cancelProduct}" rerender="products, buttons"/> -->
+                                <apex:actionFunction name="addProduct" action="{!addProduct}" rerender="products, buttons"/>
+                                <apex:actionFunction name="updateDistributorName" rerender="products, buttons"/>
+                                <apex:actionFunction name="updateUnderlyingFacts" reRender="underlyingFactsSection"/>
+                            </apex:pageBlock>
+
+                        </apex:form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </body>
+    <site:previewAsAdmin />
+</apex:page>

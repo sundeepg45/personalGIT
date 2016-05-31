@@ -1,0 +1,76 @@
+<apex:page controller="MSController" showheader="true" sidebar="false" standardStylesheets="false" action="{!initWithContent}">
+
+<head>
+<script src="/jslibrary/1333170890000/sfdc/JiffyStubs.js"></script><meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<meta HTTP-EQUIV="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT" />
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<apex:include pageName="RHELSiteCSS"/>
+
+<title>Selling Cloud with Attitude</title>
+<span></span>
+
+</head>
+
+<body>
+<div id="header">
+  <div class="container">
+    <a class="logo-redhat" href="http://www.redhat.com">Red Hat</a>
+    <a class="logo-product" href="MSRHELHome">Red Hat Enterprise Linux</a>
+    <div class="title"><strong>Do the math.</strong> <br />Migrate to Red Hat<sup>&reg;</sup> Enterprise Linux<sup>&reg;</sup> and save.</div>
+    
+    <ul id="nav-main">
+      <li id="home"><a id="selected" href="MSRHELHome">&nbsp;Home</a></li>
+      <li id="nav2"><a href="MSRHELSiteTraining">Train to sell</a></li>
+      <li id="nav3"><a href="MSRHELCollateral">Engage customers</a></li>
+      <li id="nav4"><a href="MSRHELMarketing">Build a campaign</a></li>
+      <li id="nav5"><a href="MSRHELTechDetails">Access technical resources</a></li>
+      <li class="last" id="nav6"><a href="MSRHELSolutions">Sell RHEL + Partner solutions</a></li>
+    </ul>
+  </div>
+</div>
+<div id="content">
+  <div id="content-inner">
+    <div class="container">
+      <div id="content-primary">
+        <h2>Welcome</h2>
+        <p>
+          Our partner ecosystem is vital to Red Hat’s success and growth. As an
+          extension of our business and sales force, you represent our voice to
+          the customer.  To help you communicate the value of Red Hat Enterprise
+          Linux and related solutions, we have compiled the most relevant
+          content and resources to train your sales teams, build highly
+          successful go-to-market campaigns and generate recurring revenue and
+          profits for your business.  For more information about how to use
+          these tools, please contact your Red Hat channel manager.
+        </p>
+        <apex:outputPanel layout="none">
+ 
+       	<c:MSSection pageController="{!this}" annotation="HomeNewResource">
+		     <div class="sub-links presentations">
+		        <h2>New Resources</h2>
+		        <ul class="links-list-new-resources presentations-list">
+		        <c:MSSectionList pageController="{!this}" annotation="HomeNewResource" />
+		        </ul>
+		        <p>&nbsp;</p>
+		      </div>
+		</c:MSSection>
+
+      </apex:outputPanel>
+      </div>      
+ 
+      <div id="content-secondary">
+        <h2>Featured Success Story</h2>
+        <c:MSVideo pageController="{!this}" sectionKey="Featured Success Story"/>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <div class="container">
+    <p class="copyright">Copyright &copy; 2012 Red Hat, Inc. All rights reserved.</p>
+  </div>
+</div>  
+</body>
+
+</apex:page>

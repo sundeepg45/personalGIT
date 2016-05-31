@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>Invitation__c.Opportunity__c</field>
+    </columns>
+    <columns>
+        <field>Invitee__c.Contact__c</field>
+    </columns>
+    <columns>
+        <field>Invitee__c.User__c</field>
+    </columns>
+    <columns>
+        <field>Invitee__c.First_Visit__c</field>
+    </columns>
+    <columns>
+        <field>Invitee__c.Visits_clicks__c</field>
+    </columns>
+    <columns>
+        <field>Invitation__c.Is_Invitation_Expired__c</field>
+    </columns>
+    <columns>
+        <field>CUST_CREATED_NAME</field>
+    </columns>
+    <columns>
+        <field>CUST_CREATED_DATE</field>
+    </columns>
+    <description>Microsite Invitations with Recipients (Range: all time)</description>
+    <format>Summary</format>
+    <name>Microsite Invitations with Recipients</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntityCustomEntity$Invitation__c$Invitee__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Invitation__c.Invitation_Expiration__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

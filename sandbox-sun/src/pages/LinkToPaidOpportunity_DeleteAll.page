@@ -1,0 +1,3 @@
+<apex:page standardController="Link_to_Paid_Opportunity__c" extensions="LinkToPaidOpportunityControllerExtension" action="{!deleteAll}">
+<apex:pageMessages />
+</apex:page>

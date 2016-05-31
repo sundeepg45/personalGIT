@@ -1,0 +1,147 @@
+<apex:page controller="PPUserView" >
+
+    <apex:form >
+        <apex:pageBlock >
+           <apex:outputPanel >
+                <apex:outputText value="Contact ID:"/>&nbsp;
+                <apex:inputText value="{!contactId}"/>&nbsp;&nbsp;
+               <apex:commandButton value="Go" action="{!getPoints}" />
+           </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:pageBlock title="Contact">
+        <apex:outputPanel >
+            <apex:PageBlockSection columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Accrual Start"/>
+                    <apex:outputText value="{!theContact.Point_Accrual_Start__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Current Points"/>
+                    <apex:outputText value="{!userPoints.Current_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Sales Points"/>
+                    <apex:outputText value="{!userPoints.Sales_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Uncapped Points"/>
+                    <apex:outputText value="{!userPoints.Uncapped_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Pre-sales Points"/>
+                    <apex:outputText value="{!userPoints.PreSales_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Delivery Points"/>
+                    <apex:outputText value="{!userPoints.Delivery_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Expired Points"/>
+                    <apex:outputText value="{!userPoints.Expired_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Expiring Points"/>
+                    <apex:outputText value="{!userPoints.Expiring_Points__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Total Lifetime Points"/>
+                    <apex:outputText value="{!userPoints.Total_Lifetime_Points__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:PageBlockSection>
+        </apex:outputPanel>
+    </apex:pageBlock>
+
+    <apex:pageBlock title="Scores">
+        <apex:pageBlockTable value="{!scores}" var="score" rowClasses="odd,even" styleClass="tableClass">
+            <apex:column >
+                <apex:facet name="header">Name</apex:facet>
+                <a href="/{!score.id}" target="_blank">{!score.name}</a>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Category/Sub</apex:facet>
+                <apex:outputText value="{!score.cat}/{!score.subcat}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Track</apex:facet>
+                <apex:outputText value="{!score.track}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Earned</apex:facet>
+                <apex:outputText value="{!score.whenEarned}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">What ID</apex:facet>
+                <a href="/{!score.whatid}" target="_blank">{!score.whatid}</a>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Points</apex:facet>
+                <apex:outputText value="{!score.points}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Scored From</apex:facet>
+                <a href="/{!score.scoredFrom}" target="_blank">{!score.scoredFrom}</a>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+
+    <apex:pageBlock title="Content Stage">
+        <apex:pageBlockTable value="{!contents}" var="content" rowClasses="odd,even" styleClass="tableClass">
+            <apex:column >
+                <apex:facet name="header">Name</apex:facet>
+                <apex:outputText escape="false" value="<i>" rendered="{!NOT(content.eligible)}"/>
+                <a href="/{!content.id}" target="_blank">{!content.Name}</a>
+                <apex:outputText escape="false" value="</i>" rendered="{!NOT(content.eligible)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Batch</apex:facet>
+                <a href="/{!content.batchid}" target="_blank">{!content.batchid}</a>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Content ID</apex:facet>
+                <a href="/{!content.contentid}" target="_blank">{!content.contentid}</a>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Earned</apex:facet>
+                <apex:outputText value="{!content.whenEarned}" />
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    
+    <apex:pageBlock title="LMS Stage">
+        <apex:pageBlockTable value="{!lmss}" var="lms" rowClasses="odd,even" styleClass="tableClass">
+            <apex:column >
+                <apex:facet name="header">Name</apex:facet>
+                <apex:outputText escape="false" value="<i>" rendered="{!NOT(lms.eligible)}"/>
+                <a href="/{!lms.id}" target="_blank">{!lms.Name}</a>
+                <apex:outputText escape="false" value="</i>" rendered="{!NOT(lms.eligible)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Course ID</apex:facet>
+                <apex:outputText value="{!lms.courseid}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Region</apex:facet>
+                <apex:outputText value="{!lms.region}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Language</apex:facet>
+                <apex:outputText value="{!lms.language}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Training Type</apex:facet>
+                <apex:outputText value="{!lms.trainingType}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Transcript Item</apex:facet>
+                <apex:outputText value="{!lms.transcriptItem}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Earned</apex:facet>
+                <apex:outputText value="{!lms.whenEarned}" />
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+
+</apex:page>

@@ -1,0 +1,2141 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RfSearchController" sidebar="false" id="pageId" tabStyle="RE_Search__tab" docType="html-5.0" >
+    
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Sction Header-->
+    <apex:sectionHeader title="{!IF(refMatch, $Label.Reference_Match, $Label.Reference_Search)}"  help="RfSearchHelpPage"  rendered="{!isFullLicenseAccessible}"/>
+    
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader" Info="{!IF(preFilter,'Pre-filter applying?','')}"/>
+    
+    <!-- Add Style-->
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__Jplayer, 'Jplayer/css/jplayer.blue.monday.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__Jplayer, 'Jplayer/js/jquery.jplayer.min.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <script language="JavaScript" type="text/javascript" src="https://sadmin.brightcove.com/js/BrightcoveExperiences.js">
+    </script>
+    <style>
+        a.boxclose{
+            float: right;
+            margin-top: -24px;
+            cursor: pointer;
+            color: #fff;
+            border: 1px solid #AEAEAE;
+            border-radius: 16px;
+            background: #605F61;
+            font-size: 23px;
+            font-weight: bold;
+            display: inline-block;
+            line-height: 0px;
+            padding: 10px 3px;     
+        }
+        .sfdc_richtext img{
+            width:100px;
+            height:100px;
+        }
+        .collapse {
+            display: none;
+        }
+        .boxclose:before {
+            content: "?";
+        
+        }
+        .helpOrb{
+            display:none;
+        }
+        
+        //Start Bound 3 Req
+/*        jQuery(".ui-icon ui-icon-closethick").removeAttr(); */
+/*         .ui-widget-content{ */
+/*             border : none !important; */
+/*         } */
+/*         .ui-widget-header{ */
+/*             background : none !important; */
+/*             border : none !important; */
+/*             color : black !important; */
+/*         }  */
+        
+        .showButton {
+            display : inline;
+        }
+        .hideButton {
+            display : none;
+        }
+        
+        .showButton {
+            display : inline;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-top-colors: none;
+            
+            background: url("/img/alohaSkin/btn_sprite.png") repeat-x scroll right top #E8E8E9;
+            border-color: #B5B5B5 #B5B5B5 #7F7F7F;
+            border-image: none;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            color: #333333;
+            font-size: 0.9em;
+            font-weight: bold;
+            font-family: Arial,Helvetica,sans-serif;
+            margin: 1px;
+            padding: 2px 3px !important; 
+        }
+        a{
+            color: black ;
+            text-decoration: underline;
+        }
+        body{
+            font-size: 12px ;
+            line-height: 1.1;
+        }
+        .btn{
+            line-height: 1.128571429;
+        }
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-family: Arial,Helvetica,sans-serif !important;
+            font-weight:bold ;
+            line-height: 1.1;
+        }   
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+            padding: 4px 12px 4px 12px !important;
+            //padding-bottom: 4px !important;
+            font-family: Arial,Helvetica,sans-serif !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style> 
+    
+    <!-- Add JavaScript & Jquery-->
+    <script language="javascript" type="text/javascript">
+       var lastRecordId = '';
+       var lastClickedObj = '';
+       
+       jQuery(".content img").css("background-image","none");
+       jQuery(".content img").attr("src","{!URLFOR($Resource.RESearchFilterIcons, 'search-icon.png')}");
+        PORShowLoading();
+        jQuery(window).load(function() {
+            if({!isFullLicenseAccessible} || {!isFullLicenseAccessible} == true){
+                if({!refMatch} || {!refMatch} == true){
+                    //if(document.getElementById('pageId_formId_refMatchblockId_refMatchSectionId_specPbtRequest_0_ArstatusFieldId_ileinner') != null || document.getElementById('pageId_formId_refMatchblockId_refMatchSectionId_specPbtRequest_0_UrstatusFieldId_ileinner') != null){
+                        PORHideLoading();
+                    //}
+                    //else{
+                        //updateInlineEditingValue(true);
+                    //}
+                }
+                else{
+                    if({!preFilter} || {!preFilter} == true){
+                        preFilterRecords();
+                    }
+                    else{
+                        PORHideLoading();
+                    }
+                }
+            }
+            else{
+                PORHideLoading();
+            }
+        });
+       function openSite(siteUrl){
+            if(siteUrl != '' && siteUrl != null){
+             if (siteUrl.indexOf("http://")>=0 || siteUrl.indexOf("https://") >=0){ 
+                 window.open('','_blank').location.href = siteUrl;
+             }
+             else{
+                 window.open('','_blank').location.href = 'http://'+siteUrl;
+             }
+            }
+        }
+        //this method is Use to check & uncheck all checkbox with header checkbox.
+        function selectAllChk(cb, selectSingleBlockId, size, noticeId){
+            var selectSingleId = 'input:checkbox[id*='+ selectSingleBlockId +']';
+            var tempCount= 0;
+            if(jQuery(cb).attr("checked")){
+                
+                if(selectSingleBlockId == 'selectSingleContentPbtId'){
+                   jQuery(selectSingleId).each(function(){
+                        if(jQuery(this).attr('disabled') != 'disabled')
+                           jQuery(this).attr('checked','checked');
+                    });
+                }
+                else {
+                    if(size > {!numberOfRequestAccounts} || totalSelectedAccount >= {!numberOfRequestAccounts}){
+                        var msg = '{!$Label.Maximum_Account_No_Message_Part1}';
+                        var infoMsg = msg.replace('@@@', '{!numberOfRequestAccounts}');
+                        alert(infoMsg);
+                        jQuery(cb).attr("checked", false);
+                        return false;
+                    }
+                    else {
+                        for(var i=0; i < size; i++) {
+                            var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":selectSingleAccountId";
+                            if(document.getElementById(id).checked){
+                                tempCount += 1;
+                            }
+                        }
+                        var tempCount = totalSelectedAccount + (parseInt(size)-tempCount);
+                        
+                        if(tempCount > {!numberOfRequestAccounts}){
+                            var msg = '{!$Label.Maximum_Account_No_Message_Part1}';
+                            var infoMsg = msg.replace('@@@', '{!numberOfRequestAccounts}');
+                            alert(infoMsg);
+                            jQuery(cb).attr("checked", false);
+                            return false;
+                        }
+                        else{
+                            jQuery(selectSingleId).attr('checked', 'checked');
+                            totalSelectedAccount = tempCount;
+                        }
+                    }
+                }
+                if(size > 0){
+                    for(var i=0; i < size; i++) {
+                        if(noticeId == 'accountNoticeId')
+                            var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":accountNoticeId";
+                        if(noticeId == 'contactNoticeId')
+                            var id = "pageId:formId:blockId:1:contactPbId:contactPbsId:pbtContact:"+i+":contactNoticeId";
+                        if(document.getElementById(id).innerHTML == '{!$Label.Limit_Reached}'){
+                            alert('{!$Label.Limit_Reached_Message}');
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                jQuery(selectSingleId).removeAttr('checked');  
+                if(selectSingleBlockId != 'selectSingleContentPbtId'){
+                    if(totalSelectedAccount >= size){
+                        for(var i=0; i < size; i++) {
+                            totalSelectedAccount-=1;
+                        }
+                    }
+                    else 
+                        totalSelectedAccount = 0;
+                }
+            }
+            
+        }
+        
+        //this method is Use uncheck header checkbox.
+        function deSelectAllChk(selectAllBlockId){
+            var selectAllId = 'input:checkbox[id*='+ selectAllBlockId +']';
+            jQuery(selectAllId).removeAttr('checked');  
+        }
+        var totalSelectedAccount = {!noOfSelectedAccount};
+        //this method is Use to check & uncheck header checkbox.
+        function enableDisable(cb, selectSingleBlockId, selectAllBlockId, limit ){
+            var selectSingleId = 'input:checkbox[id*='+ selectSingleBlockId +']';
+            var selectAllId = 'input:checkbox[id*='+ selectAllBlockId +']';
+            
+            if(selectSingleBlockId == 'selectSingleAccountId'){
+                if(jQuery(cb).attr("checked")){
+                    totalSelectedAccount+=1;
+                    if(totalSelectedAccount > {!numberOfRequestAccounts}){
+                        var msg = '{!$Label.Maximum_Account_No_Message_Part1}';
+                        var infoMsg = msg.replace('@@@', '{!numberOfRequestAccounts}');
+                        alert(infoMsg);
+                        jQuery(cb).attr("checked", false);
+                        totalSelectedAccount-=1;
+                        return false;
+                    }
+                }
+                else if(!jQuery(cb).attr("checked")){
+                    totalSelectedAccount-=1;
+                }
+                
+            }
+            if(!jQuery(cb).attr("checked")){
+                
+                jQuery(selectAllId).removeAttr('checked');
+            }
+            else{
+                if(limit == '{!$Label.Limit_Reached}'){
+                    alert('{!$Label.Limit_Reached_Message}');
+                }
+                if(jQuery(selectSingleId+":checked").length == jQuery(selectSingleId).length)
+                    jQuery(selectAllId).attr('checked', 'checked');
+                else
+                    jQuery(selectAllId).removeAttr('checked');
+            }
+        }
+        
+        //this method call on click of search button
+        function doSearch() {
+            var searchText = jQuery('input:text[id*=inputTextId]').val();
+            if (searchText.length ==1) {
+                alert('{!$Label.Atleast_two_characters}');
+                return false;
+            }
+            else {
+                PORShowLoading();
+                searchRecord(searchText);
+            }
+        }
+        var previouslyselectedaccount = false;
+        var previouslyselectedcontent = false;
+        //this method to check Account is selected or Not and also pass ids
+        function validateSelection(size, pageBlockNo, selectSingleAccountId, edition){
+            if('{!JSENCODE(minimumStageError)}' != ''){
+                alert('{!JSENCODE(minimumStageError)}');
+            }
+            else{
+                var hasChecked = false;
+                var count=0;
+                for(var i=0; i < size; i++) {
+                    var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":"+selectSingleAccountId; 
+                    if(document.getElementById(id).checked ) {
+                        hasChecked = true;
+                        break ;  
+                    }
+                }
+                for(var i=0; i < size; i++) {
+                        var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":"+selectSingleAccountId; 
+                        var id2 = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":selectsingleHidden"; 
+                        if(document.getElementById(id).checked ) {
+                            count = count+1;
+                            if(ids2 == '') {
+                                ids2 = document.getElementById(id2).value ;
+                            } else {
+                                ids2 = ids2+','+document.getElementById(id2).value ;
+                            }
+                        }
+                    }
+                    
+                    if(count  > '{!numberOfRequestAccounts}'){
+                        var msg = '{!$Label.Maximum_Account_No_Message_Part1}';
+                        var infoMsg = msg.replace('@@@', '{!numberOfRequestAccounts}');
+                        alert(infoMsg);
+                        return false;
+                    }
+                if(hasChecked == false && previouslyselectedaccount == false){
+                    alert('{!$Label.Select_Atleast_One_Account}');
+                    return false;
+                }
+                
+                var ids2 ='' ;
+                for(var i=0; i < size; i++) {
+                    var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":"+selectSingleAccountId; 
+                    id2 = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":selectsingleHidden"; 
+                    if(document.getElementById(id).checked ) {
+                        if(ids2 == '') {
+                            ids2 = document.getElementById(id2).value ;
+                        } else {
+                            ids2 = ids2+','+document.getElementById(id2).value ;
+                        }
+                    }
+                }
+                PORShowLoading();
+                
+                if(edition == '')
+                    moveToMixManaged(ids2);      
+                else
+                    moveToSelfService(ids2);  
+            }
+            return false;
+        }
+        
+        //this method call on mouse over on Image 
+        var IE = document.all?true:false;
+        var tempX = 0;
+        var tempY = 0;
+
+        function showDiv(contentId, refconId, e) {     
+            if (IE) { 
+                tempX = e.clientX + document.body.scrollLeft;
+                tempY = e.clientY + document.body.scrollTop;
+            } 
+            else {  
+                tempX = e.pageX;
+                tempY = e.pageY;
+            } 
+            fetchContentItem(contentId, refconId);
+        }
+        function showDivOncompleteAction() {
+           document.getElementById('pageId:formId:dvContentDetails').style.display = 'block';
+            document.getElementById('pageId:formId:dvContentDetails').style.left = tempX+'px';
+            document.getElementById('pageId:formId:dvContentDetails').style.top = (tempY-100)+'px';
+        }
+        
+        //this method call on mouse out on Image 
+        function hideDiv() {
+                        document.getElementById('pageId:formId:dvContentDetails').style.display = 'none';
+        }
+        
+        //Method to open Link
+        function openLinkContent(contentUrl) {
+            if (contentUrl.indexOf("http://")>=0 || contentUrl.indexOf("https://")>=0) 
+                window.open('','_blank').location.href = contentUrl;
+            else
+                window.open('','_blank').location.href = 'http://'+contentUrl;
+        }
+        
+        
+        //Start Bound 3 Req 
+        //this method to call when click on Continue without selecting Accounts Link
+        function continueWitoutAccount(size, pageBlockNo, selectSingleAccountId){
+            if('{!JSENCODE(minimumStageError)}' != ''){
+                alert('{!JSENCODE(minimumStageError)}');
+            }
+            else{
+                var hasChecked = false;
+                for(var i=0; i < size; i++) {
+                    var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":"+selectSingleAccountId; 
+                    if(document.getElementById(id).checked ) {
+                        hasChecked = true;
+                        break ;  
+                    }
+                }
+                
+                if(hasChecked){
+                    var ids2 ='' ;
+                    var count = 0;
+                    
+                    for(var i=0; i < size; i++) {
+                        var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":"+selectSingleAccountId; 
+                        var id2 = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":selectsingleHidden"; 
+                        if(document.getElementById(id).checked ) {
+                            count = count+1;
+                            if(ids2 == '') {
+                                ids2 = document.getElementById(id2).value ;
+                            } else {
+                                ids2 = ids2+','+document.getElementById(id2).value ;
+                            }
+                        }
+                    }
+                    
+                    if(count  > '{!numberOfRequestAccounts}'){
+                        var msg = '{!$Label.Maximum_Account_No_Message_Part1}';
+                        var infoMsg = msg.replace('@@@', '{!numberOfRequestAccounts}');
+                        
+                        alert(infoMsg);
+                        return false;
+                    }
+                    
+                    jQuery( "#dialogBoxDiv" ).dialog({
+                        width: '400px',
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        buttons: [
+                        {
+                            text: "{!$Label.Discard}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                                jQuery( this ).dialog( "close" );
+                                PORShowLoading();
+                                discardAccount();
+                            }
+                        },
+                        {
+                            text: "{!$Label.Keep}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                                jQuery( this ).dialog( "close" ); 
+                                PORShowLoading();
+                                keepAccount(ids2);
+                            }
+                        }
+                        ]
+                    });
+                    jQuery(".ui-dialog-titlebar").hide();
+                    jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                    
+                    return false;
+                }
+                
+                //If account is not selected
+                PORShowLoading(); 
+                discardAccount();
+            }
+            return false;
+        }
+        var contactBlockDisplayed = false;
+        function checkUnspecSelected(reqId, accId, conId) {
+            if(jQuery('input[id=radioID]:checked').size() > 0){
+                if(accId.trim() != ''){
+                    PORShowLoading();
+                    assignAccount(accId);
+                }
+                else if(conId.trim() != ''){
+                    PORShowLoading();
+                    assignContact(conId);
+                }
+                else {
+                    if(reqId.trim() != '' && reqId != oldRequestId){
+                        alert('{!$Label.Click_Selected_Request_Message}');
+                        if(contactBlockDisplayed){
+                            showContactBlock(true, false,accId,reqId);
+                        }
+                        else{
+                            showContactBlock(false, true,accId,reqId);
+                       }
+                    }
+                    else{
+                        PORShowLoading();
+                        showContactBlock(true, false,accId,reqId);
+                    }
+                }
+            }
+            else {
+                alert('{!$Label.Select_Item_Message}');
+                return false;
+            }
+        }
+        var urSelected;
+        function assignUnspecReqIdJS(reqId,cb,isUr){
+            var chkCount=0;
+            urSelected = isUr;
+            jQuery('input[id=radioID]').each(function() {
+                if(jQuery(this).is(':checked')) {
+                    var id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":radioPanelId";
+                    var ele = document.getElementById(id) ;
+                    setBackground(true, jQuery(ele), "#B0E1FA");
+                } 
+                else if (jQuery(this).is(':disabled')) {
+                    var id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":radioPanelId2";
+                    var ele = document.getElementById(id) ;
+                    setBackground(false, jQuery(ele), "#FFFFFF");
+                }
+                else{
+                    var id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":radioPanelId";
+                    var ele = document.getElementById(id) ;
+                    setBackground(false, jQuery(ele), "#FFFFFF");
+                }
+                chkCount = chkCount+1;
+            });
+            assignUnspecReqId(reqId);
+        }
+        function setBackground(CheckedOrUnchecked, ele, color) {
+            if(CheckedOrUnchecked == true) {
+                ele.closest('tr').css("background-color",color);
+            }else {
+                ele.closest('tr').css("background-color",color);
+            }
+        } 
+        
+        function setColorOnStatus(){
+            
+            var chkCount=0;
+            jQuery('input[id=radioID]').each(function() {
+                if (jQuery(this).is(':disabled')) {
+                    if(jQuery(this).val() == newRequestId || jQuery(this).val() == oldRequestId){
+                        var id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":radioPanelId2";
+                        var ele = document.getElementById(id) ;
+                        setBackground(true, jQuery(ele), "#B0E1FA");
+                    }
+                }
+                else {
+                    if(jQuery(this).val() == newRequestId || jQuery(this).val() == oldRequestId){
+                        var id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":radioPanelId";
+                        var ele = document.getElementById(id) ;
+                        setBackground(false, jQuery(ele), "#B0E1FA");
+                    }
+                }
+                chkCount = chkCount+1;
+            });
+        }
+        
+        jQuery(document).ready(function() {
+            jQuery(window).load( function() {
+              if({!isFullLicenseAccessible} || {!isFullLicenseAccessible} == true){
+                checkRadio();
+              }
+            });
+        });
+        
+        function checkRadio(){
+            var chkCount=0;
+            var isSizeOne = true;
+            if({!allActiveReq.size} > 1)
+                isSizeOne = false;
+            else
+                isSizeOne = true;
+            var checkedReqId = '';
+            jQuery('input[id=radioID]').each(function() {
+                if (jQuery(this).is(':disabled') == false) {
+                    var id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":radioPanelId";
+                    var ele = document.getElementById(id) ;
+                    if(jQuery(this).val() == oldRequestId || isSizeOne){
+                        jQuery(this).attr("checked", "checked");
+                        setBackground(true, jQuery(ele), "#B0E1FA");
+                        if(isSizeOne)
+                            checkedReqId = document.getElementById("pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":selectsingleHiddenReq").value;
+                    }
+                    else {
+                        setBackground(true, jQuery(ele), "#FFFFFF");
+                    }
+                }
+                chkCount = chkCount+1;
+            });
+            if(checkedReqId != '')
+                assignUnspecReqId(checkedReqId);
+        }
+        function sendSelectedIdsAccount(size,showMoreLink,button){
+            var ids2='';
+            var count=0;
+            if(showMoreLink){
+                for(var i=0; i < size; i++) {
+                     var id = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":selectSingleAccountId"; 
+                     var id2 = "pageId:formId:blockId:0:accountPbId:accountPbsId:pbtAccount:"+i+":selectsingleHidden"; 
+                     if(document.getElementById(id).checked ) {
+                         count = count+1;
+                         if(ids2 == '') {
+                             ids2 = document.getElementById(id2).value ;
+                         } else {
+                             ids2 = ids2+','+document.getElementById(id2).value ;
+                         }
+                     }
+                }
+                callShowMoreLink(ids2,true,false,false);
+             }
+             else{
+                if(button == 'previous'){
+                    accountPrevious();
+                }
+                else if(button == 'next'){
+                    
+                    accountNext();
+                }
+            }
+            return false;
+        }
+        function sendSelectedIdsContent(size,showMoreLink,button){
+            var ids2='';
+            var count=0;
+            if(showMoreLink){
+                for(var i=0; i < size; i++) {
+                
+                     var id = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":selectSingleContentPbtId"; 
+                     var id2 = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":selectSingleContentIdHidden"; 
+                     if(document.getElementById(id).checked ) {
+                         count = count+1;
+                         if(ids2 == '') {
+                             ids2 = document.getElementById(id2).value ;
+                         } else {
+                             ids2 = ids2+','+document.getElementById(id2).value ;
+                         }
+                     }
+                }
+                callShowMoreLink(ids2,false,false,true);
+            }
+            else{
+                if(button == 'previous'){
+                    contentPrevious(ids2);
+                }
+                else if(button == 'next'){
+                    contentNext(ids2);
+                }
+            }
+            return false;
+        }
+        var process = '';
+        var isUrRequest = false;
+        function enabletoUpdateJS(reqId,clickedObj,statusClicked,isUr){
+            document.getElementById('pageId:formId:refMatchblockId:refMatchSectionId:saveButton').className = 'showButton';
+            document.getElementById('pageId:formId:refMatchblockId:refMatchSectionId:cancelButton').className = 'showButton';
+            isUrRequest = isUr;
+            var singleChange = true;
+            var Id = '';
+            jQuery('.inlineEditUndo').each(function() {
+                if(jQuery(this).parent().parent().css('display') != 'none'){
+                    id = jQuery(this).parent().parent().attr('id');
+                    if(id.indexOf("specPbtRequest") > -1){
+                        singleChange = false;
+                    }
+                }
+            });
+            if(singleChange == false && previousRequestId != '' && previousRequestId != reqId){
+                jQuery( "#dialogBoxDivNew" ).dialog({
+                    width: '400px',
+                    modal: true,
+                    resizable: false,
+                    draggable: false,
+                    buttons: [{
+                        text: "{!$Label.Ok}",
+                        "class": "dialogButtonClass",
+                        click: function() {
+                            jQuery( this ).dialog( "close" );
+                            return false;
+                        }
+                    }]
+                });
+            }
+            else{
+                previousRequestId = reqId;
+                if(!statusClicked){
+                    lastClickedObj = clickedObj;
+                    lastRecordId = reqId;
+                }
+                enabletoUpdate(reqId);
+            }
+        }
+        var previousRequestId = '';
+        function checkProcess(){
+            var chkCount=0;
+            var flag = false;
+            var breakloop = false;
+            var statusValue = '';
+            var changedEntity = '';
+            if(lastClickedObj != ''){
+                var newId = lastClickedObj.id;
+                var find = ':';
+                var re = new RegExp(find, 'g');
+                var newId1 = newId.replace(re, '_');
+                if(newId1.search('inlineEditStatusId') != -1){
+                    if(isUrRequest)
+                        var newId1 = newId1.replace('inlineEditStatusId','UrstatusFieldId');
+                    else
+                        var newId1 = newId1.replace('inlineEditStatusId','ArstatusFieldId');
+                    var e = document.getElementById(newId1);
+                    statusValue = e.options[e.selectedIndex].value;
+                    changedEntity = 'status';
+                }
+                if(newId1.search('processId') != -1){
+                    var newId1 = newId1.replace('processId','inlineProcessId');
+                    var e = document.getElementById(newId1);
+                    statusValue = e.options[e.selectedIndex].value;
+                    changedEntity = 'process';
+                }
+                getAccReqDetails(lastRecordId,statusValue,changedEntity);
+            }
+            else{
+                lastRecordId = previousRequestId;
+                getAccReqDetails(lastRecordId,'','');
+            }
+            /*jQuery('input[id=radioID]').each(function() {
+                if(!breakloop){
+                    if (jQuery(this).is(':disabled') == false) {
+                        if(rep2repIds.indexOf(jQuery(this).val()) != -1){
+                            var id = '';
+                            if({!isInlineEditingDisabled}){
+                                id = "pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:"+ chkCount +":inlineProcessIdEdit";
+                                if(document.getElementById(id) != null){
+                                    if(document.getElementById(id).value.indexOf('Managed') != -1){
+                                        var r=confirm('{!$Label.Change_Request_Type_Message}')
+                                        breakloop = true;
+                                        if (r==true){
+                                            flag = false;
+                                            return;
+                                        }
+                                        else {
+                                            flag = true;
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                id = "pageId_formId_refMatchblockId_refMatchSectionId_specPbtRequest_"+ chkCount +"_inlineProcessId_ileinner";
+                                if(document.getElementById(id) != null){
+                                    if(document.getElementById(id).innerHTML.indexOf('Managed') != -1){
+                                        var r=confirm('{!$Label.Change_Request_Type_Message}')
+                                        breakloop = true;
+                                        if (r==true){
+                                            flag = false;
+                                            return;
+                                        }
+                                        else {
+                                            flag = true;
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                chkCount = chkCount+1;
+            });
+            
+            if( ! flag){
+                saveAllReq(lastRecordId,statusValue,changedEntity);
+                return false;
+            
+            }
+            else {
+                PORShowLoading();
+                cancelAllReq();
+                return false;
+            }
+            */
+            
+        }
+        function getReqInfoDetailsEdit(RecordId,isUr){
+            
+            isUrRequest = isUr;
+            lastRecordId = RecordId;
+            getAccReqDetails(lastRecordId,'','');
+        }
+        /*hit list*/
+        function checkForRadioSelected(isAccount,isContact,accId,conId,isAlreadyHit){
+            if(!isAlreadyHit){
+                PORShowLoading();
+                createHitRecord(isAccount,isContact,accId,conId);
+            }
+            else{
+                return false;
+            }
+        }
+        function showHideTab(Id){
+            
+            if(Id == 'filterBasicId'){
+                document.getElementById('filterBasicId').style.display = 'block';
+                document.getElementById('filterOrderId').style.display = 'none';
+            }
+            if(Id == 'filterOrderId'){
+                document.getElementById('filterBasicId').style.display = 'none';
+                document.getElementById('filterOrderId').style.display = 'block';
+            }
+        }
+    </script>
+    <apex:outPutPanel id="SizePanel">
+        <script>
+            function updateMessage(){
+                var flag=false;
+                var writetoNote = false;
+                writetoNote = document.getElementById('pageId:formId:writetoNoteId').checked;
+                if({!showPeer2ManagedMessage}){
+                     var r=confirm('{!$Label.Change_Request_Type_Message}')
+                     if (r==true){
+                          previewEmailOncomplete(writetoNote);
+                          return;
+                      }
+                      else {
+                           PORShowLoading();
+                           cancelAllReq();
+                           return;
+                      }
+                }
+                else{
+                    previewEmailOncomplete(writetoNote);
+                    return false;
+                }
+            }
+            
+            function previewEmailOncomplete(writetoNote){
+                var fieldId = '';
+                var noteId = '';
+                var typeId = '';
+                var deadlineId = '';
+                var isPreview = false;
+                var subject = '';
+                for(var chkCount = 0; chkCount < {!allActiveReq.size}; chkCount++){
+                    if(lastRecordId == document.getElementById('pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:'+ chkCount +':selectsingleHiddenReq').value){
+                        if(isInlineEditingDisabled){
+                            fieldId = 'pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:'+ chkCount +':';
+                        }
+                        else {
+                            fieldId = 'pageId_formId_refMatchblockId_refMatchSectionId_specPbtRequest_'+ chkCount +'_';
+                        }
+                        var e ;
+                        var statusValue = '';
+                        if(isUrRequest){
+                            noteId = 'pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:'+ chkCount +':denyNotesUn';
+                            if(isInlineEditingDisabled){
+                                typeId = fieldId+'typePanelFieldUnspecified1';
+                                statusValue = document.getElementById(fieldId+'UrstatusFieldIdEdit').value;
+                            }
+                            else{
+                                typeId = fieldId+'typePanelFieldUnspecified_ileinner';
+                                if(document.getElementById(fieldId+'UrstatusFieldId') != null){
+                                    e = document.getElementById(fieldId+'UrstatusFieldId');
+                                    statusValue = e.options[e.selectedIndex].value;
+                                }
+                                else{
+                                    statusValue = document.getElementById(fieldId+'UrstatusFieldId_ileinner').innerHTML;
+                                }
+                            }
+                            if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}'){
+                                if(statusValue == 'On Hold'){
+                                    isPreview = true;
+                                }
+                            }
+                        }
+                        else {
+                            noteId = 'pageId:formId:refMatchblockId:refMatchSectionId:specPbtRequest:'+ chkCount +':denyNotes';
+                            if(isInlineEditingDisabled){
+                                typeId = fieldId+'typePanelField1';
+                                statusValue = document.getElementById(fieldId+'ArstatusFieldIdEdit').value;
+                            }
+                            else{
+                                
+                                typeId = fieldId+'typePanelField_ileinner';
+                                if(document.getElementById(fieldId+'ArstatusFieldId') != null){
+                                    e = document.getElementById(fieldId+'ArstatusFieldId');
+                                    statusValue = e.options[e.selectedIndex].value;
+                                }
+                                else{
+                                    statusValue = document.getElementById(fieldId+'ArstatusFieldId_ileinner').innerHTML;
+                                }
+                            }
+                            if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}'){
+                                if(statusValue != 'In Progress' && statusValue != 'Unavailable' && statusValue != 'No Longer Needed' && statusValue != '' && statusValue != 'Not Started' && statusValue != 'No Response'){
+                                    isPreview = true;
+                                }
+                            }
+                        }
+                        if(isPreview || isPreview == true){
+                            if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}'){
+                                document.getElementById('pageId:formId:Subject').value = '{!STATUS_UPDATE_SUBJECT}';
+                            }
+                            document.getElementById('pageId:formId:account').innerHTML = '{!JSENCODE(tempRRA.Account__r.Name)}';
+                            if(isInlineEditingDisabled){
+                                document.getElementById('pageId:formId:UseRequested').innerHTML = document.getElementById(typeId).value;
+                            }
+                            else{
+                                document.getElementById('pageId:formId:UseRequested').innerHTML = document.getElementById(typeId).children[0].innerHTML;
+                            }
+                            document.getElementById('pageId:formId:Status').innerHTML = statusValue;
+
+                            document.getElementById('pageId:formId:notes').value = document.getElementById(noteId).value;
+                            
+                            jQuery("#dialogBoxDivNoti").dialog({
+                                height    : 150,
+                                width     : 415,
+                                modal     : true,
+                                resizable : false,  
+                                buttons: [{
+                                    text: "{!$Label.Send}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        previousRequestId = '';
+                                        updateInformation(true,lastRecordId,writetoNote,'');
+                                        return false;
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Edit_then_Send}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        jQuery("#dialogBoxDiv1").dialog({
+                                            height    : 420,
+                                            width     : 600,
+                                            modal     : true,
+                                            resizable : false,  
+                                            buttons: [{
+                                                text: "{!$Label.Done}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    document.getElementById(noteId).value = document.getElementById('pageId:formId:notes').value;
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    writetoNote = document.getElementById('pageId:formId:writetoNoteId').checked;
+                                                    subject = document.getElementById('pageId:formId:Subject').value;
+                                                    PORShowLoading();
+                                                    previousRequestId = '';
+                                                    updateInformation(true,lastRecordId,writetoNote,subject);
+                                                    return false;
+                                                }
+                                            }]              
+                                        });
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Do_Not_Send}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        previousRequestId = '';
+                                        updateInformation(false,lastRecordId,writetoNote,'');
+                                        return false;
+                                    },
+                                },
+                                {
+                                    text: "{!$Label.Cancel}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        cancelAllReq();
+                                        previousRequestId = '';
+                                        return false;
+                                    }
+                                }]              
+                            });
+                            break;
+                        }
+                        else{
+                            PORShowLoading();
+                            previousRequestId = '';
+                            updateInformation(true,lastRecordId,writetoNote,'');
+                            return false;
+                        }
+                    }
+                }
+                if(!isPreview || isPreview == false){
+                    PORShowLoading();
+                    previousRequestId = '';
+                    updateInformation(true,lastRecordId,writetoNote,'');
+                    return false;
+                }
+                
+            }
+        </script>
+    </apex:outPutPanel>
+    <apex:outputPanel id="chkRadio">
+        <script>
+            function selectRadioButton(){
+            //PORHideLoading();
+            
+            oldRequestId = '{!JSENCODE(selectedUnsepReq)}';
+            checkRadio();
+        }
+        </script>
+    </apex:outputPanel>
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <script>
+            var isInlineEditingDisabled = {!isInlineEditingDisabled};
+        </script>
+        
+        <apex:actionFunction immediate="true" name="preFilterRecords" action="{!preFilterSearch}" rerender="formId,PORLoader" onComplete="PORHideLoading();"/> 
+        <apex:actionFunction name="searchRecord" action="{!search}" reRender="accountOpId, contactOpId, contentOpId, inputTextId, pageMsgId" oncomplete="PORHideLoading();">
+            <apex:param name="searchParam" value="" assignTo="{!inputTextValue}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="updateInlineEditingValue" rerender="formId" onComplete="PORHideLoading();">
+            <apex:param name="isInlineEditingDisabled" assignTo="{!isInlineEditingDisabled}" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="callShowMoreLink" action="{!callShowMoreLink}" reRender="accountOpId, contactOpId, contentOpId" oncomplete="PORHideLoading();">
+             <apex:param name="selectedIds" value="one" assignTo="{!selectedId}"/>
+             <apex:param name="accountParam" value="" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+             <apex:param name="contactParam" value="" assignTo="{!contactSearch.showMoreContactRecords}"/>
+             <apex:param name="contentParam" value="" assignTo="{!contentSearch.showMoreContentRecords}"/>
+             
+        </apex:actionFunction>
+        <apex:actionFunction name="createHitRecord" action="{!createHitRecord}" oncomplete="PORHideLoading();" rerender="pgmsgId,accountPbsId,contactPbsId">
+            <apex:param name="isAccount" value="" assignTo="{!isAccount}"/>
+            <apex:param name="isContact" value="" assignTo="{!isContact}"/>
+            <apex:param name="hitAccount" value="" assignTo="{!hitAccount}"/>
+            <apex:param name="hitContact" value="" assignTo="{!hitContact}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="contentPrevious" rerender="contentOpId" action="{!contentSearch.previous}" onComplete="PORHideLoading();">
+            <apex:param name="selectedIds" value="" assignTo="{!selectedId}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="contentNext" rerender="contentOpId" action="{!contentSearch.next}" onComplete="PORHideLoading();">
+            <apex:param name="selectedIds" value="" assignTo="{!selectedId}"/>
+        </apex:actionFunction>
+        <apex:actionfunction name="accountPrevious" reRender="accountOpId" action="{!accountSearch.previous}" oncomplete="PORHideLoading();" />
+        <apex:actionFunction name="accountNext" reRender="accountOpId" action="{!accountSearch.next}" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="moveToSelfService" reRender="accountOpId2,pgmsgId" action="{!selectAndContinue}" oncomplete="PORHideLoading();">
+            <apex:param name="basicAccId" value="" assignTo="{!selectedIds}"/>
+        </apex:actionFunction> 
+        <apex:actionFunction name="setTheFeaturedCheckbox" action="{!contentSearch.setTheFeaturedCheckbox}" oncomplete="PORHideLoading();" rerender="contentOpId"/>
+        
+        
+        <apex:actionFunction name="moveToMixManaged" reRender="accountOpId2,pgmsgId" action="{!keepReqAccount}" oncomplete="PORHideLoading();">
+            <apex:param name="otherAccId" value="" assignTo="{!selectedIds}"/>
+        </apex:actionFunction> 
+        
+        <apex:actionFunction name="fetchContentItem"  action="{!contentSearch.fetchHoverContentItem}" reRender="pgmsgId, dvContentDetails" oncomplete="showDivOncompleteAction();">
+            <apex:param name="contId" value="" assignTo="{!contentSearch.hoverContentId}"/>
+            <apex:param name="refContId" value="" assignTo="{!contentSearch.hoverRefContentId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="downloadContentFiles" reRender="pgmsgId" action="{!contentSearch.downloadContents}" >
+            <apex:param name="contIds" value="" assignTo="{!contentSearch.selectContentDocumentId}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="downloadSingleContent" reRender="pgmsgId" action="{!contentSearch.singleContentDownload}" />
+        
+        <!-- Start Bound 3 Req -->
+        <apex:actionfunction name="discardAccount" action="{!discardReqAccount}" reRender="pgmsgId, dialogBoxDiv" oncomplete="PORHideLoading();"/>
+        <apex:actionfunction name="keepAccount" action="{!keepReqAccount}" reRender="pgmsgId, dialogBoxDiv" oncomplete="PORHideLoading();">
+            <apex:param name="selectedParam" value="" assignTo="{!selectedIds}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="assignUnspecReqId" action="{!findAccountofReq}"  reRender="oppDetailPbsId,contactOpId,accountOpId,pgmsgId" oncomplete="PORHideLoading();">
+            <apex:param name="selectedUnsepReq" value=""  assignTo="{!selectedUnsepReq}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="assignAccount" action="{!assignAccount}" reRender="reqId,accountOpId,pgmsgId" oncomplete="PORHideLoading();setColorOnStatus();return false;">
+            <apex:param name="selectedacc" value=""  assignTo="{!selectedacc}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="assignContact" action="{!assignContact}" reRender="reqId,contactOpId,chkRadio,pgmsgId" oncomplete="PORHideLoading();setColorOnStatus();selectRadioButton();return false;">
+            <apex:param name="selectedCon" value=""  assignTo="{!selectedCon}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="findAccountofReq" action="{!findAccountofReq}" reRender="contactOpId,accountOpId,pgmsgId" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="enabletoUpdate" action="{!enabletoUpdate}" reRender="oppDetailPbsId,pgmsgId">
+            <apex:param name="reqId" assignTo="{!updatableReq}" value=""/>
+        </apex:actionFunction>
+<!--         <apex:actionFunction name="saveAllReq" action="{!saveReqList}" reRender="reqId, pgmsgId,contactOpId,accountOpId" oncomplete="PORHideLoading();"> -->
+<!--              <apex:param name="reqId" assignTo="{!updateReqId}" value=""/> -->
+<!--              <apex:param name="statusValue" assignTo="{!statusValue}" value=""/> -->
+<!--              <apex:param name="changesEntity" assignTo="{!changeField}" value=""/> -->
+<!--         </apex:actionFunction> -->
+        <apex:actionFunction name="updateInformation" action="{!saveReqList}" rerender="blocksectionId,requestPanel,sectionId,msgId,Notes_ListId" onComplete="PORHideLoading();return false;">
+                <apex:param name="isSend" assignTo="{!isSend}" value=""/>
+                <apex:param name="reqId" assignTo="{!updateReqId}" value=""/>
+                <apex:param name="writetoNote" assignTo="{!writetoNote}" value=""/>
+                <apex:param name="subject" assignTo="{!subjectValue}" value=""/>
+            </apex:actionFunction>
+        <apex:actionFunction name="getAccReqDetails" action="{!getSelectedAccReqDetails}" rerender="SizePanel,dialogBoxDiv1" oncomplete="updateMessage();return false;">
+             <apex:param name="reqId" assignTo="{!updateReqId}" value=""/>
+             <apex:param name="statusValue" assignTo="{!statusValue}" value=""/>
+             <apex:param name="changedEntity" assignTo="{!changeField}" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="cancelAllReq" action="{!cancelReqList}"  reRender="reqId, pgmsgId" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="showContactBlock" action="{!showContactBlock}" oncomplete="selectRadioButton();PORHideLoading();return false;"   reRender="contactOpId,accountOpId,chkRadio,pgmsgId">
+            <apex:param name="contactParam" value="" assignTo="{!showContact}"/>
+            <apex:param name="accountParam" value="" assignTo="{!showAccount}"/>
+            <apex:param name="accountId" value="" assignTo="{!contactSearch.accountId}"/>
+            <apex:param name="selectedUnsepReq" value=""  assignTo="{!selectedUnsepReq}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="showAll" action="{!showAll}"  reRender="contactOpId,accountOpId,pgmsgId" oncomplete="PORHideLoading();"/>
+        
+        <apex:actionFunction name="changeAccountType1" action="{!changeAccountType}" oncomplete="PORHideLoading();selectRadioButton();return false;"   reRender="accountOpId,accountPbsId,chkRadio,pgmsgId"/>
+        <apex:actionFunction name="changeContactType1" action="{!changeContactType}" oncomplete="PORHideLoading();selectRadioButton();return false;"   reRender="contactOpId,contactPbsId,chkRadio,pgmsgId"/>
+        <!-- End Bound 3 Req -->
+        
+        <!-- Main Div -->
+        <apex:actionStatus id="porStatus" onStart="PORShowLoading();" onStop="PORHideLoading()"/>
+        <div style="width:'100%';border:'0';" id="mainDivId">
+            
+            <!-- Left Div -->
+            <div style="float: left; width: 15%; valign:'top';"> 
+                <div style="float: left; min-height: 90px; width: 90%; background-color:#CFEEF8; border-radius:5px;">  
+                    <div style="float: left; height: 25px; width: 100%; background-color:#1797C0; font-weight: bold; color: white; border-radius:5px;line-height:25px;">&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.Filter_Your_Results}</div>
+                    {!$Label.use_the_filters}<br/>
+                    <apex:commandLink value="{!$Label.View_All_Filters}" action="{!goToViewAllFilterResults}"/><br/>
+                    <apex:commandLink value="{!$Label.Clear_Filters}" action="{!clearFilters}"/><br/>
+                    <apex:commandLink value="{!$Label.Advance_Filters}" action="{!gotoAdvancedFilter}"/><br/>
+                    <!-- <apex:commandLink value="{!$Label.Advance_Search}" action="{!gotoAdvancedSearch}"/> -->
+                </div>   
+                <div style="height:20px;clear:both; "></div>
+                <apex:outputPanel id="filterPanel">
+                <apex:outputPanel id="filterBasicId" rendered="{!isBasicSearchViewSelected}">
+                    <apex:repeat value="{!basicFilterList}" var="filter">
+                        <!-- Referenceability Div --> 
+                        <apex:outputPanel rendered="{!AND(showAccount,filter.refedge__Field_API_Name__c=='Referenceability',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Referenceability}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalReferenciability}" />
+                                </div>
+                                <apex:repeat value="{!referenceabilityWrapper.selectedReferenceabilityTypes}" var="ref">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!ref.refType.Name}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToReferencibiltyresults}" />
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        <!--  Related Mapping Div -->
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__From_Mapping__c,OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div style="float:left;width:100%;border-radius:5px;">
+                                <div style="float:left;width:100%;border-radius:5px;">
+                                    <apex:repeat value="{!attributeResults[filter.refedge__Field_API_Name__c]}" var="attRecord">
+                                        <div>
+                                            <B><apex:outputLabel value="{!attRecord.Filter_Label_Name__c}"/></B> <br/>
+                                            <div> 
+                                                <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearMappings}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                                </apex:commandLink>
+                                            </div>
+                                            <apex:repeat value="{!relatedMappingController.mappingSelectedValues[attRecord.Id]}" var="ref">
+                                                <div>
+                                                    <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                                    {!ref}
+                                                </div>
+                                            </apex:repeat> 
+                                             <apex:commandLink value="{!$Label.See_All}" action="{!goToTheRelatedSearch}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                             </apex:commandLink>
+                                        </div>   
+                                        <div style="height:15px;">
+                                        </div> 
+                                    </apex:repeat>
+                                </div>
+                            </div>  
+                        </apex:outputPanel> 
+                        <!-- Content Languages Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__Field_API_Name__c=='Content Language',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Language}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentLanguages}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentLanguages}" var="contLang">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contLang.contentLanguageName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentLanguageResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div>
+                        </apex:outputPanel>
+                        <!-- Content Types Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch), filter.refedge__Field_API_Name__c=='Content Types',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Types}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentTypes}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentTypes}" var="contentType">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contentType.contentTypeName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentTypeResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        
+                        <!-- Attributes Div -->
+                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(filter.refedge__Field_API_Name__c)),NOT(filter.refedge__From_Mapping__c),NOT(ISNULL(filter.refedge__Field_API_Name__c)), filter.refedge__Field_API_Name__c != 'Content Types', filter.refedge__Field_API_Name__c != 'Content Language', filter.refedge__Field_API_Name__c != 'Referenceability',OR(filter.refedge__Visible__c,filter.refedge__Required__c))}">
+                            <div><B>{!filter.Label__c}</B>
+                                    <div > 
+                                        <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalAttribute}">
+                                            <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                        </apex:commandLink>
+                                    </div>
+                                    <apex:repeat value="{!attributeWrapper.mapAttributesLabels[filter.refedge__Field_API_Name__c]}" var="attr">
+                                        <div>
+                                            <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                            {!attr.attributeLabel.Attribute__r.Name}
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                                <apex:commandLink action="{!goToAttributeResults}" value="{!$Label.See_All}" >
+                                    <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                </apex:commandLink>                        
+                                <div style="height:15px;">
+                                </div>
+                        </apex:outputPanel>
+                    </apex:repeat>
+                    <apex:commandLink value="{!$Label.more}" style="color:#0070c0;" action="{!changeBasicFilterView}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" rendered="{!isShowMoreLink}" reRender="filterPanel"></apex:commandLink>
+                </apex:outputPanel>
+                <apex:outputPanel id="filterOrderId" rendered="{!!isBasicSearchViewSelected}">
+                    <apex:repeat value="{!filterList}" var="filter">
+                        <!-- Referenceability Div --> 
+                        <apex:outputPanel rendered="{!AND(showAccount,filter.refedge__Field_API_Name__c=='Referenceability')}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Referenceability}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalReferenciability}" />
+                                </div>
+                                <apex:repeat value="{!referenceabilityWrapper.selectedReferenceabilityTypes}" var="ref">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!ref.refType.Name}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToReferencibiltyresults}" />
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        <!--  Related Mapping Div -->
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__From_Mapping__c)}">
+                            <div style="float:left;width:100%;border-radius:5px;">
+                                <div style="float:left;width:100%;border-radius:5px;">
+                                    <apex:repeat value="{!attributeResults[filter.refedge__Field_API_Name__c]}" var="attRecord">
+                                        <div>
+                                            <B><apex:outputLabel value="{!attRecord.Filter_Label_Name__c}"/></B> <br/>
+                                            <div> 
+                                                <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearMappings}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                                </apex:commandLink>
+                                            </div>
+                                            <apex:repeat value="{!relatedMappingController.mappingSelectedValues[attRecord.Id]}" var="ref">
+                                                <div>
+                                                    <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                                    {!ref}
+                                                </div>
+                                            </apex:repeat> 
+                                             <apex:commandLink value="{!$Label.See_All}" action="{!goToTheRelatedSearch}" >
+                                                    <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!attRecord.Id}"/>
+                                             </apex:commandLink>
+                                        </div>   
+                                        <div style="height:15px;">
+                                        </div> 
+                                    </apex:repeat>
+                                </div>
+                            </div>  
+                        </apex:outputPanel> 
+                        <!-- Content Languages Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__Field_API_Name__c=='Content Language')}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Language}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentLanguages}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentLanguages}" var="contLang">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contLang.contentLanguageName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentLanguageResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div>
+                        </apex:outputPanel>
+                        <!-- Content Types Div --> 
+                        <apex:outputPanel rendered="{!AND(showRefContent,NOT(refMatch), filter.refedge__Field_API_Name__c=='Content Types')}">
+                            <div>
+                                <B><apex:outputLabel value="{!$Label.Content_Types}"/></B> <br/>
+                                <div> 
+                                    <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!contentSearch.clearAllContentTypes}" />
+                                </div>
+                                <apex:repeat value="{!contentSearch.selectedContentTypes}" var="contentType">
+                                    <div>
+                                        <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                        {!contentType.contentTypeName}
+                                    </div>
+                                </apex:repeat>
+                                <apex:commandLink value="{!$Label.See_All}" action="{!goToContentTypeResults}"/>
+                            </div> 
+                            <div style="height:15px;">
+                            </div> 
+                        </apex:outputPanel>
+                        
+                        <!-- Attributes Div -->
+                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(filter.refedge__Field_API_Name__c)),NOT(filter.refedge__From_Mapping__c),NOT(ISNULL(filter.refedge__Field_API_Name__c)), filter.refedge__Field_API_Name__c != 'Content Types', filter.refedge__Field_API_Name__c != 'Content Language', filter.refedge__Field_API_Name__c != 'Referenceability')}">
+                            <div><B>{!filter.Label__c}</B>
+                                    <div > 
+                                        <apex:commandLink value="{!$Label.Clear}" style="color:#9EB9DA" action="{!ClearInternalAttribute}">
+                                            <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                        </apex:commandLink>
+                                    </div>
+                                    <apex:repeat value="{!attributeWrapper.mapAttributesLabels[filter.refedge__Field_API_Name__c]}" var="attr">
+                                        <div>
+                                            <apex:image url="{!$Resource.refedge__Tick}" height="12px" width="12px"/>
+                                            {!attr.attributeLabel.Attribute__r.Name}
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                                <apex:commandLink action="{!goToAttributeResults}" value="{!$Label.See_All}" >
+                                    <apex:param name="p1" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                </apex:commandLink>                        
+                                <div style="height:15px;">
+                                </div>
+                        </apex:outputPanel>
+                    </apex:repeat>
+<!--                    <apex:outputLink value="#" style="color:#0070c0;" onclick="showHideTab('filterBasicId');">{!$Label.less}</apex:outputLink> -->
+                    <apex:commandLink value="{!$Label.less}" style="color:#0070c0;" onclick="PORShowLoading();" oncomplete="PORHideLoading();" action="{!changeBasicFilterView}" rendered="{!isShowMoreLink}" reRender="filterPanel"></apex:commandLink>
+                </apex:outputPanel>
+                </apex:outputPanel>
+            </div>
+            <!-- Right Div -->
+            <div style="float: left; width: 85%; valign:'top';" id="refMatchId">    
+                <!-- Start Bound 3 Req -->  
+                <apex:outputPanel id="reqId" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                    <div style="float:left ; width: 40%;">
+                        <apex:commandLink style="color:#5C95C4;" action="{!redirectOnRequest}" value="{!$Label.Back_to_Request_Reference_Use}" rendered="{!request != null}"/><br/>
+                    </div>
+                    <script>
+                        var newRequestId = '{!JSENCODE(newAccountRequestId)}';
+                        var oldRequestId = '{!JSENCODE(selectedUnsepReq)}';
+                        var rep2repIds = '{!JSENCODE(rep2repId)}';
+                    </script>
+                    <apex:pageBlock id="refMatchblockId" rendered="{!request != null}">
+                        <apex:pageBlockSection title="{!IF(request.Opportunity__r.Name != '', $Label.Opportunity_Information,$Label.General_information)}" columns="2" id="oppDetailPbsId">
+                            <apex:outputField rendered="{!request.Opportunity__r.Name != ''}" value="{!request.Opportunity__r.Name}"/>
+                            <apex:outputField rendered="{!request.Opportunity__r.Name != ''}" value="{!request.Opportunity__r.AccountId}" label="{!$Label.Opportunity_Account}"/>
+                            <apex:outputField value="{!request.refedge__Requester__c}"/>
+                            <apex:outputField value="{!request.refedge__Project_Type__c}"/>
+                            <apex:outputField value="{!request.refedge__Case__c}" rendered="{!request.refedge__Case__c != null}"/>
+                            <script>
+                                var oldRequestId = '{!JSENCODE(selectedUnsepReq)}';
+                            </script>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection id="refMatchSectionId" title="{!$Label.Requested_Accounts}" columns="1">
+                            <apex:outputPanel id="InlineEditButton">
+                                <!--<apex:commandButton rendered="{!AND(!isEdit,isInlineEditingDisabled)}" reRender="refMatchSectionId" value="{!$Label.Edit}" id="editButton" action="{!editRow}" onclick="PORShowLoading();" oncomplete="PORHideLoading();document.getElementById('pageId:formId:refMatchblockId:refMatchSectionId:saveButton').className = 'showButton';document.getElementById('pageId:formId:refMatchblockId:refMatchSectionId:cancelButton').className = 'showButton';" style="margin-left:40%;width:50px;"/>-->
+                                <apex:commandButton styleClass="hideButton" value="{!$Label.Save}" id="saveButton" onclick="checkProcess();return false;" style="margin-left:40%;width:50px;"/>
+                                <apex:commandButton styleClass="hideButton" value="{!$Label.Cancel}" id="cancelButton" Onclick="PORShowLoading();cancelAllReq();return false;" style="width:50px;"/>
+                            </apex:outputPanel>
+                            <apex:pageBlockTable value="{!allActiveReq}" var="reqWrap" id="specPbtRequest" >
+                                <apex:column id="headerFooterId" headerValue="{!$Label.Action}">
+                                    <apex:inputhidden value="{!reqWrap.id}" id="selectsingleHiddenReq"/>
+                                    <apex:outputPanel id="radioPanelId"  rendered="{!NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}"><input type="radio" id="radioID" Class="{!JSENCODE(reqWrap.Id)}"  name="radioName" value="{!reqWrap.id}"  onclick="PORShowLoading();assignUnspecReqIdJS('{!JSENCODE(reqWrap.id)}', this,{!reqWrap.isUr});" /></apex:outputPanel>
+                                    <apex:outputPanel id="radioPanelId2" rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'),reqWrap.rra.refedge__Account_Request_Status__c == 'No Response', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}"><input type="radio" disabled="disabled" name="radioName" value="{!reqWrap.id}" /></apex:outputPanel>
+                                </apex:column> 
+                                <apex:column headerValue="{!$Label.Type}">
+                                    <apex:outputPanel onclick="enabletoUpdateJS('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr});" rendered="{!AND(reqWrap.id != selectedaccountReq, NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.rra.refedge__Account_Request_Status__c == 'No Response', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                        <apex:outputField id="typePanelField" value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!!(reqWrap.isUR)}">
+                                            <apex:InlineEditSupport event="ondblclick"/>
+                                        </apex:outputField>
+                                        <apex:outputField id="typePanelFieldUnspecified" value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!(reqWrap.isUR)}">
+                                            <apex:InlineEditSupport event="ondblclick"/>
+                                        </apex:outputField>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel id="typePanelEdit" rendered="{!AND(isEdit, NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.rra.refedge__Account_Request_Status__c == 'No Response', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                        <apex:inputField id="typePanelField1"  value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                        <apex:inputField id="typePanelFieldUnspecified1" value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.id == selectedaccountReq)}"/>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed',reqWrap.rra.refedge__Account_Request_Status__c == 'No Response', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}">
+                                        <apex:outputField value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                        <apex:outputPanel id="editLinkDisableOp1" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                                            <a href="#" style="pointer-events: none; color : lightgray;">{!reqWrap.rra.Reference_Type_Needed__r.Name}</a>
+                                        </apex:outputPanel>
+                                        <apex:outputField value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!reqWrap.isUR}"/>
+                                    </apex:outputPanel>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Account}" >
+                                    <apex:outputField value="{!reqWrap.rra.refedge__Account__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                    <apex:outputPanel id="editLinkDisableOp2" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                                        <a href="#" style="pointer-events: none; color : lightgray;">{!reqWrap.rra.Account__r.Name}</a>
+                                    </apex:outputPanel>
+                                    <apex:outputText value="" rendered="{!(reqWrap.isUR)}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Contact}" >
+                                    <apex:commandLink rendered="{!AND(NOT(reqWrap.isUR),NOT(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable'), CONTAINS(refReqContactMap[reqWrap.Id], '*'))}" onClick="PORShowLoading();showContactBlock(true,false, '{!JSENCODE(reqWrap.rra.refedge__Account__c)}','{!JSENCODE(reqWrap.Id)}');return false;"  value="{!$Label.Display}"/>
+                                    <apex:outputText style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'color : lightgray;', '')}" rendered="{!AND(NOT(reqWrap.isUR), NOT(CONTAINS(refReqContactMap[reqWrap.rra.Id], '*')))}" value="{!refReqContactMap[reqWrap.rra.Id]}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Deadline}">
+                                    <apex:outputField value="{!reqWrap.rra.refedge__Deadline__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                    <apex:outputText style="color : lightgray;" value="{!TEXT(MONTH(reqWrap.rra.refedge__Deadline__c))+'/'+TEXT(DAY(reqWrap.rra.refedge__Deadline__c))+'/'+TEXT(YEAR(reqWrap.rra.refedge__Deadline__c))}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                                    <apex:outputField value="{!reqWrap.unSpec.refedge__Deadline__c}" rendered="{!(reqWrap.isUR)}"/> 
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Process}">
+                                    <apex:outputPanel Id="processId" onclick="enabletoUpdateJS('{!JSENCODE(reqWrap.Id)}',this,true,{!reqWrap.isUr});" rendered="{!AND(reqWrap.id != selectedaccountReq, NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                        <apex:outputText value="{!reqWrap.processStatus}" rendered="{!reqWrap.processStatus == 'Managed'}"/>
+                                        <apex:outputField Id="inlineProcessId" value="{!reqWrap.rra.refedge__Process__c}" rendered="{!reqWrap.processStatus != 'Managed'}">
+                                            <apex:InlineEditSupport event="ondblclick"/>
+                                        </apex:outputField>
+                                    </apex:outputpanel>
+                                    <apex:outputPanel rendered="{!AND(isEdit, NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                        <apex:outputText value="{!reqWrap.processStatus}" rendered="{!AND(reqWrap.id == selectedaccountReq,reqWrap.processStatus == 'Managed')}"/>
+                                        <apex:inputField Id="inlineProcessIdEdit" value="{!reqWrap.rra.refedge__Process__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq,reqWrap.processStatus != 'Managed')}"/>
+                                    </apex:outputpanel>
+                                    <apex:outputPanel rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}">
+                                        <apex:outputText style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'color : lightgray;', '')}" value="{!reqWrap.processStatus}"/>
+                                    </apex:outputPanel>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Status}" >
+                                    <apex:outputPanel id="inlineEditStatusId" onclick="enabletoUpdateJS('{!JSENCODE(reqWrap.Id)}',this,true,{!reqWrap.isUr});" rendered="{!AND(reqWrap.id != selectedaccountReq, NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                        <apex:outputField id="ArstatusFieldId" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!!(reqWrap.isUR)}">
+                                            <apex:InlineEditSupport id="Arinline" event="ondblclick"/>
+                                        </apex:outputField>
+                                        <apex:outputField id="UrstatusFieldId" value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!reqWrap.isUR}">
+                                            <apex:InlineEditSupport id="Urinline" event="ondblclick"/>
+                                        </apex:outputField>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!AND(isEdit, NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                        <apex:inputField id="ArstatusFieldIdEdit" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                        <apex:inputField id="UrstatusFieldIdEdit" value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.id == selectedaccountReq)}"/>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}">
+                                        <apex:outputField value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                        <apex:outputText style="color : lightgray;" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                                        <apex:outputField value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!reqWrap.isUR}"/>
+                                    </apex:outputPanel>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Project}">
+                                    <apex:outputLink style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'pointer-events: none; color : lightgray;', '')}" value="/{!reqWrap.Id}" target="_blank">{!$Label.Details}</apex:outputLink> 
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Notes}">
+                                    <apex:outputpanel rendered="{!AND(!(reqWrap.isUR),reqWrap.rra.refedge__Request_Notes__c != '')}">
+                                        <apex:outputText id="RRANotes" title="{!reqWrap.rra.refedge__Request_Notes__c}" value="{!$Label.Display}"/>
+                                        <!--<a href="/{!reqWrap.rra.Id}" style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'pointer-events: none; color : lightgray;', '')}" id="{!reqWrap.rra.Id}" onblur="LookupHoverDetail.getHover('{!reqWrap.rra.Id}').hide();" onfocus="LookupHoverDetail.getHover('{!reqWrap.rra.Id}', '/{!reqWrap.rra.Id}/m?retURL=%2F{!reqWrap.rra.Id}&isAjaxRequest=1').show();" onmouseout="LookupHoverDetail.getHover('{!reqWrap.rra.Id}').hide();" onmouseover="LookupHoverDetail.getHover('{!reqWrap.rra.Id}', '/{!reqWrap.rra.Id}/m?retURL=%2F{!reqWrap.rra.Id}&isAjaxRequest=1').show();">{!$Label.Display}</a>-->
+                                    </apex:outputpanel>
+                                    <apex:outputpanel rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Request_Notes__c != '')}">
+                                        <apex:outputText title="{!reqWrap.unSpec.refedge__Request_Notes__c}" value="{!$Label.Display}"/>
+                                        <!--<a href="/{!reqWrap.unSpec.Id}" id="{!reqWrap.unSpec.Id}" onblur="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}').hide();" onfocus="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}', '/{!reqWrap.unSpec.Id}/m?retURL=%2F{!reqWrap.unSpec.Id}&isAjaxRequest=1').show();" onmouseout="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}').hide();" onmouseover="LookupHoverDetail.getHover('{!reqWrap.unSpec.Id}', '/{!reqWrap.unSpec.Id}/m?retURL=%2F{!reqWrap.unSpec.Id}&isAjaxRequest=1').show();">{!$Label.Display}</a>-->
+                                    </apex:outputpanel>
+                                    <apex:inputhidden id="denyNotes" value="{!reqWrap.rra.refedge__Approve_Deny_Notes__c}"/>
+                                    <apex:inputhidden id="denyNotesUn" value="{!reqWrap.unSpec.refedge__Notes__c}"/>
+                                </apex:column>
+                                <apex:column id="headerFooterId2" headerValue="{!$Label.Edit}" rendered="{!isInlineEditingDisabled}">
+                                    <apex:commandLink rendered="{!AND(!isEdit,NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed', reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'Account Specified')))}" action="{!editRow}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="refMatchSectionId,msgId">
+                                        <apex:image url="{!$Resource.refedge__Edit}" height="12px" width="12px"/>
+                                        <apex:param name="requestToEdit" value="{!reqWrap.id}" assignTo="{!selectedaccountReq}" />
+                                    </apex:commandLink>
+                                    <apex:commandLink rendered="{!AND(isEdit, reqWrap.id == selectedaccountReq)}" onclick="getReqInfoDetailsEdit('{!JSENCODE(reqWrap.Id)}',{!reqWrap.isUr});return false;" oncomplete="PORHideLoading();" reRender="requestPanel,msgId">
+                                        <apex:image url="{!$Resource.refedge__Save}" height="12px" width="12px"/>
+                                    </apex:commandLink>&nbsp;&nbsp;&nbsp;
+                                    <apex:commandLink rendered="{!AND(isEdit, reqWrap.id == selectedaccountReq)}" onclick="PORShowLoading();cancelAllReq();return false;" oncomplete="PORHideLoading();" reRender="requestPanel,msgId">
+                                        <apex:image url="{!$Resource.refedge__Cancel}" height="12px" width="12px"/>
+                                        <apex:param name="requestToEdit" value="{!reqWrap.id}" assignTo="{!selectedaccountReq}"/>
+                                    </apex:commandLink>
+                                </apex:column> 
+                            </apex:pageBlockTable> 
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                    <apex:pageBlock rendered="{!request == null}">
+                        <apex:outputPanel >
+                            <apex:pageMessage summary="{!$Label.Request_Deleted_Message}" severity="Warning" strength="3" />
+                        </apex:outputPanel>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+                <!-- End Bound 3 Req -->
+                
+                <apex:inputText maxlength="100" style="width:250px;" id="inputTextId" value="{!tempTextValue}"/> &nbsp;
+                <apex:commandButton value="{!$Label.Search}" onclick="doSearch();return false;"/>
+
+                <br/><br/>
+                <apex:repeat id="blockId" value="{!sectionOrder}" var="section">
+                <!-- Accounts Page Block -->
+                <apex:outputPanel id="accountOpId" rendered="{!section == 'account'}">
+                    <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(accountSearch.showMoreAccountRecords,showAccount)}" reRender="accountOpId, contactOpId, contentOpId"/>
+                    <!-- Start Bound 3 Req -->
+                    <apex:outputPanel layout="block" style="float:left;" rendered="{!AND(NOT(refMatch),NOT(isthisBasic),NOT(OR(contactSearch.showMoreContactRecords,contentSearch.showMoreContentRecords)),showAccount)}">
+                       
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="block" style="float:right;" rendered="{!AND(NOT(refMatch),NOT(isthisBasic),NOT(OR(contactSearch.showMoreContactRecords,contentSearch.showMoreContentRecords)),showAccount,Not(preFilter))}">
+                        <apex:commandLink style="color:#1797C0;" value="{!$Label.Continue_without_selecting_Accounts}" onclick="continueWitoutAccount({!accounts.size}, 1, 'selectSingleAccountId');return false;"/>
+                    </apex:outputPanel>
+                    <!-- End Bound 3 Req -->
+                    <apex:pageBlock id="accountPbId" title="{!$Label.Accounts} ({!IF(accountSearch.accountSize>2000, TEXT(2000)+'+', accountSearch.accountSize)})" rendered="{!AND(NOT(OR(contactSearch.showMoreContactRecords,contentSearch.showMoreContentRecords)),showAccount,Not(preFilter))}">
+                        <apex:outputPanel id="accountTypeId" rendered="{!AND(refMatch,NOT(request.refedge__Project_Type__c == 'Candidate'))}">
+                            <apex:selectRadio value="{!accountSearch.selectedType}" onchange="PORShowLoading();changeAccountType1();return false;">
+                                <apex:selectOptions value="{!accountSearch.items}"/>
+                            </apex:selectRadio>
+                        </apex:outputPanel>
+                        <apex:outputPanel id="accountTypeId2" rendered="{!AND(refMatch,request.refedge__Project_Type__c == 'Candidate')}">
+                            <apex:outputText style="color:red;" value="{!$Label.Displaying_Reference_Candidates_only}"/>
+                        </apex:outputPanel>
+                        
+                        <apex:pageBlockButtons location="top" >
+                            <apex:commandButton id="selectAContinuePro" value="{!$Label.Select_Continue}" rendered="{!AND(NOT(refMatch),showAccount, accounts.size > 0,NOT(isthisBasic))}" onclick="return validateSelection({!accounts.size}, 1, 'selectSingleAccountId','');"/>
+                            <apex:commandButton id="selectAContinueBasic" value="{!$Label.Select_Continue}" rendered="{!AND(NOT(refMatch),showAccount, accounts.size > 0,isthisBasic)}" onclick="return validateSelection({!accounts.size}, 1, 'selectSingleAccountId','basic');"/>
+                        </apex:pageBlockButtons>
+                        
+                        <apex:pageBlockSection columns="1" id="accountPbsId">
+                            <apex:outputPanel rendered="{!accounts.size == 0}">
+                                    <apex:pageMessage summary="{!$Label.No_matches_found}" severity="Warning" strength="3" />
+                            </apex:outputPanel>
+                            <apex:pageBlockTable value="{!accounts}" var="accWrap" id="pbtAccount" rendered="{!AND(accounts!= null, accounts.size > 0)}">
+                                <apex:column id="headerFooterId1" rendered="{!NOT(refMatch)}">
+                                    <apex:facet name="header">
+                                        <apex:inputCheckBox id="selectAllAccountId"  onclick="selectAllChk(this, 'selectSingleAccountId', '{!accounts.size}', 'accountNoticeId')" />
+                                    </apex:facet>
+                                    <apex:inputCheckBox id="selectSingleAccountId" value="{!accWrap.isSelected}" onclick="enableDisable(this, 'selectSingleAccountId', 'selectAllAccountId', '{!IF(accWrap.acc.refedge__Account_Level_RUL__c, IF(accWrap.acc.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''),IF(accWrap.acc.refedge__Is_Contact_Limit_Reached__c, $Label.Limit_Reached,''))}');" />
+                                    <apex:inputhidden value="{!accWrap.accountId}" id="selectsingleHidden"/>
+                                </apex:column> 
+                                <apex:column id="headerFooterId2" headerValue="{!$Label.Action}" style="width:8%;" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputLink style="font-weight:bold;" onClick="checkUnspecSelected('', '{!JSENCODE(accWrap.acc.refedge__Account__c)}', ''); return false;">{!$Label.Assign}</apex:outputLink> | 
+                                    <apex:commandLink style="{!IF(accWrap.isAlreadyHit, 'pointer-events: none;color : lightgray;font-weight:bold;', 'font-weight:bold;')}" value=" {!$Label.Hit}" onClick="checkForRadioSelected(true,false,'{!JSENCODE(accWrap.acc.Account__r.Id)}',null,{!accWrap.isAlreadyHit});return false;" rendered="{!AND(refMatch,NOT(isthisBasic))}" >
+                                    </apex:commandLink>
+                                </apex:column>  
+                                <apex:column headerValue="{!$Label.Account_Name}">
+                                    <apex:outputLink value="/{!accWrap.acc.refedge__Account__c}">{!accWrap.acc.Account__r.name}</apex:outputLink>
+                                </apex:column>
+                                <apex:column headervalue="{!$Label.Owner}" value="{!accWrap.acc.Account__r.OwnerId}" rendered="{!IF(accWrap.acc.refedge__Reference_Owner__c == NULL, true, false)}"/>  
+                                <apex:column headervalue="{!$Label.Owner}" value="{!accWrap.acc.refedge__Reference_Owner__c}" rendered="{!IF(accWrap.acc.refedge__Reference_Owner__c != NULL,true,false)}"/>
+                                <apex:column headervalue="{!$Label.Referenceability}" value="{!accWrap.acc.refedge__Referenceability__c}" /> 
+                                <apex:column headervalue="{!$Label.Attributes}" value="{!accWrap.acc.refedge__Attributes__c}" /> 
+                                <apex:column headervalue="{!$Label.Last} {!RULPeriodLength} {!$Label.days}" value="{!accWrap.acc.refedge__Default_Period_Completed_Uses__c}" /> 
+                                <apex:column headervalue="{!$Label.T_Last_Used}" value="{!accWrap.acc.refedge__RUL_Last_Activity_Date__c}" /> 
+                                <apex:column headervalue="{!$Label.Notice}">
+                                    <apex:outputText id="accountNoticeId" value="{!IF(accWrap.acc.refedge__Account_Level_RUL__c, IF(accWrap.acc.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''),IF(accWrap.acc.refedge__Is_Contact_Limit_Reached__c, $Label.Limit_Reached,''))}" style="color:red;"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Assigned}" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputText value="{!accWrap.relatedAR}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Hit_List}"   rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputText rendered="{!accWrap.hitListCount!=0}" value="{!accWrap.hitListCount}"/>
+                                    <apex:outputText rendered="{!accWrap.hitListCount==0}" value="{!accWrap.hitListCount}"/>
+                                </apex:column>
+                            </apex:pageBlockTable>
+                           
+                            <apex:actionRegion >
+                                <apex:commandLink style="font-weight: bold;" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',true,'link');return false;"  value="{!$Label.Show_More}"  rendered="{!AND(accountSearch.isAccountLimitExceed, NOT(accountSearch.showMoreAccountRecords),NOT(refMatch))}"  />
+                                <apex:commandLink style="font-weight: bold;" onclick="PORShowLoading();" action="{!callShowMoreLink}" value="{!$Label.Show_More}"  rendered="{!AND(accountSearch.isAccountLimitExceed, NOT(accountSearch.showMoreAccountRecords),refMatch)}"  >
+                                    <apex:param name="accountParam" value="true" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+                                    <apex:param name="contactParam" value="false" assignTo="{!contactSearch.showMoreContactRecords}"/>
+                                    <apex:param name="contentParam" value="false" assignTo="{!contentSearch.showMoreContentRecords}"/>
+                                </apex:commandLink>
+                            </apex:actionRegion>
+                            
+                            <apex:outputPanel id="pagingPanel" >
+                                <apex:actionRegion >
+                                    <apex:outputPanel rendered="{!AND(accountSearch.showMoreAccountRecords, accounts.size > 0)}">
+                                    <table border="0" align="center">
+                                        <tr> 
+                                            <td align="center">
+                                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!accountSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                                <apex:commandLink value="{!$Label.Previous_Page}" reRender="accountPbId" rendered="{!accountSearch.pageIndex > 1}" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',false,'previous');return false;" /> 
+                                                &nbsp;&nbsp;
+                                                <apex:outputText >
+                                                    {!(accountSearch.pageIndex * accountSearch.pageLimit)+1-accountSearch.pageLimit}-{!(accountSearch.pageIndex * accountSearch.pageLimit) - (accountSearch.pageLimit - accounts.size)}
+                                                </apex:outputText>
+                                                &nbsp;&nbsp;
+                                                <apex:commandLink value="{!$Label.Next_Page} " reRender="accountPbId" rendered="{!accountSearch.isNextRender}" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',false,'next');return false;" />&nbsp; 
+                                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!accountSearch.isNextRender}" width="5px" height="8px"/>
+                                            </td>                                                  
+                                        </tr>
+                                    </table>   
+                                    </apex:outputPanel> 
+                                </apex:actionRegion> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSection>
+                        <script language="javascript" type="text/javascript">
+                            previouslyselectedaccount = {!accountSearch.isAccountSelected};
+                            deSelectAllChk('selectAllAccountId');
+                        </script>
+                    </apex:pageBlock>  
+                </apex:outputPanel> 
+                
+                <!-- Contacts Page Block -->
+                <apex:outputPanel id="contactOpId" rendered="{!section == 'contact'}">
+                    <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(contactSearch.showMoreContactRecords)}" reRender="accountOpId, contactOpId, contentOpId" onclick="PORShowLoading();" oncomplete="PORHideLoading();"/>
+                    <apex:commandLink style="font-weight: bold;" value="{!$Label.Show_All}" action="{!showAll}" rendered="{!contactSearch.accountId != null}" reRender="accountOpId, contactOpId" onclick="PORShowLoading();" oncomplete="PORHideLoading();"/>
+                    <apex:pageBlock id="contactPbId" title="{!$Label.Contacts} ({!IF(contactSearch.contactSize>2000, TEXT(2000)+'+', contactSearch.contactSize)})" rendered="{!AND(NOT( OR(accountSearch.showMoreAccountRecords, contentSearch.showMoreContentRecords)),OR(showContact,showHitContacts))}">
+                        <apex:outputPanel id="contactTypeId" rendered="{!AND(refMatch,NOT(request.refedge__Project_Type__c == 'Candidate'))}">
+                            <apex:selectRadio value="{!contactSearch.selectedType}" onchange="PORShowLoading();changeContactType1();return false;">
+                                <apex:selectOptions value="{!contactSearch.items}"/>
+                            </apex:selectRadio>
+                        </apex:outputPanel>
+                        <apex:outputPanel id="contactTypeId2" rendered="{!AND(refMatch,request.refedge__Project_Type__c == 'Candidate')}">
+                            <apex:outputText style="color:red;" value="{!$Label.Displaying_Reference_Candidates_only}"/>
+                        </apex:outputPanel>
+                        
+                        <apex:pageBlockSection columns="1" id="contactPbsId">
+                            <script>
+                                contactBlockDisplayed = {!showContact};
+                            </script>
+                            <apex:outputPanel rendered="{!contacts.size == 0}">
+                                    <apex:pageMessage summary="{!$Label.No_matches_found}" severity="Warning" strength="3" />
+                            </apex:outputPanel>
+                            <apex:pageBlockTable value="{!contacts}" var="contWrap" id="pbtContact" rendered="{!AND(contacts!= null, contacts.size > 0)}">
+                                <apex:column id="headerFooterId2" headerValue="{!$Label.Action}" style="width:8%;" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputPanel >
+                                        <apex:outputLink style="font-weight:bold;" onClick="checkUnspecSelected('', '', '{!JSENCODE(contWrap.con.refedge__Contact__c)}'); return false;">{!$Label.Assign}</apex:outputLink> |
+                                        <apex:commandLink style="{!IF(contWrap.isAlreadyHit, 'pointer-events: none;color : lightgray;font-weight:bold;', 'font-weight:bold;')}" onclick="checkForRadioSelected(false,true,null,'{!JSENCODE(contWrap.con.Contact__r.Id)}',{!contWrap.isAlreadyHit});return false;"  value=" {!$Label.Hit}"  rendered="{!AND(refMatch,NOT(isthisBasic))}" > 
+                                        </apex:commandLink>
+                                    </apex:outputPanel>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Contact_Name}">
+                                    <apex:outputLink value="/{!contWrap.con.Contact__r.Id}">{!contWrap.con.contact__r.name}</apex:outputLink>
+                                </apex:column>
+                                <apex:column headervalue="{!$Label.Account_Name}" value="{!contWrap.con.Contact__r.AccountId}" />
+                                <apex:column headervalue="{!$Label.Contact_Owner}" value="{!contWrap.con.Contact__r.OwnerId}" />  
+                                <apex:column headervalue="{!$Label.Referenceability}" value="{!contWrap.con.refedge__Referenceability__c}" /> 
+                                <apex:column headervalue="{!$Label.Attributes}" value="{!contWrap.con.refedge__Attributes__c}" /> 
+                                <apex:column headervalue="{!$Label.Last} {!RULPeriodLengthContact} {!$Label.days}" value="{!contWrap.con.refedge__Default_Period_Completed_Uses__c}" /> 
+                                <apex:column headervalue="{!$Label.T_Last_Used}" value="{!contWrap.con.refedge__RUL_Last_Activity_Date__c}" /> 
+                                <apex:column headervalue="{!$Label.Notice}">
+                                    <apex:outputText id="contactNoticeId" value="{!IF(contactSearch.mapAccountRBIofContactRBI[contWrap.con.refedge__Account__c].Account_Level_RUL__c, IF(contactSearch.mapAccountRBIofContactRBI[contWrap.con.refedge__Account__c].RUL_Limit_Reached__c, $Label.Limit_Reached,''),IF(contWrap.con.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''))}" style="color:red;"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Assigned}" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputText value="{!contWrap.relatedAR}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Hit_List}" rendered="{!AND(refMatch,NOT(isthisBasic))}">
+                                    <apex:outputText rendered="{!contWrap.hitListCount!=0}" value="{!contWrap.hitListCount}"/>
+                                    <apex:outputText rendered="{!contWrap.hitListCount==0}" value="{!contWrap.hitListCount}"/>
+                                </apex:column>
+                            </apex:pageBlockTable>
+                            <!-- Show more Link-->
+                            <apex:actionRegion >
+                                <apex:commandLink style="font-weight: bold;" action="{!callShowMoreLink}"  value="{!$Label.Show_More}" reRender="accountOpId, contactOpId, contentOpId" rendered="{!AND(contactSearch.isContactLimitExceed, NOT(contactSearch.showMoreContactRecords))}" onclick="PORShowLoading();" oncomplete="PORHideLoading();">
+                                    <apex:param name="accountParam" value="false" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+                                    <apex:param name="contactParam" value="true" assignTo="{!contactSearch.showMoreContactRecords}"/>
+                                    <apex:param name="contentParam" value="false" assignTo="{!contentSearch.showMoreContentRecords}"/>
+                                </apex:commandLink>
+                            </apex:actionRegion>
+
+                            <!-- Paging Panel-->
+                            <apex:outputPanel id="pagingPanel" >
+                                <apex:actionRegion >
+                                    <apex:outputPanel rendered="{!AND(contactSearch.showMoreContactRecords, contacts.size > 0)}">
+                                    <table border="0" align="center">
+                                        <tr> 
+                                            <td align="center">
+                                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!contactSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                                <apex:commandLink action="{!contactSearch.previous}" value="{!$Label.Previous_Page}" reRender="contactPbId" rendered="{!contactSearch.pageIndex > 1}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"/> 
+                                                &nbsp;&nbsp;
+                                                <apex:outputText >
+                                                    {!(contactSearch.pageIndex * contactSearch.pageLimit)+1-contactSearch.pageLimit}-{!(contactSearch.pageIndex * contactSearch.pageLimit) - (contactSearch.pageLimit - contacts.size)}
+                                                </apex:outputText>
+                                                &nbsp;&nbsp;
+                                                <apex:commandLink action="{!contactSearch.next}" value="{!$Label.Next_Page} " reRender="contactPbId" rendered="{!contactSearch.isNextRender}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"/>&nbsp; 
+                                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!contactSearch.isNextRender}" width="5px" height="8px"/>
+                                            </td>                                                  
+                                        </tr>
+                                    </table>   
+                                    </apex:outputPanel> 
+                                </apex:actionRegion> 
+                            </apex:outputPanel>
+                       </apex:pageBlockSection>
+                       
+                       <script language="javascript" type="text/javascript">
+                           deSelectAllChk('selectAllContactPbtId');
+                       </script>
+                    </apex:pageBlock> 
+                </apex:outputPanel>
+                </apex:repeat>
+                <!-- Contents Page Block -->
+                <apex:outputPanel id="contentOpId" rendered="{!NOT(refMatch)}">
+                    
+                    <apex:outputPanel id="transcriptPlayPanel">
+                    <script>
+                        function downloadContents(size, pageBlockNo, selectSingleContentPbtId){
+                            var hasChecked = false;
+                            var selectedContentIds = '' ;
+                            var hasLinkUrl = false;
+                            <apex:repeat value="{!contentSearch.mapContent}" var="key">
+                                if({!key} != {!contentSearch.pageIndex}){
+                                    <apex:repeat value="{!contentSearch.mapContent[key]}" var="contentList">
+                                        
+                                        if({!contentList.isSelected} ){
+                                            hasChecked = true;
+                                        }
+                                        if(hasChecked && '{!contentList.contentVersion.FileType}' == 'LINK')
+                                            hasLinkUrl = true;
+                                        
+                                    </apex:repeat>
+                                }
+                            </apex:repeat>
+                            
+                            for(var i=0; i < size; i++) {
+                                var id = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":"+selectSingleContentPbtId; 
+                                if(document.getElementById(id).checked ) {
+                                    hasChecked = true;
+                                    break ;  
+                                }
+                            }
+                            if (hasChecked == false){
+                                alert('{!$Label.Select_Atleast_One_Content}');
+                                return false;
+                            }
+                            if(hasLinkUrl){
+                                alert('{!$Label.Link_Content_Message}');
+                            }
+                            
+                            downloadContentFiles(selectedContentIds); 
+                            return false;
+                        }
+                        var fileType = '{!JSENCODE(transcriptFileType)}';
+                        
+                        
+                    </script>
+                    
+                    
+                    </apex:outputPanel>
+                    <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(contentSearch.showMoreContentRecords)}" reRender="accountOpId, contactOpId, contentOpId"/>
+                    <apex:outputPanel layout="block" style="float:right;" rendered="{!AND(NOT(OR(accountSearch.showMoreAccountRecords, contactSearch.showMoreContactRecords)),showRefContent,Not(preFilter))}">
+                        <apex:commandLink style="color:#1797C0;" value="{!$Label.use_a_Content_Collection}" onclick="openSelectCollection();return false;"/>
+                    </apex:outputPanel>
+                    <apex:pageBlock title="{!$Label.Content} ({!IF(contentSearch.contentSize>2000, TEXT(2000)+'+', contentSearch.contentSize)})" id="contentPbId" rendered="{!AND(NOT(OR(accountSearch.showMoreAccountRecords, contactSearch.showMoreContactRecords)),showRefContent,Not(preFilter))}">
+                        <apex:pageBlockButtons id="contentPbbId" location="top" rendered="{!AND(contents != null, contents.size > 0, isCRMContentUser)}"> 
+                            <apex:commandButton value="{!$Label.Download}" onclick="return downloadContents({!contents.size}, 2, 'selectSingleContentPbtId');" title="Downloads a zip file of the selected content."/>
+                            <apex:commandButton value="{!IF(invitationcontroller.showShareButton,$Label.Share,$Label.Return_to_Invitation)}"  action="{!shareContents}" />
+                            <apex:commandButton value="{!$Label.Create_Collection}" onclick="openCreateCollection({!contents.size});return false;" rendered="{!isCollectionCreateable}"/> 
+                        </apex:pageBlockButtons>
+                        
+                        <apex:pageBlockSection columns="1" id="contentPbsId">
+                            <apex:outputPanel rendered="{!contents.size == 0}">
+                                    <apex:pageMessage summary="{!$Label.No_matches_found}" severity="Warning" strength="3" />
+                            </apex:outputPanel>
+                            
+                            <apex:pageBlockTable value="{!contents}" var="contentWrap" id="pbtContent" rendered="{!AND(contents != null, contents.size > 0)}">
+                                <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:inputCheckBox id="selectAllContentPbtId"  onclick="selectAllChk(this, 'selectSingleContentPbtId', null, null)" />
+                                    </apex:facet>
+                                    <apex:inputCheckBox disabled="{!OR(NOT(isCRMContentUser),contentWrap.refContent.refedge__Internal_Use__c,NOT(OR(contentWrap.refContent.refedge__Content_ID__c != null,contentWrap.refContent.Reference_Content_Type__r.refedge__Recorded_Reference_Type__c)))}" id="selectSingleContentPbtId" value="{!contentWrap.isSelected}" onclick="enableDisable(this, 'selectSingleContentPbtId', 'selectAllContentPbtId', null)" />
+                                    <apex:inputhidden value="{!contentWrap.contentVersion.ContentDocumentId}" id="selectSingleContentIdHidden"/>
+                                    <apex:inputhidden value="{!contentWrap.contentVersion.FileType}" id="fileTypeHiddenId"/>
+                                </apex:column> 
+                                <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:outputPanel >
+                                            <apex:image title="{!$Label.Featured_Content}" url="{!URLFOR($Resource.refedge__starImages,'startImages/starchecked.png')}" onclick="setTheFeaturedCheckbox();PORShowLoading();" rendered="{!contentSearch.featuredChecked}"/>
+                                            <apex:image title="{!$Label.Featured_Content}" url="{!URLFOR($Resource.refedge__starImages,'startImages/startunchecked.png')}" onclick="setTheFeaturedCheckbox();PORShowLoading();" rendered="{!!contentSearch.featuredChecked}"/>
+                                        </apex:outputPanel>
+                                    </apex:facet>
+                                    <apex:image title="{!$Label.Featured_Content}" url="{!URLFOR($Resource.refedge__starImages,'startImages/starchecked.png')}" rendered="{!contentWrap.refContent.refedge__Featured_Content__c}"/>
+                                </apex:column> 
+                                
+                                <apex:column headerValue="{!$Label.Share}" style="text-align: center;">
+                                    <apex:outputText value="X" rendered="{!contentWrap.refContent.refedge__Internal_Use__c}" style="color: red;font-weight: bold;font-size: medium;"/>
+                                    <apex:outputText value="" rendered="{!NOT(contentWrap.refContent.refedge__Internal_Use__c)}"/>
+                                </apex:column> 
+                                
+                                <apex:column >
+                                    <apex:image onclick="showDiv('{!JSENCODE(contentWrap.refContent.refedge__Content_ID__c)}', '{!JSENCODE(contentWrap.refContent.Id)}', event);" url="{!URLFOR($Resource.refedge__ExtensionImages, contentWrap.fileTypeImagePath)}" width="16" height="16" style="vertical-align: middle; margin-right: 0.4em;cursor:pointer;" />
+                                </apex:column> 
+                                <apex:column headerValue="{!$Label.Title}" style="min-width:200px;">
+                                    <apex:outputLink value="/{!contentWrap.refContent.Id}" id="contantTitle" target="_blank">
+                                        <apex:outputText value="{!contentWrap.refContent.refedge__Title__c}" rendered="{!isCRMContentUser}"/>
+                                    </apex:outputLink>
+                                    <apex:outputText value="{!contentWrap.refContent.refedge__Title__c}" rendered="{!NOT(isCRMContentUser)}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.Type}" value="{!contentWrap.refContent.Reference_Content_Type__r.refedge__Name__c}" /> 
+                                <apex:column headervalue="{!$Label.Account}">
+                                    <apex:outputLink value="{!contentWrap.accountIds}" id="accName" target="_blank">
+                                        <apex:outputText value="{!contentWrap.accountName}"/>
+                                    </apex:outputLink>
+                                </apex:column>
+                                <apex:column headervalue="{!$Label.Publish_Date}"> 
+                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                        <apex:param value="{!contentWrap.refContent.refedge__Publish_date__c}" /> 
+                                    </apex:outputText>
+                                </apex:column> 
+                                <apex:column value="{!contentWrap.refContent.refedge__Language__c}" />
+                                <apex:column value="{!contentWrap.refContent.refedge__Attributes__c}" />
+                                
+                            </apex:pageBlockTable>   
+                            
+                            <!-- Show more Link-->
+                            <apex:actionRegion >
+                                <apex:commandLink style="font-weight: bold;" value="{!$Label.Show_More}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',true,'link');return false;" rendered="{!AND(contentSearch.isContentLimitExceed, NOT(contentSearch.showMoreContentRecords))}"/>
+                            </apex:actionRegion>
+                            
+                            <!-- Paging Panel--> 
+                            <apex:outputPanel id="pagingPanel" rendered="{!AND(contentSearch.showMoreContentRecords, contents.size > 0)}">
+                                <apex:actionRegion >
+                                <table border="0" align="center">
+                                    <tr> 
+                                        <td align="center">
+                                            <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!contentSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                            <apex:commandLink value="{!$Label.Previous_Page}"  rendered="{!contentSearch.pageIndex > 1}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',false,'previous');return false;" oncomplete="PORHideLoading();"/> 
+                                            &nbsp;&nbsp;
+                                            <apex:outputText >
+                                                {!(contentSearch.pageIndex * contentSearch.pageLimit)+1-contentSearch.pageLimit}-{!(contentSearch.pageIndex * contentSearch.pageLimit) - (contentSearch.pageLimit - contents.size)}
+                                            </apex:outputText>
+                                            &nbsp;&nbsp;
+                                            <apex:commandLink value="{!$Label.Next_Page} " rendered="{!contentSearch.isNextRender}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',false,'next');return false;" oncomplete="PORHideLoading();"/>&nbsp; 
+                                            <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!contentSearch.isNextRender}" width="5px" height="8px"/>
+                                        </td>                                                  
+                                    </tr>
+                                </table>  
+                                </apex:actionRegion>    
+                            </apex:outputPanel>
+                        </apex:pageBlockSection>
+                        
+                        <script language="javascript" type="text/javascript">
+                            previouslyselectedcontent = {!contentSearch.isContentSelected};
+                            deSelectAllChk('selectAllContentPbtId');
+                        </script>
+                    </apex:pageBlock> 
+                </apex:outputPanel>
+                
+                <!-- Div for on Mouse hover -->
+                <apex:outputPanel style="display:none;width:450px;position:absolute;z-index:1000;scroll-y:auto;" id="dvContentDetails">
+                    
+                    <apex:pageBlock rendered="{!contentSearch.hoverContentVersion.Id != null}" id="contPbId">
+                        <div style="font-size:15px;">
+                            <strong>{!contentSearch.hoverContentVersion.Title}</strong>
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <div style="height:10px;clear:both; "></div>
+                        <apex:outputPanel layout="block" style="word-break: break-word;-ms-word-break:break-all;">
+                            <apex:pageBlockSection columns="1" id="contentPbsId" >
+                                <apex:outputField id="summaryId" label="{!$Label.Summary}:" value="{!contentSearch.hoverContentVersion.Description}"/>
+                                <apex:outputField label="{!$Label.File_Size}:" value="{!contentSearch.hoverContentVersion.ContentSize}"/>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                        
+                        <apex:pageBlockButtons location="bottom">
+                            <apex:commandButton value="{!$Label.Open}" onclick="openLinkContent('{!JSENCODE(contentSearch.hoverContentVersion.ContentUrl)}'); return false;" rendered="{!contentSearch.hoverContentVersion.FileType = 'LINK'}"/>
+                            <apex:commandButton value="{!$Label.Download}" onclick="downloadSingleContent(); return false;" rendered="{!AND(contentSearch.hoverContentVersion.FileType != 'LINK', isCRMContentUser)}"/>
+                            <apex:commandButton value="{!$Label.View_Details}" onclick="window.open('/{!JSENCODE(contentSearch.hoverRefContentId)}', '_blank'); return false;" rendered="{!isCRMContentUser}"/>
+                        </apex:pageBlockButtons>
+                    </apex:pageBlock>
+                    
+                    <apex:pageBlock rendered="{!AND(contentSearch.hoverContentVersion.Id == null,NOT(contentSearch.customRefContent),contentSearch.refInterview.size = 0) }">
+                        <div style="font-size:15px;">
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <apex:outputLabel value="{!$Label.Content_View_Permission_Message}"/>
+                    </apex:pageBlock>
+                    
+                    <apex:pageBlock rendered="{!AND(contentSearch.hoverContentVersion.Id == null,contentSearch.customRefContent) }">
+                        <div style="font-size:15px;">
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <apex:pageBlockSection rendered="{!contentSearch.refContentFields.size > 0}" columns ="1">
+                            <strong>{!contentSearch.referenceContentTitle}</strong>
+                            <apex:repeat value="{!contentSearch.refContentFields}" var="rcf">
+                                <apex:repeat value="{!contentSearch.customContentTypeFields}" var="fieldAPIName">
+                                    <apex:outputField style="font-weight:normal;" value="{!rcf[fieldAPIName]}"/>
+                                </apex:repeat>  
+                            </apex:repeat>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                    <apex:outputPanel rendered="{!contentSearch.refInterview.size >0}" layout="block" style="width:100%;max-height:200px;background-color:white;">
+                        <div style="font-size:15px;">
+                            <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                        </div>
+                        <div class="panel-group" id="accordion" style="width:100%;float:left;background:#EAEAEA;max-height:200px;overflow-y:auto;">
+                            <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                                <div id="contentDetails" class="imageDiv" style="background-color: #f8f8f8;border:2px solid gray;border-radius:1px;width:100%;height:100%;">
+                                    <apex:outputPanel layout="block" >
+                                        <apex:outputPanel id="imagePanel" styleClass="imagePanelClass" style="width:100%;float:left;text-align:left;padding-left: 10px;">
+                                            <apex:outputLabel value="" />
+                                            <apex:outputField styleclass="ImageClass" id="imageIds" value="{!contentSearch.refInterviewRecord.refedge__Photograph__c}" />
+                                        </apex:outputPanel>
+                                        <apex:outputPanel style="width:100%;float:left;font-weight:bold;font-size:14px;padding-top: 2%;">
+                                            <apex:outputLabel value="" />
+                                            <apex:outputText style="padding-left: 10px;font-weight:bold;" value="{!contentSearch.refInterviewRecord.Reference_Content__r.refedge__Title__c}" />
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel style="width:100%;float:left;padding-left:10px;">
+                                        <div style="float:left;width:100%;">
+                                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrptInfo">
+                                                <apex:outputLabel style="font-weight:bold;cursor:pointer;" value="{!$Label.Reference_Interview_Info}" />
+                                            </a>
+                                        </div>
+                                        <div id="collapseTrnanscrptInfo" style="float:left;width:100%;" class="panel-collapse collapse">
+                                            <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Speaker_info__c.label}" />&nbsp;
+                                            <apex:outputField value="{!contentSearch.refInterviewRecord.refedge__Speaker_info__c}" />
+                                            <br/>
+                                            <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_website__c.label}" />&nbsp;
+                                            <apex:commandLink style="color:blue" value="{!contentSearch.refInterviewRecord.refedge__Org_website__c}" onClick="openSite('{!contentSearch.refInterviewRecord.refedge__Org_website__c}');return false;" />
+                                            <br/>
+                                            <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_description__c.label}" />&nbsp;
+                                            <apex:outputField value="{!contentSearch.refInterviewRecord.refedge__Org_description__c}" />
+                                        </div>
+                                    </apex:outputPanel>
+                                    <table style="width:100%;float:left;margin-top:1%;">
+                                        <tbody style="width:100%;">
+                                            <apex:repeat value="{!contentSearch.refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                                <tr style="width:100%;">
+                                                    <td style="width:100%;border: 1px solid #ececec;">
+                                                        <div style="float:left;width:100%;padding-left: 10px;">
+                                                            <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                                <apex:outputLabel style="font-weight:bold;cursor:pointer;" value="{!interviewTopic.refedge__Question__c}" />
+                                                            </a>
+                                                        </div>
+                                                        <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse in">
+                                                         <apex:outputPanel rendered="{!interviewTopic.refedge__Video_Url_Embed__c != null}">
+                                                            <iframe id="player" width="420" height="315" src="{!interviewTopic.Video_Url_Embed__c}?showinfo=0&rel=0&modestbranding=1"/>
+                                                            <script src="https://www.youtube.com/iframe_api"></script>
+                                                            
+                                                        </apex:outputPanel>
+                                                            <apex:outputLabel style="font-weight:normal;padding-left: 10px;" value="{!interviewTopic.refedge__Transcript__c}" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </div>
+        </div>
+        <div id="dialogBoxDivNoti" title="{!$Label.Send_notification}" style="display:none;height: 60px; !important;">
+            {!$Label.Options_to_notify}
+        </div>
+        <div id="dialogBoxDivNew" title="{!$Label.Request_Item_Update}" style="display:none;height: 60px; !important;">
+            {!$Label.One_Request_Item_Changed}
+        </div>
+        <div id="dialogBoxDiv1" title="{!$Label.E_mail_Preview}" style="display:none;height:300px;">
+            <div>
+                
+                <table style="width: 80%; margin-left:5%;">
+                    <tr>
+                        <td style="text-align:right;">
+                            <apex:outputText value="{!$Label.Subject}"/>
+                        </td>
+                        <td>
+                            <div style="background-color:white;border:1px solid #cfd0d2;padding: 7px 0 3px 10px;">
+                                <apex:inputText id="Subject" value="{!subjectValue}" style="border: 0;width:100%;"/><br/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div style="background-color:white;border:1px solid #cfd0d2;padding: 7px 0 3px 10px;font-weight:none !important;">
+                                <apex:outputLabel value="{!$Label.Use_Requested}:" style="font-weight:normal !important;"/>
+                                <apex:outputText id="UseRequested" value=""/><br/>
+                                <apex:outputLabel value="{!$Label.Reference_Account}: " style="font-weight:normal !important;"/>
+                                <apex:outputText id="account" value=""/><br/>
+                                <apex:outputLabel value="{!$Label.Status}: " style="font-weight:normal !important;"/>
+                                <apex:outputText id="Status" value=""/><br/>
+                                <apex:outputLabel value="{!$Label.Need_by}: " style="font-weight:normal !important;"/>
+                                <apex:outputText id="deadline" value=""/><br/><br/>
+                                <apex:outputLabel value="{!$Label.Notes}: " style="font-weight:normal !important;"/><br/>
+                                <apex:inputTextArea style="border: 0;width: 300px;height: 100px;margin:0;margin-top: 5px;" id="notes"  value="{!NoteValue}"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;"><apex:outputText value="{!$Label.Write_to_Notes}"/></td>
+                        <td>
+                            <apex:inputCheckbox id="writetoNoteId" value="{!writetoNote}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- Start Bound 3 Req -->
+        <div id="dialogBoxDiv" style="display:none;height: 60px; !important;">
+            {!$Label.Keep_Discard_Message}
+        </div>
+        <!-- End Bound 3 Req -->
+        <apex:outputPanel id="jsPanel">
+            <script>
+            var collectionNameInput = '';
+            function openCreateCollection(size) {
+                var hasChecked = false;
+                for(var i=0; i < size; i++) {
+                    var id = "pageId:formId:contentPbId:contentPbsId:pbtContent:"+i+":selectSingleContentPbtId"; 
+                    if(document.getElementById(id).checked ) {
+                        hasChecked = true;
+                        break ;  
+                    }
+                }
+                if(hasChecked == false && previouslyselectedcontent == false){
+                    alert('{!$Label.Please_select_content_on_create_collection}');
+                    return false;
+                }
+                else {
+                    document.getElementById('pageId:formId:collectionNameId').value = '';
+                    jQuery("#createCollectionDiv").dialog({
+                        width     : 300,
+                         modal     : true,
+                         resizable : false, 
+                         buttons: [
+                            {
+                                text: "{!$Label.Continue}",
+                                "class": "dialogButtonClass",
+                                click: function(){
+                                    var name = collectionNameInput;
+                                    if(name != null && name != ''){
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        createCollection(name);
+                                    }
+                                    else{
+                                        alert('{!$Label.Please_fill_the_Name_of_Content_Collection}');
+                                    }
+                                    return false;
+                                }
+                            },
+                            {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function(){
+                                    jQuery( this ).dialog( "close" ); 
+                                    return false;
+                                }
+                            }
+                        ]
+                    });
+                    jQuery(".ui-dialog-title").text( '{!$Label.Create_Collection}');
+                    jQuery(".ui-dialog-buttonset").css("float", "none");
+                    jQuery(".ui-dialog-buttonset").css("text-align", "center");
+                    return false;
+                }
+            }
+            function openSelectCollection() {
+                 jQuery("#createCollectionDiv2").dialog({
+                     width     : 300,
+                     modal     : true,
+                     resizable : false, 
+                     buttons: [
+                        {
+                        text: "{!$Label.Continue}",
+                        "class": "dialogButtonClass",
+                        click: function(){
+                            var name = document.getElementById('pageId:formId:selectcc').value;
+                            //alert(name);
+                         
+                             if(name != null && name != ''){
+                                 jQuery( this ).dialog( "close" ); 
+                                 PORShowLoading();
+                                 selectCollection(name,true);
+                             }
+                             else{
+                                 alert('{!$Label.Please_select_any_Content_Collection}');
+                             }
+                             return false;
+                        }
+                    },
+                    {
+                        text: "{!$Label.Cancel}",
+                        "class": "dialogButtonClass",
+                        click: function(){
+                            jQuery( this ).dialog( "close" ); 
+                            return false;
+                        }
+                    }
+                    ]
+                });
+                jQuery(".ui-dialog-title").text( '{!$Label.Select_Collection}');
+                jQuery(".ui-dialog-buttonset").css("float", "none");
+                jQuery(".ui-dialog-buttonset").css("text-align", "center");
+                return false;
+            }
+            </script>
+        </apex:outputPanel>
+            <apex:outputPanel id="contentCollectionLinkId" >
+                <div id="createCollectionDiv" style="display:none;">
+                    <apex:outputText value="{!$Label.Provide_Collection_Name}"/><br/><br/>
+                    <apex:inputText value="{!collectionName}" Id="collectionNameId" style="width : 100%;" onblur="displayName(this.value);"/><br/><br/>
+                    <apex:outputText value="{!$Label.All_contents_added}"/>
+                </div>
+            
+                <div id="createCollectionDiv2" style="display:none;">
+                    <apex:outputText value="{!$Label.Please_select_content_collection}"/><br/><br/>
+                    <apex:selectList size="1" value="{!selectedCollection}" id="selectcc" style="width:100%;">
+                        <apex:selectOptions value="{!contentCollections}"/>
+                    </apex:selectList>
+                </div>
+                <script>
+                    
+                    function onCollectionComplete(){
+                        if(document.getElementById('pageId:pgmsgId').innerHTML == ''){
+                            alert('{!$Label.Collection_created}');
+                        }
+                    }
+                    function displayName(val){
+                        collectionNameInput = val;
+                    }
+                </script>
+            </apex:outputPanel>
+        <apex:actionFunction action="{!createCollection}" name="createCollection" reRender="pgmsgId,contentCollectionLinkId,jsPanel,collectionNameId" oncomplete="PORHideLoading();onCollectionComplete();return false;">
+            <apex:param name="param" value="" assignTo="{!collectionName}"/>
+        </apex:actionFunction>
+        <apex:actionFunction action="{!createCollection}" name="selectCollection" onComplete="redirecttoInvitation();PORHideLoading();return false;">
+            <apex:param name="param" value="" assignTo="{!selectedCollection}"/>
+            <apex:param name="param2" value="" assignTo="{!isContentCollection}"/>
+        </apex:actionFunction>
+        <apex:actionFunction action="{!shareContents}" name="redirecttoInvitation"/>
+        <script type="text/javascript">brightcove.createExperiences();</script>
+    </apex:form>
+</apex:page>

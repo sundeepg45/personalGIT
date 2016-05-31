@@ -1,0 +1,318 @@
+<apex:page controller="RequalificationMetDashController">
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.RequalificationMetDashboard_Met_vs_Set}"/></h2>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        ####################### OEM / Distributor Message ######################
+     -->
+    <apex:pageBlock rendered="{!isOEM || isDistributor}">
+        <apex:pageBlockSection >
+                <apex:outputLabel id="DistiOEMMsg" value="{!$Label.RequalificationMetDashboard_OEMDistiMessage}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+
+	<!--
+		######################## Tiered View #####################
+	 -->
+
+    <apex:pageBlock rendered="{!NOT(isAffiliated) && NOT(isOEM) && NOT(isDistributor)}">
+
+        <table class="list">
+            <tbody>
+                <tr class="headerRow">
+                    <td class="actionColumn" rowspan="2"><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Requirements}"/></b></td>
+                    <td class="actionColumn" colspan="3"><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Partner_Tier}"/></b></td>
+                    <td class="actionColumn" rowspan="2"><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Your_Account}"/></b></td>
+                </tr>
+                <tr class="headerRow">
+                    <td class="actionColumn" ><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Ready}"/></b></td>
+                    <td class="actionColumn" ><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Advanced}"/></b></td>
+                    <td class="actionColumn" ><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Premier}"/></b></td>
+                </tr>
+                <tr class="dataRow even first">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Sales_Trained}"/></td>
+                    <td>{!readyReqs.Sales}</td>
+                    <!-- <apex:outputText rendered="{!globalRegion = 'EMEA'}">*</apex:outputText>
+                    -->
+                    <td>{!advReqs.Sales}</td>
+                    <td>{!premReqs.Sales}<apex:outputText rendered="{!globalRegion = 'APAC'}">+</apex:outputText></td>
+                    <td>{!salesCerts.size}</td>
+                </tr>
+                <tr class="dataRow odd">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Sales_Engineers_Trained}"/></td>
+                    <td>{!readyReqs.SalesEngineer}</td>
+                    <td>{!advReqs.SalesEngineer}</td>
+                    <td>{!premReqs.SalesEngineer}</td>
+                    <td>{!salesEngineerCerts.size}</td>
+                </tr>
+                <tr class="dataRow even">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Delivery_Specialists_Trained}"/></td>
+                    <td>{!readyReqs.Delivery}</td>
+                    <td>{!advReqs.Delivery}</td>
+                    <td>{!premReqs.Delivery}</td>
+                    <td>{!deliveryCerts.size}</td>
+                </tr>
+                <tr class ="dataRow odd">
+                    <td valign="middle" >
+                    	<apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Tech_Accreditations}" rendered="{!globalRegion != 'EMEA'}"/>
+                        <apex:outputText value="Number of Users with a Technical Certification" rendered="{!globalRegion == 'EMEA'}"/>
+                    </td>
+                    <td>{!readyReqs.Rhce}</td>
+                    <td>{!advReqs.Rhce}</td>
+                    <td>{!premReqs.Rhce}</td>
+                    <td>{!techCerts.size}</td>
+                </tr>
+                <tr class="dataRow even">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Customer_Reference}"/></td>
+                    <td>{!readyReqs.CustomerRefs}</td>
+                    <!-- <apex:outputText rendered="{!globalRegion = 'EMEA'}">*</apex:outputText> -->
+                    <td>{!advReqs.CustomerRefs}</td>
+                    <td>{!premReqs.CustomerRefs}</td>
+                    <td>{!activeCustRefs.size}</td>
+                </tr>
+
+                <tr class="dataRow even">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Approved_Business_Plan}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_No}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Yes}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Yes}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_No}" rendered="{!ISNULL(businessPlan)}"/><apex:outputText value="{!$Label.RequalificationMetDashboard_Yes}" rendered="{!NOT(ISNULL(businessPlan))}"/></td>
+                </tr>
+                <tr class="dataRow odd">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Spec_Required}"/></td>
+                    <td>{!readyReqs.Specializations}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!advReqs.Specializations}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!premReqs.Specializations}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!specList.size}</td>
+                </tr>
+
+            </tbody>
+                <!-- Original prior to 12/17/2013
+
+                <tr class="dataRow even first">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Spec_Required}"/></td>
+                    <td>{!readyReqs.speczs}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!advReqs.speczs}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!premReqs.speczs}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!specializationList.size}</td>
+                </tr>
+
+                <tr class="dataRow odd">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_RHCTs}"/></td>
+                    <td>{!readyReqs.techCerts}</td>
+                    <td>{!advReqs.techCerts}</td>
+                    <td>{!premReqs.techCerts}</td>
+                    <td>{!rhctCerts.size}</td>
+                </tr>
+                <tr class="dataRow even">
+                    <td height="47"
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Sales_Trained}"/></td>
+                    <td>{!readyReqs.salesCerts}<apex:outputText rendered="{!globalRegion = 'EMEA'}">*</apex:outputText></td>
+                    <td>{!advReqs.salesCerts}</td>
+                    <td>{!premReqs.salesCerts}<apex:outputText rendered="{!globalRegion = 'APAC'}">+</apex:outputText></td>
+                    <td>{!salesCerts.size}</td>
+                </tr>
+                <tr class="dataRow odd">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Approved_Business_Plan}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_No}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Yes}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Yes}"/></td>
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_No}" rendered="{!ISNULL(businessPlan)}"/><apex:outputText value="{!$Label.RequalificationMetDashboard_Yes}" rendered="{!NOT(ISNULL(businessPlan))}"/></td>
+                </tr>
+                <tr class="dataRow even">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Customer_Reference}"/></td>
+                    <td>{!readyReqs.custRefs}<apex:outputText rendered="{!globalRegion = 'EMEA'}">*</apex:outputText></td>
+                    <td>{!advReqs.custRefs}</td>
+                    <td>{!premReqs.custRefs}</td>
+                    <td>{!activeCustRefs.size}</td>
+                </tr>
+            </tbody>
+            -->
+        </table>
+<!--
+		<apex:outputText rendered="{!globalRegion = 'EMEA'}" value="{!$Label.RequalificationMetDashboard_EMEA_Note}" escape="false"/>
+-->
+		<apex:outputText rendered="{!globalRegion = 'APAC'}" value="{!$Label.RequalificationMetDashboard_APAC_Note}" escape="false"/>
+	</apex:pageBlock>
+
+	<!--
+		######################## Affiliated View #####################
+	 -->
+    <apex:pageBlock rendered="{!isAffiliated && NOT(isOEM) && NOT(isDistributor)}">
+        <table class="list">
+            <tbody>
+                <tr class="headerRow">
+                    <td class="actionColumn" rowspan="2"><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Requirements}"/></b></td>
+                    <td class="actionColumn" colspan="1"><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Partner_Tier}"/></b></td>
+                    <td class="actionColumn" rowspan="2"><b><apex:outputText value="{!$Label.RequalificationMetDashboard_Your_Account}"/></b></td>
+                </tr>
+                <tr class="headerRow">
+                    <td class="actionColumn" ><b><apex:outputText value="Affiliated"/></b></td>
+                </tr>
+                <tr class="dataRow even first">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Sales_Trained}"/></td>
+                    <td>{!affiliatedReqs.Sales}</td>
+                    <td>{!salesCerts.size}</td>
+                </tr>
+                <tr class="dataRow odd">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Sales_Engineers_Trained}"/></td>
+                    <td>{!affiliatedReqs.SalesEngineer}</td>
+                    <td>{!salesEngineerCerts.size}</td>
+                </tr>
+                <tr class="dataRow even">
+                    <td
+                        valign="middle" ><apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Delivery_Specialists_Trained}"/></td>
+                    <td>{!affiliatedReqs.Delivery}</td>
+                    <td>{!deliveryCerts.size}</td>
+                </tr>
+                <tr class ="dataRow odd">
+                    <td valign="middle" >
+                    	<apex:outputText value="{!$Label.RequalificationMetDashboard_Number_of_Tech_Accreditations}" rendered="{!globalRegion != 'EMEA'}"/>
+                        <apex:outputText value="Number of Users with a Technical Certification" rendered="{!globalRegion == 'EMEA'}"/>
+                    </td>
+                    <td>{!affiliatedReqs.Rhce}</td>
+                    <td>{!techCerts.size}</td>
+                </tr>
+                <tr class="dataRow even">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Customer_Reference}"/></td>
+                    <td>{!affiliatedReqs.CustomerRefs}</td>
+                    <td>{!activeCustRefs.size}</td>
+                </tr>
+
+                <tr class="dataRow odd">
+                    <td><apex:outputText value="{!$Label.RequalificationMetDashboard_Spec_Required}"/></td>
+                    <td>{!affiliatedReqs.Specializations}<apex:outputText rendered="{!globalRegion = 'APAC'}">*</apex:outputText></td>
+                    <td>{!specList.size}</td>
+                </tr>
+
+            </tbody>
+        </table>
+<!--
+		<apex:outputText rendered="{!globalRegion = 'EMEA'}" value="{!$Label.RequalificationMetDashboard_EMEA_Note}" escape="false"/>
+-->
+		<apex:outputText rendered="{!globalRegion = 'APAC'}" value="{!$Label.RequalificationMetDashboard_APAC_Note}" escape="false"/>
+		<apex:outputText value="Diagnostic Service/Cloud Providers are required to have 2 users with a Technical Accreditation. Full Service/Cloud Providers do not need to meet this requirement." escape="false"/>
+	</apex:pageBlock>
+
+
+    <apex:pageBlock title="{!$Label.RequalificationMetDashboard_Spec_Reseller_Ready_Title}" rendered="{!isSpecialized && NOT(isOEM) && NOT(isDistributor)}">
+        <apex:pageBlockTable value="{!requalPointsReady}" var="points" id="readyPointsTable" rowClasses="odd,even" styleClass="tableClass">
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_Specialization}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSpecialization" value="{!points.Specialization__c}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSalesUsers" value="{!floor(points.Sales_Users__c)} / {!floor(points.Needed_Sales_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsPresalesUsers" value="{!floor(points.PreSales_Users__c)} / {!floor(points.Needed_PreSales_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsDeliveryUsers" value="{!floor(points.Delivery_Users__c)} / {!floor(points.Needed_Delivery_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSales" value="{!floor(points.Sales_Points__c)} / {!floor(points.Needed_Sales_Points__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsPresales" value="{!floor(points.PreSales_Points__c)} / {!floor(points.Needed_PreSales_Points__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsDelivery" value="{!floor(points.Delivery_Points__c)} / {!floor(points.Needed_Delivery_Points__c)}"/>
+            </apex:column>
+
+        </apex:pageBlockTable>
+
+        <br/>
+	</apex:pageBlock>
+
+    <apex:pageBlock title="{!$Label.RequalificationMetDashboard_Spec_Reseller_Adv_Title}" rendered="{!isSpecialized && NOT(isOEM) && NOT(isDistributor)}">
+        <apex:pageBlockTable value="{!requalPointsAdvanced}" var="points" id="advancedPointsTable" rowClasses="odd,even" styleClass="tableClass">
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_Specialization}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSpecialization" value="{!points.Specialization__c}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSalesUsers" value="{!floor(points.Sales_Users__c)} / {!floor(points.Needed_Sales_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsPresalesUsers" value="{!floor(points.PreSales_Users__c)} / {!floor(points.Needed_PreSales_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsDeliveryUsers" value="{!floor(points.Delivery_Users__c)} / {!floor(points.Needed_Delivery_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSales" value="{!floor(points.Sales_Points__c)} / {!floor(points.Needed_Sales_Points__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsPresales" value="{!floor(points.PreSales_Points__c)} / {!floor(points.Needed_PreSales_Points__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsDelivery" value="{!floor(points.Delivery_Points__c)} / {!floor(points.Needed_Delivery_Points__c)}"/>
+            </apex:column>
+
+        </apex:pageBlockTable>
+
+        <br/>
+	</apex:pageBlock>
+    <apex:pageBlock title="{!$Label.RequalificationMetDashboard_Spec_Reseller_Prem_Title}" rendered="{!isSpecialized && NOT(isOEM) && NOT(isDistributor)}">
+        <apex:pageBlockTable value="{!requalPointsPremier}" var="points" id="premierPointsTable" rowClasses="odd,even" styleClass="tableClass">
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_Specialization}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSpecialization" value="{!points.Specialization__c}" />
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSalesUsers" value="{!floor(points.Sales_Users__c)} / {!floor(points.Needed_Sales_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsPresalesUsers" value="{!floor(points.PreSales_Users__c)} / {!floor(points.Needed_PreSales_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryUsers}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsDeliveryUsers" value="{!floor(points.Delivery_Users__c)} / {!floor(points.Needed_Delivery_Users__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsSales" value="{!floor(points.Sales_Points__c)} / {!floor(points.Needed_Sales_Points__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsPresales" value="{!floor(points.PreSales_Points__c)} / {!floor(points.Needed_PreSales_Points__c)}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryPoints}" escape="false"/></apex:facet>
+                <apex:outputText id="txtPointsDelivery" value="{!floor(points.Delivery_Points__c)} / {!floor(points.Needed_Delivery_Points__c)}"/>
+            </apex:column>
+
+        </apex:pageBlockTable>
+
+        <br/>
+	</apex:pageBlock>
+</apex:page>

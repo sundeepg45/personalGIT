@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Community : Invitation Accepted</description>
+    <encodingKey>ISO-8859-1</encodingKey>
+    <letterhead>Refedge_Invitation_Latterhead</letterhead>
+    <name>Community : Invitation Accepted</name>
+    <style>freeForm</style>
+    <subject>Community Invitation Accepted</subject>
+    <textOnly>The Community Member {!Community_Invite_Contact__c.Contact_Name__c} with {!Community_Invite_Contact__c.Account_f__c} has accepted the invitation to participate in the following Reference Activity:
+
+Type: {!Community_Invite_Contact__c.Referenceability_Type__c}
+With: {!Community_Invite_Contact__c.With__c}
+Deadline: {!Community_Invite_Contact__c.Deadline__c}
+
+
+{!Community_Invite_Contact__c.Reference_Project_link__c}</textOnly>
+    <type>html</type>
+</EmailTemplate>

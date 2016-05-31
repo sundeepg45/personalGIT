@@ -1,0 +1,51 @@
+<apex:page controller="CommunitiesNewsDisplayController" showHeader="{!showHeader}" sidebar="{!showHeader}" standardStylesheets="false">
+    <!--CSS Files 
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+    -->
+    <!--JS Files
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+    -->
+
+    <div class="red-hat-content" style="background: none;">
+        <table class="table table-striped">
+            <tr>
+                <th style="vertical-align: bottom;"><b>{!$Label.CommunitiesNewsItemsLabel}</b></th>
+                <th></th>
+            </tr>
+            <tr>
+                <td style="width:200px"><b>{!$Label.Published_Date}</b></td>
+                <td><b>{!$Label.Title}</b></td>
+            </tr>
+            <apex:repeat value="{!relatedNewsItems}" var="newsItem">
+                <apex:outputPanel id="resultsPanel" rendered="{!OR(newsItem.English_Label__c != null,newsItem.Communities_News_Item_Labels__r.size > 0)}">
+                    <tr>
+                        <td id="{!newsItem.id}date">
+                            <apex:outputText value="{0,date, M/d/yyyy}">
+                                <apex:param value="{!newsItem.Publish_Date__c}"/>
+                            </apex:outputText>
+                        </td>
+                        <td id="{!newsItem.id}URL">
+                            <a href="{!newsItem.URL__c}" target="_blank">
+                                <apex:outputText value="{!IF(newsItem.Communities_News_Item_Labels__r.size > 0, newsItem.Communities_News_Item_Labels__r[0].label__c, newsItem.English_Label__c)}" />
+                            </a>
+                        </td>
+                    </tr>
+                </apex:outputPanel>
+            </apex:repeat>
+                <tr>
+                <td>
+                    <apex:outputPanel id="morePanel" rendered="{!limitNumber != 30 && relatedNewsItems.size>4}">
+                        <apex:outputLink value="/CommunitiesNewsDisplay" target="_blank" id="moreLink">
+                            <apex:param name="viewMore" value="true"/>
+                            <apex:param name="language" value="{!selectedLanguageCode}"/>
+                            {!$Label.View_More}
+                        </apex:outputLink>
+                    </apex:outputPanel>
+                </td>
+                <td></td>
+                </tr>
+        </table>
+    </div>
+</apex:page>

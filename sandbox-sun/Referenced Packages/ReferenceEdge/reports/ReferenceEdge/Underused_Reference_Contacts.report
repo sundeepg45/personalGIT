@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>FK_NAME</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Contact__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.RUL_Activities_available__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.RUL_Last_Activity_Date__c</field>
+    </columns>
+    <description>Reference Contacts that have not reached their use limit</description>
+    <filter>
+        <booleanFilter>1 AND 2 AND 3 AND (4 OR 5)</booleanFilter>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.Is_Referenceable__c</column>
+            <operator>equals</operator>
+            <value>1</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.Contact__c</column>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.Referenceability_Status__c</column>
+            <operator>equals</operator>
+            <value>Active,Caution</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.RUL_Last_Activity_Date__c</column>
+            <operator>equals</operator>
+            <value></value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.RUL_Activities_available__c</column>
+            <operator>greaterOrEqual</operator>
+            <value>1</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <name>Underused Reference Contacts</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Reference_Basic_Information__c@Reference_Basic_Information__c.Account__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <sortColumn>Reference_Basic_Information__c.RUL_Last_Activity_Date__c</sortColumn>
+    <sortOrder>Asc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>Reference_Basic_Information__c.RUL_Date_Available__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

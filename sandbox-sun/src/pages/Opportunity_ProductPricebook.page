@@ -1,0 +1,51 @@
+<apex:page controller="Opportunity_ProductPricebookController" showHeader="true" tabStyle="OpportunityLineItem">
+	<style type="text/css">
+		body { margin: 10px; }
+	</style>
+
+	<script language="javascript">
+
+		//
+		// have the user confirm since we are going
+		// to delete products if they change the pricebook
+		//
+
+		/*
+		 * coming back to this firefox is not allowing redirection through javascript due to css.
+		 *
+		function confirmSave() {
+			var answer = confirm("You have modified the price book for this opportunity. All products related to this opportunity will be permanently deleted. Continue?")
+			if (answer){
+				save();
+			}
+		}
+		*/
+	</script>
+
+	<apex:form id="form">
+		<apex:actionFunction name="save" action="{!save}"/>
+
+		<apex:sectionHeader title="Choose Price Book"/>
+		<apex:pageMessages />
+
+		<apex:outputLabel value="Select a price book for this opportunity. You can add products only from a single price book. Changing a selected price book will delete all existing products from this opportunity." style="display:block; margin-bottom:12px;"/>
+		<apex:outputLabel value="Choose a price book that contains products with the same currency as the opportunity. If no products are available for the chosen currency, ask your administrator to create them." style="display:block; margin-bottom:12px;"/>
+
+		<apex:pageBlock >
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Save" action="{!save}"/>
+				<apex:commandButton value="Cancel" action="{!cancel}"/>
+			</apex:pageBlockButtons>
+
+			<apex:pageBlockSection >
+				<apex:pageBlockSectionitem >
+					<apex:outputLabel value="Price Book" for="pricebook"/>
+
+					<apex:selectList id="pricebook" value="{!opportunity.pricebook2Id}" size="1" style="margin-bottom:25px;">
+						<apex:selectOptions value="{!pricebookOptions}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionitem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

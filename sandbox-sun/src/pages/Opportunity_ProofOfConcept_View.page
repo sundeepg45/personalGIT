@@ -1,0 +1,124 @@
+<apex:page standardController="Opportunity" extensions="Opportunity_ProofOfConceptControllerExtn" id="page" action="{!detectRecordLock}" rendered="{!NOT(ISBLANK(Opportunity.Name))}">
+    <script src="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"></script>
+    <apex:variable var="showSubmitForApprovalButton" value="{!AND(isEngagementSA,isPOCScoping,NOT(isLocked))}"/>
+    <div style="display:none">
+        <apex:detail subject="{!Opportunity}" title="true" showChatter="true" relatedList="true" />
+    </div>
+    <apex:outputText value="{!Opportunity.POC_Status__c}" rendered="false"/>
+    <apex:form id="form">
+        <apex:pageBlock title="{!$Label.POC_Title}" mode="view" id="titleBlock">
+            <apex:pageMessages id="pageMessages"/>
+            <apex:pageBlockButtons location="both" id="buttonBlocks">
+                <apex:commandButton action="{!edit}" id="editButton" value="{!$Label.Edit}" rendered="{!AND(recordAccess.hasEditAccess,NOT(isLocked))}"/>
+                <apex:commandButton action="{!delete}" id="deleteButton" value="{!$Label.Delete}" rendered="{!recordAccess.hasDeleteAccess}"/>
+                <apex:commandButton action="{!submitForScoping}" id="submitForScopingButton" value="{!$Label.POC_Submit_For_Scoping_Assignment}" rendered="{!AND(isPOCNewRequest,NOT(isLocked),Opportunity.Super_Region__c!='APAC')}" />
+                       <!---Added for APAC Approval Process---> 
+                         <apex:commandButton action="{!submitPOC}" id="submitFAButton" value="{!$Label.POC_Submit_For_Approval}" rendered="{!AND(isPOCNewRequest,NOT(isLocked),Opportunity.Super_Region__c=='APAC')}" />
+                       <!---End--->
+                <apex:commandButton action="{!submitPOC}" id="submitButton" value="{!$Label.POC_Submit_For_Approval}" rendered="{!showSubmitForApprovalButton}" />
+                <apex:commandButton action="{!recallPOC}" id="recallButton" value="{!$Label.POC_Recall_Approved}" rendered="{!AND(isPOCAccepted,OR(isOwner,isSaManagement),Opportunity.Super_Region__c!='APAC')}" />
+                <apex:commandButton action="{!$Page.Opportunity_ProofOfConcept_Close+'?id='+Opportunity.Id}" id="permanentlyCloseButton" value="{!$Label.POC_Permanently_Close}" rendered="{!OR(AND(NOT(isLocked),NOT(isPOCSubmitted)),isPOCAccepted,isPOCEngaged)}"/>
+                <apex:commandButton action="{!save}" id="saveButton" value="{!$Label.Save}" style="display:none" rendered="{!NOT(isLocked)}"/>
+                <apex:commandButton action="{!recordAccess.forceSave}" id="forceSaveButton" value="{!$Label.Save}" style="display:none" rendered="{!AND(isLocked,recordAccess.hasEditAccess)}"/>
+                <apex:commandButton action="{!cancel}" id="cancelButton" immediate="true" value="{!$Label.cancel}" style="display:none"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.POC_Close_Section_Title}" columns="1" rendered="{!isPOCClosed}">
+                <apex:outputField value="{!Opportunity.POC_Close_Reason__c}"/>
+                <apex:outputField value="{!Opportunity.POC_Close_Comments__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="{!$Label.POC_Details_Section_Title}" columns="1">
+                <apex:outputField value="{!Opportunity.OwnerId}" label="{!$Label.POC_Owner}">
+                    <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, submitButton, recallButton, submitForScopingButton, permanentlyCloseButton" event="ondblclick" />
+                </apex:outputField>
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.POC_Fields_General}" var="field">
+                    <!-- We are required to show this message above the Steps after POC field -->
+                    <apex:pageBlockSectionItem rendered="{!field='Likelihood_of_Opportunity_Win__c'}" >
+                        <apex:pageMessage title="{!$Label.Customer_Steps_after_POC}" severity="info"/>
+                    </apex:pageBlockSectionItem>
+                    <!-- outputField for most fields -->
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!NOT(OR(field='Cloned_From_Opportunity__c',
+                            field='Engagement_SA__c',
+                            field='EngagementStartDate__c',
+                            field='EngagementEndDate__c'))}"
+                        label="{!IF(field='Name',$Label.POC_Name, 
+                            IF(field='AccountId', $ObjectType.Account.fields.Name.Label, 
+                            IF(field='CreatedById', 'Created By', field.label)))}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" 
+                            hideOnEdit="editButton, deleteButton, submitButton, recallButton, submitForScopingButton, permanentlyCloseButton" 
+                            event="ondblclick" 
+                            rendered="{!NOT(OR(isLocked,
+                                field='PrimaryBusinessUnit__c',
+                                field='POC_Primary_Product__c',
+                                field='AccountId',
+                                field='Country_of_Order__c',
+                                field='Super_Region__c',
+                                field='Region__c',
+                                field='SubRegion__c'))}" />
+                    </apex:outputField>
+                    <!-- outputField for Cloned From Opportunity field -->
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!field='Cloned_From_Opportunity__c'}"
+                        label="{!$Label.POC_Parent_Opportunity}">
+                        <apex:inlineEditSupport showOnEdit="forceSaveButton, cancelButton" 
+                            hideOnEdit="editButton, deleteButton, submitButton, recallButton, submitForScopingButton, permanentlyCloseButton" 
+                            event="ondblclick" 
+                            rendered="{!OR(isOwner,isSaManagement)}" />
+                    </apex:outputField>                         
+                    <!-- outputField for Engagement SA field -->
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!AND(field='Engagement_SA__c',
+                            OR(NOT(isPOCNewRequest)))}">
+                        <apex:inlineEditSupport showOnEdit="forceSaveButton, cancelButton" 
+                                hideOnEdit="editButton, deleteButton, submitButton, recallButton, submitForScopingButton, permanentlyCloseButton" 
+                                event="ondblclick" resetFunction="resetInlineEdit" id="engagementSA" rendered="{!NOT(isPOCClosed)}"/>
+                    </apex:outputField> 
+                    <!-- outputField for Engagement Start Date and End Date fields -->
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!OR(field='EngagementStartDate__c',
+                            field='EngagementEndDate__c')}">
+                        <apex:inlineEditSupport showOnEdit="forceSaveButton, cancelButton" 
+                            hideOnEdit="editButton, deleteButton, submitButton, recallButton, submitForScopingButton, permanentlyCloseButton" 
+                            event="ondblclick" rendered="{!NOT(isPOCClosed)}"/>
+                    </apex:outputField>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="{!$Label.POC_Storage_Details_Section_Title}" columns="1" rendered="{!IsStorageBusinessUnit}">
+                <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, submitButton, recallButton, submitForScopingButton, permanentlyCloseButton" event="ondblclick" rendered="{!NOT(isLocked)}" />
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.POC_Fields_Storage}" var="field"> 
+                    <apex:outputField value="{!Opportunity[field]}" />
+                </apex:repeat>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:relatedList list="OpenActivities" id="Activities" rendered="{!NOT(isPOCClosed)}"/>
+    <apex:relatedList list="OpenActivities" id="ActivitiesNoButtons" rendered="{!isPOCClosed}">
+        <apex:facet name="header">
+            <apex:outputPanel layout="block" styleClass="pbTitle">
+                <img src="/s.gif" alt="" width="12" height="1" class="minWidth" title="" style="margin-right: 0.25em;margin-right: 0.25em;" />
+                <h3><apex:outputText value="{!$Label.Open_Activities_Related_List_Header}"/></h3>
+            </apex:outputPanel>
+        </apex:facet>
+    </apex:relatedList>
+    <apex:relatedList list="NotesAndAttachments" id="Attachments" />
+    <apex:relatedList list="OpportunityTeamMembers" id="OpportunityTeam" rendered="{!NOT(isPOCClosed)}" />
+    <apex:relatedList list="OpportunityTeamMembers" id="OpportunityTeamNoButtons"  rendered="{!isPOCClosed}">
+        <apex:facet name="header">
+            <apex:outputPanel layout="block" styleClass="pbTitle">
+                <img src="/s.gif" alt="" width="12" height="1" class="minWidth" title="" style="margin-right: 0.25em;margin-right: 0.25em;" />
+                <img src="/s.gif" alt="{!$Label.Opportunity_Team_Related_List_Header}" class="relatedListIcon" title=""/>
+                <h3><apex:outputText value="{!$Label.Opportunity_Team_Related_List_Header}"/></h3>
+            </apex:outputPanel>
+        </apex:facet>
+    </apex:relatedList>
+    <apex:relatedList list="ProcessSteps" id="ApprovalHistory" rendered="{!OR(showSubmitForApprovalButton,isPOCSubmitted)}" />
+    <apex:relatedList list="ProcessSteps" id="ApprovalHistoryNoButtons" rendered="{!OR(AND(isPOCScoping,NOT(showSubmitForApprovalButton)),isPOCAccepted,isPOCEngaged,isPOCClosed)}">
+        <apex:facet name="header">
+            <apex:outputPanel layout="block" styleClass="pbTitle">
+                <img src="/s.gif" alt="" width="12" height="1" class="minWidth" title="" style="margin-right: 0.25em;margin-right: 0.25em;" />
+                <h3><apex:outputText value="{!$Label.Approval_History_Related_List_Header}"/></h3>
+            </apex:outputPanel>
+        </apex:facet>
+    </apex:relatedList>
+    <apex:relatedList list="Paid_Opportunities__r" id="PaidOpportunities" />
+</apex:page>

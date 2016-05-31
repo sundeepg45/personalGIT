@@ -1,0 +1,424 @@
+<apex:page standardController="CCSP_Form__c" extensions="CCSPFormController" showHeader="true" sidebar="true" action="{!init}" cache="false">
+
+    <apex:outputText escape="false" value="<WM4SF3:WalkMeSnippet ></WM4SF3:WalkMeSnippet>"/>
+
+    <apex:outputPanel id="pageMessages">
+        <apex:pageMessages />
+    </apex:outputPanel>
+
+    <apex:form >
+
+        <apex:pageBlock title="{!$Label.CCSPForm_Checklist_For_Qualification}" mode="maindetail">
+
+            <apex:pageBlockSection collapsible="false" columns="1">
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:outputLabel value="{!$Label.CCSPForm_Indicates_Required}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText escape="false" value="<b>{!$Label.CCSPForm_Wording_Warning}</b>"/>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="" collapsible="false" columns="1">
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText escape="false" value="{!$Label.CCSPForm_Please_Reference_Program_Guide}">
+                        <apex:param value="{!programGuide}"/>
+                        <apex:param value="{!technicalGuide}"/>
+                    </apex:outputText>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!NOT(isDistributor)}">
+                    <apex:outputLabel for="distributorDirected" value="{!$Label.CCSPForm_Distributor_Directed}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="distributorDirected" value="{!distributorDirected}" onchange="updateDistributorName();">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:outputPanel id="distributorNameSection" rendered="{!NOT(isDistributor)}">
+                    <apex:outputPanel rendered="{!distributorNameRequired}">
+                        <apex:pageBlockSection collapsible="false" columns="1">
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="distributorName" value="{!$Label.CCSPForm_Distributor_Name}"/>
+                                <apex:outputPanel >
+                                    <div class="requiredInput">
+                                        <div class="requiredBlock" style="{!style}"></div>
+                                        <apex:inputText id="distributorName" value="{!distributorName}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+
+                <apex:pageBlockSectionItem rendered="{!isDistributor}">
+                    <apex:outputLabel for="referringDistributor" value="{!$Label.CCSPForm_Referring_Distributor}"/>
+                    <apex:outputText id="referringDistributor" value="{!distributorName}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="authorizationCountries" value="{!$Label.CCSPForm_Authorization_Countries}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectList id="authorizationCountries" value="{!authorizationCountries}" multiselect="true" size="10">
+                                <apex:selectOptions value="{!selectableCountries}"/>
+                            </apex:selectList>
+                        </div>
+                        <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="authorizationCountriesStatic" value="{!$Label.CCSPForm_Authorization_Countries}"/>
+                    <apex:outputText id="authorizationCountriesStatic" value="{!ccspForm.Authorization_Countries__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="products" value="{!$Label.CCSPForm_Red_Hat_Products}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectList id="products" value="{!RedHatProducts}" multiselect="true" size="3">
+                                <apex:selectOptions value="{!RedHatProductsOptions}"/>
+                            </apex:selectList>
+                        </div>
+                        <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="productsStatic" value="{!$Label.CCSPForm_Red_Hat_Products}"/>
+                    <apex:outputText id="productsStatic" value="{!ccspForm.Products__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="{!$Label.CCSPForm_Acknowledgements}" collapsible="false" columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.CCSPForm_Acknowledge_Requirements}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="revenueUnitMatching" value="{!$Label.CCSPForm_Revenue_Unit_Matching}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:inputCheckbox id="revenueUnitMatching" value="{!revenueUnitMatching}" />
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="revenueUnitMatchingStatic" value="{!$Label.CCSPForm_Revenue_Unit_Matching}"/>
+                    <apex:inputCheckbox id="revenueMatchingStatic" value="{!ccspForm.Revenue_Unit_Matching__c}" disabled="true"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="monthlyReportingRequirement" value="{!$Label.CCSPForm_Monthly_Reporting_Requirement}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:inputCheckbox id="monthlyReportingRequirement" value="{!monthlyReportingRequirement}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="monthlyReportingRequirementStatic" value="{!$Label.CCSPForm_Monthly_Reporting_Requirement}"/>
+                    <apex:inputCheckbox id="monthlyReportingRequirementStatic" value="{!ccspForm.Monthly_Reporting_Requirement__c}" disabled="true"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="systemForReporting" value="{!$Label.CCSPForm_Metering_And_Billing}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:inputCheckbox id="systemForReporting" value="{!systemForReporting}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="systemForReportingStatic" value="{!$Label.CCSPForm_Metering_And_Billing}"/>
+                    <apex:inputCheckbox id="systemForReportingStatic" value="{!ccspForm.System_For_Reporting__c}" disabled="true"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="requirementToImplementAndUpdate" value="{!$Label.CCSPForm_Implement_And_Update}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:inputCheckbox id="requirementToImplementAndUpdate" value="{!requirementToImplementAndUpdate}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="requirementToImplementAndUpdateStatic" value="{!$Label.CCSPForm_Implement_And_Update}"/>
+                    <apex:inputCheckbox id="requirementToImplementAndUpdateStatic" value="{!ccspForm.Implement_And_Update__c}" disabled="true"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="certifiedHypervisor" value="{!$Label.CCSPForm_Certified_Hypervisor}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectList id="certifiedHypervisor" value="{!CertifiedHypervisors}" multiselect="true" size="3">
+                                <apex:selectOptions value="{!CertifiedHypervisorsOptions}"/>
+                            </apex:selectList>
+                        </div>
+                        <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="certifiedHypervisorStatic" value="{!$Label.CCSPForm_Certified_Hypervisor}"/>
+                    <apex:outputText id="certifiedHypervisorStatic" value="{!ccspForm.Certified_Hypervisor__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="requirementsExceptions" value="{!$Label.CCSPForm_Exceptions}"/>
+                    <apex:inputTextarea id="requirementsExceptions" value="{!requirementsExceptions}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="requirementsExceptionsStatic" value="{!$Label.CCSPForm_Exceptions}"/>
+                    <apex:outputText id="requirementsExceptionsStatic" value="{!ccspForm.Requirements_Exceptions__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Other Questions" collapsible="false" columns="2">
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="managedOSServices" value="{!$Label.CCSPForm_Managed_OS_Services}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="managedOSServices" value="{!managedOSServices}">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="managedOSServicesStatic" value="{!$Label.CCSPForm_Managed_OS_Services}"/>
+                    <apex:outputText id="managedOSServicesStatic" value="{!ccspForm.Managed_OS_Services__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="dedicatedPhysicalServersBareMetal" value="{!$Label.CCSPForm_Servers_Bare_Metal}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="dedicatedPhysicalServersBareMetal" value="{!dedicatedPhysicalServersBareMetal}">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="dedicatedPhysicalServersBareMetalStatic" value="{!$Label.CCSPForm_Servers_Bare_Metal}"/>
+                    <apex:outputText id="dedicatedPhysicalServersBareMetalStatic" value="{!ccspForm.Dedicated_Servers_Metal__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="dedicatedPhysicalServersVirtualization" value="{!$Label.CCSPForm_Servers_Virt}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="dedicatedPhysicalServersVirtualization" value="{!dedicatedPhysicalServersVirtualization}">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="dedicatedPhysicalServersVirtualizationStatic" value="{!$Label.CCSPForm_Servers_Virt}"/>
+                    <apex:outputText id="dedicatedPhysicalServersVirtualizationStatic" value="{!ccspForm.Dedicated_Servers_Virt__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="multiTenantVirtualInstances" value="{!$Label.CCSPForm_Multi_Tenant}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="multiTenantVirtualInstances" value="{!multiTenantVirtualInstances}">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="multiTenantVirtualInstancesStatic" value="{!$Label.CCSPForm_Multi_Tenant}"/>
+                    <apex:outputText id="multiTenantVirtualInstancesStatic" value="{!ccspForm.Multi_Tenant__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="typesOfCloudsServices" value="{!$Label.CCSPForm_Types_of_Clouds_Services}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectList id="typesOfCloudsServices" value="{!CloudServices}" multiselect="true" size="3">
+                                <apex:selectOptions value="{!CloudServicesOptions}"/>
+                            </apex:selectList>
+                        </div>
+                        <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="typesOfCloudsServicesStatic" value="{!$Label.CCSPForm_Types_of_Clouds_Services}"/>
+                    <apex:outputText id="typesOfCloudsServicesStatic" value="{!ccspForm.Cloud_Services__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="otherRelationships" value="{!$Label.CCSPForm_Other_Relationships}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectList id="otherRelationships" value="{!Relationships}" multiselect="true" size="3">
+                                <apex:selectOptions value="{!RelationshipsOptions}"/>
+                            </apex:selectList>
+                        </div>
+                        <p class="info"><i class="fa fa-info-circle"></i><span> {!$Label.CCSPForm_Multiselect}</span></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="otherRelationshipsStatic" value="{!$Label.CCSPForm_Other_Relationships}"/>
+                    <apex:outputText id="otherRelationshipsStatic" value="{!ccspForm.Relationships__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="" columns="1" collapsible="false">
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputText value="{!$Label.CCSPForm_Plan_to_Offer_JBoss}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="planToOfferJBoss" value="{!planToOfferJBoss}">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputText value="{!$Label.CCSPForm_Plan_to_Offer_JBoss}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputText id="planToOfferJBossStatic" value="{!planToOfferJBoss}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputText value="{!$Label.CCSPForm_How_Will_You_Set_Up_Service}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:selectRadio id="howWillYouSetUp" value="{!howWillYouSetUpYourService}" layout="pageDirection">
+                                <apex:selectOption itemLabel="{!$Label.CCSPForm_I_Require_Red_Hat_to_Set_Up_RHUI}*" itemValue="I require Red Hat to set up RHUI"/>
+                                <apex:selectOption itemLabel="{!$Label.CCSPForm_Implementing_RHUI_on_My_Own}" itemValue="I will be implementing RHUI on my own" />
+                                <apex:selectOption itemLabel="{!$Label.CCSPForm_I_Require_Red_Hat_to_Set_Up_Sat}*" itemValue="I require Red Hat to set up Satellite"/>
+                            </apex:selectRadio>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputText value="{!$Label.CCSPForm_How_Will_You_Set_Up_Service}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputText id="howWillYouSetUpStatic" value="{!howWillYouSetUpYourService}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="* {!$Label.CCSPForm_Your_Company_Will_Be_Charged}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="" columns="2" collapsible="false">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.CCSPForm_Who_Is_The_Contact}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="contactName" value="{!$Label.CCSPForm_Name}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="display:inline"></div>
+                            <apex:inputText id="contactName" value="{!contactName}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="contactNameStatic" value="{!$Label.CCSPForm_Name}"/>
+                    <apex:outputText id="contactNameStatic" value="{!ccspForm.Contact_Name__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="contactEmail" value="{!$Label.CCSPForm_Email}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="display:inline"></div>
+                            <apex:inputText id="contactEmail" value="{!contactEmail}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="contactEmailStatic" value="{!$Label.CCSPForm_Email}"/>
+                    <apex:outputText id="contactEmailStatic" value="{!ccspForm.Contact_Email__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem rendered="{!NOT(AND(isDistributor, formSent))}">
+                    <apex:outputLabel for="contactPhone" value="{!$Label.CCSPForm_Phone}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock" style="{!style}"></div>
+                            <apex:inputText id="contactPhone" value="{!contactPhone}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isDistributor, formSent)}">
+                    <apex:outputLabel for="contactPhoneStatic" value="{!$Label.CCSPForm_Phone}"/>
+                    <apex:outputText id="contactPhoneStatic" value="{!ccspForm.Contact_Phone__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="" columns="2" collapsible="false" >
+                <apex:pageBlockSectionItem rendered="{!AND(isRedHatUser, formReturned)}">
+                    <apex:outputLabel for="customTermsRequired" value="Custom Terms Required"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputField id="customTermsRequired" value="{!ccspForm.Custom_Terms_Required__c}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AND(isRedHatUser, NOT(formReturned))}">
+                    <apex:outputLabel for="customTermsRequired" value="Custom Terms Required"/>
+                    <apex:outputPanel >
+                        <apex:inputField id="customTermsRequired" value="{!ccspForm.Custom_Terms_Required__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons id="distributorFormNotSent" location="bottom" rendered="{!AND(isDistributor, NOT(formSent))}">
+                <apex:commandButton action="{!submit}" value="{!$Label.CCSPForm_Send_to_Partner}" onclick="if(!confirm('{!$Label.CCSPForm_Are_You_Sure_to_Partner}')) return false;"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockButtons id="camFormSent" location="bottom" rendered="{!AND(isRedHatUser, formSent)}">
+                <apex:commandButton action="{!saveForm}" value="{!$Label.CCSPForm_Save}"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockButtons id="camFormNotSent" location="bottom" rendered="{!AND(isRedHatUser, NOT(formSent))}">
+                <apex:commandButton action="{!saveForm}" value="{!$Label.CCSPForm_Save}"/>
+                <apex:commandButton action="{!submit}" value="{!$Label.CCSPForm_Send_to_Partner}" onclick="if(!confirm('{!$Label.CCSPForm_Are_You_Sure_to_Partner}')) return false;"/>
+            </apex:pageBlockButtons>
+
+        </apex:pageBlock>
+
+        <apex:actionFunction name="updateUnderlyingFacts" reRender="underlyingFactsSection"/>
+        <apex:actionFunction name="updateDistributorName" reRender="distributorNameSection"/>
+
+    </apex:form>
+
+</apex:page>

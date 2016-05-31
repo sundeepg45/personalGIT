@@ -1,0 +1,201 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+
+    <head>
+        <title>Red Hat Enterprise Virtualization 3</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+        <apex:include pageName="RHEV_css_main"/>
+        <link rel="stylesheet" type="text/css" media="all" href="{!URLFOR($Resource.RHEV_zip, 'css/960.css')}" />
+        <link rel="stylesheet" type="text/css" media="all" href="{!URLFOR($Resource.RHEV_zip, 'css/webfonts.css')}" />
+        <script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 'j/lib/jquery/plugins/jquery.easing.1.3.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 'j/lib/jquery/plugins/jquery.cycle.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 'j/lib/jquery/plugins/superfish.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 'j/jquery.hoverintent.minified.js')}"></script>
+
+        <apex:stylesheet value="{!URLFOR($Resource.RHEV_zip, 'css/video.css')}"/>
+        <script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 'j/lib/jquery/plugins/jquery.cycle.min.js')}"></script>
+        <script type="text/javascript">
+$(function() {
+    $('#newPromoHome > a').removeClass('SPButtonNonJS') // remove hide if JS
+    $('#newPromoHome > a').addClass('SPButton') // add css if JS
+    startFlipper();
+    function startFlipper() { // this is the main function that operates through two cycles
+        $('#newPromoSlides').cycle({
+            fx: 'fade', // transition effect
+            speed: 400, // transition speed
+            timeout: 4000, // amount of time each promo displays before rotating
+            pager: '#newPromoNav',
+            autostop: 1, // set to true
+            autostopCount: 6, // set to two cycles
+            end: endFlipper,
+            pagerAnchorBuilder: function(idx, slide) { 
+                // return selector string for existing anchor 
+                return '#newPromoNav li:eq(' + idx + ') a'; 
+            }
+        });
+        $('.SPButton').text('Stop');
+        $('.SPButton').removeClass('play');
+        $('.SPButton').toggle(
+            function() {
+                $('#newPromoSlides').cycle('pause');
+                $(this).text('Play');
+                $(this).addClass('play');
+            },
+            function() {
+                $('#newPromoSlides').cycle('resume', true);
+                $(this).text('Stop');
+                $(this).removeClass('play');
+            }
+        );
+        $('#newPromoNav a').click(function() {
+            return stopFlipper(); // stop the rotation if user clicks
+        });
+    }
+    function startFlipperLite() { // this is non-running - only for flipping back and forth
+        $('#newPromoSlides').cycle({
+            fx: 'fade',
+            speed: 400,
+            timeout: 0, // set to non rotation
+            pager: '#newPromoNav',
+            pagerAnchorBuilder: function(idx, slide) { 
+                // return selector string for existing anchor 
+                return '#newPromoNav li:eq(' + idx + ') a'; 
+            }
+        });
+        $('.SPButton').text('Play');
+        $('.SPButton').addClass('play');
+        $('.SPButton').click(function() {
+            $('.SPButton').unbind('click');
+            return startFlipper(); //restart if user clicks Play button
+        });
+    }
+    function stopFlipper() { // this stops cycle when a small promo is clicked while running
+        $('#newPromoSlides').cycle('pause');
+        $('.SPButton').unbind('click');
+        $('.SPButton').text('Play');
+        $('.SPButton').addClass('play');
+        $('.SPButton').click(function() {
+            $('.SPButton').unbind('click');
+            return startFlipper(); //restart if user clicks Play button
+        });
+    }
+    function endFlipper() { // this is what happens when end of second cycle is reached
+        $('.SPButton').unbind('click');
+        return startFlipperLite(); // go to non-rotating function
+    }
+});     
+        
+$(document).ready(function() {
+});
+
+</script>
+        
+<style type="text/css">     
+
+#newPromoHome {
+    width: inherit; 
+    height: 250px; 
+    }
+#newPromoSlides {
+    width: inherit;
+    height: inherit;
+    *height: 230px !important;
+    background: transparent;
+    
+    }
+    #newPromoSlides div {
+        width: inherit;
+        background: transparent !important;
+        }
+#dot-links {
+    float: right;
+    position: relative;
+    z-index: 50;
+    margin-top: 350px;
+    }
+#newPromoNav { 
+    padding: 0; 
+    margin: 0; 
+    list-style-type: none;
+    }
+#newPromoNav li {
+    overflow:hidden;
+    margin: 0; 
+    padding: 0; 
+    width: 20px; 
+    height: 20px;  
+    text-align: left;
+    float: left;
+    }
+#newPromoNav a {
+    display: block;
+        width: 20px;
+        height: 20px;
+        background: url({!URLFOR($Resource.RHEV_zip, 'i/chrome/dot-sprite.png')}) 4px -75px no-repeat;}    /* adjust position to appropriate off color */
+        #newPromoNav li a.activeSlide {background-position: 4px -95px;}     /* adjust position to appropriate active color */
+        #newPromoNav li:hover a {background-position: 4px -35px;}       /* adjust position to appropriate hover color */
+        #newPromoNav li:hover a.activeSlide {background-position: 4px -95px;}   /* adjust position to appropriate active color */
+
+#newPromoSlides .video {
+    background-color: #222;
+    width: 300px;
+    height: 175px;
+    float: right;
+    margin: 0 50px;
+    }
+#newPromoSlides .promo_block {
+    width: auto;
+    margin: 12px 30px 12px 0;
+    }
+#newPromoSlides .promo_block img {
+    margin-right: 25px;
+    }
+
+</style>
+
+
+ <script type="text/javascript">
+ // initialise plugins
+ jQuery(function(){
+     jQuery('ul.sf-menu').superfish();
+ });
+ </script>
+ 
+ <!--[if lt IE 9]>
+     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+ <![endif]-->
+ 
+ <meta name="viewport" content="width=device-width, initial-scale=1"/>
+ <!-- Adding "maximum-scale=1" fixes the Mobile Safari auto-zoom bug: http://filamentgroup.com/examples/iosScaleBug/ -->
+         
+<!-- SiteCatalyst code version: H.21.
+Copyright 1996-2010 Adobe, Inc. All Rights Reserved
+More info available at http://www.omniture.com -->
+
+<div id="oTags">
+<script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 's_code.js')}"></script>
+
+
+<script type="text/javascript" src="{!URLFOR($Resource.RHEV_zip, 'j/rh_omni_footer.js')}"></script>
+<script language="JavaScript" type="text/javascript">
+if(navigator.appVersion.indexOf('MSIE')>=0)document.write(unescape('%3C')+'\!-'+'-')
+//</script><noscript><a href="http://www.omniture.com" title="Web Analytics"><img
+src="https://smtrcs.redhat.com/b/ss/redhatcom,redhatglobal/1/H.21--NS/0?[AQB]&cdp=3&[AQE]"
+height="1" width="1" border="0" alt="" /></a></noscript><!--/DO NOT REMOVE/-->
+<!-- End SiteCatalyst code version: H.21. -->
+</div>
+
+
+<style type="text/css">
+ .wrapReady {
+     float: left;
+     padding: 30px;
+ }
+
+</style>
+
+    
+</head>
+   
+
+</apex:page>

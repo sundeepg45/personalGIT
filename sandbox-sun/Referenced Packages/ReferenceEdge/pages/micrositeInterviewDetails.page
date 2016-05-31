@@ -1,0 +1,159 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId"  controller="refedge.MicrositePreviewController"  sideBar="false" showHeader="false" docType="html-5.0">
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <!-- Add POR_ModalLoader Component-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <!-- <c:POR_ModalLoader id="PORLoader"/>-->
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/rateit.css')}"/>
+     <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/jquery-1.10.2.js')}"/> 
+     <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/jquery.rateit.js')}"/> 
+     <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles, 'rate/bootstrap.js')}"/> 
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+   <!--  <apex:includeScript value="{!URLFOR($Resource.BootstrapFiles,'collapse.js')}"/> -->
+    <style>
+        .ImageClass table tbody tr td .sfdc_richtext img{
+            width:100px;
+            height:100px;
+        }
+        span.interviewClass span.interviewClass1 div.ContentDetailsClass  div.imageDiv span.imagePanelClass span table tbody tr td div.sfdc_richtext img{
+            width:100px;
+            height:100px;
+        }
+    </style>
+    <apex:outputPanel id="transcriptPlayPanel">
+        <script>
+            function downloadTranscript1(url,contentId) {
+                var videobutton = document.getElementById(contentId);
+                videobutton.pause();
+                //videobutton.setAttribute('src', '{!JSENCODE(downloadSiteUrl)}' + contentId);
+                videobutton.setAttribute('src',  url)
+                videobutton.load();
+                videobutton.play();
+            }
+        
+            function downloadTranscript2(transcriptId) {
+                if (transcriptId != '') {
+                    window.open('', '_self').location.href = '{!JSENCODE(downloadSiteUrl)}' + transcriptId;
+                }
+            }
+            function openSite(siteUrl){
+                if(siteUrl != '' && siteUrl != null){
+                    if (siteUrl.indexOf("http://")>=0 || siteUrl.indexOf("https://") >=0){ 
+                        window.open('','_blank').location.href = siteUrl;
+                    }
+                    else{
+                        window.open('','_blank').location.href = 'http://'+siteUrl;
+                    }
+                }
+            }
+        </script>
+    </apex:outputPanel>
+    <html>
+        <body style="background:{!HTMLENCODE(microsite.refedge__Page_Color__c)};">
+            <apex:form rendered="{!isFullLicenseAccessible}">
+                <apex:actionFunction name="playTranscript" action="{!playTranscript}" rerender="pgmsgId,transcriptPlayPanel" oncomplete="downloadTranscript1();">
+                    <apex:param name="interviewTopicId" assignTo="{!interviewTopicId}" value="" />
+                </apex:actionFunction>
+                <apex:actionFunction name="hideDiv" action="{!backtoMicrosite}"/>
+                <apex:outputPanel styleclass="container" style="background:{!HTMLENCODE(microsite.refedge__Page_Color__c)};display:block;margin-top: 30px;" layout="block">
+                    <div class="panel-group" id="accordion" style="width:100%;float:left;background:#EAEAEA;">
+                        <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                            <div>
+                                <a class="boxclose" id="boxclose" style="cursor:pointer;" onclick="hideDiv();return false;">Back</a>
+                            </div>
+                            <div id="contentDetails" class="imageDiv" style="background-color: #f8f8f8;overflow-y:auto;border:2px solid gray;border-radius:1px;width:100%;height:100%;">
+                                <apex:outputPanel layout="block" onClick="downloadTranscript2('{!JSENCODE(refInterviewRecord.refedge__Transcript_Content_Id__c)}');return false;">
+                                    <apex:outputPanel id="imagePanel" styleClass="imagePanelClass" style="width:100%;float:left;text-align:left;padding-left: 10px;">
+                                        <apex:outputLabel value="" />
+                                        <apex:outputField styleclass="ImageClass" id="imageIds" value="{!refInterviewRecord.refedge__Photograph__c}" />
+                                    </apex:outputPanel>
+                                    <apex:outputPanel style="width:100%;float:left;font-weight:bold;font-size:14px;padding-top: 2%;">
+                                        <apex:outputLabel value="" />
+                                        <apex:outputText style="padding-left: 10px;font-weight:bold;color:{!HTMLENCODE(microsite.refedge__Header_Copy_Color__c)};" value="{!refInterviewRecord.Reference_Content__r.refedge__Title__c}" />
+                                    </apex:outputPanel>
+                                    <apex:outputPanel style="width:100%;float:left;padding-top: 1%;padding-left: 10px;">
+                                        <apex:outputLabel value="{!$Label.Account}: " style="font-weight:bold;color:{!HTMLENCODE(microsite.refedge__Header_Copy_Color__c)};" />
+                                        <apex:outputText value=" {!refContentAccounts[refInterviewRecord.refedge__Reference_Content__c]} " />
+                                    </apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel style="width:100%;float:left;padding-left:10px;">
+                                    <div style="float:left;width:100%;COLOR:{!HTMLENCODE(microsite.Document_Title_Color__c)};">
+                                        <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrptInfo">
+                                            <apex:outputLabel style="font-weight:bold;color:{!HTMLENCODE(microsite.refedge__Document_Title_Color__c)};cursor:pointer;" value="{!$Label.Reference_Interview_Info}" />
+                                        </a>
+                                    </div>
+                                    <div id="collapseTrnanscrptInfo" style="float:left;width:100%;" class="panel-collapse collapse">
+                                        <apex:outputLabel value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Speaker_info__c.label}" />&nbsp;
+                                        <apex:outputField value="{!refInterviewRecord.refedge__Speaker_info__c}" />
+                                        <br/>
+                                        <apex:outputLabel value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_website__c.label}" />&nbsp;
+                                        <apex:commandLink style="color:blue" value="{!refInterviewRecord.refedge__Org_website__c}" onClick="openSite('{!refInterviewRecord.refedge__Org_website__c}');return false;" />
+<!--                                        <a style="color:blue;" target="_blank" href="{!SECUREURL}{!refInterviewRecord.refedge__Org_website__c}" >{!refInterviewRecord.refedge__Org_website__c}</a> -->
+                                        <br/>
+                                        <apex:outputLabel value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_description__c.label}" />&nbsp;
+                                        <apex:outputField value="{!refInterviewRecord.refedge__Org_description__c}" />
+                                    </div>
+                                </apex:outputPanel>
+                                <table style="width:100%;float:left;margin-top:1%;">
+                                    <tbody style="width:100%;">
+                                        <apex:repeat value="{!refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                            <tr style="width:100%;">
+                                                <td style="width:100%;border: 1px solid #ececec;">
+                                                    <div style="float:left;width:100%;padding-left: 10px;">
+                                                        <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                            <apex:outputLabel style="font-weight:bold;color:{!HTMLENCODE(microsite.refedge__Document_Title_Color__c)};cursor:pointer;" value="{!interviewTopic.refedge__Question__c}" />
+                                                        </a>
+                                                       <!--  <apex:commandLink style="float:right;font-size: 20px;font-weight: bold;text-decoration: none;" value="?" rendered="{!AND(interviewTopic.Video_URL__c != null,interviewTopic.Video_URL__c!='')}" onclick="downloadTranscript1('{!JSENCODE(interviewTopic.Video_URL__c)}','{!JSENCODE(interviewTopic.Id)}');return false;" /> -->
+                                                    </div>
+                                                    <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse">
+                                                     <Apex:outputPanel rendered="{!interviewTopic.refedge__Video_Url_Embed__c != null}">
+                                                        <apex:iframe src="{!interviewTopic.refedge__Video_Url_Embed__c}"/>
+                                                    </Apex:outputPanel>
+                                                        <apex:outputLabel style="font-weight:normal;padding-left: 10px;" value="{!interviewTopic.refedge__Transcript__c}" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+            
+                        </div>
+                    </div>
+            
+                    <!-- Footer-->
+                    <div style="float:left;width:100%;padding-left: 10px;color:{!HTMLENCODE(microsite.Footer_Copy_Color__c)}">
+                        <apex:outputPanel rendered="{!microsite.refedge__Footer_Copy_Alignment__c != 'Center'}" style="width:100%;float: left;text-align: center;">
+                            <apex:outputLabel style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Footer_Copy_Alignment__c)};" rendered="{!microsite.refedge__Footer_Link__c == NULL}" value="{!microsite.refedge__Footer_Copy__c}" />
+                            <apex:commandLink style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};float:{!HTMLENCODE(microsite.refedge__Footer_Copy_Alignment__c)};" rendered="{!microsite.refedge__Footer_Link__c != NULL}" value="{!microsite.refedge__Footer_Copy__c}" onClick="openSite('{!microsite.refedge__Footer_Link__c}');return false;" />
+                        </apex:outputPanel>
+                        <apex:outputpanel rendered="{!microsite.refedge__Footer_Copy_Alignment__c = 'Center'}" style="width:100%;float: left;text-align: center;">
+                            <apex:outputLabel style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};" rendered="{!microsite.refedge__Footer_Link__c == NULL}" value="{!microsite.refedge__Footer_Copy__c}" />
+                            <apex:commandLink style="color:{!HTMLENCODE(microsite.refedge__Footer_Copy_Color__c)};font-size:{!HTMLENCODE(microsite.refedge__Footer_Copy_Size__c)};" rendered="{!microsite.refedge__Footer_Link__c != NULL}" value="{!microsite.refedge__Footer_Copy__c}" onClick="openSite('{!microsite.refedge__Footer_Link__c}');return false;" />
+                        </apex:outputpanel>
+                    </div>
+                </apex:outputPanel>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,57 @@
+﻿<apex:page controller="TabUIController" showHeader="true" tabStyle="StrategicPlan__c">
+    <apex:stylesheet value="/sCSS/27.0/sprites/1297816277000/Theme3/default/gc/versioning.css" />
+    <apex:stylesheet value="/sCSS/27.0/sprites/1297816277000/Theme3/default/gc/extended.css" />﻿
+    <!-- apex:includeScript value="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"/ -->
+    <script type="text/javascript">
+        // unfortunately loading jquery breaks the tabsets, so we have to do this the hard way.
+        var printLinksInterval = null;
+        function printLinksUpdate() {
+            var links = document.getElementsByClassName('configLinks');
+            for (var i=0; i < links.length; i++) {
+                var href = links[i].getAttribute('href');
+                if(href != null) {
+                    if(href.match(/^javascript:printWin.*/)) {
+                        clearInterval(printLinksInterval);
+                        var links2 = document.getElementsByTagName('a');
+                        for(var j=0;j<links2.length;j++) {
+                            var href2 = links2[j].getAttribute('href');
+                            if(href2 != null) {
+                                if(href2.match(/^javascript:openPopupFocus.*'PrintableView'.*/)) {
+                                    links[i].setAttribute('href',href2);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        printLinksInterval = setInterval(printLinksUpdate,200);
+    </script>
+    <div style="display:none">
+        <apex:sectionHeader title="{!$ObjectType.StrategicPlan__c.Label}" printUrl="/apex/StrategicPlan_Print?id={!tabId['StrategicPlan__c']}" rendered="{!NOT(ISBLANK(tabId['StrategicPlan__c']))}"/>
+        <apex:detail subject="{!tabId['StrategicPlan__c']}" title="true" showChatter="false" relatedList="false" rendered="{!NOT(ISBLANK(tabId['StrategicPlan__c']))}"/>
+    </div>
+    <apex:sectionHeader title="{!$ObjectType.StrategicPlan__c.Label}" subtitle="New {!$ObjectType.StrategicPlan__c.Label}" rendered="{!ISBLANK(tabId['StrategicPlan__c'])}" />
+    <apex:tabPanel switchType="server" value="{!activeTab}" styleClass="theTabPanel" tabClass="theTabPanel" contentClass="tabContent" activeTabClass="activeTab" inactiveTabClass="inactiveTab">
+        <apex:tab label="{!$Label.StrategicPlan_PlanOverviewTab}" name="StrategicPlan__c">
+            <apex:include pageName="StrategicPlanTab"/>
+        </apex:tab>
+        <apex:tab label="{!$Label.StrategicPlan_StrategyTab}" name="StrategicPlan_Strategy__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <apex:include pageName="StrategicPlan_StrategyTab"/>
+        </apex:tab>
+        <apex:tab label="{!$Label.StrategicPlan_SolutionTab}" name="StrategicPlan_Solution__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <apex:include pageName="StrategicPlan_SolutionTab"/>
+        </apex:tab>  
+        <apex:tab label="{!$Label.StrategicPlan_OpportunityTab}" name="StrategicPlan_SolutionOpportunity__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <apex:include pageName="StrategicPlan_SolutionOpportunityTab"/>
+        </apex:tab>  
+        <apex:tab label="{!$Label.StrategicPlan_ActionTab}" name="StrategicPlan_Action__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <apex:include pageName="StrategicPlan_ActionTab"/>
+        </apex:tab>
+        <!-- apex:tab label="Opportunity Charts" name="StrategicPlan_OppProdSummary__c" rendered="{-!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}" -->
+            <!-- apex:include pageName="StrategicPlan_OppProdSummaryTab"/ -->
+        <!-- /apex:tab -->   
+    </apex:tabPanel>
+</apex:page>

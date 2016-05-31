@@ -1,0 +1,103 @@
+<apex:page controller="MSController" sidebar="false" showheader="true" standardStylesheets="false" action="{!initWithContent}">
+
+<head>
+<script src="/jslibrary/1333170890000/sfdc/JiffyStubs.js"></script><meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<meta HTTP-EQUIV="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT" />
+
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<title>Selling Cloud with Attitude</title>
+<apex:include pageName="RHELSiteCSS"/>
+<span id="j_id0:j_id4"></span>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a class="logo-redhat" href="http://www.redhat.com">Red Hat</a>
+        <a class="logo-product" href="MSRHELHome">Red Hat Enterprise Linux</a>
+        <div class="title"><strong>Do the math.</strong> <br />Migrate to Red Hat<sup>&reg;</sup> Enterprise Linux<sup>&reg;</sup> and save.</div>
+        
+        <ul id="nav-main">
+            <li id="home"><a href="MSRHELHome">&nbsp;Home</a></li>
+            <li id="nav2"><a href="MSRHELSiteTraining">Train to sell</a></li>
+            <li id="nav3"><a href="MSRHELCollateral">Engage customers</a></li>
+            <li id="nav4"><a id="selected" href="MSRHELMarketing">Build a campaign</a></li>
+            <li id="nav5"><a href="MSRHELTechDetails">Access technical resources</a></li>
+            <li class="last" id="nav6"><a href="MSRHELSolutions">Sell RHEL + Partner solutions</a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <div id="content-inner">
+        <div class="container">
+            <div id="content-primary">
+              <h2>Build a campaign</h2>
+              <p>
+                Start here to build your integrated Red Hat Enterprise Linux
+                solution campaigns, including campaign kits and resources for joint
+                campaigns with key Red Hat partners including IBM, HP, SAS, Symantec
+                and more.
+              </p>
+            </div>
+            <div id="content-secondary">
+            <div class='section'>
+              <h4>General RHEL Campaigns</h4>
+              <br />
+                <c:MSSection pageController="{!this}" sectionKey="General RHEL Campaigns">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="General RHEL Campaigns"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="General RHEL Campaigns"/></p></strong>
+                   </ul>
+                </c:MSSection>
+            </div>
+            <div class='section'>
+              <h4>Migrate: Unix to Red Hat Enterprise Linux (New!)</h4>
+              An integrated seminar/event campaign kit, including all of the
+              resources to help you plan, build and deliver a highly targeted
+              Unix to RHEL migration campaign
+              <br />
+                <c:MSSection pageController="{!this}" sectionKey="Migrate: UNIX to RHEL">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Migrate: UNIX to RHEL"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Migrate: UNIX to RHEL"/></p></strong>
+                   </ul>
+                </c:MSSection>
+            </div>
+            <div class='section'>
+              <h4>Red Hat Enterprise Linux Add Ons – Standout Idea Campaign</h4>
+              A campaign for partners to use to generate awareness and demand
+              for the RHEL family of Add On products, including Resilient
+                Storage, HA Clustering and more
+              <br />
+                <c:MSSection pageController="{!this}" sectionKey="RHEL add ons - Standout Idea Campaign">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="RHEL add ons - Standout Idea Campaign"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="RHEL add ons - Standout Idea Campaign"/></p></strong>
+                   </ul>
+                </c:MSSection>
+            </div>
+            <div class='section'>
+              <h4>Standardize on Red Hat Enterprise Linux </h4>
+              A campaign that communicates the value of standardizing on a
+              single operating system platform, including upsell and cross sell
+              opportunities
+              <br />
+                <c:MSSection pageController="{!this}" sectionKey="Standardize on RHEL">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Standardize on RHEL"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Standardize on RHEL"/></p></strong>
+                   </ul>
+                </c:MSSection>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright">Copyright &copy; 2012 Red Hat, Inc. All rights reserved.</p>
+    </div>
+</div>  
+</body>
+
+</apex:page>

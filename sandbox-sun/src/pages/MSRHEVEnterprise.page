@@ -1,0 +1,73 @@
+<apex:page controller="MSController" showHeader="false" sidebar="false" standardStylesheets="false" action="{!initWithContent}">
+
+	<apex:include pageName="RHEV_include_header"/>
+	<body id="second" class="ms dark">
+	<div id="wrapper">
+		<div id="page">
+			<div class="container_12 clearfix">
+				<div id="header" class="grid_12">
+					<div id="sm-logo"><a href="index.html">Red Hat</a></div><!-- /#sm-logo -->
+					<div id="header-links">
+					<ul style="margin-right: 8px;">
+						<li class="first" style=""></li>
+					</ul>
+						<div class="clear"></div>
+						<a target="_blank" class="header-button" href="/">redhat.com</a><!-- /.header-button -->
+					</div><!-- /#header-links -->
+					<div id="nav-band">
+					  <div id="primary-nav">
+					  	<apex:include pageName="MSRHEV_include_nav"/>
+					  </div><!-- /#primary-nav -->
+					</div><!-- /#nav-band -->
+					<apex:include pageName="RHEV_include_promo"/>
+				
+				</div><!-- /#header -->
+				<div class="clear"></div>
+
+				<div id="main">
+<div class="grid_12">
+	
+	<div class="grid_9 alpha">
+<h1>ENTERPRISE-READY</h1>
+
+<p>Red Hat&reg; Enterprise Virtualization is a full enterprise-ready virtualization solution with the rich functionality and ease of use you expect from Red Hat. And with release 3, we've set the bar even higher. Check out the latest functionality:</p>
+<ul>
+<li><c:MSSingle pageController="{!this}" sectionKey="Datasheets" annotation="server_datasheet"/></li>
+<li><c:MSSingle pageController="{!this}" sectionKey="Datasheets" annotation="desktop_datasheet"/></li>
+</ul>
+
+<h2>More to love</h2>
+<p>There are 100+ new features in Red Hat Enterprise Virtualization 3 designed to improve virtual machine (VM) performance, increase manageability, and enhance usability.</p>
+<p class="look">Learn more: &nbsp; <c:MSSingle pageController="{!this}" sectionKey="Datasheets" annotation="rhev_datasheet"/></p>
+
+<h2>Virtual Machine Turbochargers</h2>
+<p>The Red Hat Enterprise Virtualization 3 Hypervisor leverages all the Red Hat Enterprise Linux&reg; 6 scalability, performance, and hardware-support enhancements to turbocharge your VMs.</p>
+
+<h2>Easy-to-use command center</h2>
+<p>The Red Hat Enterprise Virtualization Manager lets you easily manage hundreds of hosts with thousands of VMs&mdash;all from an easy-to-use graphical interface. And it's now based on fully open souce code, delivering superior performance and scalability:</p>
+
+<ul>
+<li>Hosted on Red Hat Enterprise Linux 6 (subscription not included)</li>
+<li>Powered by JBoss&reg; Enterprise Application Platform (runtime included with Red Hat Enterprise Virtualization)</li>
+</ul>
+
+	</div><!-- /.grid_9 -->	
+	<div class="grid_3 omega">
+		<apex:include pageName="RHEV_include_contact"/>
+	</div><!-- /.grid_3 -->
+	<div class="clear"></div>
+
+		
+	</div><!-- /.grid_12 -->
+</div><!-- /#main -->
+<div class="clear"></div>
+
+<apex:include pageName="RHEV_include_footer"/>
+
+</div>
+
+</div>
+</div>
+</body>
+
+</apex:page>

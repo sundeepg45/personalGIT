@@ -1,0 +1,113 @@
+<apex:page controller="RequalificationController" title="{!$Label.Requalification_Home} {!$Label.RequalificationHome_Home}" action="{!doOnLoad}">
+
+    <style type="text/css">
+        .col2 { margin-right:15px; }
+        .btn { margin-left:5px; margin-right:15px; }
+        .btnDisabled { margin-left:5px; margin-right:15px; }
+    </style>
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText escape="false" value="{!$Label.RequalificationHome_Home}"/></h2>
+            </div>
+        </div>
+    </div>
+
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:outputText id="description" escape="false" value="{!$Label.PRQ_Home_Text}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel id="profile">
+                        <apex:commandButton id="profileInfoButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewProfile}" styleClass="col1"/>
+                        <apex:outputText value="{!$Label.RequalificationHome_Profile_Information}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByProfileNote" rendered="{!requalRec.ProfileConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!ProfileConfirmed_By_Name}, {!requalRec.ProfileConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel id="user">
+                        <apex:commandButton id="userAdminButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewUser}" styleClass="col1"/>
+                        <apex:outputText value="{!$Label.RequalificationHome_User_Administration}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByUserAdmin" rendered="{!requalRec.UserConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!UserConfirmed_By_Name}, {!requalRec.UserConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!OR(isReseller,isSI,isDisti,isOEM,isTraining,isCCSP,isCcp)}">
+                    <apex:outputPanel id="certs">
+                        <apex:commandButton id="certsButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewCerts}" styleClass="col1" />
+                        <apex:outputText value="{!$Label.RequalificationHome_Certifications}" styleClass="col2"/>&nbsp;
+                        <apex:outputText rendered="{!requalRec.CertConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!$Label.RequalificationHome_Confirmed_By}"/>&nbsp;<apex:outputText id="confirmedByCerts" rendered="{!requalRec.CertConfirmed__c}" value="{!CertConfirmed_By_Name}, {!requalRec.CertConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <!--
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel id="points">
+                        <apex:commandButton id="partnerPointsButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewPP}" styleClass="col1"/>
+                        <apex:outputText value="{!$Label.RequalificationHome_Partner_Points}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByPartnerPoints" rendered="{!requalRec.PointsConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!PointsConfirmed_By_Name}, {!requalRec.PointsConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>Specializations
+
+                -->
+                <apex:pageBlockSectionItem rendered="{!isISV}">
+                    <apex:outputPanel id="products">
+                        <apex:commandButton id="productsButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewProducts}" styleClass="col1" />
+                        <apex:outputText value="{!$Label.RequalificationHome_Products}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByProducts" rendered="{!requalRec.ProductConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!ProductConfirmed_By_Name}, {!requalRec.ProductConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!isResellerAandP}">
+                    <apex:outputPanel id="custRefs">
+                        <apex:commandButton id="customerRefsButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewCustRefs}" styleClass="col1" />
+                        <apex:outputText value="{!$Label.RequalificationHome_Customer_References}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByCustomerRefs" rendered="{!requalRec.CustRefConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!CustRefConfirmed_By_Name}, {!requalRec.CustRefConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="agreements" rendered="{!hasAgreements && NOT(isCCP)}">
+                    <apex:outputPanel >
+                        <apex:commandButton id="agreementButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewAgreement}" styleClass="col1" />
+                        <apex:outputText value="{!$Label.RequalificationHome_Partner_Agreement}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByAgreement" rendered="{!OR(requalRec.AgreementConfirmed__c, requalRec.AgreementByFaxConfirmed__c)}" value="{!$Label.RequalificationHome_Confirmed_By} {!AgreementConfirmed_By_Name}, {!requalRec.AgreementConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem id="fcpa">
+                    <apex:outputPanel >
+                        <apex:commandButton id="fcpaButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewFCPA}" styleClass="col1"/>
+                        <apex:outputText value="{!$Label.RequalificationHome_FCPA_Compliance}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByFCPA" rendered="{!requalRec.FCPAConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!FCPAConfirmed_By_Name}, {!requalRec.FCPAConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!isResellerAandP}">
+                    <apex:outputPanel id="bp">
+                        <apex:commandButton id="bpButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewBusinessPlan}" styleClass="col1" />
+                        <apex:outputText value="{!$Label.RequalificationHome_Business_Plan}" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByBP" rendered="{!requalRec.BusinessPlanConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!BusinessPlanConfirmed_By_Name}, {!requalRec.BusinessPlanConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!isSpecialized}">
+                    <apex:outputPanel id="pp">
+                        <apex:commandButton id="ppButton" value="{!$Label.RequalificationHome_Review_and_Confirm}" action="{!viewSpecializations}" styleClass="col1" />
+                        <apex:outputText value="Specializations" styleClass="col2"/>&nbsp;
+                        <apex:outputText id="confirmedByPP" rendered="{!requalRec.SpecializationsConfirmed__c}" value="{!$Label.RequalificationHome_Confirmed_By} {!SpecializationsConfirmed_By_Name}, {!requalRec.SpecializationsConfirmed_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+        <apex:pageBlock rendered="{!NOT(requalRec.Submitted__c)}" >
+            <apex:pageMessage id="finalStepMessage" id="finalStepMessage" title="{!$Label.RequalificationHome_Final_Step}"
+                detail="{!$Label.RequalificationHome_Ensure_Review_Confirm}"
+                severity="{!$Label.RequalificationHome_Info}" strength="2"/>
+                <apex:commandButton id="submitRequal" onclick="if(!confirm('{! $Label.RequalificationHome_Are_You_Sure }')) return false;" value="{!$Label.RequalificationHome_Submit_Re_qualification_Request}" action="{!submitRequal}" disabled="{!OR(NOT(isComplete), requalRec.Submitted__c)}"/>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!requalRec.Submitted__c}" >
+        	<apex:outputText id="requalSubmitted" value="{! $Label.PRQ_Partner_Requal_Submitted }"/>&nbsp;<apex:outputText id="requalSubmittedDate" value="{0,date,dd/MM/yyyy}"><apex:param value="{! requalRec.Submitted_Date__c }"/></apex:outputText>.
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

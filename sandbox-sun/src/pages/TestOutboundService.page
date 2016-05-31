@@ -1,0 +1,41 @@
+<apex:page showHeader="false" sidebar="false" controller="TestOutboundServiceController">
+    <div>
+        <div style="font-size: 14pt; font-weight: bold; padding: 10px;">ESB Outbound Tester</div>
+    </div>
+    <apex:pageBlock rendered="{! !ISNULL(message) }">
+        <div style="font-size: 12pt; font-weight: bold; color: green;"><apex:outputText value="{!message}"/></div>
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{! !ISNULL(error) }">
+        <div style="font-size: 12pt; font-weight: bold; color: red;"><apex:outputText value="{!error}"/></div>
+        <div style="font-size: 10pt;"><apex:outputText value="{!stacktrace}" escape="false"/></div>
+    </apex:pageBlock>
+	<apex:form >
+        <apex:pageBlock title="Account Outbound Test Initiator">
+            Account ID to push out: <apex:inputText value="{!accountId}"/>
+            <apex:commandButton action="{!queueAccountMessage}" value="Queue Account Message"/>
+            &nbsp;<apex:outputLink value="/TestOutboundService?accountId={!accountId}" rendered="{! !ISNULL(accountId) && !ISBLANK(accountId)}">Sendable Link</apex:outputLink>
+        </apex:pageBlock>
+        <apex:pageBlock title="Address Outbound Test Initiator">
+            Address ID to push out: <apex:inputText value="{!addressId}"/>
+            <apex:commandButton action="{!queueAddressMessage}" value="Queue Address Message"/>
+            &nbsp;<apex:outputLink value="/TestOutboundService?addressId={!addressId}" rendered="{! !ISNULL(addressId) && !ISBLANK(addressId)}">Sendable Link</apex:outputLink>
+        </apex:pageBlock>
+        <apex:pageBlock title="Contact Outbound Test Initiator">
+            Contact ID to push out: <apex:inputText value="{!contactId}"/>
+            <apex:commandButton action="{!queueContactMessage}" value="Queue Contact Message"/>
+            &nbsp;<apex:outputLink value="/TestOutboundService?contactId={!contactId}" rendered="{! !ISNULL(contactId) && !ISBLANK(contactId)}">Sendable Link</apex:outputLink>
+        </apex:pageBlock>
+        <apex:pageBlock title="Order Outbound Test Initiator">
+            Opportunity ID to push out: <apex:inputText value="{!opportunityId}"/>
+            <apex:commandButton action="{!queueOpportunityMessage}" value="Queue Order Message"/>
+            &nbsp;<apex:outputLink value="/TestOutboundService?opportunityId={!opportunityId}" rendered="{! !ISNULL(opportunityId) && !ISBLANK(opportunityId)}">Sendable Link</apex:outputLink>
+        </apex:pageBlock>
+        <apex:pageBlock title="Error Outbound Test Initiator">
+            Error Description: <apex:inputText value="{!errorDescription}"/><br/>
+            Error Code: <apex:inputText value="{!errorCode}"/><br/>
+            Error Payload JSON to push out:<br/>
+            <apex:inputTextarea rows="10" cols="80" value="{!errorMessagePayload}"/><br/>
+            <apex:commandButton action="{!queueError}" value="Queue Error Message"/>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

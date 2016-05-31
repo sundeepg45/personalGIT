@@ -1,0 +1,70 @@
+<apex:page controller="BusinessPlan_CustomersController">
+
+<apex:form >
+<apex:pageMessages />
+<apex:pageBlock title="{!$Label.Business_Plan_Customers_Title}">
+    <apex:pageBlockButtons >
+        <apex:commandButton id="newButton" action="{!newRecord}" value="New" rendered="{!AND(customers.size < 10, isLocked == false)}"/>
+        <apex:commandButton id="backButton" action="{!toPlan}" value="Back to Plan"/>
+    </apex:pageBlockButtons>
+    <apex:pageBlockTable value="{!customers}" var="cust" rendered="{!customers.size > 0}">
+		<apex:column title="{!$ObjectType.Business_Plan_Customer__c.fields.Customer_Name__c.label}" headerValue="{!$ObjectType.Business_Plan_Customer__c.fields.Customer_Name__c.label}">
+            <apex:commandLink id="editLink" action="{!edit}" value="{!cust.Customer_Name__c}">
+                <apex:param name="customerId" value="{!cust.Id}"/>
+            </apex:commandLink>
+        </apex:column>
+        <apex:column title="{!$ObjectType.Business_Plan_Customer__c.fields.Technology__c.label}" headerValue="{!$ObjectType.Business_Plan_Customer__c.fields.Technology__c.label}">
+            <apex:outputText value="{!cust.Technology__c}"/>
+        </apex:column>
+        <apex:column title="{!$ObjectType.Business_Plan_Customer__c.fields.Technology_Goal__c.label}" headerValue="{!$ObjectType.Business_Plan_Customer__c.fields.Technology_Goal__c.label}">
+            <apex:outputText value="{!cust.Technology_Goal__c}"/>
+        </apex:column>
+        <apex:column title="{!$ObjectType.Business_Plan_Customer__c.fields.Delivering_All_Tech__c.label}" headerValue="{!$ObjectType.Business_Plan_Customer__c.fields.Delivering_All_Tech__c.label}">
+            <apex:outputText rendered="{!cust.Delivering_All_Tech__c == true}" value="{!$Label.yes}"/>
+            <apex:outputText rendered="{!cust.Delivering_All_Tech__c == false}" value="{!$Label.no}"/>
+        </apex:column>
+        <apex:column title="{!$ObjectType.Business_Plan_Customer__c.fields.Willing_to_Influence__c.label}" headerValue="{!$ObjectType.Business_Plan_Customer__c.fields.Willing_to_Influence__c.label}">
+            <apex:outputText rendered="{!cust.Willing_to_Influence__c == true}" value="{!$Label.yes}"/>
+            <apex:outputText rendered="{!cust.Willing_to_Influence__c == false}" value="{!$Label.no}"/>
+        </apex:column>
+        <apex:column >
+            <apex:commandLink id="removeLink" action="{!remove}" value="{!$Label.remove}" rendered="{!NOT(isLocked)}">
+                <apex:param name="customerId" value="{!cust.Id}"/>
+            </apex:commandLink>
+        </apex:column>
+    </apex:pageBlockTable>
+    <apex:outputLabel rendered="{!customers.size == 0}" id="noCustomersLabel" value="{!$Label.Business_Plan_No_Customers}"/>
+</apex:pageBlock>
+
+<apex:pageBlock rendered="{!NOT(ISNULL(edited))}">
+    <apex:pageBlockButtons >
+        <apex:commandButton id="saveButton" action="{!save}" value="{!$Label.Save}"/>
+        <apex:commandButton id="cancelButton" action="{!cancel}" value="{!$Label.cancel}"/>
+    </apex:pageBlockButtons>
+	<apex:pageBlockSection columns="1">
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="{!$ObjectType.Business_Plan_Customer__c.fields.Customer_Name__c.label}"/>
+            <apex:inputField id="customerNameText" value="{!edited.Customer_Name__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="{!$ObjectType.Business_Plan_Customer__c.fields.Technology__c.label}"/>
+            <apex:inputField id="technologyText" value="{!edited.Technology__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="{!$ObjectType.Business_Plan_Customer__c.fields.Technology_Goal__c.label}"/>
+            <apex:inputField id="technologyGoalText" value="{!edited.Technology_Goal__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="{!$ObjectType.Business_Plan_Customer__c.fields.Delivering_All_Tech__c.label}"/>
+            <apex:inputField id="allTechCheckbox" value="{!edited.Delivering_All_Tech__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="{!$ObjectType.Business_Plan_Customer__c.fields.Willing_to_Influence__c.label}"/>
+            <apex:inputField id="influenceCheckbox" value="{!edited.Willing_to_Influence__c}"/>
+        </apex:pageBlockSectionItem>
+    </apex:pageBlockSection>
+</apex:pageBlock>
+    
+</apex:form>
+
+</apex:page>

@@ -1,0 +1,207 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.ReferenceUseRequest" sidebar="false">
+    <!-- Message -->
+    <apex:pageMessages id="msgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+   
+    <!-- Sction Header-->
+    <apex:sectionHeader title="{!$Label.RF_Filters}" rendered="{!isFullLicenseAccessible}"/>
+   
+    <!-- Add JavaScript & Jquery-->
+    <script language="javascript" type="text/javascript">
+        jQuery(".content img").css("background-image","none");
+        jQuery(".content img").attr("src","{!URLFOR($Resource.RESearchFilterIcons, 'filter-icon.png')}");
+    </script>
+   
+    <!-- Add CSS-->
+    <style type="text/css">
+
+        /* ---------------------- Div width -------------------------- */
+        .attributeDiv { 
+            width:1000px;
+        }
+
+        /* ----------Change width here for item container------------- */
+        #attributeUl li { 
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word; 
+        }
+        
+        .rightImage {
+            display:inline-block; width:15px;
+        }                   
+        
+        /* ----------Change width here for item container------------- */
+        .attributeDiv div { 
+            width:950px; 
+            float:left;
+            //border : 1px solid black;
+        }
+        
+        /* ----------Change item width here -------------------------- */
+        #attributeUl li > * { 
+            //display:table; 
+            table-layout:fixed; 
+            width:250px; 
+            overflow:hidden; 
+            
+        }
+        
+        /* ----------------- Item text aliment ----------------------- */
+        .attributeDiv li { 
+            color:#333; 
+            text-align:left;
+        }
+        
+        .attributeUl  { 
+             //display:table; 
+             table-layout:fixed; 
+             width:250px; 
+             overflow:hidden; 
+             float : left;
+             list-style-type: none;
+         }
+        
+    </style>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+    </script>
+    
+    <!-- Form -->    
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <!-- Action Fuctions for Attribute-->  
+        <apex:actionFunction name="selectAttribute" reRender="opAttributes" action="{!refUseAttr.setAttributes}" immediate="false" oncomplete="PORHideLoading();">
+            <apex:param name="selectedLabelId" value="" assignTo="{!refUseAttr.selectedLabelId}"/>
+            <apex:param name="selectedAttrId" value="" assignTo="{!refUseAttr.selectedAttributeId}"/>
+        </apex:actionFunction>
+        
+        <!-- Page Block -->
+        <div style="float:left ; ">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_Request_Reference_Use}" id="backCmdLinkId" action="{!refUseAttr.backToRequestOnCancel}"/>
+        </div>
+        <apex:pageBlock id="pbId">
+        
+            <apex:PageBlockSection id="pbsAttrId">
+                <apex:outputPanel id="opAttributes">
+                    <apex:repeat value="{!refUseAttr.AttributeLabels}" var="lbl">
+                        <div class="attributeDiv">
+                            <div style="text-align:left;text-indent:50px;font-size: 150%;"> 
+                                {!lbl.Name} <apex:outputText style="color : #CC0000;" value="{!IF(refUseAttr.mapRequiredLabel[lbl.Id],' | ','')}"/>
+                            </div>
+                            
+                            <div>
+                                <!-- Output Panel for Attribute records-->
+                                <apex:outputPanel rendered="{!refUseAttr.mapAttibuteSize[lbl] > 0}"> 
+                                    <ul class="attributeUl"> 
+                                        <apex:variable var="rows" value="{!FLOOR(refUseAttr.mapAttibuteSize[lbl]/3) + if(MOD(refUseAttr.mapAttibuteSize[lbl],3) > 0, 1,0)}" />
+                                        <apex:repeat value="{!refUseAttr.mapAllAttributesLabel[lbl]}" var="attribute" first="0" rows="{!rows}">
+                                            <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!attribute.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectAttribute('{!JSENCODE(attribute.attributeLabel.Label__c)}','{!JSENCODE(attribute.attributeLabel.Attribute__c)}');return false;">
+                                                           <apex:outputLabel value="{!attribute.attributeLabel.Attribute__r.Name}" style="font-weight:{!HTMLENCODE(attribute.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>
+                                    
+                                    <ul class="attributeUl">
+                                        <apex:variable var="startVal" value="{!FLOOR(refUseAttr.mapAttibuteSize[lbl]/3) + if(MOD(refUseAttr.mapAttibuteSize[lbl],3) > 0, 1,0)}" />
+                                        <apex:variable var="rows" value="{!FLOOR(refUseAttr.mapAttibuteSize[lbl]/3) + if(MOD(refUseAttr.mapAttibuteSize[lbl],3) > 1, 1,0)}" /> 
+                                        <apex:repeat value="{!refUseAttr.mapAllAttributesLabel[lbl]}" var="attribute" 
+                                            first="{!startVal}" rows="{!rows}">
+                                            <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!attribute.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectAttribute('{!JSENCODE(attribute.attributeLabel.Label__c)}','{!JSENCODE(attribute.attributeLabel.Attribute__c)}');return false;">
+                                                           <apex:outputLabel value="{!attribute.attributeLabel.Attribute__r.Name}" style="font-weight:{!HTMLENCODE(attribute.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>                                
+                                    
+                                    <ul class="attributeUl">
+                                        <apex:variable var="startVal" value="{!FLOOR(refUseAttr.mapAttibuteSize[lbl]/3)*2 + if(MOD(refUseAttr.mapAttibuteSize[lbl],3) > 0, if(MOD(refUseAttr.mapAttibuteSize[lbl],3) > 1,2,1) ,0)}" />                                     
+                                        <apex:repeat value="{!refUseAttr.mapAllAttributesLabel[lbl]}" var="attribute"  first="{!startVal}" rows="0">
+                                            <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!attribute.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectAttribute('{!JSENCODE(attribute.attributeLabel.Label__c)}','{!JSENCODE(attribute.attributeLabel.Attribute__c)}');return false;">
+                                                           <apex:outputLabel value="{!attribute.attributeLabel.Attribute__r.Name}" style="font-weight:{!HTMLENCODE(attribute.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>  
+                                </apex:outputPanel>    
+                                
+                                <!-- Output Panel for No Record found--> 
+                                <apex:outputPanel rendered="{!refUseAttr.mapAttibuteSize[lbl] = 0}">                                
+                                    <ul class="attributeUl">    
+                                       <li>
+                                           <apex:outputLabel value="{!$Label.No_Data_Found}" />
+                                       </li>
+                                    </ul>
+                                </apex:outputPanel>
+                            </div>
+                            
+                        </div>
+                    </apex:repeat>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+                    
+            
+            <!-- Page Block Buttons Top-->
+            <apex:pageBlockButtons id="pbbIdTop">
+                <apex:commandButton value="{!$Label.Done}" id="doneCmdBtnId" action="{!refUseAttr.backToRequest}"/>
+                <apex:commandButton value="{!$Label.Cancel}" id="cancelCmdBtnId" action="{!refUseAttr.backToRequestOnCancel}"/>
+            </apex:pageBlockButtons>
+            
+        </apex:pageBlock> 
+    </apex:form>
+</apex:page>

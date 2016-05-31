@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Reference_Content__c.Title__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Content__c.Content_Type__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Content__c.Language__c</field>
+    </columns>
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>Reference_Content__c.Review_Date__c</field>
+    </columns>
+    <columns>
+        <field>CUST_CREATED_DATE</field>
+    </columns>
+    <description>To inform one or more individuals, or a team, that a particular Content item needs to be reviewed. Ensures that old / outdated content isn&apos;t still being used by sales and others in the organization</description>
+    <filter>
+        <criteriaItems>
+            <column>Reference_Content__c.Review_Date__c</column>
+            <operator>equals</operator>
+            <value>LAST_N_DAYS:7</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Tabular</format>
+    <name>Content Due for Review in Last 7 Days</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Reference_Content__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Reference_Content__c.Review_Date__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

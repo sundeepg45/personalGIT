@@ -1,0 +1,79 @@
+<apex:page standardController="SFDC_Channel_Account_Plan__c" extensions="BusinessPlan_MktRscSectionCtrl">
+    <apex:stylesheet value="{!$Resource.Common_EmbeddedPageStylesheet}"/>
+
+	<style>
+        <!--
+	.bPageBlock .detailList .dataCol {
+		width:25%;
+		text-align:right;
+		float:left;
+	}
+	.bPageBlock .detailList .labelCol {
+		width:25%;
+		text-align:right;
+		float:left;
+	}
+	div.header {
+		font-size: 91%;
+		font-weight: bold;
+		color: #4a4a56;
+	}
+-->
+    table#marketingResourcesTable {
+        width: 100%;
+    }
+    table#topCustomerTable td {
+        width: 20%;
+    }
+	</style>
+
+  	<apex:form >
+    <div id="BusinessPlan_MktRscSection"><apex:pageBlock >
+        <div class="pbSubsection"><div class="detailList">
+            <apex:pageBlockButtons location="top" >
+                <apex:commandButton id="editResourcesButton" value="Edit Contacts"
+                onclick="window.top.location.href='/apex/BusinessPlan_MktResources?bpid={!bpId}'"/>
+            </apex:pageBlockButtons>
+    
+			<apex:outputPanel rendered="{!contacts.size > 0}">
+            <table id="marketingResourcesTable">
+                <tr>
+                    <th>{!$ObjectType.Contact.fields.Name.label}</th>
+                    <th>{!$ObjectType.Contact.fields.Title.label}</th>
+                    <th>{!$ObjectType.Contact.fields.Phone.label}</th>
+                    <th>{!$ObjectType.Contact.fields.Email.label}</th>
+                </tr>
+                <apex:repeat value="{!contacts}" var="contact">
+                    <tr>
+                        <td>{!contact.Name}</td>
+                        <td>{!contact.Title}</td>
+                        <td>{!contact.Phone}</td>
+                        <td>{!contact.Email}</td>
+                    </tr>
+                </apex:repeat>
+            </table>
+<!--
+            <div>
+                <div class="labelCol first">{!$ObjectType.Contact.fields.Name.label}</div>
+                <div class="dataCol header">{!$ObjectType.Contact.fields.Title.label}</div>
+                <div class="dataCol header">{!$ObjectType.Contact.fields.Phone.label}</div>
+                <div class="dataCol header">{!$ObjectType.Contact.fields.Email.label}</div>
+            </div>
+            <apex:repeat value="{!contacts}" var="contact" rendered="{!contacts.size > 0}">
+                <div>
+                    <div class="labelCol first">{!contact.Name}</div>
+                    <div class="dataCol">{!contact.Title}</div>
+                    <div class="dataCol">{!contact.Phone}</div>
+                    <div class="dataCol">{!contact.Email}</div>
+                </div>
+            </apex:repeat>
+-->
+            </apex:outputPanel>
+            <apex:outputText id="noResourcesMessage" rendered="{!contacts.size == 0}">There are no marketing contacts currently designated</apex:outputText>
+    
+        </div>
+    </div>
+    </apex:pageBlock></div>
+    </apex:form>
+    
+</apex:page>

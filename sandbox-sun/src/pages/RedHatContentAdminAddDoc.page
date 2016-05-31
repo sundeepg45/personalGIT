@@ -1,0 +1,46 @@
+<apex:page controller="RHContentListAdminController" cache="true" expires="1">
+	<apex:form >
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Red Hat Content<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Adding document</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+		<apex:pageMessages id="messages"/>
+		
+		<apex:pageBlock id="sitePageSection">
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!saveRHContent}" id="saveContent" value="Save"/>
+				<apex:commandButton action="{!back}" id="findContent" value="Cancel"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Selected Document:" for="documentName"/>
+					<apex:outputText id="delectedDOc" value="{!contentDocument.Title} ({!RHContent.ContentDocumentId__c})"/>
+				</apex:pageBlockSectionItem>					
+			</apex:pageBlockSection>
+			<apex:pageBlockSection columns="2" id="formDetail">
+				<apex:inputField id="txtName" value="{!newRHContent.Name}"/>
+				<apex:inputField id="txtSortOrder" value="{!newRHContent.Sort_Order__c}"/>
+				<apex:inputField id="cboSite" value="{!RHContent.Site__c}">
+					<apex:actionSupport event="onchange" rerender="formDetail"/>
+				</apex:inputField>
+				<apex:inputField id="chkIsPublished" value="{!newRHContent.IsPublished__c}"/>
+				<apex:inputField id="cboPage" value="{!RHContent.Page__c}">
+					<apex:actionSupport event="onchange" rerender="formDetail"/>
+				</apex:inputField>
+				<apex:inputField id="chkIsNew" value="{!newRHContent.IsNew__c}"/>
+				<apex:inputField id="cboSection" value="{!RHContent.Section__c}"/>
+				<apex:inputField id="chkIsFeatured" value="{!RHContent.IsFeatured__c}"/>
+				<apex:inputField id="txtAnnotation" value="{!newRHContent.Annotation__c}"/>
+				<apex:inputField id="cboAudience" value="{!newRHContent.Audience__c}"/>
+				<apex:inputField id="txtKalturaURL" value="{!newRHContent.Kaltura_Thumbnail_URL__c}"/>
+				<apex:inputField id="txtKalturaId" value="{!newRHContent.KalturaId__c}"/>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

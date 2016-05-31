@@ -1,0 +1,15 @@
+<apex:component controller="MSViewAllController">
+
+	<apex:attribute name="pageController" description="" type="MSController" required="true" assignTo="{!ctrl}"/>
+	<apex:attribute name="sectionKey" description="" type="String" required="true" assignTo="{!key}"/>
+
+	<strong>
+		<p>
+			<a href="/sfc/#search?searchTerm=%22{!key}%22%20%22{!pageName}%22%20%22{!siteName}%22&searchLanguage=0&searchPageNum=0&searchWorkspaceIds=%5B%22ALL_WORKSPACES%22%5D&masterWorkspaceId=ALL_WORKSPACES" >View All {!sectionKey} </a>
+<!-- 
+			<a href="/sfc/#search?searchPageNum=0&searchLanguage=0&masterWorkspaceId=ALL_WORKSPACES&searchWorkspaceIds=%5B%22ALL_WORKSPACES%22%5D&searchTags=%5B%22{!key}%22%2C%22{!pageName}%22%2C%22{!siteName}%22%5D&searchExtensions=%5B%5D&searchLanguageFilters=%5B%5D&searchCreatorIds=%5B%5D&resultsListType=s&searchRefreshFacets=false" >View All {!sectionKey} </a>
+-->
+		</p>
+	</strong>
+
+</apex:component>

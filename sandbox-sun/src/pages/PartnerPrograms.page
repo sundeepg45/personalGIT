@@ -1,0 +1,70 @@
+<apex:page controller="PartnerPgmDashController" action="{!init}">
+<style>
+  body .bPageTitle .ptBody h1.noSecondHeader{
+    font-size: 14px;
+  }
+  .pbHeader {
+      font-size:150%;
+  }
+</style>
+
+<apex:sectionHeader title="{!$Label.Programs_Title}"/>
+<apex:pageBlock title="{!$Label.Programs_Enrolled_Programs}" >
+	<apex:form >
+    <apex:pageBlockTable id="tableEnrolledPrograms" value="{!accountPrograms}" var="pgm" rendered="{!accountPrograms.size > 0}">
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Enrolled_Col_Name}</apex:facet>
+            <apex:outputText id="txtName" value="{!pgm.name}"/>
+        </apex:column>
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Col_Created_Date}</apex:facet>
+            <apex:outputText id="dateCreated" value="{!pgm.created}"/>
+        </apex:column>
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Enrolled_Col_Enrolled_Date}</apex:facet>
+            <apex:outputText id="dateEnrolled" value="{!pgm.enrolled}"/>
+        </apex:column>
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Enrolled_Col_Status}</apex:facet>
+            <apex:outputText id="txtStatus" value="{!pgm.status}" rendered="{!pgm.status != 'Approved'}"/>
+            <apex:commandLink id="linkApproved" action="{!approvedClicked}" value="{!$Label.Programs_Enrolled_Approved_Proceed}" rendered="{!pgm.status == 'Approved'}">
+            	<apex:param name="enrollProgramId" value="{!pgm.programId}" assignTo="{!enrollProgramId}"/>
+            </apex:commandLink>
+        </apex:column>
+    </apex:pageBlockTable>
+    </apex:form>
+    <apex:outputText id="txtNotEnrolled" value="{!$Label.Programs_Enrolled_Not_Enrolled}" rendered="{!accountPrograms.size == 0}"/>
+</apex:pageBlock>
+<apex:pageBlock title="{!$Label.Programs_Available_Programs}" id="availableProgramsBlock">
+	<apex:form >
+    <apex:pageBlockTable id="tableAvailablePrograms" value="{!availablePrograms}" var="pgm" rendered="{!availablePrograms.size > 0}">
+        <apex:column >
+        	<apex:commandLink id="linkEnroll" styleClass="btn" action="{!enroll}" value="{!$Label.Programs_Available_Enroll}" rendered="{!NOT(pgm.isEnrolled)}">
+	            <apex:param name="enrollProgramId" value="{!pgm.definitionId}" assignTo="{!enrollProgramId}"/>
+            </apex:commandLink>
+            <apex:outputText id="enrolledText" value="{!$Label.Programs_Available_Enrolled}" rendered="{!pgm.isEnrolled}"/>
+        </apex:column>
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Available_Col_Name}</apex:facet>
+            <apex:outputText id="txtNameAvailable" value="{!pgm.name}"/>
+        </apex:column>
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Available_Col_Description}</apex:facet>
+            <apex:outputText id="txtDescriptionAvailable" value="{!pgm.description}"/>
+        </apex:column>
+        <apex:column >
+        	<apex:facet name="header">{!$Label.Programs_Available_Col_Downloads}</apex:facet>
+			<apex:repeat value="{!pgm.attachments}" var="attachment">
+	            <apex:outputLink id="linkDocumentAvailable" value="{!URLFOR($Action.Attachment.Download, attachment.Id)}" target="_blank">{!attachment.Name}</apex:outputLink> <br />
+			</apex:repeat>
+			<apex:repeat value="{!pgm.agreementAttachments}" var="agreementAttachment">
+	            <apex:outputLink id="linkAgreementAvailable" value="{!URLFOR($Action.Attachment.Download, agreementAttachment.Id)}" target="_blank">{!agreementAttachment.Name}</apex:outputLink> <br />
+			</apex:repeat>
+        </apex:column>
+    </apex:pageBlockTable>
+    </apex:form>
+    <apex:outputText id="txtNoPrograms" value="{!$Label.Programs_Available_No_Programs}" rendered="{!availablePrograms.size == 0}"/>
+</apex:pageBlock>
+
+
+</apex:page>

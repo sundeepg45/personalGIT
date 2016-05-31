@@ -1,0 +1,25 @@
+<apex:page showHeader="false" standardStylesheets="true" sidebar="false" controller="RequalificationHomepageCompController">
+	<style>
+		body {
+	    	background-color: transparent;
+	    }
+	</style>
+	<apex:outputPanel layout="none" rendered="{!MyAccount.RequalStatus__c == ''}">
+		<apex:outputText value="{!$Label.Requalification_Homepage_Comp_Not_Eligable}"/>
+	</apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!MyAccount.RequalStatus__c == 'Eligible'}">
+		<a target="_parent" href="/apex/RequalificationHome"><img width="165" src="/resource/RequalStart" alt="{!$Label.Requalification_Homepage_Comp_Start}"/></a>
+	</apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!MyAccount.RequalStatus__c == 'In Progress'}">
+		<a target="_parent" href="/apex/RequalificationHome"><img width="165" src="/resource/RequalContinue" alt="{!$Label.Requalification_Homepage_Comp_Continue}"/></a>
+	</apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!MyAccount.RequalStatus__c == 'Completed' || MyAccount.RequalStatus__c == 'Submitted' || MyAccount.RequalStatus__c == 'Manager Completed'}">
+		<a target="_parent" href="/apex/RequalificationHome"><img width="165" src="/resource/RequalSubmitted" alt="{!$Label.Requalification_Homepage_Comp_Review_Last}"/></a>
+	</apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!MyAccount.RequalStatus__c == 'Overdue'}">
+		<script type="text/javascript">top.location.href="/apex/RequalificationOverdue";</script>
+	</apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!MyAccount.RequalStatus__c != 'Completed' && MyAccount.RequalStatus__c != 'In Progress' && MyAccount.RequalStatus__c != 'Eligible' && MyAccount.RequalStatus__c != 'Submitted' && MyAccount.RequalStatus__c != '' && MyAccount.RequalStatus__c != 'Manager Completed'}">
+		<a target="_parent" href="/apex/RequalificationHome"><apex:outputText value="{!MyAccount.RequalStatus__c}"/></a>
+	</apex:outputPanel>
+</apex:page>

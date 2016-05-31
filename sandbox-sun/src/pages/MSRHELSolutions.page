@@ -1,0 +1,104 @@
+<apex:page controller="MSController" sidebar="false" showheader="true" standardStylesheets="false" action="{!initWithContent}">
+
+<head>
+<script src="/jslibrary/1333170890000/sfdc/JiffyStubs.js"></script><meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<meta HTTP-EQUIV="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT" />
+
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<apex:include pageName="RHELSiteCSS"/>
+<title>Selling Cloud with Attitude</title>
+<span id="j_id0:j_id4"></span>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a class="logo-redhat" href="http://www.redhat.com">Red Hat</a>
+        <a class="logo-product" href="MSRHELHome">Red Hat Enterprise Linux</a>
+        <div class="title"><strong>Do the math.</strong> <br />Migrate to Red Hat<sup>&reg;</sup> Enterprise Linux<sup>&reg;</sup> and save.</div>
+        
+        <ul id="nav-main">
+            <li id="home"><a href="MSRHELHome">&nbsp;Home</a></li>
+            <li id="nav2"><a href="MSRHELSiteTraining">Train to sell</a></li>
+            <li id="nav3"><a href="MSRHELCollateral">Engage customers</a></li>
+            <li id="nav4"><a href="MSRHELMarketing">Build a campaign</a></li>
+            <li id="nav5"><a href="MSRHELTechDetails">Access technical resources</a></li>
+            <li class="last" id="nav6"><a id="selected" href="MSRHELSolutions">Sell RHEL + Partner solutions</a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <div id="content-inner">
+        <div class="container">
+            <div id="content-primary">
+              <h2>Sell RHEL + Partner Solutions</h2>
+              <p>
+                Search here for the latest collateral, whitepapers, sales tools,
+                customer case studies and customer presentations that can be
+                used in solution campaigns that feature leading Red Hat
+                partners, including IBM, HP, SAP, SAS, Symantec and more.
+              </p>
+            </div>
+            <div id="content-secondary">
+            <div class='section'>
+              <h4>RHEL solution campaigns: </h4>
+              Integrated solution campaigns with leading Red Hat partners,
+              including HP, IBM, Symantec, SAS and more
+              <br />
+                <c:MSSection pageController="{!this}" sectionKey="RHEL Solution Campaigns">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="RHEL Solution Campaigns"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="RHEL Solution Campaigns"/></p></strong>
+                   </ul>
+                </c:MSSection>
+            </div>
+              <div class='section'>
+                <h4>End User Solution collateral</h4>
+                Joint solution collateral and whitepapers
+                developed with leading hardware and software partners
+                <br /><br />
+                <c:MSSection pageController="{!this}" sectionKey="End User Solution Collateral">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="End User Solution Collateral"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="End User Solution Collateral"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Partner Solution Sales tools</h4>
+                Sales playbooks, sales training presentations, sales guides
+                and other resources for your sales teams to sell RHEL-based
+                solutions
+                <br /><br />
+                <c:MSSection pageController="{!this}" sectionKey="Partner Solution Sales Tools">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Partner Solution Sales Tools"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Partner Solution Sales Tools"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Case studies</h4>
+                Find case studies and customer videos that
+                highlight RHEL-based solutions with leading hardware and
+                software partners
+                <br /><br />
+                <c:MSSection pageController="{!this}" sectionKey="Case Studies">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Case Studies"/>
+                    <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Case Studies"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright">Copyright &copy; 2012 Red Hat, Inc. All rights reserved.</p>
+    </div>
+</div>  
+</body>
+
+</apex:page>

@@ -1,0 +1,17 @@
+<apex:page controller="CommunitiesFeaturedHeadlinesController" standardStylesheets="false" showHeader="false" sidebar="false">
+
+<head>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerRegResources, 'partnerRegResources/partner-reg-header-styles.css')}" />
+</head>
+
+<apex:outputPanel rendered="{!acc != null && acc.Global_Region__c == 'NA'}">
+    <apex:outputPanel id="buttonDiv" rendered="{!headline.Include_Button__c}">
+        <a href="https://redhat.sharedvue.net/SSO/SamlLogin" class="uppercase btn ease"> Access Now </a>
+    </apex:outputPanel>
+</apex:outputPanel>
+<apex:outputPanel rendered="{!acc != null && acc.Global_Region__c != 'NA'}">
+    <apex:outputPanel id="buttonDiv2" rendered="{!headline.Include_Button__c}">
+        <a href="{!headline.Button_URL__c}" class="uppercase btn ease"> {!headline.Communities_Featured_Headline_Labels__r[0].Button_Label__c} </a>
+    </apex:outputPanel>
+</apex:outputPanel>
+</apex:page>

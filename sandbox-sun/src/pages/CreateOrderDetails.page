@@ -1,0 +1,662 @@
+<!--
+/*****************************************************************************************
+    Name    : createOrderDetails
+    Desc    : Used to Create and Edit Order details 
+           
+                            
+Modification Log : 
+---------------------------------------------------------------------------
+ Developer              Date            Description
+---------------------------------------------------------------------------
+Phaniraj             05/22/2014          Created
+******************************************************************************************/
+-->
+<apex:page id="mainPage" standardController="Opportunity" Extensions="OrderDetailsExtensions">
+<script type="text/javascript">
+	function setSelectedIndex(element, value) {
+		if(element && element.options && element.options.length) {
+			for(var i=0; i < element.options.length; i++) {
+				if(value == element.options[i].value) {
+					element.options[i].selected = true;
+					element.selectedIndex = i;
+					return;
+				}
+			}
+		}
+	}
+
+	var desiredOperatingUnit = '{!JSENCODE(OpportunityRecord.Desired_Operating_Unit__c)}';
+	function setOldCCValue(element) {
+		if(element != null) {
+			if({!IF(OR(ISBLANK(OpportunityRecord.Credit_Card_Number__c),ISBLANK(OpportunityRecord.Desired_Operating_Unit__c)),'false','true')} && element && ! element.value && ! element.calledOnce ) {
+				element.calledOnce = true;
+				setSelectedIndex(element,desiredOperatingUnit);
+				element.oldCCValue = element.value;
+				element.onchange();
+			}
+			else {
+				element.oldCCValue = element.value;
+			}
+		}
+	}
+
+	function confirmCCChange(element) {
+		var retval = true;
+		if({!IF(OR(ISBLANK(OpportunityRecord.Credit_Card_Number__c),AND(ISBLANK(OpportunityRecord.Operating_Unit__c),ISBLANK(OpportunityRecord.Desired_Operating_Unit__c))),'false','true')} && element && element.confirmedChange != true) {
+			var oldCCValue = element.oldCCValue;
+			if(oldCCValue != element.value) {
+				element.confirmedChange = retval = confirm('{! JSENCODE($Label.CC_Clear_Warning_1)}');
+				if(! retval) {
+					element.value = oldCCValue;
+				}
+			}
+		}
+		if(retval && element) {
+			setOrderTypeDefaultValue(element.value);
+		}
+		return retval;
+	}
+</script>
+    <apex:sectionHeader title="Edit Order Details"/>
+    <!-- Script and Stylesheets to support functionality on the page -->
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables_themeroller.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.min.js')}" />
+    <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+    <style>
+        .operatingUnitClass{
+            width: 3px;background: #CC0000;height: 24px;float: left;
+        }
+        .disableclass{
+            position:absolute;width:220px; height: 20px; background-color: #f9f8f0; z-index: 12; opacity:0.50;
+        }
+        
+        .disableclassbtn{
+            position:absolute;width:200px; height: 30px; background-color: #ffffff; z-index: 12; opacity:0.50;
+        }
+    </style>
+    <!-- Common stylesheets and Script pages -->
+    <apex:stylesheet value="{!$Page.CommonStyleSheets}" />
+    <apex:includeScript value="{!$Page.CommonScripts}" />
+    <div class="hideThis" id="validateAddressHere" >{!isValid}</div>
+    <div class="hideThis" id="chkOrderSubmitStatus">{!HTMLENCODE(chkOrderSubmitStatus)}</div>
+    <apex:form id="oppForm">
+        
+        <apex:pageMessages id="AFPanel"></apex:pageMessages>
+        <apex:inputHidden value="{!hideNonRelevent}" id="hideNonRelevent"/>
+        <apex:inputHidden value="{!newProfileName}" id="newProfileName"/>
+        <apex:inputHidden value="{!chkOrderSubmitStatus}" id="chkOrderSubmitStatus"/>
+        <apex:inputHidden value="{!pageParameters0}" id="pageParameters0"/>
+        <apex:inputHidden value="{!pageParameters1}" id="pageParameters1"/>
+        <apex:inputHidden value="{!pageParameters2}" id="pageParameters2"/>
+        <apex:inputHidden value="{!pageParameters3}" id="pageParameters3"/>
+        <apex:inputHidden value="{!pageParameters4}" id="pageParameters4"/>
+        <apex:inputHidden value="{!pageParameters5}" id="pageParameters5"/>
+        <apex:inputHidden value="{!pageParameters6}" id="pageParameters6"/>
+        <apex:inputHidden value="{!pageParameters7}" id="pageParameters7"/>
+        <apex:inputHidden value="{!pageParameters8}" id="pageParameters8"/>
+        <apex:inputHidden value="{!pageParameters9}" id="pageParameters9"/>
+        <apex:inputHidden value="{!pageParameters10}" id="pageParameters10"/>
+        <apex:inputHidden value="{!pageParameters11}" id="pageParameters11"/>
+        <apex:inputHidden value="{!pageParameters12}" id="pageParameters12"/>
+        <apex:inputHidden value="{!pageParameters13}" id="pageParameters13"/>
+        <apex:inputHidden value="{!pageParameters14}" id="pageParameters14"/>
+        <apex:inputHidden value="{!pageParameters15}" id="pageParameters15"/>
+        <apex:inputHidden value="{!pageParameters16}" id="pageParameters16"/>
+        <apex:inputHidden value="{!pageParameters17}" id="pageParameters17"/>
+        <apex:inputHidden value="{!pageParameters18}" id="pageParameters18"/>
+        <apex:inputHidden value="{!pageParameters19}" id="pageParameters19"/>
+        <apex:inputHidden value="{!pageParameters20}" id="pageParameters20"/>
+        <apex:inputHidden value="{!pageParameters21}" id="pageParameters21"/>
+        <apex:inputHidden value="{!pageParameters22}" id="pageParameters22"/>
+        <apex:inputHidden value="{!pageParameters23}" id="pageParameters23"/>
+        <apex:inputHidden value="{!pageParameters24}" id="pageParameters24"/>
+        <apex:inputHidden value="{!pageParameters25}" id="pageParameters25"/>
+        <apex:inputHidden value="{!pageParameters26}" id="pageParameters26"/>
+        <apex:inputHidden value="{!pageParameters27}" id="pageParameters27"/>
+        <apex:inputHidden value="{!pageParameters28}" id="pageParameters28"/>
+        <apex:inputHidden value="{!pageParameters29}" id="pageParameters29"/>
+        <apex:inputHidden value="{!pageParameters30}" id="pageParameters30"/>
+        <apex:inputHidden value="{!pageParameters31}" id="pageParameters31"/>
+        <apex:actionFunction name="refreshData" action="{!refreshData}" reRender="oppForm, pageParameters27" oncomplete="populateInfo();hideElements();" status="contcall"/>
+        <div class="RH_StyleSection">
+            <!-- <div class="RH_Header">Opportunity Information</div> -->
+          <!--  <apex:pageBlock id="errorBlock" >
+             <apex:pageblockSection title="Error Section" collapsible="false"  >  <apex:pageMessages /></apex:pageblockSection>
+          
+        </apex:pageBlock>-->
+        <br/> 
+            <apex:pageBlock >
+                <apex:pageBlockSection collapsible="false" columns="1" title="Order Management Profile"></apex:pageBlockSection>
+                
+            </apex:pageBlock>
+            <div >
+                <table border="0" cellpadding="2" cellspacing="0" class="RH_Opp_Detail"  width="100%">
+                    <tr>
+                        <td width="20%" align="right"><span class="RH_Opp_Field_Label">Order Management Profile:</span></td>
+                        <td width="30%" align="left">
+                            <span class="RH_Opp_Field_Value">
+                                <table>
+                                    <tr><td>
+                                    <apex:selectList size="1" onchange="checkCreate(this)" value="{!selectedProfile}" id="prof">
+                                        <apex:selectOptions value="{!profiles}"></apex:selectOptions>
+                                        
+                                    </apex:selectList>
+                                    </td><td>
+                                        <span id="omp123" style="display:none;">
+                                            <input type="text" onkeyup="assignName(this);"/>
+                                        </span>
+                                        <apex:actionStatus id="contcall">
+                                           <apex:facet name="stop">
+                                               <!--apex:commandButton action="{!searchAccount}" value="Search" reRender="test" status="callWebService"/-->
+                                           </apex:facet>
+                                           <apex:facet name="start">
+                                               <apex:outputPanel >
+                                                   Processing...<apex:image value="/img/loading32.gif" style="height: 18px;"/>
+                                               </apex:outputPanel>
+                                           </apex:facet>
+                                        </apex:actionStatus>
+                                    </td></tr>
+                                </table>
+                            </span>
+                            <script>
+                                function checkCreate(elem){
+                                    //document.getElementById("mainPage:oppForm:prof").value = elem.value;
+                                    if(elem.value == 'Create New'){
+                                        document.getElementById("omp123").style.display = "block";
+                                        document.getElementById("mainPage:oppForm:checkdef").disabled = false;
+                                    }
+                                    else{
+                                        document.getElementById("omp123").style.display = "none";
+                                        if(elem.value != '--None--'){
+                                            refreshData();
+                                        }
+                                    }
+                                }
+                                
+                                function assignName(elem){
+                                    //alert(elem.value);
+                                    document.getElementById("mainPage:oppForm:newProfileName").value = elem.value;
+                                }
+                            </script>
+                        </td>
+                        <td width="20%" align="right"><span class="RH_Opp_Field_Label">&nbsp;</span></td>
+                        <td width="30%" align="left"><span class="RH_Opp_Field_Value">&nbsp;</span></td>
+                    </tr>
+                    <tr>
+                        <td width="20%" align="right"><span class="RH_Opp_Field_Label">Set As Default Profile:</span></td>
+                        <td width="30%" align="left"><span class="RH_Opp_Field_Value"><apex:inputCheckbox value="{!setAsDefault}" id="checkdef"/></span></td>
+                        <td width="20%" align="right"><span class="RH_Opp_Field_Label">&nbsp;</span></td>
+                        <td width="30%" align="left"><span class="RH_Opp_Field_Value">&nbsp;</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="RH_StyleSection">
+            <!-- <div class="RH_Header">Opportunity Information</div> -->
+            <apex:pageBlock >
+                <apex:pageBlockSection collapsible="false" columns="1" title="Opportunity Information"></apex:pageBlockSection>
+            </apex:pageBlock>
+            <div >
+                <table border="0" cellpadding="0" cellspacing="0" class="RH_Opp_Detail"  width="100%">
+                    <tr>
+                        <td width="20%" align="right"><span class="RH_Opp_Field_Label">Opportunity Name:</span></td>
+                        <td width="30%" align="left"><span class="RH_Opp_Field_Value">{!HTMLENCODE(OpportunityRecord.Name)}</span></td>
+                        <td width="20%" align="right"><span class="RH_Opp_Field_Label">Close Date:</span></td>
+                        <td width="30%" align="left"><span class="RH_Opp_Field_Value"><apex:outputField value="{!OpportunityRecord.CloseDate}"/></span></td>
+                    </tr>
+                    <tr>
+                        <td class="RH_Opp_Tbl_Data" align="right"><span class="RH_Opp_Field_Label">Opportunity Stage:</span></td>
+                        <td class="RH_Opp_Tbl_Data" align="left"><span class="RH_Opp_Field_Value"><apex:outputField value="{!OpportunityRecord.StageName}"/></span></td>
+                        <td class="RH_Opp_Tbl_Data" align="right"><span class="RH_Opp_Field_Label">Opportunity Type:</span></td>
+                        <td class="RH_Opp_Tbl_Data" align="left"><span class="RH_Opp_Field_Value" id="operatingUnitSpan" ><apex:outputField id="opportunityType" value="{!OpportunityRecord.OpportunityType__c}"/></span></td>
+                    </tr>
+                    <tr>
+                        <td class="RH_Opp_Tbl_Data" align="right"><span class="RH_Opp_Field_Label">Opportunity Channel:</span></td>
+                        <td class="RH_Opp_Tbl_Data" align="left"><span class="RH_Opp_Field_Value"><apex:outputField value="{!OpportunityRecord.FulfillmentChannel__c}"/></span></td>
+                        <td class="RH_Opp_Tbl_Data" align="right">&nbsp;</td>
+                        <td class="RH_Opp_Tbl_Data" align="left">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="RH_Opp_Tbl_Data" align="right"><span class="RH_Opp_Field_Label">Operating Unit:</span></td>
+                        <td class="RH_Opp_Tbl_Data" align="left"><span class="RH_Opp_Field_Value"><!--<span class="{!IF(hideNonRelevent, 'disableclass','')}"></span>--><div class="operatingUnitClass" style="display:{!IF(OR(hideNonRelevent,chkOrderSubmitStatus=='differentProfile'), 'none', 'block')};"></div><apex:inputField id="operatingUnit" onfocus="setOldCCValue(this);" onchange="if(!confirmCCChange(this)){return false;}" value="{!OpportunityRecord.Operating_Unit__c}"/></span></td>
+                        <td class="RH_Opp_Tbl_Data" align="right"><span class="RH_Opp_Field_Label">Order Type:</span></td>
+                        <td class="RH_Opp_Tbl_Data" align="left"><span class="RH_Opp_Field_Value"><!--<span class="{!IF(hideNonRelevent, 'disableclass','')}"></span>--><apex:inputField id="orderType" value="{!OpportunityRecord.Order_Type__c}"/></span></td>
+                    </tr>
+                </table>
+            </div>
+            <script>
+                window.onload = function(){
+                    try{document.getElementById("mainPage:oppForm:checkdef").setAttribute("disabled", "true");}catch(e){}
+                    if(document.getElementById("mainPage:oppForm:hideNonRelevent").value == 'true'){
+                        try{document.getElementById("mainPage:oppForm:operatingUnit").setAttribute("disabled", "true");}catch(e){}
+                        try{document.getElementById("mainPage:oppForm:orderType").setAttribute("disabled", "true");}catch(e){}
+                        //try{document.getElementById("mainPage:oppForm:prof").setAttribute("disabled", "true");}catch(e){}
+                        try{document.getElementById("mainPage:oppForm:checkdef").setAttribute("disabled", "true");}catch(e){}
+                        try{document.getElementById("submitOrder").style.display = "none";}catch(e){}
+                    }
+                }
+                
+                function hideElements(){
+                    try{document.getElementById("mainPage:oppForm:checkdef").setAttribute("disabled", "true");}catch(e){}
+                    if(document.getElementById("mainPage:oppForm:hideNonRelevent").value == 'true'){
+                        try{document.getElementById("mainPage:oppForm:operatingUnit").setAttribute("disabled", "true");}catch(e){}
+                        try{document.getElementById("mainPage:oppForm:orderType").setAttribute("disabled", "true");}catch(e){}
+                        //try{document.getElementById("mainPage:oppForm:prof").setAttribute("disabled", "true");}catch(e){}
+                        try{document.getElementById("mainPage:oppForm:checkdef").setAttribute("disabled", "true");}catch(e){}
+                        try{document.getElementById("submitOrder").style.display = "none";}catch(e){}
+                    }
+                }
+            </script>    
+        </div>
+        <br/>
+        <div class="RH_OrderDetails_Header_Padding">
+            <!-- <div class="RH_Header">Add Order Details for this Opportunity</div> -->
+            <apex:pageBlock >
+                <apex:pageBlockSection collapsible="false" columns="1" title="Add Order Details for this Opportunity"></apex:pageBlockSection>
+            </apex:pageBlock>
+            <div>
+                <div onclick="showHideContent(1);" id="header1" class="RH_MenuTitle RH_firsrMenuTitle">Bill-To Information</div>
+                <div id="content1" class="RH_Hide RH_contentOutlineBorder" style="display:{!IF(hideNonRelevent, 'block', 'none')};">
+                    <div>        
+                        <input type="text" onchange="copyNullValue('billSalesAccount','billSalesAccountId');" class="RH_inputFieldWidth" id="billSalesAccount" placeholder="Bill to Sales Account" /><span class="RH_Hide" id="billSalesAccountId" ></span> <img onclick="getSalesAccount($('#billSalesAccount').val(),'billSalesAccountId','billSalesAccount','billEBSAccount', 'billAddress', 'billContact');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" /> 
+                        <input type="text" onchange="copyNullValue('billEBSAccount','billEBSAccountId');" class="RH_inputFieldWidth RH_secondInputMargin" id="billEBSAccount" placeholder="Bill to EBS Account" html-readonly="readonly"/><span class="RH_Hide" id="billEBSAccountId" ></span> <img class="RH_PointerCursor" onclick="getEBSAccount($('#billSalesAccountId').html(),'billEBSAccountId','billEBSAccount');" src="/img/func_icons/util/search16.png" />
+                    </div>
+                    <span class="RH_right"><button class="RH_Button_Padding" onclick="copyDetails('3')" type="button">Apply to All</button></span>
+                    <div>
+                        <input type="text"  onchange="copyNullValue('billAddress','billAddressId');" class="RH_inputFieldWidth RH_inputFieldMargin" id="billAddress" placeholder="Bill to Address"  html-readonly="readonly"/><span class="RH_Hide" id="billAddressId" ></span> <img class="RH_PointerCursor" onclick="getAddresses($('#billSalesAccountId').html(),'billAddressId','billAddress','bill');" src="/img/func_icons/util/search16.png" />
+                        <input type="text"  onchange="copyNullValue('billContact','billContactId');" class="RH_inputFieldWidth RH_inputFieldMargin RH_secondInputMargin" id="billContact" placeholder="Bill to Contact"  html-readonly="readonly"/><span class="RH_Hide" id="billContactId" ></span> <img class="RH_PointerCursor" onclick="getContacts($('#billSalesAccountId').html(),'billContactId','billContact');" src="/img/func_icons/util/search16.png" />
+                    </div>
+                    
+                </div>
+                
+            </div>
+            
+            <div>
+                <div onclick="showHideContent(2);" id="header2" class="RH_MenuTitle RH_firsrMenuTitle">Ship-To Information</div>
+                <div id="content2" class="RH_Hide RH_contentOutlineBorder">
+                    <div>        
+                        <input type="text"  onchange="copyNullValue('shipSalesAccount','shipSalesAccountId');" class="RH_inputFieldWidth" id="shipSalesAccount" placeholder="Ship to Sales Account" /><span class="RH_Hide" id="shipSalesAccountId" ></span> <img onclick="getSalesAccount($('#shipSalesAccount').val(),'shipSalesAccountId','shipSalesAccount','shipEBSAccount','shipAddress','shipContact');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" /> 
+                        <input type="text"  onchange="copyNullValue('shipEBSAccount','shipEBSAccountId');" class="RH_inputFieldWidth RH_secondInputMargin" id="shipEBSAccount" placeholder="Ship to EBS Account" html-readonly="readonly" /><span class="RH_Hide" id="shipEBSAccountId" ></span> <img onclick="getEBSAccount($('#shipSalesAccountId').html(),'shipEBSAccountId','shipEBSAccount');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                    </div>
+                    <span class="RH_right"><button class="RH_Button_Padding" onclick="copyDetails('7')" type="button">Apply to All</button></span>
+                    <div>
+                        <input type="text"  onchange="copyNullValue('shipAddress','shipAddressId');" class="RH_inputFieldWidth RH_inputFieldMargin" id="shipAddress" placeholder="Ship to Address" html-readonly="readonly" /><span class="RH_Hide" id="shipAddressId" ></span> <img onclick="getAddresses($('#shipSalesAccountId').html(),'shipAddressId','shipAddress','ship');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                        <input type="text"  onchange="copyNullValue('shipContact','shipContactId');" class="RH_inputFieldWidth RH_inputFieldMargin RH_secondInputMargin" id="shipContact" placeholder="Ship to Contact" html-readonly="readonly" /><span class="RH_Hide" id="shipContactId" ></span> <img class="RH_PointerCursor" onclick="getContacts($('#shipSalesAccountId').html(),'shipContactId','shipContact');" src="/img/func_icons/util/search16.png" />
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div onclick="showHideContent(3);" id="header3" class="RH_MenuTitle RH_firsrMenuTitle">Entitle-To Information</div>
+                <div id="content3" class="RH_Hide RH_contentOutlineBorder">
+                    <div>        
+                        <input type="text"  onchange="copyNullValue('entitleSalesAccount','entitleSalesAccountId');" class="RH_inputFieldWidth" id="entitleSalesAccount" placeholder="Entitle to Sales Account" /><span class="RH_Hide" id="entitleSalesAccountId" ></span> <img onclick="getSalesAccount($('#entitleSalesAccount').val(),'entitleSalesAccountId','entitleSalesAccount','entitleEBSAccount','entitleAddress','entitleContact');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" /> 
+                        <input type="text"  onchange="copyNullValue('entitleEBSAccount','entitleEBSAccountId');" class="RH_inputFieldWidth RH_secondInputMargin" id="entitleEBSAccount" placeholder="Entitle to EBS Account" html-readonly="readonly" /><span class="RH_Hide" id="entitleEBSAccountId" ></span> <img onclick="getEBSAccount($('#entitleSalesAccountId').html(),'entitleEBSAccountId','entitleEBSAccount');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                    </div>
+                    <span class="RH_right"><button class="RH_Button_Padding" onclick="copyDetails('11')" type="button">Apply to All</button></span>
+                    <div>
+                        <input type="text"  onchange="copyNullValue('entitleAddress','entitleAddressId');" class="RH_inputFieldWidth RH_inputFieldMargin" id="entitleAddress" placeholder="Entitle to Address" html-readonly="readonly" /><span class="RH_Hide" id="entitleAddressId" ></span> <img onclick="getAddresses($('#entitleSalesAccountId').html(),'entitleAddressId','entitleAddress','entitle');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                        <input type="text"  onchange="copyNullValue('entitleContact','entitleContactId');" class="RH_inputFieldWidth RH_inputFieldMargin RH_secondInputMargin" id="entitleContact" placeholder="Entitle to Contact" html-readonly="readonly" /><span class="RH_Hide" id="entitleContactId" ></span> <img onclick="getContacts($('#entitleSalesAccountId').html(),'entitleContactId','entitleContact');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div onclick="showHideContent(4);" id="header4" class="RH_MenuTitle RH_firsrMenuTitle">Sold-To Information</div>
+                <div id="content4" class="RH_Hide RH_contentOutlineBorder">
+                    <div>        
+                        <input type="text"  onchange="copyNullValue('SoldSalesAccount','SoldSalesAccountId');" class="RH_inputFieldWidth" id="SoldSalesAccount" placeholder="Sold to Sales Account" /><span class="RH_Hide" id="SoldSalesAccountId" ></span> <img onclick="getSalesAccount($('#SoldSalesAccount').val(),'SoldSalesAccountId','SoldSalesAccount','SoldEBSAccount','SoldAddress','SoldContact');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" /> 
+                        <input type="text"  onchange="copyNullValue('SoldEBSAccount','SoldEBSAccountId');" class="RH_inputFieldWidth RH_secondInputMargin" id="SoldEBSAccount" placeholder="Sold to EBS Account" html-readonly="readonly" /><span class="RH_Hide" id="SoldEBSAccountId" ></span> <img onclick="getEBSAccount($('#SoldSalesAccountId').html(),'SoldEBSAccountId','SoldEBSAccount');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                    </div>
+                    <span class="RH_right"><button class="RH_Button_Padding" onclick="copyDetails('15')" type="button">Apply to All</button></span>
+                    <div>
+                        <input type="text"  onchange="copyNullValue('SoldAddress','SoldAddressId');" class="RH_inputFieldWidth RH_inputFieldMargin" id="SoldAddress" placeholder="Sold to Address" html-readonly="readonly" /><span class="RH_Hide" id="SoldAddressId" ></span> <img onclick="getAddresses($('#SoldSalesAccountId').html(),'SoldAddressId','SoldAddress','sold');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                        <input type="text"  onchange="copyNullValue('SoldContact','SoldContactId');" class="RH_inputFieldWidth RH_inputFieldMargin RH_secondInputMargin" id="SoldContact" placeholder="Sold to Contact" html-readonly="readonly" /><span class="RH_Hide" id="SoldContactId" ></span> <img onclick="getContacts($('#SoldSalesAccountId').html(),'SoldContactId','SoldContact');" class="RH_PointerCursor" src="/img/func_icons/util/search16.png" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <button style="margin-right:1%" class="RH_submitButton buttonClass" onclick="updateOpportunity()" type="button">Save Order Information</button>
+            <button style="margin-left:1%" class="RH_submitButton buttonClass" onclick="cancelUpdate();" type="button">Cancel</button>    <!-- style="margin-left:0%"-->
+        </div>
+        <div style="float:right;">
+            
+            <!--<span class="{!IF(hideNonRelevent, 'disableclassbtn','')}"></span>--><button class="RH_submitButton buttonClass" id="submitOrder" style="width:200px;margin-left:0;margin-top:0;" type="button">Save and Submit Order</button><!--display:{!IF(hideNonRelevent, 'none', 'block')};-->
+            
+            
+        </div>
+   <!--</apex:form> 
+   <apex:form >-->
+        <apex:actionFunction name="initializeAddressCreation" action="{!initializeAddressCreation}" reRender="addressPanel" oncomplete="showModel();">
+            <apex:param name="salesaccountId" value="salesaccountId" />
+            <apex:param name="addrIdentifier" value="addrIdentifier" />
+        </apex:actionFunction>  
+        <apex:actionfunction name="getAllStates" action="{!getAllStates}" rerender="cityField,countyListDropDown,countyListText,provinceListDropDown,provinceListText,stateListDropDown,stateListText,ZipPostalField" >
+            <apex:param name="countryName" value="countryName" />
+        </apex:actionfunction>
+        
+        <apex:actionFunction oncomplete="setValuesToFields();" name="setAdminLevelOne" action="{!setSelectListFieldsToText}" reRender="countyListDropDown,countyListText,provinceListDropDown,provinceListText,stateListDropDown,stateListText" >
+            <apex:param name="adminType" value="adminType" />
+            <apex:param name="adminPlaceVal" value="adminPlaceVal" />
+        </apex:actionfunction>  
+        
+      
+        <apex:actionFunction name="opportunityUpdate" action="{!opportunityUpdate}" reRender="AFPanel">
+            <apex:param name="opportunityDetailToUpdate" value="opportunityDetailToUpdate" />
+        </apex:actionFunction>
+        <apex:actionFunction name="submitOrderForThisOpportunity" action="{!onSubmitOrderBtnClick}" reRender="AFPanel">
+            <apex:param name="opportunityDetailToUpdate" value="opportunityDetailToUpdate" />
+        </apex:actionFunction>
+   </apex:form> 
+    
+    <div id="contentTable"> </div>
+    
+    <!-- Popup Code -->
+    <div class = "RH_bg-fade"></div>
+    <div class = "RH_modal-window">
+        <div class = "RH_modal-head">
+            <!--------- Popup Group Member Header -----------> 
+            <div class = "modal-group-header RH_left" id = "RH_header">
+                Test Header
+            </div>
+            <!--------- End Group Member Header ---------
+            <a class = "modal-close" href = "javascript: void(0);" onclick = "hideModal()"></a> -->
+        </div>    
+        <!--------- Popup Group Member Content ----------->
+        <div class = "RH_modal-content" id = "RH_body">
+            <apex:outputPanel id="addressPanel">
+            <div id="SalesAccountTable">
+                <apex:outputPanel rendered="{!if(createNewAddress == true,true,false)}">
+                    <apex:form id="form" >
+                        <apex:pageBlock id="mainBlock" >
+                            <div id="inputFields">
+                                <apex:pageBlockSection title="Location Details" id="addressSection" columns="1">
+                                    <apex:inputField styleClass="inputFieldWidth" id="addressLine1" value="{!addressRecord.Address_Line1__c}"  required="{!if(addressline1Mandatory==true,true,false)}" />
+                                    <apex:inputField styleClass="inputFieldWidth" id="addressLine2" value="{!addressRecord.Address_Line2__c}"  required="{!if(addressline2Mandatory==true,true,false)}" />
+                                    <apex:inputField styleClass="inputFieldWidth" id="addressLine3" value="{!addressRecord.Address_Line3__c}"  required="{!if(addressline3Mandatory==true,true,false)}" />
+                                    <apex:inputField styleClass="inputFieldWidth" id="addressLine4" value="{!addressRecord.Address_Line4__c}"  required="{!if(addressline4Mandatory==true,true,false)}" />
+                                    <apex:pageBlockSectionItem id="countrySection" >
+                                        <apex:outputLabel id="countryValLabel" value="Country" />
+                                        <apex:selectList value="{!countryName}" styleClass="inputFieldWidth" required="true" id="countryVal" onchange="getStates(this.value)" size="1">
+                                            <apex:selectOptions value="{!CountryList}"></apex:selectOptions>
+                                        </apex:selectList>
+                                    </apex:pageBlockSectionItem>
+                                </apex:pageBlockSection>
+                            
+                                <!-- ********** City ************ -->
+                                <apex:pageBlockSection id="cityField">
+                                    <apex:pageBlockSectionItem id="citySection">
+                                        <apex:outputLabel id="cityLabel" style="margin-left:102px" value="City" />
+                                        <apex:inputField id="city" styleClass="inputFieldWidth" value="{!addressRecord.City__c}"  required="{!if(cityMandatory==true,true,false)}" />
+                                    </apex:pageBlockSectionItem>
+                               </apex:pageBlockSection>
+                                
+                                <!-- ********** City Ends ************ -->
+                                
+                                
+                                <!-- ********** County ************ -->
+                                <span id="countyList">
+                                    <apex:pageBlockSection id="countyListDropDown">
+                                        <apex:pageBlockSectionItem id="countyListSection" rendered="{!If(AND (countyVisibility == true,countyList.size > 1) ,true,false)}">
+                                            <apex:outputLabel style="margin-left:78px" id="countyListValLabel" value="County" />
+                                            <apex:selectList value="{!countyTextValue}" styleClass="inputFieldWidth" id="countyListVal" size="1">
+                                                <apex:selectOptions value="{!countyList}"></apex:selectOptions>
+                                            </apex:selectList>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                </span>                                
+                                <span id="countyText">
+                                    <apex:pageBlockSection id="countyListText">                                        
+                                        <apex:pageBlockSectionItem id="countyTextSection" rendered="{!If(AND (countyVisibility== true,countyList.size < 2) ,true,false)}">
+                                            <apex:outputLabel style="margin-left:78px" id="countyTextValLabel" value="County" />
+                                            <apex:outputPanel >
+                                               <apex:outputPanel style="width:3px;height:20px;background:#CC0000;position:absolute;margin-left:-5px" rendered="{!if(countyMandatory == true,true,false)}" />                                                                                                                                           
+                                               <apex:inputText styleClass="inputFieldWidth" id="countyTextVal" value="{!countyTextValue}" required="{!if(countyMandatory == true,true,false)}" /> 
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                </span>
+                                <!-- ********** County Ends ************ -->         
+                                
+                                
+                                <!-- ********** Province ************ -->
+                                
+                                    <apex:pageBlockSection id="provinceListDropDown">
+                                        <apex:pageBlockSectionItem id="provinceListSection" rendered="{!If(AND(provinceVisibility == true, provinceList.size > 1),true,false)}">
+                                            <apex:outputLabel style="margin-left:77px" id="provinceListValLabel" value="Province" />
+                                            <apex:selectList value="{!provinceTextValue}" styleClass="inputFieldWidth" id="provinceListVal" size="1">
+                                                <apex:selectOptions value="{!provinceList}"></apex:selectOptions>
+                                            </apex:selectList>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                
+                                    <apex:pageBlockSection id="provinceListText">
+                                        <apex:pageBlockSectionItem id="provinceTextSection" rendered="{!If(AND(provinceVisibility == true, provinceList.size < 2),true,false)}">
+                                            <apex:outputLabel style="margin-left:77px" id="provinceTextValLabel" value="Province" />
+                                            <apex:inputText styleClass="inputFieldWidth" id="provinceTextVal" value="{!provinceTextValue}" required="{!if(provinceMandatory == true,true,false)}" />
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                
+                                <!-- ********** Province Ends ************ --> 
+                                
+                                
+                                <!-- ********** State ************ -->
+                                <span id="stateList">
+                                    <apex:pageBlockSection id="stateListDropDown">
+                                        <apex:pageBlockSectionItem id="stateListSection" rendered="{!If(AND (stateVisibility == true,stateList.size > 1),true,false)}">
+                                            <apex:outputLabel style="margin-left:94px" id="stateListValLabel" value="State" />
+                                            <apex:selectList value="{!stateTextValue}" styleClass="inputFieldWidth" id="stateListVal" size="1">
+                                                <apex:selectOptions value="{!stateList}"></apex:selectOptions>
+                                            </apex:selectList>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                </span>
+                                <span id="stateText">
+                                    <apex:pageBlockSection id="stateListText">
+                                        <apex:pageBlockSectionItem id="stateTextSection" rendered="{!If(AND (stateVisibility== true,stateList.size < 2) ,true,false)}">
+                                            <apex:outputLabel style="margin-left:94px" id="stateTextValLabel" value="State" />
+                                            <apex:inputText styleClass="inputFieldWidth" id="stateTextVal" value="{!stateTextValue}" required="{!if(stateVisibility == true,true,false)}" />
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                </span>
+                                <!-- ********** State Ends ************ --> 
+                                
+                                <!-- ********** Zip / Postal ************ -->  
+                                    
+                                <apex:pageBlockSection id="ZipPostalField">
+                                    <apex:pageBlockSectionItem id="postalSection" rendered="{!if(postalCodeVisibilty==true,true,false)}">
+                                        <apex:outputLabel style="margin-left:103px" id="zipPostalValLabel" value="Zip / Postal Code" />
+                                        <apex:inputField styleClass="inputFieldWidth" id="zipPostalVal" value="{!addressRecord.Zip_Postal_Code__c}" required="{!if(postalCodeMandatory==true,true,false)}" />
+                                    </apex:pageBlockSectionItem>
+                                </apex:pageBlockSection>
+                            </div>    
+                                <!-- ********** Zip / Postal Ends ************ -->
+                           
+                            <button type="button" style="margin-left:150px;" class="buttonClass" onclick="getAddressDetails('Yes')">Validate Address </button>
+                            <button type="button" style="margin-left:25px;" class="buttonClass" onclick="checkValidation();">Save </button>
+                        </apex:pageBlock> 
+                        <apex:actionfunction name="saveDetails" action="{!saveAddressDetails}" oncomplete="getAddressValues('{!addressName}','{!addressId}')" reRender="AFPanel,addressPanel" />  
+                        <div id="addressMsg" style="color:red;font-weight:bold;font-size:12px;font-family:arial"></div>
+                    </apex:form>
+                </apex:outputPanel>        
+            </div>
+            </apex:outputPanel>
+        </div>
+        
+        <!--------- End Popup Group Member Content ----------->
+        <div class = "RH_modal-btm">
+            <!--------- Popup Popup Group Member Footer ----------->  
+           <div class = "modal-footer" id = "RH_footer">                   
+                <button type = "button" class="RH_closePopup" id="closePopup" >Proceed</button>
+                <button type = "button" class="RH_closePopup" onclick="hideThisPopup();" id="closePopup" >Cancel</button>
+                <button type = "button" class="RH_createAddress" id="createAddress" >Create New Address</button>
+           </div>
+           <!--------- End Popup Popup Group Member Footer ----------->  
+        </div>        
+     </div> 
+     <!--------- End Popup ----------->
+    <script>
+         
+        // remove quate from json string 
+        function removeQuotes(mystring) {
+                
+            newString = mystring.replace(/&(lt|gt|quot);/g, function (m, p) { 
+                //console.log(p);
+                return (p == "lt") ? "<" : ((p == "gt") ? ">" : "\"");
+            });
+            
+            //var newJ= $.parseJSON(newString);
+            var  newJ = eval ("(" + newString+ ")");
+            return newJ;
+        }
+        
+        function initialize(){
+            //var hideNonRelevent = "{!IF(hideNonRelevent,true,false)}";
+            orderSubmissionStatus = $('#chkOrderSubmitStatus').html();
+            console.log('---------------------orderSubmissionStatus'+orderSubmissionStatus);
+            if(orderSubmissionStatus == 'true'){
+                $("#submitOrder").click(function(){ 
+                    submitOrderOpportunity();
+                });
+            }else if(orderSubmissionStatus == 'differentProfile'){
+                $("#submitOrder").click(function(){ 
+                    alert('You do not have sufficient privileges to submit opportunity as an order. Only an OM personnel can submit the order');
+                });
+            }else if(orderSubmissionStatus == 'submittedForReview'){
+                $("#submitOrder").click(function(){ 
+                    alert('The Opportunity cannot be submitted as an order as it has not been submitted for OM review. Only opportunities that are Pending OM review can be submitted as an order.');
+                });
+            }
+            populateInfo();
+        }
+        
+      // initialize data for order details
+      initialize();
+      
+      function populateInfo(){
+            //opportunityDetailsBeforeEditing = '{!JSENCODE(OpportunityRecord.Bill_To_Sales_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Sales_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Address_Details__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Address__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Contact__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Bill_To_Contact__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Sales_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Sales_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Address_Details__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Address__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Contact__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Ship_To_Contact__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Sales_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Sales_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Address_Details__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Address__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Contact__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Entitle_To_Contact__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Sales_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Sales_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Account__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Account__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Address_Details__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Address__c)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Contact__r.Name)}'+'||'+'{!JSENCODE(OpportunityRecord.Sold_To_Contact__c)}';
+            //alert(document.getElementById("mainPage:oppForm:pageParameters23").value);
+            //alert(document.getElementById("mainPage:oppForm:pageParameters22").value);
+            opportunityDetailsBeforeEditing =  //'{!JSENCODE(pageParameters0)}'+
+                                               document.getElementById("mainPage:oppForm:pageParameters0").value+ 
+                                          //'||'+'{!JSENCODE(pageParameters1)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters1").value+
+                                          //'||'+'{!JSENCODE(pageParameters2)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters2").value+
+                                          //'||'+'{!JSENCODE(pageParameters3)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters3").value+
+                                          //'||'+'{!JSENCODE(pageParameters4)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters4").value+
+                                          //'||'+'{!JSENCODE(pageParameters5)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters5").value+
+                                          //'||'+'{!JSENCODE(pageParameters6)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters6").value+
+                                          //'||'+'{!JSENCODE(pageParameters7)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters7").value+
+                                          //'||'+'{!JSENCODE(pageParameters8)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters8").value+
+                                          //'||'+'{!JSENCODE(pageParameters9)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters9").value+
+                                          //'||'+'{!JSENCODE(pageParameters10)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters10").value+
+                                          //'||'+'{!JSENCODE(pageParameters11)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters11").value+
+                                          //'||'+'{!JSENCODE(pageParameters12)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters12").value+
+                                          //'||'+'{!JSENCODE(pageParameters13)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters13").value+
+                                          //'||'+'{!JSENCODE(pageParameters14)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters14").value+
+                                          //'||'+'{!JSENCODE(pageParameters15)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters15").value+
+                                          //'||'+'{!JSENCODE(pageParameters16)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters16").value+
+                                          //'||'+'{!JSENCODE(pageParameters17)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters17").value+
+                                          //'||'+'{!JSENCODE(pageParameters18)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters18").value+
+                                          //'||'+'{!JSENCODE(pageParameters19)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters19").value+
+                                          //'||'+'{!JSENCODE(pageParameters20)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters20").value+
+                                          //'||'+'{!JSENCODE(pageParameters21)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters21").value+
+                                          //'||'+'{!JSENCODE(pageParameters22)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters22").value+
+                                          //'||'+'{!JSENCODE(pageParameters23)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters23").value+
+                                          //'||'+'{!JSENCODE(pageParameters24)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters24").value+
+                                          //'||'+'{!JSENCODE(pageParameters25)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters25").value+
+                                          //'||'+'{!JSENCODE(pageParameters26)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters26").value+
+                                          //'||'+'{!JSENCODE(pageParameters27)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters27").value+
+                                          //'||'+'{!JSENCODE(pageParameters28)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters28").value+
+                                          
+                                          //'||'+'{!JSENCODE(pageParameters29)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters29").value+
+                                          //'||'+'{!JSENCODE(pageParameters30)}'+
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters30").value+
+                                          //'||'+'{!JSENCODE(pageParameters31)}'
+                                          '||'+document.getElementById("mainPage:oppForm:pageParameters31").value;
+            
+            opportunityDetailsBeforeEditingArray = opportunityDetailsBeforeEditing.split('||');
+            console.log(opportunityDetailsBeforeEditingArray.length);
+            var oppFieldArray = ["billSalesAccount", "billEBSAccount", "billAddress", "billContact", "shipSalesAccount", "shipEBSAccount", "shipAddress", "shipContact", "entitleSalesAccount", "entitleEBSAccount", "entitleAddress", "entitleContact", "SoldSalesAccount", "SoldEBSAccount", "SoldAddress", "SoldContact"];
+            for(i = 0 ; i < oppFieldArray.length ; i++){
+                j = i + i;
+                $('#'+oppFieldArray[i]).val(opportunityDetailsBeforeEditingArray[j]);
+                $('#'+oppFieldArray[i]+'Id').html(opportunityDetailsBeforeEditingArray[j+1]);
+                
+            }
+      }
+      
+      // cancel function  
+      function cancelUpdate(){
+            window.location = '/{!OpportunityRecord.Id}';     
+      }
+      
+       // check validation for the address being created
+        function checkValidation(){
+            if($('#validateAddressHere').html() == 'false'){
+                alert('Please validate your address');
+                return;
+            }
+               
+            saveDetails();
+        }
+        
+        function copyNullValue(homeField,hiddenField){
+            console.log(homeField);
+            console.log(hiddenField);
+            console.log(document.getElementById(homeField).value);
+            var homeFieldValue = document.getElementById(homeField).value;
+            homeFieldValue = homeFieldValue.length;
+            console.log(homeFieldValue);
+            if(homeFieldValue < 1){
+                document.getElementById(hiddenField).innerHTML ='';
+                console.log('--Iam here--');
+                
+            }
+            console.log(document.getElementById(hiddenField).innerHTML);
+        }
+        
+     </script>
+<div class="container"> </div>
+<style>
+    .dataTable{
+        width:50%;
+    }
+</style>           
+
+            
+        
+     
+</apex:page>

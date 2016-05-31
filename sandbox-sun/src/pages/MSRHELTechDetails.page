@@ -1,0 +1,102 @@
+<apex:page controller="MSController" sidebar="false" showheader="true" standardStylesheets="false" action="{!initWithContent}">
+
+
+<head>
+<script src="/jslibrary/1333170890000/sfdc/JiffyStubs.js"></script><meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<meta HTTP-EQUIV="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT" />
+
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<title>Selling Cloud with Attitude</title>
+<apex:include pageName="RHELSiteCSS"/>
+<span id="j_id0:j_id4"></span>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a class="logo-redhat" href="http://www.redhat.com">Red Hat</a>
+        <a class="logo-product" href="MSRHELHome">Red Hat Enterprise Linux</a>
+        <div class="title"><strong>Do the math.</strong> <br />Migrate to Red Hat<sup>&reg;</sup> Enterprise Linux<sup>&reg;</sup> and save.</div>
+        
+        <ul id="nav-main">
+            <li id="home"><a href="MSRHELHome">&nbsp;Home</a></li>
+            <li id="nav2"><a href="MSRHELSiteTraining">Train to sell</a></li>
+            <li id="nav3"><a href="MSRHELCollateral">Engage customers</a></li>
+            <li id="nav4"><a href="MSRHELMarketing">Build a campaign</a></li>
+            <li id="nav5"><a id="selected" href="MSRHELTechDetails">Access technical resources</a></li>
+            <li class="last" id="nav6"><a href="MSRHELSolutions">Sell RHEL + Partner solutions</a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <div id="content-inner">
+        <div class="container">
+            <div id="content-primary">
+              <h2>Access Technical Resources: </h2>
+              <p>
+                This comprehensive technical resource library features all Red
+                Hat Enterprise Linux reference architectures, performance
+                benchmarks, sizing guides and other relevant content for your
+                technical pre-and post-sales teams.
+              </p>
+            </div>
+            <div id="content-secondary">
+              <div class='section'>
+                <h4>Reference Architectures</h4>
+                Detailed technical guides for deploying RHEL-based solutions
+                <br />
+                <c:MSSection pageController="{!this}" sectionKey="Reference Architectures">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Reference Architectures"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Reference Architectures"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Performance benchmarks</h4>
+                A comprehensive library of current RHEL performance benchmarks
+                <br />
+                <c:MSSection pageController="{!this}" sectionKey="Performance Benchmarks">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Performance Benchmarks"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Performance Benchmarks"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Technical demos and videos</h4>
+                Search here for the latest technical demo kits and technical
+                videos for use with customers and in training
+                <br />
+                <c:MSSection pageController="{!this}" sectionKey="Technical Demos and Videos">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Technical Demos and Videos"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Technical Demos and Videos"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Technical training</h4>
+                Search here for all recorded technical training, webinars and
+                links to online training courses to equip your technical pre-
+                and post sales teams to provide an excellent customer
+                experience
+                <br />
+                <c:MSSection pageController="{!this}" sectionKey="Technical Training">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Technical Training"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Technical Training"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright">Copyright &copy; 2012 Red Hat, Inc. All rights reserved.</p>
+    </div>
+</div>  
+</body>
+</apex:page>

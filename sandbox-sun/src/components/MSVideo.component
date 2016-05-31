@@ -1,0 +1,42 @@
+<apex:component controller="MSSectionController">
+	<apex:attribute name="pageController" description="" type="MSController" required="true" assignTo="{!ctrl}"/>
+	<apex:attribute name="sectionKey" description="" type="String" required="true" assignTo="{!sectionKey}"/>
+
+    <script type="text/javascript" src="http://www.kaltura.com/p/739972/sp/73997200/embedIframeJs/uiconf_id/5912762/partner_id/739972"></script>
+    <apex:repeat value="{!sectionContent}" var="item">
+	    <object id="kaltura_player_1363024922" 
+			name="kaltura_player_1363024922" 
+			type="application/x-shockwave-flash" 
+			allowFullScreen="true" 
+			allowNetworking="all" 
+			allowScriptAccess="always" 
+			height="500" 
+			width="782" 
+			bgcolor="#000000" 
+			xmlns:dc="https://purl.org/dc/terms/" 
+			xmlns:media="https://search.yahoo.com/searchmonkey/media/" 
+			rel="media:video" 
+			resource="https://cdnapisec.kaltura.com/index.php/kwidget/cache_st/1363024922/wid/_739972/uiconf_id/5912762/entry_id/{!item.rhcontent.KalturaId__c}" 
+			data="https://cdnapisec.kaltura.com/index.php/kwidget/cache_st/1363024922/wid/_739972/uiconf_id/5912762/entry_id/{!item.rhcontent.KalturaId__c}">
+			<param name="allowFullScreen" value="true" />
+			<param name="allowNetworking" value="all" />
+			<param name="allowScriptAccess" value="always" />
+			<param name="bgcolor" value="#000000" />
+			<param name="flashVars" value="&{FLAVOR}" />
+			<param name="movie" value="https://cdnapisec.kaltura.com/index.php/kwidget/cache_st/1363024922/wid/_739972/uiconf_id/5912762/entry_id/{!item.rhcontent.KalturaId__c}" />
+			<a href="https://corp.kaltura.com/products/video-platform-features">Video Platform</a>
+			<a href="https://corp.kaltura.com/Products/Features/Video-Management">Video Management</a>
+			<a href="https://corp.kaltura.com/Video-Solutions">Video Solutions</a>
+			<a href="https://corp.kaltura.com/Products/Features/Video-Player">Video Player</a>
+			<a rel="media:thumbnail" href="https://cdnsecakmi.kaltura.com/p/739972/sp/73997200/thumbnail/entry_id/{!item.rhcontent.KalturaId__c}/width/120/height/90/bgcolor/000000/type/2"></a>
+            <span property="dc:description" content="{!item.content.Description}"></span>
+            <span property="media:title" content="{!item.content.Title}"></span> 
+			<span property="media:width" content="782"></span>
+			<span property="media:height" content="500"></span>
+			<span property="media:type" content="application/x-shockwave-flash"></span>
+		</object>
+       	<br />
+       	<h3>{!item.content.Description}</h3>
+    </apex:repeat>
+    <apex:componentBody />
+</apex:component>

@@ -1,0 +1,37 @@
+<apex:page standardController="Temporal_Content__c" extensions="ContentTechnicalContributions">
+
+        <style>
+                h1 {
+                color:#cc0000;
+                font-size:18px;
+                font-size:18px;
+                font-weight:bold;
+                margin:0 0 .7em 0;
+                }
+        </style>
+       
+        <apex:form >
+        <p></p>
+        <p></p>
+        <h1 >Content Technical Contribution</h1>
+        <p></p>
+        <p></p>
+         <apex:pageMessages />
+        <apex:pageBlock title="Enter the following Information:" rendered="{!saved=false}">
+            <apex:pageBlockButtons location="bottom" >
+                  <apex:commandButton id="addScreenshot" value="Upload File" action="{!addContent}"/> 
+                  <apex:commandbutton action="{!Cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection > 
+                <apex:inputField value="{!Temporal_Content__c.Content_Title__c}" id="ContentTitle" Required="TRUE"/>
+                <apex:inputField value="{!Temporal_Content__c.Content_Description__c}" id="ContentDescription" Required="TRUE"/>
+                <apex:inputField value="{!Temporal_Content__c.Document_Date__c}" id="DocumentDate" Required="TRUE"/>
+                <apex:inputField value="{!Temporal_Content__c.Expiration_Date__c}" id="ExpirationDate" Required="TRUE"/>       
+                <apex:inputField value="{!Temporal_Content__c.Technical_Topics__c}" id="TechnicalTopics" Required="TRUE"/>
+                <apex:inputField value="{!Temporal_Content__c.Technical_Topics_Categories__c}" id="TechnicalTopicsCategory" Required="TRUE"/> 
+                <p></p>
+               <apex:inputFile id="uploadContent" value="{!attachmentFile}" filename="{!attachmentFilename}" title="Select the File to Upload" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        </apex:form>
+</apex:page>

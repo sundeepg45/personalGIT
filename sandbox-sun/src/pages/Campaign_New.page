@@ -1,0 +1,3 @@
+<apex:page standardController="Campaign" cache="false" readOnly="false">
+	<c:RecordTypeSelect ent="Campaign" apiName="Campaign"/>
+</apex:page>

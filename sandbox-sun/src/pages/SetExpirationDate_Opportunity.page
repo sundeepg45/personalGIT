@@ -1,0 +1,41 @@
+<apex:page title="{!Opportunity.Name}: Set Expiration Date ~ Salesforce - Unlimited Edition" standardController="Opportunity" showHeader="false" sidebar="false">
+	<apex:outputText rendered="false" value="{!Opportunity.Deal_Registration__c}"/>
+	<apex:outputText rendered="false" value="{!Opportunity.Owner.UserRole.Name}"/>
+	<apex:outputText rendered="false" value="{!Opportunity.Owner.Profile.Name}"/>
+	<apex:outputText rendered="false" value="{!Opportunity.Owner.Region__c}"/>
+	<apex:form >
+		<apex:variable var="isNA" value="{!Opportunity.Owner.Region__c=='NA'}"/>
+		<apex:variable var="isGlobalAdministration" value="{!Opportunity.Owner.UserRole.Name=='Global'}"/>
+		<apex:variable var="isSalesAdministration" value="{!Opportunity.Owner.Profile.Name=='Administration - Operations'}"/>
+		<apex:variable var="isBusinessDevelopment" value="{!OR(Opportunity.Owner.Profile.Name=='Marketing',CONTAINS(Opportunity.Owner.UserRole.Name,'Public Sector'))}"/>
+		<apex:variable var="validOwner" value="{!OR(isGlobalAdministration,AND(isNA,isSalesAdministration),AND(isNA,isBusinessDevelopment))}"/>
+		<apex:pageBlock title="{!Opportunity.Name} Set Expiration Date" mode="edit">
+			<apex:facet name="header">
+				<apex:outputPanel >
+					<b><apex:outputText value="{!Opportunity.Name}" /></b><br />
+					<h1>Set Expiration Date</h1>
+				</apex:outputPanel>
+			</apex:facet>
+			<apex:pageMessage strength="3" severity="Error" rendered="{!NOT(Opportunity.Deal_Registration__c)}">
+			The expiration date can only be set if deal registration.
+			</apex:pageMessage>			
+			<apex:pageMessage strength="3" severity="Error" rendered="{!AND(Opportunity.Deal_Registration__c,NOT(validOwner),isNA)}">
+			You can not set the expiration date because the opportunity owner has a profile of "{!Opportunity.Owner.Profile.Name}"" and a role of "{!Opportunity.Owner.UserRole.Name}".
+			</apex:pageMessage> 
+			<apex:pageMessage strength="3" severity="Error" rendered="{!AND(Opportunity.Deal_Registration__c,NOT(validOwner),NOT(isNA),OR(isSalesAdministration,isBusinessDevelopment))}">
+			You can not set the expiration date because the opportunity owner has a a super region of {!Opportunity.Owner.Region__c}.
+			</apex:pageMessage> 
+			<apex:pageMessage strength="3" severity="Error" rendered="{!AND(Opportunity.Deal_Registration__c,NOT(validOwner),NOT(isNA),NOT(isSalesAdministration),NOT(isBusinessDevelopment))}">
+			You can not set the expiration date because the opportunity owner has a profile of "{!Opportunity.Owner.Profile.Name}", a super region of {!Opportunity.Owner.Region__c} and a role of "{!Opportunity.Owner.UserRole.Name}".
+			</apex:pageMessage> 
+			<apex:pageMessages />
+			<apex:pageBlockButtons >
+				<apex:commandButton disabled="{!NOT(AND(Opportunity.Deal_Registration__c,validOwner))}" action="{!save}" value="Save"/>
+				<apex:commandButton value="Cancel" action="{!cancel}"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1">
+				<apex:inputField value="{!Opportunity.Registration_Expiration__c}"/>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

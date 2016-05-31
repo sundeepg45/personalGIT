@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Attribute__c$Parent__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c$Name</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Contact_Attributes__r$Contact__c.Account</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Contact_Attributes__r$From_Account__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Contact_Attributes__r$Reference_Basic_Information__c.Reference_Program_Candidate__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Contact_Attributes__r$Reference_Basic_Information__c.Is_Referenceable__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Contact_Attributes__r$Reference_Basic_Information__c.Referenceability_Status__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Contact_Attributes__r$Reference_Basic_Information__c</field>
+    </columns>
+    <description>Contact Attributes with the Contact, the Account and the Reference Profile, incl. status, member, candidate.</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Attribute__c.Contact_Attributes__r$Contact__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Attributes with Contacts &amp; Profiles</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Attributes_with_Contacts_and_Profiles__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Attribute__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

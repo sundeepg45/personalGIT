@@ -1,0 +1,10 @@
+<apex:page standardController="Opportunity" sidebar="false">
+    <script>
+        if((typeof sforce != 'undefined')  && (sforce != null)){
+            sforce.one.navigateToURL('{!$Page.refedge__SF1_RfSearchPage}?opportunityId={!Opportunity.Id}&forAccount=false&forContent=true&SF1=true')
+        }
+        else{
+            window.open('{!$Page.refedge__RfSearchPage}?opportunityId={!Opportunity.Id}&forAccount=false&forContent=true&PreFilter=true&SF1=false','_self');
+        }
+    </script>
+</apex:page>

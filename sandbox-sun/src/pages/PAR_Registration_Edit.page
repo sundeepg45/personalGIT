@@ -1,0 +1,16 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt">
+<apex:form >
+    <apex:outputPanel rendered="{!isEditable}">
+        <script type="text/javascript">
+           var url='/{!Id}/e?nooverride=1&retURL=/{!Id}';
+           try {
+               top.window.location.replace(url);
+           }
+           catch(e) {
+               top.window.location = url;
+           }
+       </script>
+    </apex:outputPanel>
+</apex:form>
+<apex:outputText value="{!$Label.Cannot_edit_closed_registrations}" rendered="{!NOT(isEditable)}"/>
+</apex:page>

@@ -1,0 +1,98 @@
+<apex:page showHeader="false" standardStylesheets="false">
+    <apex:stylesheet value="http://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="http://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Partner_Onboarding_CSS}" />
+    
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    
+    
+    <div id="container">
+        <div id="shell-top-simple">
+            <div class="wrap">
+                <div id="header">
+                    <div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div><!-- end logo -->
+					<div id="login-pre">
+		                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso/logout.html">LOG OUT</a>
+		            </div>
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+                <div id="content">
+                    <div id="content-full" style="background: none;">
+						<h1><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Benefits}"/></h1>
+						<br></br>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Online_Tech_Training}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Online_Tech_Training_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Online_Sales_Training}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Online_Sales_Training_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Not_For_Resale}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Not_For_Resale_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Knowledgebase}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Knowledgebase_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Discount_Train_Cert}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Discount_Train_Cert_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Marketing_Support}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Marketing_Support_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Joint_Success_Stories}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Joint_Success_Stories_Desc}"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_CoBranding}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_CoBranding_Desc}" escape="false"/></p>
+						<h3><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Red_Hat_Sponsored_Events}"/></h3>
+						<p><apex:outputText value="{!$Label.Onboarding_PartnerBenefits_Red_Hat_Sponsored_Events_Desc}"/>  </p>
+
+
+					</div><!-- end content-full -->
+                </div> <!-- end_content-->
+            </div><!-- end-wrap -->
+        </div><!--end shell-top-simple -->  
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+                    
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>Copyright &copy;2011 Red Hat, Inc.</li>
+                            <li>|</li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">Privacy Statement</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">Terms of use</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">Patent promise</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">Careers</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">Trademark guidelines</a></li>
+                            <li><a href="">About Red Hat</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">Contact us</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">Site map</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">FAQs</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">Supplier requirements</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div>
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+
+</apex:page>

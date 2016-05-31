@@ -1,0 +1,22 @@
+<apex:page sidebar="false">
+<body>
+	<div align="center" style="height:100%">
+		<br/>
+		<object id="kaltura_player_987059722" width="90%" height="500" name="kaltura_player_987059722" type="application/x-shockwave-flash" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" xmlns:dc="http://purl.org/dc/terms/" xmlns:media="http://search.yahoo.com/searchmonkey/media/" rel="media:video" resource="{! $CurrentPage.parameters.videoURL }" data="{! $CurrentPage.parameters.videoURL }">
+			<param name="allowFullScreen" value="true" />
+			<param name="allowNetworking" value="all" />
+			<param name="allowScriptAccess" value="always" />
+			<param name="bgcolor" value="#000000" />
+			<param name="flashVars" value="&{FLAVOR}" />
+			<param name="movie" value="{! $CurrentPage.parameters.videoURL }" />
+			<a rel="media:thumbnail" href="{! $CurrentPage.parameters.videoThumbnail }" ></a>
+			<span property="media:width" content="90%"></span> 
+			<span property="media:height" content="500"></span>
+			<span property="dc:description" content="Lucy and Edmund Pevensie return to Narnia with their cousin Eustace where they meet up with Prince Caspian for a trip across the sea aboard the royal ship The Dawn Treader."></span>
+			<span property="media:title" content="The Chronicles of Narnia: The Voyage of the Dawn Treader"></span> 
+			<span property="media:type" content="application/x-shockwave-flash"></span> <span property="media:duration" content="128"></span>
+		</object>
+		<br/>
+	</div>
+</body>
+</apex:page>

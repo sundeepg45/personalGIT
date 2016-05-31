@@ -1,0 +1,24 @@
+<apex:component controller="AccountComponentController">
+	<apex:attribute name="value" description="Account to show" type="Account" required="true" assignto="{!account}" />
+	<apex:attribute name="showHeader" description="True if the header should be displayed" type="Boolean" required="false" default="true" />
+	<apex:outputPanel rendered="{!showHeader}" layout="block" styleClass="pbSubheader tertiaryPalette">
+		<h3>LAST FISCAL YEAR <span class="titleSeparatingColon">:</span></h3>
+	</apex:outputPanel>
+	<div class="pbSubsection">
+		<table style="font-size: 100%;padding-left:1em" class="detailList" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+				<apex:componentBody />
+				<tr>
+					<td width="30%" style="padding-right:5px"><b># of Closed Opportunities</b></td>
+					<td width="70%" style="padding-right:5px"><b>Total Amount</b></td>
+				</tr>
+				<apex:repeat value="{!previousFiscalYearSummary}" var="summary">
+					<tr>
+						<td style="padding-right:5px"><apex:outputText value="{!summary.count}" /></td>
+						<td style="padding-right:5px"><c:OutputCurrency isoCode="{!summary.CurrencyIsoCode}" value="{!summary.total}" /><apex:outputPanel layout="none" rendered="{!NOT(ISNULL(summary.usdTotal)||(summary.CurrencyIsoCode='USD'))}">&#160;(<c:OutputCurrency isoCode="USD" value="{!summary.usdTotal}" />)</apex:outputPanel></td>
+					</tr>
+				</apex:repeat>
+			</tbody>
+		</table>
+	</div>
+</apex:component>

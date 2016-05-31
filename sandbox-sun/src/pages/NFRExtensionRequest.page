@@ -1,0 +1,30 @@
+<!--  -->
+<apex:page standardcontroller="NFR_Request__c" extensions="NFRExtensionController" 
+	tabStyle="NFR_Request__c" 
+	id="thePage" 
+	action="{!validate}">
+
+    <apex:form id="theForm">
+        <apex:sectionHeader title="{!$Label.NFRExtentsionRequest_NFR_Req_Title}{!nfrObj.Name}"
+        	description="{!$Label.NFRExtentsionRequest_Days_For_Extension}"  rendered="{!NOT(error)}"/>
+         <apex:outputPanel rendered="{!NOT(ISNULL(message))}">
+			<apex:pageMessage summary="{!message}" 
+				severity="error" strength="3" /><br><br>
+				<apex:commandButton action="{!cancel}" value="{!$Label.NFRExtentsionRequest_Back}" immediate="true"/>
+		</apex:outputPanel>
+        <apex:pageBlock rendered="{!NOT(error)}" >
+            <apex:pageBlockButtons >
+<!--<apex:commandButton action="{!saveAndSubmit}" value="Request Extension" />--> 
+                <apex:commandButton action="{!cancel}" value="{!$Label.NFRExtentsionRequest_Cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection >
+            	<apex:pageBlockSectionItem >
+            		<apex:outputLabel value="{!$Label.NFRExtentsionRequest_Days_To_Extend}" />
+					<apex:selectList value="{!term}" size="1">
+						<apex:selectOptions value="{!extensionOptions}" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+    </apex:form>
+</apex:page>

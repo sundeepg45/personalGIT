@@ -1,0 +1,92 @@
+<apex:page controller="MSController" showheader="true" sidebar="false" standardStylesheets="false" action="{!initWithContent}">
+
+
+<head>
+<script src="/jslibrary/1333170890000/sfdc/JiffyStubs.js"></script><meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE" />
+<meta HTTP-EQUIV="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT" />
+
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<title>RHEL</title>
+<apex:include pageName="RHELSiteCSS"/>
+
+<span></span>
+</head>
+
+<body>
+<div id="header">
+    <div class="container">
+        <a class="logo-redhat" href="http://www.redhat.com">Red Hat</a>
+        <a class="logo-product" href="MSRHELHome">Red Hat Enterprise Linux</a>
+        <div class="title"><strong>Do the math.</strong> <br />Migrate to Red Hat<sup>&reg;</sup> Enterprise Linux<sup>&reg;</sup> and save.</div>
+        
+        <ul id="nav-main">
+            <li id="home"><a href="MSRHELHome">&nbsp;Home</a></li>
+            <li id="nav2"><a id='selected' href="MSRHELSiteTraining">Train to sell</a></li>
+            <li id="nav3"><a href="MSRHELCollateral">Engage customers</a></li>
+            <li id="nav4"><a href="MSRHELMarketing">Build a campaign</a></li>
+            <li id="nav5"><a href="MSRHELTechDetails">Access technical resources</a></li>
+            <li class="last" id="nav6"><a href="MSRHELSolutions">Sell RHEL + Partner solutions</a></li>
+        </ul>
+    </div>
+</div>
+<div id="content">
+    <div id="content-inner">
+        <div class="container">
+              <div id='content-primary'>
+            <h2>Training to Sell Red Hat Enterprise Linux</h2> 
+              <p>
+                Explore this area to find the latest training materials and
+                resources to train and enable your sales teams, including RHEL
+                competitive information, product training webinars and videos,
+                sales cheat sheets, sales guides and more.
+              </p>
+             </div>
+             <div id='content-secondary'>
+              <div class='section'>
+                <h4>RHEL family product training materials</h4>
+                <c:MSSection pageController="{!this}" sectionKey="RHEL Family Product Training Materials">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="RHEL Family Product Training Materials"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="RHEL Family Product Training Materials"/></p></strong>
+                    </ul>
+                 
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Competitive sales tools</h4>
+                <c:MSSection pageController="{!this}" sectionKey="Competitive Sales Tools">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Competitive Sales Tools"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Competitive Sales Tools"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Unix to Linux migration sales tools and training</h4>
+                <c:MSSection pageController="{!this}" sectionKey="UNIX To LINUX Migration Sales Tools and Training">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="UNIX To LINUX Migration Sales Tools and Training"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="UNIX To LINUX Migration Sales Tools and Training"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              <div class='section'>
+                <h4>Partner solutions training tools and resources</h4>
+                <c:MSSection pageController="{!this}" sectionKey="Partner Solutions Training Tools and Resources">
+                    <ul class="links-list presentations-list">
+                    <c:MSSectionList pageController="{!this}" sectionKey="Partner Solutions Training Tools and Resources"/>
+	                <strong><p><c:MSViewAll pagecontroller="{!this}" sectionKey="Partner Solutions Training Tools and Resources"/></p></strong>
+                   </ul>
+                </c:MSSection>
+              </div>
+              </div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p class="copyright">Copyright &copy; 2012 Red Hat, Inc. All rights reserved.</p>
+    </div>
+</div>  
+</body>
+</apex:page>

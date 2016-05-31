@@ -1,0 +1,177 @@
+<apex:page controller="ManageSSOUsers_Controller">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $.noConflict(); 
+        
+        function unescapeHtml(html){
+            return jQuery("<div />").html(html).text();
+        }
+        
+        var responded = {'resetPassword' : false, 'toggleAdmin' : false};
+        var errors = {
+            'API-CreateUser':unescapeHtml('{!$Label.ManagerUsers_Error_Failed_To_Create_Contact}'),
+            'API-UpdateUser':unescapeHtml('{!$Label.ManagerUsers_Error_Something_Went_Wrong}'),
+            'NewUserEmail':unescapeHtml('{!$Label.ManagerUsers_Error_New_User_email_failed}'),
+            'catchall':unescapeHtml('{!$Label.ManagerUsers_Error_Something_Went_Wrong}'),
+            'API-RetrievePrincipalUser':unescapeHtml('{!$Label.ManagerUsers_Error_Could_Not_FInd_User}'),
+            'NotAdmin':unescapeHtml('{!$Label.ManagerUsers_Error_Not_An_Admin}'),
+            'NotAuthenticated':unescapeHtml('{!$Label.ManagerUsers_Error_Not_Authenticated}'),
+            'API-AccountDetails':unescapeHtml('{!$Label.ManagerUsers_Error_Could_Not_Find_Account}')
+        };
+        
+        function checkForResponse(caller, fedId){
+            if (!responded[caller]){
+                document.getElementById('IsAdminThrobber' + fedId).style.display = 'none';
+                document.getElementById('ResetPasswordThrobber' + fedId).style.display = 'none';
+                document.getElementById('IsEnabledThrobber' + fedId).style.display = 'none';
+                alert(unescapeHtml('{!$Label.ManagerUsers_No_Response_From_RH_com}'));
+            }
+        }
+        
+        function resetPassword(fedId){
+            if (!confirm(unescapeHtml('{!$Label.ManageUsers_Sure_You_Want_To_Reset_Password} "') + fedId + '"?')){
+                return;
+            }
+                
+            responded['resetPassword' + fedId] = false;
+            document.getElementById('ResetPasswordThrobber' + fedId).style.display = '';
+            window.setTimeout('checkForResponse(\'resetPassword' + fedId + '\',\'' + fedId + '\');', 15000);
+            jQuery.ajax(
+            {
+                  url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/resetPassword', 
+                  dataType: 'jsonp',  
+                  data: 'login=' + encodeURIComponent(fedId),
+                  success: function(jsonResult){
+                    responded['resetPassword' + fedId] = true;
+                    document.getElementById('ResetPasswordThrobber' + fedId).style.display = 'none';
+                    if (eval(jsonResult.complete)){
+                        alert(unescapeHtml('{!$Label.ManagerUsers_Message_Password_Reset_For} ') + fedId);
+                    } else {
+                        alert(unescapeHtml('{!$Label.ManagerUsers_No_Response_From_RH_com}'));
+                    }
+                  }           
+            });
+        }   
+        
+        function translateError(errorCode){
+            if (errors[errorCode] != null){
+                return errors[errorCode];
+            }
+            for (var i = 0; i < errors.length; i++){
+                if (errors[i][0].startswith(errorCode)){
+                    return errors[i][1];
+                }
+            }
+            return errorCode;
+        }
+        
+        function toggleAdmin(fedId, isAdminCheckbox){
+            var isAdmin = isAdminCheckbox.checked;
+            if (!isAdmin && !confirm(unescapeHtml('{!$Label.ManagerUsers_Verify_Revoke_Admin_Privilege} "') + fedId + '"?')){
+                isAdminCheckbox.checked = true;
+                return;
+            }
+                
+            responded['toggleAdmin' + fedId] = false;
+            document.getElementById('IsAdminThrobber' + fedId).style.display = '';
+            window.setTimeout('checkForResponse(\'toggleAdmin' + fedId + '\',\'' + fedId + '\');', 15000);
+            jQuery.ajax(
+            {
+                  url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/setAdmin', 
+                  dataType: 'jsonp',  
+                  data: 'login=' + encodeURIComponent(fedId) + '&isAdmin=' + isAdmin,
+                  success: function(jsonResult){
+                    responded['toggleAdmin' + fedId] = true;
+                    document.getElementById('IsAdminThrobber' + fedId).style.display = 'none';
+                    if (!eval(jsonResult.complete)){
+                        isAdminCheckbox.checked = !isAdmin;
+                        alert(unescapeHtml('{!$Label.ManagerUsers_Error_Administration_flag_failed_to_update_for_User} ') + fedId + ' (' + translateError(jsonResult.error) + ')');
+                    }
+                  }           
+            });
+        }
+        
+        function toggleEnabled(fedId, isEnabledCheckbox){
+            var isEnabled = isEnabledCheckbox.checked;
+            if (!isEnabled && !confirm(unescapeHtml('{!$Label.ManagerUsers_Verify_Disable_User} "') + fedId + '"?')){
+                isEnabledCheckbox.checked = true;
+                return;
+            }
+                
+            responded['toggleActive' + fedId] = false;
+            document.getElementById('IsEnabledThrobber' + fedId).style.display = '';
+            window.setTimeout('checkForResponse(\'toggleActive' + fedId + '\',\'' + fedId + '\');', 15000);
+            jQuery.ajax(
+            {
+                  url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/setActive', 
+                  dataType: 'jsonp',  
+                  data: 'login=' + encodeURIComponent(fedId) + '&isActive=' + isEnabled,
+                  success: function(jsonResult){
+                    responded['toggleActive' + fedId] = true;
+                    document.getElementById('IsEnabledThrobber' + fedId).style.display = 'none';
+                    if (!eval(jsonResult.complete)){
+                        isEnabledCheckbox.checked = !isEnabled;
+                        alert(unescapeHtml('{!$Label.ManagerUsers_Error_Enabled_flag_failed_to_update_for_User} ') + fedId + ' (' + translateError(jsonResult.error) + ')');
+                    }
+                  }           
+            });
+        }
+    </script>
+    <div class="editPage sfdcBody">
+        <div class="bPageTitle">
+            <div class="ptBody secondaryPalette">
+                <div class="content">
+                    <h2 style="display:inline;" class="pageDescription">{!$Label.ManagerUsers_Page_Title}</h2>
+                    <apex:outputPanel rendered="{!me.IsPartnerAdmin__c}">
+                        <div style="display:inline;"><input type="button" title="{!$Label.ManagerUsers_Page_New_Button}" onclick="navigateToUrl('/apex/CreateSSOUser',null,'new');" name="new" class="btn" value="{!$Label.ManagerUsers_Page_New_Button}"></div>
+                    </apex:outputPanel>
+                </div>
+            </div>
+        </div>
+        <div>&nbsp;</div>
+          <apex:pageBlock >
+            <apex:pageBlockTable value="{!users}" var="u">
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_View}"><a href="/{!u.ContactId}">{!$Label.ManagerUsers_Label_View_Contact}</a></apex:column>
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_Name}" value="{!u.name}"/>
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_Login}" value="{!u.FederationIdentifier}"/>
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_Email}" value="{!u.email}"/>
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_Is_User_Admin}">
+                    <apex:outputText rendered="{!me.FederationIdentifier != u.FederationIdentifier}">
+                        <apex:outputText rendered="{!u.IsPartnerAdmin__c && me.IsPartnerAdmin__c}">
+                            <input type="checkbox" onchange="toggleAdmin('{!u.FederationIdentifier}', this);" name="isAdmin" value="true" checked/>
+                        </apex:outputText>
+                        <apex:outputText rendered="{!!u.IsPartnerAdmin__c && me.IsPartnerAdmin__c}">
+                            <input type="checkbox" onchange="toggleAdmin('{!u.FederationIdentifier}', this);" name="isAdmin" value="true"/>
+                        </apex:outputText>
+                        <span id="IsAdminThrobber{!u.FederationIdentifier}" style="display:none;"><img src="https://www.redhat.com/g/chrome/throbber_dickie.gif"/></span>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!me.FederationIdentifier == u.FederationIdentifier || !me.IsPartnerAdmin__c}">
+                        <apex:outputText rendered="{!u.IsPartnerAdmin__c}">
+                            <input type="checkbox" name="isAdmin" DISABLED CHECKED/>
+                        </apex:outputText>
+                        <apex:outputText rendered="{!!u.IsPartnerAdmin__c}">
+                            <input type="checkbox" name="isAdmin" DISABLED/>
+                        </apex:outputText>
+                    </apex:outputText>
+                </apex:column>
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_Is_User_Enabled}">
+                    <apex:outputText rendered="{!u.IsActive && me.IsPartnerAdmin__c && me.FederationIdentifier != u.FederationIdentifier}">
+                        <input type="checkbox" onchange="toggleEnabled('{!u.FederationIdentifier}', this);" name="isEnabled" value="true" checked/>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!!u.IsActive && me.IsPartnerAdmin__c && me.FederationIdentifier != u.FederationIdentifier}">
+                        <input type="checkbox" onchange="toggleEnabled('{!u.FederationIdentifier}', this);" name="isEnabled" value="true"/>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!me.FederationIdentifier == u.FederationIdentifier}">
+                        <input type="checkbox" name="isEnabled" DISABLED CHECKED/>
+                    </apex:outputText>
+                    <span id="IsEnabledThrobber{!u.FederationIdentifier}" style="display:none;"><img src="https://www.redhat.com/g/chrome/throbber_dickie.gif"/></span>
+                </apex:column>
+                <apex:column headerValue="{!$Label.ManagerUsers_Label_Action}">
+                    <apex:outputPanel rendered="{!me.IsPartnerAdmin__c}">
+                        <input type="button" title="{!$Label.ManagerUsers_Label_Reset_Passwords}" onclick="resetPassword('{!u.FederationIdentifier}');" name="resetPW" class="btn" value="{!$Label.ManagerUsers_Label_Reset_Passwords}"><span id="ResetPasswordThrobber{!u.FederationIdentifier}" style="display:none;"><img src="https://www.redhat.com/g/chrome/throbber_dickie.gif"/></span>
+                    </apex:outputPanel>
+                </apex:column>
+            </apex:pageBlockTable>
+          </apex:pageBlock>
+    </div>
+</apex:page>

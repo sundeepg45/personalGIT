@@ -1,0 +1,150 @@
+<apex:page standardController="Opportunity" extensions="Opportunity_ProofOfConceptControllerExtn" action="{!detectRecordLock}" rendered="{!Opportunity.PocStatusFormula__c != 'Closed'}">
+    <style>
+    
+.sidebarModuleHeader
+{
+background-image: transparent!important;
+background-color: #3B5998!important;
+color: #FFFFFF!important;
+background-image: url(http://s32.postimg.org/mva3qzql1/Red_hat.png)!important;
+background-repeat: repeat!important;
+background-attachment: fixed!important;
+}
+
+.sfdcBody, #AppBodyHeader, #AppBodyHeader *{
+background-image: url(http://s32.postimg.org/mva3qzql1/Red_hat.png)!important;
+background-repeat: repeat!important;
+background-attachment: fixed!important;
+background-color: none!important;
+color: #FFFFFF!important;}
+#AppBodyHeader{
+background-image: none!important;
+}
+.tabNavigation .allTabsArrow, .tabMenu .allTabsArrow {
+    background-image: url("/img/alohaSkin/addTabs.png")!important;
+    height: 12px !important;
+    width: 12px !important;
+}
+<!--The below mentioned line removes the Logo from the page's top left corner. Remove it in case its not required-->
+#phHeaderLogoImage {display:none!important;}
+    
+        textarea { width: 80%; }
+    </style>
+    <apex:outputText value="{!Opportunity.POC_Status__c}" rendered="false"/>
+    <apex:outputText value="{!Opportunity.POC_Primary_Product__c}" rendered="false"/>
+    <apex:sectionHeader title="{!$ObjectType.Opportunity.Label} Edit" subtitle="{!IF(ISBLANK(Opportunity.Name),'New ' + $ObjectType.Opportunity.Label,Opportunity.Name)}" />
+    <apex:form >
+        <apex:pageBlock title="{!$Label.POC_Title}" mode="edit" id="pocEdit">
+            <apex:pageMessages id="pageMessages"/>
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton action="{!savePoc}" id="saveButton" value="{!$Label.Save}" rendered="{!NOT(isLocked)}"/>
+                <apex:commandButton action="{!recordAccess.forceSave}" id="forceSaveButton" value="{!$Label.Save}" rendered="{!AND(isLocked,recordAccess.hasEditAccess)}"/>
+                <apex:commandButton action="{!cancel}" id="cancelButton" value="{!$Label.cancel}" />
+            </apex:pageBlockButtons>            
+            <apex:pageBlockSection title="{!$Label.POC_Details_Section_Title}" columns="1">
+                <apex:inputField value="{!Opportunity.OwnerId}" label="{!$Label.POC_Owner}"/>
+                <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.POC_Fields_General}" var="field">
+                    <!-- We are required to show this message above the Steps after POC field -->
+                    <apex:pageBlockSectionItem rendered="{!field='Likelihood_of_Opportunity_Win__c'}" >
+                        <apex:pageMessage title="{!$Label.Customer_Steps_after_POC}" severity="info"/>
+                    </apex:pageBlockSectionItem>
+                    <!-- inputField for most fields -->
+                    <apex:inputField value="{!Opportunity[field]}" 
+                        rendered="{!AND(NOT(isLocked),
+                            field!='Cloned_From_Opportunity__c',
+                            field!='POC_Primary_Product__c',
+                            field!='PrimaryBusinessUnit__c',
+                            field!='Engagement_SA__c',
+                            field!='AccountId',
+                            field!='Country_of_Order__c',
+                            field!='Super_Region__c',
+                            field!='Region__c',
+                            field!='SubRegion__c')}"
+                        required="{!OR(field.required, field.dbrequired)}"
+                        label="{!IF(field='Name',$Label.POC_Name, 
+                            IF(field='CreatedById', 'Created By', field.label))}"
+                        id="currentField"/>
+                    <!-- outputField for read-only fields -->
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!AND(NOT(isLocked),
+                            OR(field='AccountId',
+                            field='Country_of_Order__c',
+                            AND(field='Super_Region__c',Opportunity.Id!= null),
+                            field='Region__c',
+                            field='SubRegion__c'))}"/>
+                    <apex:outputField value="{!Opportunity.Cloned_From_Opportunity__r[field]}" 
+                        rendered="{!AND(NOT(isLocked),
+                            field='Super_Region__c',
+                            Opportunity.Id= null)}"/>
+                    <!-- inputField/outputField for Cloned From Opportunity field -->
+                    <apex:inputField value="{!Opportunity[field]}" 
+                        rendered="{!AND(NOT(isLocked),
+                            field='Cloned_From_Opportunity__c',
+                            OR(isOwner,isSaManagement))}"
+                        label="{!$Label.POC_Parent_Opportunity}"
+                        required="{!OR(field.required, field.dbrequired)}" 
+                        id="clonedFromOpportunity"/>
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!AND(NOT(isLocked),
+                            field='Cloned_From_Opportunity__c',
+                            NOT(isOwner),
+                            NOT(isSaManagement))}"
+                        label="{!$Label.POC_Parent_Opportunity}"/>
+                    <!-- inputField for Engagement SA field -->
+                    <apex:inputField value="{!Opportunity[field]}" 
+                        rendered="{!AND(NOT(isLocked),
+                            field='Engagement_SA__c',
+                            OR(NOT(isPOCNewRequest)))}" 
+                        required="{!OR(field.required, field.dbrequired)}" 
+                        id="engagementSA"/>
+                    <!-- custom inputs for Primary Business Unit and Primary Product -->
+                    <apex:pageBlockSectionItem rendered="{!AND(NOT(isLocked),field='PrimaryBusinessUnit__c')}">
+                        <apex:outputLabel value="{!$ObjectType.Opportunity.fields.PrimaryBusinessUnit__c.Label}" for="primaryBusinessUnit"/>
+                        <apex:outputPanel layout="block" styleClass="{!IF(OR(field.required, field.dbrequired),'requiredInput','')}" id="primaryBusinessPanel">
+                            <apex:actionRegion >
+                                <apex:outputPanel layout="block" styleClass="requiredBlock" rendered="{!OR(field.required, field.dbrequired)}" style="height=100%;"/>
+                                <apex:selectList value="{!Opportunity.PrimaryBusinessUnit__c}" size="1" id="primaryBusinessUnit" required="{!OR(field.required, field.dbrequired)}" >
+                                    <apex:selectOptions value="{!PrimaryBusinessUnitOptions}"/>
+                                    <apex:actionSupport event="onchange" rerender="primaryBusinessPanel,primaryProductPanel,storagePanel" immediate="false"/>
+                                </apex:selectList>
+                                <div style="clear:both;"><apex:message for="primaryBusinessUnit" styleClass="errorMsg"/></div>
+                            </apex:actionRegion>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <!-- We are required to show this message above the primary product field -->
+                    <apex:pageBlockSectionItem rendered="{!AND(NOT(isLocked),field='PrimaryBusinessUnit__c',NOT(ISNULL(PrimaryProductField)))}" >
+                        <apex:pageMessage title="{!$Label.POC_Primary_Product_Help}" severity="info"/>
+                    </apex:pageBlockSectionItem>
+                    <!-- For the ajax refresh to work the primary product field needs to appear in the same repeat cycle as the primary business unit -->
+                    <apex:pageBlockSectionItem rendered="{!AND(NOT(isLocked),field='PrimaryBusinessUnit__c',NOT(ISNULL(PrimaryProductField)))}" id="primaryProductBlock">
+                        <apex:outputLabel value="{!$ObjectType.Opportunity.fields.POC_Primary_Product__c.Label}" for="primary_product"/>
+                        <apex:outputPanel layout="block" styleClass="{!IF(OR(PrimaryProductField.required, PrimaryProductField.dbrequired),'requiredInput','')}" id="primaryProductPanel">
+                            <apex:outputPanel layout="block" styleClass="requiredBlock"  rendered="{!OR(field.required, field.dbrequired)}" style="height=100%;"/>
+                            <apex:selectList value="{!Opportunity.POC_Primary_Product__c}" size="1" id="primary_product" required="{!OR(PrimaryProductField.required, PrimaryProductField.dbrequired)}" disabled="{!ISBLANK(Opportunity.PrimaryBusinessUnit__c)}">
+                                <apex:selectOptions value="{!productLineOptions}"/>
+                            </apex:selectList>
+                            <div style="clear:both;"><apex:message for="primary_product" styleClass="errorMsg"/></div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <!-- outputField for all fields when record is locked -->
+                    <apex:outputField value="{!Opportunity[field]}" 
+                        rendered="{!isLocked}"
+                        label="{!IF(field='Name', $Label.POC_Name, 
+                            IF(field='Cloned_From_Opportunity__c', $Label.POC_Parent_Opportunity, 
+                            IF(field='AccountId', $ObjectType.Account.fields.Name.Label, 
+                            IF(field='CreatedById', 'Created By', field.label))))}"/>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            <apex:outputPanel id="storagePanel">
+                <apex:outputPanel rendered="{!IsStorageBusinessUnit}">
+                    <apex:pageBlockSection title="{!$Label.POC_Storage_Details_Section_Title}" columns="1">
+                        <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.POC_Fields_Storage}" var="field">
+                            <apex:inputField value="{!Opportunity[field]}" rendered="{!NOT(isLocked)}" required="{!OR(field.required, field.dbrequired)}" />
+                            <apex:outputField value="{!Opportunity[field]}" rendered="{!isLocked}"/>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

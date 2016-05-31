@@ -1,0 +1,14 @@
+<apex:page Controller="ContactRefRequestController" sidebar="false" showHeader="true"
+    tabStyle="Customer_Reference__c" apiVersion="13.0">
+
+    <apex:sectionHeader title="Contact Reference Request" subtitle=""/>
+    <apex:form >
+        <apex:pageBlock title="" id="thePageBlock" mode="view">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Done" action="{!doCancel}" immediate="true" />
+            </apex:pageBlockButtons>
+            <apex:pageMessage summary="Your request for the reference contact has been submitted to the reference owner."
+                severity="info" strength="1" /> 
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

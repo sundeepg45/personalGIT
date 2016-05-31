@@ -1,0 +1,118 @@
+<!--
+/*
+*--------------------------------RH C360 Project------------------------------------------------
+* @Name             Address_MergeRequestRecievedByCDH
+* @author           Neha Jaiswal
+* @date             
+* @description      Address Merge page 
+* ----------------------------------------------------------------------------------------------
+* Modification Log:
+* ----------------------------------------------------------------------------------------------
+* Developer                      Date                    Description                 
+* ---------                      ----                    -----------                 
+* Neha Jaiswal                15-5-2014                Created      
+*-----------------------------------------------------------------------------------------------
+*/
+-->
+
+<apex:page controller="Address_MergeRequestRecievedByCDH" sidebar="true">
+ <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+ <apex:stylesheet value="{!$Page.CommonStyleSheets}" />
+   <head>
+        <style>
+            addMergeTableStyle {
+                margin: 1em;
+                border-collapse: collapse;
+            }
+            
+            td,th {
+                padding: .3em;
+                border: 1px #ccc solid;
+            }
+            
+            thead {
+                
+            }
+            
+            #clickme tr.clicked {
+                background: #eee;
+            }
+      </style>
+  </head>  
+  <apex:form id="form">
+   <apex:sectionHeader title="Select two addresses to merge"/>
+     <apex:pageblock >
+        <apex:dataTable value="{!addressWrapperList}" var="add" id="addMergeTable"   
+                        rowClasses="odd,even" styleClass="addMergeTableStyle" align="center">
+           <apex:column >
+              <apex:facet name="header">Select</apex:facet>   
+              <apex:inputCheckbox value="{!add.CheckboxSelected}" id="checkBox" onchange="selectRecords(this.value,this.id);"/>
+           </apex:column>
+           <apex:column >
+              <apex:facet name="header">Address Line 1</apex:facet>
+              <apex:outputText value="{!add.AddressRecord.Address_Line1__c}" />
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header">Address Line 2</apex:facet>
+              <apex:outputText value="{!add.AddressRecord.Address_Line2__c}" />
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header">City</apex:facet>
+              <apex:outputText value="{!add.AddressRecord.City__c}" />
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header">State</apex:facet>
+              <apex:outputText value="{!add.AddressRecord.State__c}" />
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header">County</apex:facet>
+              <apex:outputText value="{!add.AddressRecord.County__c}" />
+          </apex:column>
+           <apex:column >
+              <apex:facet name="header">Zip Code</apex:facet>
+              <apex:outputText value="{!add.AddressRecord.Zip_Postal_Code__c}" />
+          </apex:column>
+           <apex:column >
+              <apex:facet name="header">Country</apex:facet>
+              <apex:outputText value="{!add.strCountryName}" />
+          </apex:column>
+       </apex:dataTable>
+       <br/>
+       <br/>
+             <div style="margin-left: 45%">
+                <input type="button" onclick="selectRecordsValidation();" value="Select" class="btn" />            
+                <apex:commandButton value="Cancel" action="{!Cancel}" />
+            </div>
+      <apex:actionFunction name="validated" action="{!OnSelectButtonClick}"  />
+    </apex:pageBlock>
+    </apex:form>
+<script>
+    function selectRecords(recordId,chkId){
+           console.log($('.apexp :checkbox:checked').length);
+           var noOfChecked = $('.apexp :checkbox:checked').length;
+           if(noOfChecked > 2)
+           {
+               document.getElementById(chkId).checked = false;
+               alert('Please select only two records to get merged');
+               return;
+           }
+           return;
+       }
+   
+   function selectRecordsValidation(){
+       var noOfChecked = $('.apexp :checkbox:checked').length;
+         if(noOfChecked == 1)
+       {
+           alert('Please select one more record to get merged.');
+           return false;  
+       }
+       else if(noOfChecked != 2)
+       {  
+           alert('Please select two records to get merged.');
+           return false;
+       }
+      
+       validated();
+   }
+</script>
+</apex:page>

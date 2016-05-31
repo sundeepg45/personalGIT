@@ -1,0 +1,112 @@
+<apex:page controller="OnboardingDisplayLeadStatusController" showHeader="false" standardStylesheets="false" sidebar="false">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Lead Status</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body id="join">
+
+    <div class="red-hat-content">
+        <div class="user-header">
+          <div class="container">
+            <div class="row">
+              <div class="row">
+                <div class="col-xs-5">
+                  <a href="#" class="logo">Redhat Partner Portal</a>
+                </div><!-- /.col-xs-5 -->
+                <div class="col-xs-7">
+                </div><!-- /.col-xs-7 -->
+              </div><!-- /.row -->
+            </div><!-- /.row -->
+          </div><!-- /.container -->
+        </div><!-- /.partner-portal-header -->
+
+        <div class="join-content-wrap user-signup">
+            <div class="container">
+                <div class="row">
+                    <div class="content-wrapper">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <apex:outputPanel layout="none">
+                                    <h1><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_App_To_Join}"/> {!Lead.Company__c}&nbsp; <apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Partner_Account}"/></h1>
+                                    <div id="onboardSectionTitle">
+                                        <h2><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Application_Status}"/>:</h2>
+                                    </div>
+                                </apex:outputPanel>
+                                <div class="onboarding-application-status-info">
+                                    <apex:outputPanel styleClass="rowform" layout="block">
+                                        <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Appl_Status}"/>:</apex:outputLabel>
+                                        <apex:outputPanel id="onboardingStatus">{!Lead.Partner_Onboarding_Status__c}</apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel styleClass="rowform" layout="block">
+                                        <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Company_Name}"/>:</apex:outputLabel>
+                                        <apex:outputPanel id="companyName">{!Lead.Company__c}</apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel styleClass="rowform" layout="block">
+                                        <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Partner_Type}"/>:</apex:outputLabel>
+                                        <apex:outputPanel id="partnerType">{!Lead.Partner_Type__r.Name}</apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel styleClass="rowform" layout="block">
+                                        <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Location}"/>:</apex:outputLabel>
+                                        <apex:outputPanel id="location">
+                                            <apex:outputText value="{!Lead.City__c}, " rendered="{!NOT(ISBLANK(Lead.City__c))}" />
+                                            <apex:outputText value="{!Lead.State_Province__r.Abbreviation__c}, " rendered="{!NOT(ISBLANK(Lead.State_Province__r))}" />
+                                            <apex:outputText value="{!Lead.Country__r.Name}" rendered="{!NOT(ISBLANK(Lead.Country__r.Name))}" />
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <c:Onboarding_Footer />
+    </div>
+</body>
+<style>
+    .red-hat-content .onboarding-application-status-info label{
+        margin-right: 15px;
+        font-family: "Overpass";
+    }
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+</style>
+</apex:page>

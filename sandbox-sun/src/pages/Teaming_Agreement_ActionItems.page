@@ -1,0 +1,51 @@
+<apex:page standardController="Teaming_Agreement__c" extensions="Teaming_Agreement_ActionItems" standardStylesheets="false">
+    <apex:pageMessages />   
+   <apex:pageBlock title="Action Items">
+     
+      <apex:pageblocksection columns="1"  >
+       Include the action items that will be taken to move the opportunity(s) associated with the teaming agreement to closure. The Action item list should be agreed upon by the partner and Red Hat account sales team and include owners and dates.
+        </apex:pageblocksection>
+            <table border="0" with="100%">
+              <tr>
+                    <th width="20%" margin="{0,6px,0,0}">Action Item</th>
+                    <th width="20%">Owner</th>
+                    <th width="20%">Due Date</th>
+                    <th width="20%">Completed</th>
+                    <th width="20%">Action</th>
+                </tr>
+                <apex:repeat var="aitems" value="{!teamingAgreementActions}">
+                 <apex:form id="form1"> 
+                <tr>
+                    <td width="20%"><apex:outputField id="actionItem" value="{!aitems.Action_Item__c}" /></td>
+                    <td width="20%"><apex:outputField id="owner" value="{!aitems.Red_Hat_Partner_Owner__c}"/></td>
+                    <td width="20%"><apex:outputText id="dueDate" value="{0,date,MM/dd/yyyy}" >      
+                    <apex:param value="{!aitems.Due_Date__c}" />
+                    </apex:outputText></td>
+           <td width="20%"><apex:outputText value="{!IF((!aitems.Completed__c=TRUE),'Not Completed','Completed')}" id="status"/></td>
+           <td><apex:outputText rendered="{!IF((!aitems.Completed__c=TRUE),'TRUE','FALSE')}" >
+           <apex:commandLink action="{!MarkComplete}" id="newteamingAgreementAction" value="Mark Complete" onclick="if(!confirm('Are you sure you want to Mark this as complete?')) return false;" >
+           <apex:param name="actionid" assignTo="{!actionid}" value="{!aitems.id}"/>
+           </apex:commandLink>
+            </apex:outputText></td>
+           
+                </tr>
+                 </apex:form>
+                </apex:repeat> 
+               
+                <apex:form id="form2" >
+                <tr>
+                <td><apex:inputField value="{!newteamingAgreementAction.Action_Item__c}" id="addActionItem"/></td>
+                <td><apex:inputField value="{!newteamingAgreementAction.Red_Hat_Partner_Owner__c}" id="addOwner"/></td>
+                <td><apex:inputField value="{!newteamingAgreementAction.Due_Date__c}" id="addDueDate"/></td>
+                <td><apex:inputField value="{!newteamingAgreementAction.Completed__c}" id="addStatus"/>Completed?</td>
+                <td>  <apex:commandbutton action="{!AddActionItem}" id="newteamingAgreementA" value="Add New item"/>
+          </td>
+                </tr>
+                </apex:form>
+           </table>
+
+    </apex:pageBlock>
+ 
+    
+
+</apex:page>

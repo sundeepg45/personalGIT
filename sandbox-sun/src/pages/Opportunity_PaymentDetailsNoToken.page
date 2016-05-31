@@ -1,0 +1,35 @@
+<apex:page standardController="Opportunity" extensions="Opportunity_PaymentDetailsController" tabStyle="Opportunity" showHeader="false" sidebar="false" action="{!redirect}">
+<script type="text/javascript">
+function reloadOppAndClose() {
+	try {
+		top.window.opener.location.reload();
+	}
+	catch(e) {
+		top.window.opener.location.hash = '#reload';
+	}
+	top.window.close();
+}
+</script>
+	<apex:pageMessages />
+	<apex:form >
+		<apex:pageBlock mode="edit" title="Add Credit Card Details">
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton id="cancel" value="{!$Label.CC_Cancel}" onclick="window.close();" immediate="true"/>
+				<apex:commandButton id="clearAndSave" value="{!$Label.Clear_and_Save}" action="{!clearAndSave}" immediate="true" oncomplete="reloadOppAndClose()"/>
+				<apex:commandButton id="save" value="Save" action="{!saveNoToken}" disabled="{!ISBLANK(opportunity.Operating_Unit__c)}" oncomplete="reloadOppAndClose()"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection title="{!$Label.CC_Card_Information}" columns="1" id="ccDetails">
+				<apex:inputField value="{!opportunity.CreditCardType__c}" required="true" rendered="{!NOT(ISBLANK(opportunity.Operating_Unit__c))}"/>
+				<apex:inputField value="{!opportunity.CreditCardType__c}" html-disabled="disabled" rendered="{!ISBLANK(opportunity.Operating_Unit__c)}"/>
+				<apex:inputField value="{!opportunity.Credit_Card_Number__c}" required="true" rendered="{!NOT(ISBLANK(opportunity.Operating_Unit__c))}"/>
+				<apex:inputField value="{!opportunity.Credit_Card_Number__c}" html-disabled="disabled" rendered="{!ISBLANK(opportunity.Operating_Unit__c)}"/>
+				<apex:inputField value="{!opportunity.ExpirationDate__c}" required="true" rendered="{!NOT(ISBLANK(opportunity.Operating_Unit__c))}"/>
+				<apex:inputField value="{!opportunity.ExpirationDate__c}" html-disabled="disabled" rendered="{!ISBLANK(opportunity.Operating_Unit__c)}"/>
+				<apex:inputField value="{!opportunity.NameOnCard__c}" required="true" rendered="{!NOT(ISBLANK(opportunity.Operating_Unit__c))}"/>
+				<apex:inputField value="{!opportunity.NameOnCard__c}" html-disabled="disabled" rendered="{!ISBLANK(opportunity.Operating_Unit__c)}"/>
+				<apex:inputField value="{!opportunity.CC_SpecialInstructions__c}" rendered="{!NOT(ISBLANK(opportunity.Operating_Unit__c))}"/>
+				<apex:inputField value="{!opportunity.CC_SpecialInstructions__c}" html-disabled="disabled" rendered="{!ISBLANK(opportunity.Operating_Unit__c)}"/>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

@@ -1,0 +1,13 @@
+<apex:page standardController="Account" extensions="PartnerOrSalesAccountController" showHeader="true" sidebar="true">
+    <apex:form >
+        <apex:pageBlock title="Please select the type of account to create...">
+            <ul>
+                <li style="margin-bottom: 5px;"><apex:commandLink id="salesAccount" action="{!createSalesAccount}">Sales Account</apex:commandLink></li>
+                <li><apex:commandLink id="partnerAccount" action="{!createPartnerAccount}">Partner Account</apex:commandLink></li>
+            </ul>
+            <apex:pageBlockButtons id="commandButtons" location="bottom">
+                <apex:commandButton id="cancel" action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

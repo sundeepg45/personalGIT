@@ -1,0 +1,726 @@
+<apex:page standardController="Address__c" id="mainPage" extensions="AddressCreateEditExtensions"  >
+        <!-- set the page header -->
+        <apex:sectionHeader title="{!if(createModeFlag == true,'New Address','Edit Address')}" />
+        
+        <!-- Error page messages -->
+        <apex:outputPanel id="pageMessages">
+            <apex:pageMessages />
+        </apex:outputPanel>
+        <!-- include Data table libraries -->
+        <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+        
+        <!-- get google map libraries -->
+        <script src="https://maps.google.com/maps/api/js?sensor=false" type="text/javascript"></script>
+        
+        <!-- style sheets -->
+        <style>
+            #map_canvas {
+                width: 675px;
+                height: 500px;
+            }
+            
+            .inputFieldWidth{
+                width : 375px;
+            }
+            
+            .hideThis{
+                display:none;
+            }
+            
+            .buttonClass{
+                padding : 5px 10px;
+            }
+        </style>
+        
+        <!-- flag div to check if the address is validated -->
+        <div class="hideThis" id="validateAddressHere" >{!isValid}</div>
+        <div style="width:45%;float:left">
+        <!-- form starts here -->
+        <apex:form id="form" >
+            <apex:pageBlock id="mainBlock" >
+                
+                <apex:pageBlockSection columns="1" id="salesAccSection" title="Sales Account Details">
+                    <!-- Show the sales account field as editable only when the record is being created -->
+                    <apex:pageBlockSectionItem rendered="{!If(createModeFlag == true,true,false)}">
+                        <apex:outputLabel style="margin-left:64px" value="Sales Account" />
+                        <!-- <apex:inputField styleClass="inputFieldWidth" id="salesAccount"  value="{!addressRecord.Sales_Account__c}"/> -->
+                        <apex:outputText value="{!HTMLENCODE(accountName)}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem rendered="{!If(createModeFlag == false,true,false)}">
+                        <apex:outputLabel style="margin-left:64px" value="Sales Account" />
+                        <apex:outputField id="salesAccountReadonly" rendered="{!If(createModeFlag == false,true,false)}" value="{!addressRecord.Sales_Account__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <!-- End of Sales Account -->
+                </apex:pageBlockSection>
+                
+                <!-- Address Fields -->
+                <div id="inputFields">
+                    <apex:pageBlockSection title="Location Details" id="addressSection" columns="1">
+                        <apex:inputField styleClass="inputFieldWidth" id="addressLine1" value="{!addressRecord.Address_Line1__c}"  required="{!if(addressline1Mandatory==true,true,false)}" />
+                        <apex:inputField styleClass="inputFieldWidth" id="addressLine2" value="{!addressRecord.Address_Line2__c}"  required="{!if(addressline2Mandatory==true,true,false)}" />
+                        <apex:inputField styleClass="inputFieldWidth" id="addressLine3" value="{!addressRecord.Address_Line3__c}"  required="{!if(addressline3Mandatory==true,true,false)}" />
+                        <apex:inputField styleClass="inputFieldWidth" id="addressLine4" value="{!addressRecord.Address_Line4__c}"  required="{!if(addressline4Mandatory==true,true,false)}" />
+                        <apex:pageBlockSectionItem id="countrySection" >
+                            <apex:outputLabel id="countryValLabel" value="Country" />
+                            <apex:outputPanel >
+                                <apex:outputPanel styleClass="requiredInput" layout="block" >  
+                                    <apex:outputPanel styleClass="requiredBlock"/>    
+                                    
+                                        <apex:selectList value="{!countryName}" styleClass="inputFieldWidth" required="true" id="countryVal" onchange="getStates(this.value)" size="1">
+                                            <apex:selectOptions value="{!CountryList}"></apex:selectOptions>
+                                        </apex:selectList>
+                                </apex:outputPanel> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                
+                    <!-- ********** City ************ -->
+                    <apex:pageBlockSection id="cityField">
+                        <apex:pageBlockSectionItem id="citySection">
+                            <apex:outputLabel id="cityLabel" style="margin-left:70px" value="City" />
+                            <apex:inputField id="city" styleClass="inputFieldWidth" value="{!addressRecord.City__c}"  required="{!if(cityMandatory==true,true,false)}" />
+                        </apex:pageBlockSectionItem>
+                   </apex:pageBlockSection>
+                    
+                    <!-- ********** City Ends ************ -->
+                    
+                    
+                    <!-- ********** County ************ -->
+                    <!--
+                    <span id="countyList">
+                        <apex:pageBlockSection id="countyListDropDown">
+                            <apex:pageBlockSectionItem id="countyListSection" rendered="{!If(AND (countyVisibility == true,countyList.size > 1) ,true,false)}">
+                                <apex:outputLabel style="margin-left:50px" id="countyListValLabel" value="County" />
+                                <apex:selectList value="{!stateTextValue}" styleClass="inputFieldWidth" id="countyListVal" size="1">
+                                    <apex:selectOptions value="{!countyList}"></apex:selectOptions>
+                                </apex:selectList>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </span> 
+                    -->
+                    <span id="countyText">
+                        <apex:pageBlockSection id="countyListText">
+                            <apex:pageBlockSectionItem id="countyTextSection" rendered="{!If(AND (countyVisibility== true,countyList.size < 2) ,true,false)}">
+                                <apex:outputLabel style="margin-left:50px" id="countyTextValLabel" value="County" />
+                                <apex:outputPanel >
+                                    <apex:outputPanel style="width:3px;height:25px;background:#CC0000;position:absolute;margin-left:-5px" rendered="{!if(countyMandatory == true,true,false)}" />  
+                                    <apex:inputText styleClass="inputFieldWidth" id="countyTextVal" value="{!countyTextValue}" required="{!if(countyMandatory == true,true,false)}" />
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </span>
+                    <!-- ********** County Ends ************ -->         
+                    
+                    
+                    <!-- ********** Province ************ -->
+                        <!--
+                            <apex:outputPanel styleClass="requiredInput" layout="block" id="pwPanel" >
+                            <apex:outputPanel styleClass="requiredBlock"/>
+                            <apex:selectList value="{!countries}" multiselect="false" size="1">
+                        -->
+                        
+                        <apex:pageBlockSection id="provinceListDropDown">
+                            <apex:pageBlockSectionItem id="provinceListSection" rendered="{!If(AND(provinceVisibility == true, provinceList.size > 1),true,false)}">
+                                <apex:outputLabel style="margin-left:42px" id="provinceListValLabel" value="Province" />
+                                <apex:outputPanel >
+                                   <apex:outputPanel style="width:3px;height:25px;background:#CC0000;position:absolute;margin-left:-5px" rendered="{!if(provinceMandatory == true,true,false)}" />  
+                                   <apex:selectList value="{!provinceTextValue}" styleClass="inputFieldWidth" required="{!if(provinceMandatory == true,true,false)}" id="provinceListVal" size="1">
+                                        <apex:selectOptions value="{!provinceList}"></apex:selectOptions>
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    
+                        <apex:pageBlockSection id="provinceListText">
+                            <apex:pageBlockSectionItem id="provinceTextSection" rendered="{!If(AND(provinceVisibility == true, provinceList.size < 2),true,false)}">
+                                <apex:outputLabel style="margin-left:42px" id="provinceTextValLabel" value="Province" />
+                                <apex:outputPanel >
+                                    <apex:outputPanel style="width:3px;height:25px;background:#CC0000;position:absolute;margin-left:-5px" rendered="{!if(provinceMandatory == true,true,false)}" />  
+                                    <apex:inputText styleClass="inputFieldWidth" id="provinceTextVal" value="{!provinceTextValue}" required="{!if(provinceMandatory == true,true,false)}" />
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    
+                    <!-- ********** Province Ends ************ --> 
+                    
+                    
+                    <!-- ********** State ************ -->
+                    <span id="stateList">
+                        <apex:pageBlockSection id="stateListDropDown">
+                            <apex:pageBlockSectionItem id="stateListSection" rendered="{!If(AND (stateVisibility == true,stateList.size > 1),true,false)}">
+                                <apex:outputLabel style="margin-left:65px" id="stateListValLabel" value="State" />
+                                <apex:outputPanel >
+                                    <apex:outputPanel style="width:3px;height:25px;background:#CC0000;position:absolute;margin-left:-5px" rendered="{!if(stateMandatory == true,true,false)}" />  
+                                    <apex:selectList value="{!stateTextValue}" styleClass="inputFieldWidth" required="{!if(stateMandatory == true,true,false)}" id="stateListVal" size="1">
+                                        <apex:selectOptions value="{!stateList}"></apex:selectOptions>
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </span>
+                    <span id="stateText">
+                        <apex:pageBlockSection id="stateListText">
+                            <apex:pageBlockSectionItem id="stateTextSection" rendered="{!If(AND (stateVisibility== true,stateList.size < 2) ,true,false)}">
+                                <apex:outputLabel style="margin-left:65px" id="stateTextValLabel" value="State" />
+                                <apex:outputPanel >
+                                    <apex:outputPanel style="width:3px;height:25px;background:#CC0000;position:absolute;margin-left:-5px" rendered="{!if(stateMandatory == true,true,false)}" />  
+                                    <apex:inputText styleClass="inputFieldWidth" id="stateTextVal" value="{!stateTextValue}" required="{!if(stateMandatory == true,true,false)}" />
+                                </apex:outputPanel>
+                              </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </span>
+                    <!-- ********** State Ends ************ --> 
+                    
+                    <!-- ********** Zip / Postal ************ -->  
+                        
+                    <apex:pageBlockSection id="ZipPostalField">
+                        <apex:pageBlockSectionItem id="postalSection" rendered="{!if(postalCodeVisibilty==true,true,false)}">
+                            <apex:outputLabel style="margin-left:73px" id="zipPostalValLabel" value="Zip / Postal Code" />
+                            <apex:inputField styleClass="inputFieldWidth" id="zipPostalVal" value="{!addressRecord.Zip_Postal_Code__c}" required="{!if(postalCodeMandatory==true,true,false)}" />
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                    <!-- ********** Zip / Postal Ends ************ -->
+                    
+                    <!-- End of Address Fields -->
+                </div>    
+                
+                
+                <apex:pageBlockSection id="AddressUsage" columns="2" title="Address Usage">
+                    <!-- Bill to Address -->
+                    <apex:pageBlockSectionItem id="billToSection" >
+                        <apex:outputLabel style="margin-left:64px" value="Bill To Address" />
+                        <apex:inputField id="BillToAddress"  value="{!addressRecord.Bill_To_Address__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <!-- Ship to Address -->
+                    <apex:pageBlockSectionItem id="shipToSection" >
+                        <apex:outputLabel style="margin-left:64px" value="Ship To Address" />
+                        <apex:inputField id="shipToAddress" value="{!addressRecord.Ship_To_Address__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <!-- Entitle to Address -->
+                    <apex:pageBlockSectionItem id="entitleToSection" >
+                        <apex:outputLabel style="margin-left:64px" value="Entitle To Address" />
+                        <apex:inputField id="entitleToAddress" value="{!addressRecord.Entitle_To_Address__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <!-- Sold to Address -->
+                    <apex:pageBlockSectionItem id="soldToSection" >
+                        <apex:outputLabel style="margin-left:64px" value="Sold To Address" />
+                        <apex:inputField id="soldToAddress" value="{!addressRecord.Sold_To_Address__c}"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <!-- Required for styling purpose -->
+                    <apex:pageBlockSectionItem >  
+                        <apex:outputLabel style="margin-left:64px;display:none" value="novalue" />       
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel style="margin-left:64px;display:none" value="novalue" />       
+                    </apex:pageBlockSectionItem>
+                    <!--<apex:pageBlockSectionItem >
+                        <apex:outputLabel style="margin-left:64px;display:none" value="novalue" />       
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel style="margin-left:64px;display:none" value="novalue" />       
+                    </apex:pageBlockSectionItem>-->
+                    
+                    <apex:pageBlockSectionItem id="skipValidation">
+                        <!--<apex:outputLabel value="Skip Validation" /> -->
+                        <apex:inputField id="skipVal" value="{!addressRecord.Not_validated_by_Google__c}" style="display:none"/>      
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>  
+                
+                <!-- Page Buttons -->
+                    <button type="button" style="margin-left:150px;margin-top:15px" class="buttonClass" onclick="getAddressDetails('Yes')">Validate Address </button>
+                    <button type="button" style="margin-left:25px;" class="buttonClass" onclick="checkValidation();" id="saveBut">Save </button>
+                    <button type="button" style="margin-left:25px;" onclick="Cancel();" class="buttonClass">Cancel</button>
+                <!-- End of Page Buttons -->
+            </apex:pageBlock> 
+            <!-- Action Functions -->
+                <apex:actionfunction name="saveDetails" action="{!saveAddressDetails}" reRender="AFPanel,pageMessages" />  
+                <apex:actionfunction name="Cancel" action="{!Cancel}" />   
+            <!-- End of Action functions -->
+        </apex:form>
+        </div>
+        <!-- Map Section -->
+        <div style="float:left;margin-left:10px">
+            <div id="map_canvas"></div>
+        </div>
+        <!-- End of Map section -->
+        <apex:outputPanel id="AFPanel"></apex:outputPanel>
+        
+        <!-- Action Fucntions // This is another section for actionFunction as I want to avoid view state issues -->
+        <apex:form >
+            <apex:actionfunction name="getAllStates" action="{!getAllStates}" rerender="cityField,countyListDropDown,countyListText,provinceListDropDown,provinceListText,stateListDropDown,stateListText,ZipPostalField" >
+                <apex:param name="countryName" value="countryName" />
+            </apex:actionfunction>
+            
+            <!-- <apex:actionFunction oncomplete="setValuesToFields();" name="setAdminLevelOne" action="{!setSelectListValues}" reRender="countyListDropDown,countyListText,provinceListDropDown,provinceListText,stateListDropDown,stateListText" >
+                <apex:param name="adminType" value="adminType" />
+                <apex:param name="adminPlaceVal" value="adminPlaceVal" />
+            </apex:actionfunction> -->
+        </apex:form>
+        <!-- End of Action functions -->
+        
+        <!-- Script starts here -->
+        <script>
+            document.getElementById('img_mainPage:form:mainBlock:addressSection').style.display  = 'none';
+            document.getElementById('img_mainPage:form:mainBlock:salesAccSection').style.display  = 'none';
+            document.getElementById('img_mainPage:form:mainBlock:AddressUsage').style.display  = 'none';
+            
+            var confirmCancel = false;
+            
+            // show the map if the record is being edited.
+            function initialize(){
+                if('{!createModeFlag}' == 'true')
+                    return;
+                getAddressDetails('No');    
+            }
+            
+            window.onload = function(){
+                document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").setAttribute("disabled", "true");
+                //document.getElementById("saveBut").setAttribute("disabled", "true");
+            }
+            
+            initialize();
+            
+            // check if address is validated before saving.
+            function checkValidation(){
+                console.log($('#validateAddressHere').html());
+                if($('#validateAddressHere').html() == 'false'){
+                    
+                    if(confirmCancel && document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").checked == true){
+                        if(document.getElementById('mainPage:form:mainBlock:AddressUsage:billToSection:BillToAddress').checked == false && document.getElementById('mainPage:form:mainBlock:AddressUsage:shipToSection:shipToAddress').checked == false && document.getElementById('mainPage:form:mainBlock:AddressUsage:entitleToSection:entitleToAddress').checked == false && document.getElementById('mainPage:form:mainBlock:AddressUsage:soldToSection:soldToAddress').checked == false){
+                            alert('Please specify usage of this address');
+                            return;    
+                        }
+                        saveDetails();
+                        return;
+                    }
+                    
+                    alert('Please validate your address');
+                    return;
+                }
+                else if(document.getElementById('mainPage:form:mainBlock:AddressUsage:billToSection:BillToAddress').checked == false && document.getElementById('mainPage:form:mainBlock:AddressUsage:shipToSection:shipToAddress').checked == false && document.getElementById('mainPage:form:mainBlock:AddressUsage:entitleToSection:entitleToAddress').checked == false && document.getElementById('mainPage:form:mainBlock:AddressUsage:soldToSection:soldToAddress').checked == false){
+                    alert('Please specify usage of this address');
+                    return;    
+                }
+                else{
+                    //startLoading();
+                    saveDetails();
+                }
+            }
+            
+            // get all states for the selected country
+            function getStates(countryName){
+                if(countryName == '')
+                return;
+                getAllStates(countryName);
+            }
+            
+            elm = new Array();
+            addressLabel = '';
+            
+            // get address details
+            function getAddressDetails(confirmationReqd){
+                elm = [];
+                
+                // get all id of the address feilds dynamically
+                $('#inputFields input[id]').each(function(){
+                     elm.push($(this).attr('id'));
+                });
+                $('#inputFields select[id]').each(function(){
+                     elm.push($(this).attr('id'));
+                });
+                lastElmVal =  elm[elm.length - 1];
+                res = lastElmVal.split(':');
+                resVals = res[res.length - 1];
+                if(resVals == 'countryVal'){
+                    addressDetails = '';
+                    temp = elm[elm.length - 1];
+                    elm[elm.length - 1] = elm[elm.length - 2];
+                    elm[elm.length - 2] = temp;
+                    
+                }else{
+                    addressDetails = '';
+                    temp = elm[elm.length - 1];
+                    elm[elm.length - 1] = elm[elm.length - 3];
+                    elm[elm.length - 3] = temp;
+                }
+                //return if no country is selected
+                if(document.getElementById('mainPage:form:mainBlock:addressSection:countrySection:countryVal').value == ''){
+                    return;
+                }
+                addressLabels = new Array();
+                // Get all address details
+                for(i = 0; i < elm.length;i++){
+                    if(document.getElementById(elm[i]).value != ''){
+                        addressDetails = addressDetails+','+document.getElementById(elm[i]).value;
+                   }
+                    if(i > 3){
+                        if(document.getElementById(elm[i]+'Label').innerHTML != null)
+                            addressLabels.push(document.getElementById(elm[i]+'Label').innerHTML.replace(/\n/g, ""));
+                    }   
+                    
+                }
+              //added for testing @Ansh 12/09/2014  
+                //alert('---addressDetails #1---'+addressDetails);
+                addressDetails = addressDetails.slice(1);
+                validateAddress(confirmationReqd,addressDetails,elm);
+              //added for testing @Ansh 12/09/2014  
+                //alert('---addressDetails #2---'+addressDetails);
+            }        
+            
+            formattedAddress = '';
+            
+            // Get address details from Google API
+            function validateAddress(confirmationReqd,addressDetails,elm){
+                
+                $("#map_canvas").html('loading...');
+                CurrentAddress = addressDetails.replace(/\n/g, "");
+             //added for testing @Ansh 12/09/2014  
+                //alert('---CurrentAddress---'+CurrentAddress);
+                //console.log(CurrentAddress);
+                // Create a new Google geocoder
+                var geocoder;
+                try{
+                    geocoder = new google.maps.Geocoder();
+                }catch(err){
+                    alert('Error occurred, Please reload the page');
+                    return;
+                }
+                geocoder.geocode({ 'address': CurrentAddress }, function (results, status) {
+                    //console.log('geocoder entered');
+                    // The code below only gets run after a successful Google service call has completed.
+                    // Because this is an asynchronous call, the validator has already returned a 'true' result
+                    // to supress an error message and then cancelled the form submission.  The code below
+                    // needs to fetch the true validation from the Google service and then re-execute the
+                    // jQuery form validator to display the error message.  Futhermore, if the form was
+                    // being submitted, the code below needs to resume that submit.
+        
+                    // Google reported a valid geocoded address
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        //console.log('success');
+                        latitude = results[0].geometry.location.lat();
+                        longitude = results[0].geometry.location.lng();
+                        myLatlng = new google.maps.LatLng(latitude, longitude);
+                        // Get the formatted Google result
+                        address = results[0].formatted_address;
+                      
+                      //added for testing @Ansh 12/09/2014  
+                        //alert('---results---'+results);  
+                        //alert('---results[0]---'+results[0]); 
+                        //alert('---results[0].formatted_address---'+results[0].formatted_address);
+                        //alert('---results[0].address_components---'+results[0].address_components);
+                        //alert('---results[0].address_components[0].types[0]---'+results[0].address_components[0].types[0]);
+                        //alert('---results[0].address_components[0].long_name---'+results[0].address_components[0].long_name);
+                        //alert('---address---'+address);   
+                        
+                        formattedAddress = address;
+                        
+                        attrs = new Object();                   
+                        for (var i = 0; i < results[0].address_components.length; i++){
+                            attrs[results[0].address_components[i].types[0]] = results[0].address_components[i].long_name;
+                        }
+                        console.log('-----------'+JSON.stringify(attrs));
+                        console.log('-----------attrs.toString()  '+attrs.toString());
+                        
+                      //added for testing @Ansh 12/09/2014  
+                        //alert('---JSON.stringify(attrs)---'+JSON.stringify(attrs));
+                        //alert('---attrs.toString()---'+attrs.toString());
+                        
+                        localAddress = new Array();
+                        for(i=0;i<=3;i++){
+                            if(document.getElementById(elm[i]).value != null && document.getElementById(elm[i]).value != ''){
+                                localAddress.push(document.getElementById(elm[i]).value);    
+                            }
+                        }
+                        localAddressString = localAddress.join(",");
+                      
+                      //added for testing @Ansh 12/09/2014  
+                        //alert('---addressLabels---'+addressLabels);  
+                        //alert('---addressLabels.length---'+addressLabels.length); 
+                           
+                        // set the address to be validated
+                        message = 'Street : '+localAddressString+'\n';
+                        if(addressLabels.length == 4){
+                            //alert('1');
+                            if(attrs.locality)
+                                message += addressLabels[0]+': '+attrs.locality;
+                            if(attrs.administrative_area_level_2){
+                                message += ','+attrs.administrative_area_level_2+'\n';
+                            }
+                            if(attrs.administrative_area_level_1)
+                                message += addressLabels[1]+': '+attrs.administrative_area_level_1+'\n';
+                            if(attrs.country)
+                                message += addressLabels[2]+': '+attrs.country+'\n';
+                            if(attrs.postal_code)
+                                message += addressLabels[3]+': '+attrs.postal_code;
+                            message += '\n\n Is this correct?';
+                        }else if(addressLabels.length == 5){
+                            //alert('2');
+                            if(attrs.locality)
+                                message += addressLabels[0]+': '+attrs.locality+'\n';
+                            if(attrs.administrative_area_level_2){
+                                message += addressLabels[1]+': '+attrs.administrative_area_level_2+'\n';
+                            }
+                            if(attrs.administrative_area_level_1)
+                                message += addressLabels[2]+': '+attrs.administrative_area_level_1+'\n';
+                            if(attrs.country)
+                                message += addressLabels[3]+': '+attrs.country+'\n';
+                            if(attrs.postal_code)
+                                message += addressLabels[4]+': '+attrs.postal_code;
+                            message += '\n\n Is this correct?';
+                        }else{
+                            //alert('3');
+                            if(attrs.locality)
+                                message += addressLabels[0]+': '+attrs.locality+'\n';
+                            if(attrs.administrative_area_level_3){
+                                message += addressLabels[1]+': '+attrs.administrative_area_level_3+'\n';
+                            }
+                            if(attrs.administrative_area_level_2){
+                                message += addressLabels[2]+': '+attrs.administrative_area_level_2+'\n';
+                            }
+                            if(attrs.administrative_area_level_1)
+                                message += addressLabels[3]+': '+attrs.administrative_area_level_1+'\n';
+                            if(attrs.postal_code)
+                                message += addressLabels[4]+': '+attrs.country+'\n';
+                            if(attrs.postal_code)
+                                message += addressLabels[5]+': '+attrs.postal_code;
+                            message += '\n\n Is this correct?';
+                        
+                        }
+                        if(confirmationReqd == 'Yes'){
+                            r = confirm(message);
+                            // if the address is true, set the picklist values as text values
+                            if (r == true) {
+                                console.log('============1'+resVals);
+                                console.log('---------------------------------------------attrs.administrative_area_level_1 : '+attrs.administrative_area_level_1+'------');
+                                $('#validateAddressHere').html('true');
+                                document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").checked = false;
+                                /*if(resVals == 'stateListVal'){
+                                    //adminLevelPlace = attrs.administrative_area_level_1;
+                                    //setAdminLevelOne('State'); 
+                                }else if(resVals == 'countyListVal'){
+                                    //adminLevelPlace = attrs.administrative_area_level_1;
+                                    //setAdminLevelOne('County');    
+                                }else if(resVals == 'provinceListVal'){
+                                    //adminLevelPlace = attrs.administrative_area_level_1;
+                                    //setAdminLevelOne('Province');     
+                                }
+                                else{
+                                ********/
+                                    console.log('============2');
+                                   if(attrs.locality){
+                                       if(attrs.locality != 'undefined'){
+                                           document.getElementById('mainPage:form:mainBlock:cityField:citySection:city').value = attrs.locality;
+                                       }
+                                   }
+                                   if(attrs.postal_code){
+                                        if(attrs.postal_code != 'undefined'){
+                                            document.getElementById('mainPage:form:mainBlock:ZipPostalField:postalSection:zipPostalVal').value = attrs.postal_code;
+                                        }
+                                   }
+                                   if(addressLabels.length == 4){
+                                       //alert('---first if---'+addressLabels);
+                                       if(addressLabels[1] == 'Province'){
+                                            if(attrs.administrative_area_level_1){
+                                                if(attrs.administrative_area_level_1 != 'undefined'){
+                                                    if(document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_1;
+                                                    if(document.getElementById('mainPage:form:mainBlock:provinceListDropDown:provinceListSection:provinceListVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:provinceListDropDown:provinceListSection:provinceListVal').value = attrs.administrative_area_level_1;
+                                                }
+                                            }
+                                       }else{
+                                            if(attrs.administrative_area_level_1){
+                                                if(attrs.administrative_area_level_1 != 'undefined'){
+                                                    if(document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+                                                    if(document.getElementById('mainPage:form:mainBlock:stateListDropDown:stateListSection:stateListVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:stateListDropDown:stateListSection:stateListVal').value = attrs.administrative_area_level_1;
+                                                }
+                                            }
+                                       }  
+                                   }
+                                   else{
+                                       //alert('---first else--'+addressLabels);
+                                        if(attrs.administrative_area_level_1){
+                                            if(attrs.administrative_area_level_1 != 'undefined'){
+                                                if(document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal') != null)
+                                                    document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+                                                if(document.getElementById('mainPage:form:mainBlock:stateListDropDown:stateListSection:stateListVal') != null)
+                                                    document.getElementById('mainPage:form:mainBlock:stateListDropDown:stateListSection:stateListVal').value = attrs.administrative_area_level_1;
+                                            }
+                                        }
+                                   }
+                                   if(addressLabels.length == 6){
+                                       //alert('---second if---'+addressLabels);
+                                       if(attrs.administrative_area_level_2){
+                                            if(attrs.administrative_area_level_2 != 'undefined'){   
+                                                if(document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal') != null)
+                                                    document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;
+                                                if(document.getElementById('mainPage:form:mainBlock:provinceListDropDown:provinceListSection:provinceListVal') != null)
+                                                    document.getElementById('mainPage:form:mainBlock:provinceListDropDown:provinceListSection:provinceListVal').value = attrs.administrative_area_level_2;
+                                            }
+                                       }
+                                       if(attrs.administrative_area_level_3){
+                                            if(attrs.administrative_area_level_3 != 'undefined'){
+                                                if(document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal') != null)
+                                                    document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_3.replace('County','');
+                                                if(document.getElementById('mainPage:form:mainBlock:countyListDropDown:countyListSection:countyListVal') != null)
+                                                    document.getElementById('mainPage:form:mainBlock:countyListDropDown:countyListSection:countyListVal').value = attrs.administrative_area_level_3.replace('County','');
+                                            }
+                                       }
+                                   }
+                                   if(addressLabels.length == 5){
+                                       //alert('---third if---'+addressLabels);
+                                       if(attrs.administrative_area_level_2){
+                                           if(addressLabels[1] == 'Province'){
+                                                if(attrs.administrative_area_level_2 != 'undefined'){
+                                                    if(document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;
+                                                    if(document.getElementById('mainPage:form:mainBlock:provinceListDropDown:provinceListSection:provinceListVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:provinceListDropDown:provinceListSection:provinceListVal').value = attrs.administrative_area_level_2;    
+                                                }
+                                            }else{
+                                                if(attrs.administrative_area_level_2 != 'undefined'){
+                                                    if(document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_2.replace('County','');
+                                                    if(document.getElementById('mainPage:form:mainBlock:countyListDropDown:countyListSection:countyListVal') != null)
+                                                        document.getElementById('mainPage:form:mainBlock:countyListDropDown:countyListSection:countyListVal').value = attrs.administrative_area_level_2.replace('County','');
+                                                }
+                                            }
+                                       }
+                                   }
+                                   console.log('============2');        
+                                //}
+                            } else {
+                                console.log('============errrrr');
+                                $('#validateAddressHere').html('false');
+                                $("#map_canvas").html('Address Not found !!!!'); 
+                                confirmCancel = true;
+                                document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").removeAttribute("disabled");
+                                document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").checked = true;
+                            }
+                        }
+                        // Count the commas in the fomatted address.
+                        // This doesnt look great, but it helps us understand how specific the geocoded address
+                        // is.  For example, "CA" will geocde to "California, USA".
+                       // numCommas = address.match(/,/g) != null ? address.match(/,/g).length : 0 ;
+        
+                        // A full street address will have at least 3 commas.  Alternate techniques involve
+                        // fetching the address_components returned by Google Maps.  That code looks even more ugly.
+                        if (r == true) {
+        
+                            // Replace the first comma found with a line-break
+                            address = address.replace(/, /, "\n");
+        
+                            // Check for the map_canvas, if it exists then position the Google Map
+                            $("#map_canvas").show();
+                            Map("map_canvas", results[0].geometry.location);
+                           
+        
+                         } else {
+                            // Google Maps was able to geocode the address, but it wasnt specific
+                            // enough (not enough commas) to be a valid street address.
+                            $("#map_canvas").html('Address Not found');
+                            $('#validateAddressHere').html('false');
+                        }
+        
+                        // Otherwise the address is invalid
+                    } else {
+                        $("#map_canvas").html('Address Not found');
+                        $('#validateAddressHere').html('false');
+                                confirmCancel = true;
+                                document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").removeAttribute("disabled");
+                                document.getElementById("{!$Component.mainPage:form:mainBlock:AddressUsage:skipValidation:skipVal}").checked = true;
+                    }
+                });
+            }
+            
+            // Position the Google Map
+            function Map(elementId, geolocation) {
+                var myOptions = {
+                    zoom: 15,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                }
+                var map = new google.maps.Map(document.getElementById(elementId), myOptions);
+                map.setCenter(geolocation);
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    title: "lat: " + latitude + " long: " + longitude
+                });
+                marker.setMap(map);
+                var infowindow = new google.maps.InfoWindow({ content: "<b>"+formattedAddress+"</b>" });
+                infowindow.open(map, marker);
+            }
+            
+            // set values to text fields once the pick list fields are converted to text fields.
+            function setValuesToFields(){
+                // alert('hello');
+                if(attrs.locality){
+                    if(attrs.locality != 'undefined'){
+                        document.getElementById('mainPage:form:mainBlock:cityField:citySection:city').value = attrs.locality;
+                    }
+                }
+                if(attrs.postal_code)
+                    if(attrs.postal_code != 'undefined'){
+                        document.getElementById('mainPage:form:mainBlock:ZipPostalField:postalSection:zipPostalVal').value = attrs.postal_code;
+                    }
+                if(addressLabels.length == 4){
+                    if(addressLabels[1] == 'Province'){
+                        if(attrs.administrative_area_level_1){
+                            if(attrs.administrative_area_level_1 != 'undefined'){   
+                                document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_1;
+                            }
+                        }
+                    }else{
+                        if(attrs.administrative_area_level_1){
+                            if(attrs.administrative_area_level_1 != 'undefined'){
+                                document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+                            }
+                        }
+                    }  
+                }
+                else{
+                    if(attrs.administrative_area_level_1){
+                        if(attrs.administrative_area_level_1 != 'undefined'){
+                            document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+                        }
+                    }
+                }
+                if(addressLabels.length == 6){
+                    if(attrs.administrative_area_level_2){
+                        if(attrs.administrative_area_level_2 != 'undefined'){
+                            document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;
+                        }
+                    }
+                    if(attrs.administrative_area_level_3){
+                        if(attrs.administrative_area_level_3 != 'undefined'){
+                            document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_3.replace('County','');
+                        }
+                    }
+                }
+                if(addressLabels.length == 5){
+                    if(attrs.administrative_area_level_2){
+                        if(addressLabels[1] == 'Province'){
+                            if(attrs.administrative_area_level_2 != 'undefined'){   
+                                document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2; 
+                            }
+                        }else{
+                            if(attrs.administrative_area_level_2 != 'undefined'){
+                                document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_2.replace('County','');
+                            }
+                        }
+                    }
+                }
+             }
+             
+            
+            
+        </script>
+         
+        
+    </apex:page>

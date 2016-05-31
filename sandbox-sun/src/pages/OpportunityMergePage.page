@@ -1,0 +1,190 @@
+<apex:page controller="OpportunityMergeController" id="mergeOpportunity" action="{!validateMerge}">
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+    <apex:stylesheet value="{!$Page.CommonStyleSheets}" />
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables_themeroller.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.min.js')}" />
+    <head>
+        <style>
+            sourceOpportunityTableStyle {
+                margin: 1em;
+                border-collapse: collapse;
+                padding-left: 7%;
+            }        
+            #mergeOpportunityDetails td,th {
+                padding: .3em;
+                border: 1px #ccc solid;
+            }
+            #mergeOpportunityDetails table {
+                width:1305px;
+                margin-left:auto;
+                margin-right : auto;
+                margin-top:20px;
+            }
+            #mergeOpportunityDetails td{
+                background : #fff;
+            }
+            #mergeDetails td,th {
+                padding: 5px 4px;
+                border: 1px #ccc solid;
+            }
+            thead {
+                background: #e5e5e5;
+            }
+            #clickme tr.clicked {
+                background: #eee;back
+            }
+        </style> 
+    </head>
+    
+    <apex:form rendered="{!pageErrorVisible}">
+        <apex:pageblock >
+            <apex:pageMessages />
+            <apex:commandButton value="Back to Opportunity" action="{!cancel}"/>
+        </apex:pageblock>>
+    </apex:form>             
+    
+    <apex:form id="sourceOpportunityForm" rendered="{!pageVisible}">
+        <apex:variable var="i" value="0"/>
+        <div style="margin-top:15px">
+            <apex:pageblock id="sourceOpportunityBlock" >
+                <apex:pageMessages />
+                <div id="sourceOpportunityDetails">
+                    <apex:dataTable value="{!sourceOpportunities}" var="opportunity" id="sourceOpportunityTable" rowClasses="odd,even" styleClass="sourceOpportunityTableStyle">
+                        <apex:facet name="header">Open Opportunities : Select Source opportunities for Merge</apex:facet>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Select_Opportunity}</apex:facet>
+                            <apex:inputCheckbox value="{!opportunity.radiobutton}" styleClass="ChkClass" id="radiobutton" onchange="selectRecords(this.value,this.id);"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Name}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.Name}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Owner}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.Owner.Name}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Stage}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.StageName}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Close_Date}</apex:facet>
+                            <apex:outputField value="{!opportunity.opportunity.closeDate}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Amount}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.Amount}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Country_of_Order}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.Country_of_Order_Formula__c}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Type}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.Type}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Channel}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.FulfillmentChannel__c}" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$Label.Opportunity_Payment_Type}</apex:facet>
+                            <apex:outputText value="{!opportunity.opportunity.PaymentType__c}" />
+                        </apex:column>
+                    </apex:dataTable>
+                </div>
+                <div style="margin-left: 45%;margin-top: 2%;">
+                    <input type="button" onclick="selectRecordsValidation();" value="Select" class="btn"  />            
+                    <apex:commandButton value="Cancel" action="{!Cancel}" styleclass="btn" />
+                </div>
+            </apex:pageblock>
+        </div>
+        <apex:actionFunction name="validated" action="{!onSelectButtonClick}" oncomplete="makeDataTable();" reRender="DisplayOpportunityDetailsForm" />
+    </apex:form>
+    
+    <apex:form id="DisplayOpportunityDetailsForm" >
+        <apex:outputPanel rendered="{!if(panelOpportunitySelected==true,true,false)}">
+            <apex:pageBlock id="DisplayOpportunities">
+                <apex:pageblockButtons location="top">
+                    <apex:commandButton style="margin-left:185px" value="Merge" action="{!onMerge}"/>
+                </apex:pageblockButtons>
+                <apex:dataTable value="{!displayOpportunities}" var="displayOpportunity" id="displayOpportunityTable" rowClasses="odd,even" styleClass="sourceOpportunityTableStyle1">
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Type_of_Opportunity}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.type}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Name}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.Name}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Owner}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.Owner.Name}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Stage}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.StageName}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Close_Date}</apex:facet>
+                        <apex:outputField value="{!displayOpportunity.opportunity.closeDate}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Amount}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.Amount}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Country_of_Order}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.Country_of_Order_Formula__c}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Type}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.Type}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Channel}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.FulfillmentChannel__c}" />
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$Label.Opportunity_Payment_Type}</apex:facet>
+                        <apex:outputText value="{!displayOpportunity.opportunity.PaymentType__c}" />
+                    </apex:column>
+                </apex:dataTable>
+            </apex:pageBlock>>   
+        </apex:outputPanel>
+    </apex:form>
+    <script>
+        function selectRecords(recordId,chkId){
+            console.log($('.apexp :checkbox:checked').length);
+            var noOfChecked = $('.apexp :checkbox:checked').length;
+            if(noOfChecked > 1)
+            {
+                document.getElementById(chkId).checked = false;
+                alert('Please select only 1 record for merge');
+                return;
+            }
+            return;
+        }
+        function selectRecordsValidation(){
+            var noOfChecked = $('.apexp :checkbox:checked').length;
+            if(noOfChecked != 1)
+            {
+                alert('Please select a opportunity to merge');
+                return false;
+            }
+            validated();
+         }
+         
+         //function makeDataTable(){
+             $('.sourceOpportunityTableStyle').dataTable({"sPaginationType": "full_numbers"});
+         //}
+         function makeDataTable(){
+             $('.sourceOpportunityTableStyle1').dataTable({"sPaginationType": "full_numbers"});
+             document.getElementById('mergeOpportunity:DisplayOpportunityDetailsForm:DisplayOpportunities:displayOpportunityTable_length').style.display = 'none';
+             document.getElementById('mergeOpportunity:DisplayOpportunityDetailsForm:DisplayOpportunities:displayOpportunityTable_filter').style.display = 'none';
+             document.getElementById('mergeOpportunity:DisplayOpportunityDetailsForm:DisplayOpportunities:displayOpportunityTable_info').style.display = 'none';
+             document.getElementById('mergeOpportunity:DisplayOpportunityDetailsForm:DisplayOpportunities:displayOpportunityTable_paginate').style.display = 'none';
+         }
+    </script>
+</apex:page>

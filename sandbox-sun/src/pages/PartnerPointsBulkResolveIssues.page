@@ -1,0 +1,111 @@
+<apex:page cache="true" expires="1" sidebar="false" controller="PPBulkSubmitController" action="{! loadBatchList }">
+
+	<style>
+		.greenbox { 
+			background-color: #99FF99; 
+		}
+		.yellowbox { 
+			background-color: #FFFFCC; 
+		}
+		.redbox { 
+			background-color: #FF9999; 
+		}
+	</style>
+	
+	<apex:form >
+		
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Partner Points Bulk Load<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Step 2: Resolve issues and Submit</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+		<apex:pageMessages id="messages"/>
+		
+		<apex:pageBlock >
+			<apex:pageBlockButtons > 
+				<apex:commandButton action="{!saveChanges}" id="saveChanges" value="Save Changes"/>
+				<apex:commandButton action="{!submitBatch}" id="submitBatch" value="Save and Submit Batch" disabled="{!BatchSubmitted}"/>
+				<apex:commandButton action="{!deleteBatch}" id="deleteBatch" value="Delete Batch" disabled="{!BatchSubmitted}"/>
+				<apex:outputText rendered="{!BatchSubmitted}">&nbsp;&nbsp;Bulk load is pending Approval.</apex:outputText>
+			</apex:pageBlockButtons>
+			<div class="bRelatedList">
+				<div class="pbBody">
+					<table class="list" border="0" cellspacing="0" cellpadding="0">
+						<tbody>
+							<tr id="">
+								<td class="greenbox">
+									{!matchedBatchItems.size} Records successfully matched<br/>
+									<apex:commandButton value="Show List" action="{!showMatched}" id="showMatched"/>
+								</td>
+								<td class="redbox">									
+									{!unmatchedBatchItems.size} Records failed to match<br/>
+									<apex:commandButton value="Show List" action="{!showUnmatched}" id="showUnmatched"/>
+								</td>
+							</tr>
+						</tbody>				
+		           </table>
+				</div>
+			</div>
+			<br/>
+			<div class="bRelatedList">
+				<div class="pbBody">
+					<table class="list" border="0" cellspacing="0" cellpadding="0">
+						<tbody>
+							<tr class="headerRow"> 
+							  <th>Status</th>
+							  <th>Contact</th>
+							  <th>Name per CSV</th>
+							  <th>Federation Id</th>
+							  <th>Email</th>
+							  <th>Partner</th>
+							  <th>Partner per CSV</th>
+							  <th>Type</th>
+							  <th>Units Earned</th>
+							  <th>Action</th>
+							</tr>
+							<apex:repeat var="row" value="{!batchItems}">
+							<tr id="{! row.id }">
+								<apex:outputText rendered="{! row.Status__c == 'Matched' }">
+								<td class="greenbox" id="{! row.id }Matched">{! row.Status__c }</td>
+								</apex:outputText>
+								<apex:outputText rendered="{! row.Status__c == 'Partially Matched' }">
+								<td class="yellowbox" id="{! row.id }PartiallyMatched">{! row.Status__c }</td>
+								</apex:outputText>
+								<apex:outputText rendered="{! row.Status__c == 'Unmatched' }">
+								<td class="redbox" id="{! row.id }Unmatched">{! row.Status__c }</td>
+								</apex:outputText>
+								<td id="{! row.id }Contact">
+									<apex:inputField id="contact" value="{! row.Contact__c }" />
+								</td>
+								<td id="{! row.id }CSVName">
+									{!row.First_Name__c} {! row.Last_Name__c}
+								</td>
+								<td id="{! row.id }FedId">{! row.Federation_Id__c}</td>
+								<td id="{! row.id }Email">{! row.Email__c}</td>
+								<td id="{! row.id }Account">
+									<apex:inputField value="{! row.Partner__c }"/>
+								</td>
+								<td id="{! row.id }CSVCompanyName">
+									{!row.Company_Name__c}
+								</td>
+								<td id="{! row.id }Type">{! row.Partner_Type__c}</td>
+								<td id="{! row.id }UnitEarned">{! ROUND(row.Units_of_Credit__c,0) }</td>
+								<td id="{! row.id }Actions">
+									<apex:outputText rendered="{! (NOT(ISNULL(row.Partner__c)) && row.Status__c == 'Partially Matched') || (NOT(ISNULL(row.Partner__c)) && ISNULL(row.Contact__c) && row.Status__c == 'Matched') }">
+									<span id="{! row.id }CreateContact"><apex:inputField id="chkCreateContact" value="{!row.Create_Contact__c}"/></span><span> Create Contact</span>
+									</apex:outputText>
+								</td>
+							</tr>
+							</apex:repeat>
+						</tbody>				
+		           </table>
+				</div>
+			</div>
+		</apex:pageBlock>				
+	</apex:form>	
+</apex:page>

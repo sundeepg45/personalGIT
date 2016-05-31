@@ -1,0 +1,9 @@
+<apex:component controller="FormatController">
+	<apex:attribute name="isoCode" description="The Currency Iso Code" type="String" required="false" assignto="{!currencyIsoCode}" />
+	<apex:attribute name="value" description="The value being displayed" type="String" required="true" assignto="{!currencyString}" />
+	<apex:outputText rendered="{!NOT(ISBLANK(currencyString))}" value="{0}{1}" style="white-space: nowrap">
+		<apex:param value="{!IF(ISBLANK(isoCode),'',isoCode&' ')}"/>
+		<apex:param value="{!currencyFormatted}" />
+	</apex:outputText>
+	<apex:componentBody rendered="{!ISBLANK(currencyString)}"/>
+</apex:component>

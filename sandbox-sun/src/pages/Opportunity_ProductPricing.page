@@ -1,0 +1,1106 @@
+<apex:page controller="Opportunity_ProductPricingController" id="mainPage" tabStyle="Opportunity">
+
+    <!-- Script and Stylesheets to support functionality on the page -->
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables_themeroller.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery-1.7.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTableJs, '/DataTable/jquery.dataTables.min.js')}" />
+
+    <!-- Common stylesheets and Script pages -->
+    <apex:stylesheet value="{!$Page.CommonStyleSheets}" />
+
+    <apex:sectionHeader title="Manage Products {!opportunity.Name}"/>
+    <apex:pageMessages id="errors"/>
+    <apex:stylesheet value="/sCSS/18.0/Theme2/default/elements.css"/>
+
+    <style type="text/css">
+        .textField {
+            width:140px;
+        }
+
+        .textField2 {
+            width:60px;
+        }
+
+        .lookupField {
+            white-space:nowrap;
+            width:160px;
+        }
+
+        .arrow {
+            width:24px;
+            height:24px;
+            cursor:pointer;
+        }
+
+        .headingMsg {
+            display:block;
+            font-size:medium;
+            font-weight:bold;
+            padding-bottom:15px;
+        }
+
+        .oddRow {
+            background-color: #e0e0e0;
+        }
+
+        .evenRow {
+            background-color: #efefef;
+        }
+
+        td:not(:last-child) {
+            width:auto;
+        }
+
+        td:last-child {
+            width:100%;
+        }
+
+        /********** JQuery UI Tabs **********/
+        ul.tabs{
+            margin: 0px;
+            padding: 0px;
+            list-style: none;
+        }
+        ul.tabs li{
+            background: none;
+            color: #222;
+            display: inline-block;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        ul.tabs li.current{
+            background: #ededed;
+            color: #222;
+            font-weight : bold;
+            border-top-left-radius : 5px;
+            border-top-right-radius : 5px;
+        }
+
+        .tab-content{
+            display: none;
+            background: #ededed;
+            padding: 15px;
+        }
+
+        .tab-content.current{
+            display: inherit;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function parseCurrency(value) {
+            var retval = 0.0;
+            try {
+                retval = parseFloat(value.replace(/[^-0-9{!Decimal}]/g,"").replace("{!Decimal}","."));
+            }
+            catch(e) {}
+            return retval;
+        }
+    </script>
+
+    <script type="text/javascript">
+        function formatCurrency(value) {
+            var x = (''+value.toFixed(2)).split('.');
+            var r = /(\d+)(\d{3})/;
+            var ms = x[0];
+            while(r.test(ms)) {
+                ms = ms.replace(r,'$1'+'{!ThousandsSep}'+'$2');
+            }
+            return ms+'{!Decimal}'+x[1];
+        }
+
+        function replaceCurrency(id,currencyISOCode,value) {
+            document.getElementById(id).innerHTML = isNaN(value)?"":(currencyISOCode+"&#160;"+formatCurrency(value));
+        }
+    </script>
+
+    <script type="text/javascript">
+        var overrideReason = '{!IF(opportunity.PriceOverrideReason__c!='No Override Reason',JSENCODE(opportunity.PriceOverrideReason__c),'')}';
+    </script>
+
+    <script type="text/javascript">
+        // displays the product lookup dialog
+        function productSearch() {
+            //
+            // All products are going to come from the global price book.
+            // Commenting out price book selection. bbosely 7/16/10
+            //
+
+            // var pricebookId = '{!opportunity.Pricebook2Id}';
+            var opportunityId = '{!opportunityId}';
+            var searchTerm = objProductCode.value;
+            var page = '/apex/Opportunity_ProductSearch?opportunityId=' + opportunityId + '&search=' + searchTerm;
+            var pageTitle = 'Product_Search';
+
+            //alert ("OpportunityId: " + opportunityId + "\nsearchTerm: " + searchTerm + "\npage: " + page);
+            var objWin = window.open(page, pageTitle,'left=400, top=200, width=1024, height=600, menubar=no, resizable=yes, scrollbars=yes, status=no');
+        }
+    </script>
+
+    <script type="text/javascript">
+        //
+        // makes the sales price match the unit price
+        //
+        function updateSalesPrice(to, from, reason, reasonColumn,quant,tp,currencyIsoCode) {
+            var objSalesPrice = document.getElementById(to);
+            var objListPrice = document.getElementById(from);
+            var objPriceOverrideReasonColumn = document.getElementById(reasonColumn);
+            if(objSalesPrice != null && objListPrice != null && objPriceOverrideReasonColumn != null) {
+                // copy the value of the unit price to the sales price
+                objSalesPrice.value = objListPrice.value;
+                objSalesPrice.style.display='block';
+                salesPriceChange(to,from,reason,reasonColumn,quant,tp,currencyIsoCode);
+            }
+        }
+    </script>
+    <script>
+        var confirmedDeactivateQuotes = {!IF(NeedsDeactivateQuotesConfirmation,'false','true')};
+        var storedElement = null;
+        function revertStoredElement() {
+            var element = storedElement;
+            storedElement = null;
+            if(element && ! confirmedDeactivateQuotes) {
+                element.value = element.priorValue;
+            }
+        }
+        function storeElement(element,storedName) {
+            if(element) {
+                element.priorValue = element.value;
+                element.storedName = storedName;
+                confirmDeactivateQuotes();
+                storedElement = element;
+            }
+        }
+        function confirmDeactivateQuotesAddLine() {
+            if(! confirmedDeactivateQuotes) {
+                confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_1)}');
+            }
+            return confirmedDeactivateQuotes;
+        }
+        function confirmDeactivateQuotesRemoveLines() {
+            if(! confirmedDeactivateQuotes) {
+                confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_3)}');
+            }
+            return confirmedDeactivateQuotes;
+        }
+        function confirmDeactivateQuotesGetPricing() {
+            var retval = {!IF(PricingWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_4)}');
+            }
+            if(retval) {
+                revertStoredElement();
+            }
+            return retval;
+        }
+
+        function confirmDeactivateQuotesEntitleToAccount() {
+            var retval = {!IF(EntitleToAccountWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_5)}');
+            }
+            return retval;
+        }
+
+        function confirmDeactivateQuotesEntitleToSalesAccount() {
+            var retval = {!IF(EntitleToSalesAccountWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_5)}');
+            }
+            return retval;
+        }
+
+        function confirmDeactivateQuotesEntitleToAddress() {
+            var retval = {!IF(EntitleToAddressWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_5)}');
+            }
+            return retval;
+        }
+
+        function confirmDeactivateQuotesEntitleToContact() {
+            var retval = {!IF(EntitleToContactWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_5)}');
+            }
+            return retval;
+        }
+
+        function confirmDeactivateQuotesClearEntitleTo() {
+            var retval = {!IF(ClearEntitleToWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_5)}');
+            }
+            return retval;
+        }
+        function confirmDeactivateQuotesCopyEntitleTo() {
+            var retval = {!IF(CopyEntitleToWillDeactivateQuotes,'false','true')} || confirmedDeactivateQuotes;
+            if(! retval) {
+                retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_5)}');
+            }
+            return retval;
+        }
+        function confirmDeactivateQuotes(element,storedName) {
+            var retval = true;
+            if(! element) {
+                element = storedElement;
+            }
+            if(element) {
+                if(typeof element.storedName === 'undefined') {
+                    element.storedName = storedName;
+                }
+                if(element.storedName == 'UnitPrice') {
+                    retval = {!IF(UnitPriceWillDeactivateQuotes,'confirmedDeactivateQuotes','true')};
+                }
+                else if(element.storedName == 'NewOrRenewal') {
+                    retval = {!IF(NewOrRenewalWillDeactivateQuotes,'confirmedDeactivateQuotes','true')};
+                }
+                else if(element.storedName == 'ContractNumbers') {
+                    retval = {!IF(ContractNumbersWillDeactivateQuotes,'confirmedDeactivateQuotes','true')};
+                }
+            }
+            if(! retval) {
+                retval = true;
+                if(element && typeof element.priorValue !== 'undefined') {
+                    if(element.priorValue != element.value && ! confirmedDeactivateQuotes) {
+                        retval = confirmedDeactivateQuotes = confirm('{!JSENCODE($Label.Deactivate_Quote_Warning_2)}');
+                    }
+                    if(! retval) {
+                        element.value = element.priorValue;
+                    }
+                    else {
+                        element.priorValue = element.value;
+                    }
+                }
+            }
+            return retval;
+        }
+    </script>
+
+    <script type="text/javascript">
+        function quantityChange(sp,quant,tp,currencyIsoCode) {
+            var objSalesPrice = document.getElementById(sp);
+            var objQuantity = document.getElementById(quant);
+            if(objSalesPrice != null && objQuantity != null) {
+                try {
+                    var salePrice = parseCurrency(objSalesPrice.value);
+                    replaceCurrency(tp,currencyIsoCode,parseFloat(objQuantity.value)*salePrice);
+                }
+                catch(e) {
+                    alert(e);
+                }
+            }
+        }
+    </script>
+
+    <script type="text/javascript">
+        function salesPriceChange(sp,lp, reason, reasonColumn,quant,tp,currencyIsoCode) {
+            var objSalesPrice = document.getElementById(sp);
+            var objListPrice = document.getElementById(lp);
+            var objPriceOverrideReason = document.getElementById(reason);
+            var objPriceOverrideReasonColumn = document.getElementById(reasonColumn);
+            var objQuantity = document.getElementById(quant);
+            if(objSalesPrice != null && objListPrice != null && objPriceOverrideReason != null && objPriceOverrideReasonColumn != null && objQuantity != null) {
+                objPriceOverrideReason.disabled = true;
+                try {
+                    var salePrice = parseCurrency(objSalesPrice.value);
+                    var listPrice = parseCurrency(objListPrice.value);
+                    var opts = objPriceOverrideReason.options;
+                    if(salePrice >= listPrice) {
+                        objPriceOverrideReason.selectedIndex = 0;
+                    }
+                    else {
+                        if(objPriceOverrideReason.selectedIndex == 0) {
+                            for(var i = 0; i < opts.length;i++) {
+                                if(opts[i].value == overrideReason) {
+                                    objPriceOverrideReason.selectedIndex = i;
+                                }
+                            }
+                        }
+                        objPriceOverrideReason.disabled = false;
+                    }
+                    replaceCurrency(tp,currencyIsoCode,parseFloat(objQuantity.value)*salePrice);
+                }
+                catch(ex) {
+                    alert(ex);
+                }
+            }
+        }
+
+        function copyNullValue(homeField,hiddenField){
+            console.log(homeField);
+            console.log(hiddenField);
+            console.log(document.getElementById(homeField).value);
+            var homeFieldValue = document.getElementById(homeField).value;
+            homeFieldValue = homeFieldValue.length;
+            console.log(homeFieldValue);
+            if(homeFieldValue < 1){
+                document.getElementById(hiddenField).value ='';
+                console.log('--Iam here--');
+
+            }
+            console.log(document.getElementById(hiddenField).value);
+        }
+    </script>
+
+    <script type="text/javascript">
+        function reasonChange(reason) {
+            var objPriceOverrideReason = document.getElementById(reason);
+            if(objPriceOverrideReason != null) {
+                var opts = objPriceOverrideReason.options;
+                if(overrideReason == '') {
+                    overrideReason = opts[objPriceOverrideReason.selectedIndex].value;
+                }
+            }
+        }
+    </script>
+
+    <apex:form id="frmNewProduct">
+        <apex:pageBlock >
+            <apex:pageBlockButtons location="top">
+                <apex:actionStatus id="newProductStatus">
+                    <apex:facet name="start">
+                        <apex:image value="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+                <apex:commandButton id="btnAddProduct" action="{!addProduct}" onclick="if(!confirmDeactivateQuotesAddLine()){return false;}" value="Add Product" reRender="frmLineItems,frmNewProduct, errors" status="newProductStatus" disabled="{!if (isOppLocked, true, false)}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!lineItem}" var="item" style="width:100%;">
+                <apex:column headerValue="Product Code">
+                    <apex:outputPanel layout="block" styleClass="lookupField">
+                        <apex:inputText id="txtProductCode" styleClass="textField"/>
+                        <apex:inputHidden id="hdnPricebookEntryId" value="{!item.PricebookEntryId}"/>
+
+                         <!-- Some hackey nonsense to get around the pain of referencing SDFC components by id in js -->
+                        <script>
+                            var objProductCode = document.getElementById("{!$Component.txtProductCode}");
+                            var objPricebookEntryId = document.getElementById("{!$Component.hdnPricebookEntryId}");
+                        </script>
+
+                        <!-- Sometimes you have to use good ol' HTML -->
+                        <span style="{!if (isOppLocked, 'visibility:hidden', 'visibility:visible')}">
+                            <a href="javascript:productSearch();" id="searchProducts" title="Product Lookup (New Window)">
+                                <img src="/s.gif" alt="Product Lookup (New Window)" class="lookupIcon" title="Product Lookup (New Window)"/>
+                            </a>
+                        </span>
+                    </apex:outputPanel>
+                </apex:column>
+
+
+               <!-- To make sales price editable only for ICC record type: Begin
+                <apex:column headerValue="Sales Price" value="{!item.UnitPrice}"> -->
+
+               <apex:column headerValue="Sales Price" >
+                   <apex:inputField value="{!item.UnitPrice}" rendered="{!OR(isICCOpportunityRecord,AND(NOT(isPartnerUser),isForecastAllowed))}" />
+                   <apex:outputText value="{!item.UnitPrice}" rendered="{!NOT(OR(isICCOpportunityRecord,AND(NOT(isPartnerUser),isForecastAllowed)))}" />
+                    <!-- To make sales price editable only for ICC record type: END -->
+                </apex:column>
+                <apex:column headerValue="Quantity">
+                    <apex:inputField value="{!item.Quantity}" styleClass="textField2"/>
+                </apex:column>
+                <apex:column headerValue="New Or Renewal">
+                    <apex:selectList value="{!item.NewOrRenewal__c}" size="1" styleClass="textField" onfocus="storeElement(this,'NewOrRenewal');" onchange="setTimeout(function(){confirmDeactivateQuotes(this,'NewOrRenewal');},50);">
+                        <apex:selectOptions value="{!NewOrRenewalOptions}"/>
+                    </apex:selectList>
+                </apex:column>
+                <apex:column headerValue="Contract Number/Login">
+                    <apex:inputField value="{!item.Contract_Numbers__c}" styleClass="textField"/>
+                </apex:column>
+            </apex:pageBlockTable>
+
+        </apex:pageBlock>
+    </apex:form>
+    <apex:form id="frmConfigProduct" rendered="{!AND(useConfiguredSKUs,OR(globalPriceBook.Id = opportunity.pricebook2Id,opportunity.pricebook2Id = null))}">
+        <apex:pageBlock >
+
+            <apex:pageBlockButtons location="top">
+                <apex:actionStatus id="configProductStatus">
+                    <apex:facet name="start">
+                        <apex:image value="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+                <apex:commandButton id="btnAddConfiguredProduct" action="{!addConfiguredProduct}" value="Add Configured Product" reRender="frmLineItems,frmConfigProduct, errors" status="configProductStatus" disabled="{!if (isOppLocked, true, false)}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!lineItem}" var="item">
+                <apex:column headerValue="Configured Sku">
+                    <apex:outputPanel layout="block" styleClass="lookupField">
+                        <apex:inputText value="{!item.Configured_SKU__c}" styleClass="textField"/>
+                    </apex:outputPanel>
+                </apex:column>
+                <apex:column headerValue="Sales Price">
+                    <apex:inputField value="{!item.UnitPrice}" styleClass="textField"/>
+                </apex:column>
+                <apex:column headerValue="Quantity">
+                    <apex:inputField value="{!item.Quantity}" styleClass="textField2"/>
+                </apex:column>
+                <apex:column headerValue="New Or Renewal">
+                    <apex:selectList value="{!item.NewOrRenewal__c}" size="1" styleClass="textField" onfocus="storeElement(this,'NewOrRenewal');" onchange="setTimeout(function(){confirmDeactivateQuotes(this,'NewOrRenewal');},50);">
+                        <apex:selectOptions value="{!NewOrRenewalOptions}"/>
+                    </apex:selectList>
+                </apex:column>
+                <apex:column headerValue="Contract Number/Login">
+                    <apex:inputField value="{!item.Contract_Numbers__c}" styleClass="textField"/>
+                </apex:column>
+            </apex:pageBlockTable>
+
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:form id="frmLineItems" onsubmit="if(!confirmDeactivateQuotes()){return false;}">
+        <apex:pageBlock id="pageBlockId" >
+            <apex:pageBlockButtons location="top">
+                <apex:actionStatus id="pricingStatus">
+                    <apex:facet name="start">
+                        <apex:image value="/img/loading.gif" />
+                    </apex:facet>
+                </apex:actionStatus>
+                <apex:commandButton action="{!pricing}" value="Get Pricing" onclick="if(!confirmDeactivateQuotesGetPricing()){return false;}" reRender="errors,pageBlockId" status="pricingStatus" disabled="{!if (isOppLocked, true, false)}"/>
+                <apex:commandButton action="{!clearEntitleToInfo}" value="{!$Label.Clear_Entitle_To}" onclick="if(!confirmDeactivateQuotesClearEntitleTo()){return false;}" disabled="{!if (isOppLocked, true, false)}" reRender="frmLineItems, errors,lineItems1" status="pricingStatus" onComplete="shifttab('tab_2','tab-2');" rendered="{!NOT(isPartnerUser)}"/>
+                <apex:commandButton action="{!copyEntitleToInfo}" value="{!$Label.Copy_Entitle_To_From_Header}" onclick="if(!confirmDeactivateQuotesCopyEntitleTo()){return false;}" disabled="{!if (isOppLocked, true, false)}" reRender="frmLineItems, errors,lineItems1" status="pricingStatus" onComplete="shifttab('tab_2','tab-2');" rendered="{!NOT(isPartnerUser)}"/>
+                <apex:commandButton action="{!save}" value="Save" onclick="if(!confirmDeactivateQuotes()){return false;}" disabled="{!if (isOppLocked, true, false)}"/>
+                <apex:commandButton action="{!remove}" value="Delete Selected" onclick="if(!confirmDeactivateQuotesRemoveLines()){return false;}" reRender="frmLineItems, errors,pageBlockId" status="pricingStatus" disabled="{!if (isOppLocked, true, false)}"/>
+                <apex:commandButton action="{!cancel}" value="Cancel" onclick="revertStoredElement();" immediate="true" />
+
+                <!--
+                  All products are going to come from the global price book.
+                  Commenting out the button that allows for price book selection. bbosely 7/16/10
+                -->
+                <!--
+                <apex:commandButton action="{!selectPricebook}" value="Change Price Book" />
+                -->
+            </apex:pageBlockButtons>
+            <div class="container">
+                <script>
+                       
+                       function shifttab(tabId,divId){
+                                
+                                var headerItems=['tab_1','tab_2','tab_3'];
+                                var divItems=['tab-1','tab-2','tab-3'];
+                                for(i=0; i<headerItems.length; i++){
+                                    if(document.getElementById(headerItems[i])!=null){
+                                        document.getElementById(headerItems[i]).className="tab-link";
+                                    }
+                                    console.log('HERE');
+                                }
+                                for(i=0; i<divItems.length; i++){
+                                     if(document.getElementById(divItems[i])!=null){
+                                         document.getElementById(divItems[i]).className="tab-content";
+                                     }
+                                     console.log('NEXT');
+                                }
+                               document.getElementById(tabId).className="tab-link current";
+                               document.getElementById(divId).className="tab-content current";
+                       }
+
+                        $(document).ready(function(){
+                            if ({!isPartnerUser}) {
+                                $('#tab_2').remove();
+                                $('#tab_3').remove();
+                                $('#RH_footer').remove();
+                            }
+                        })
+
+                   </script>
+                <ul class="tabs">
+                    <li class="tab-link current" data-tab="tab-1" onclick="shifttab(this.id,'tab-1');" id="tab_1">Product Information</li>
+                    <li class="tab-link" data-tab="tab-2" onclick="shifttab(this.id,'tab-2');" id="tab_2">Entitle-To Information</li>
+                    <li class="tab-link" data-tab="tab-3" onclick="shifttab(this.id,'tab-3');" id="tab_3">Discount Details</li>
+
+                </ul>
+
+                <div id="tab-1" class="tab-content current">
+                    <apex:pageBlockTable id="lineItems0" value="{!lineItems}" var="item" rowClasses="{!IF(ISPICKVAL($User.UserType, 'Standard'),'oddRow,oddRow,evenRow,evenRow','')}">
+                        <apex:column headerValue="Delete">
+                            <apex:inputCheckBox value="{!item.isBeingRemoved}" />
+                        </apex:column>
+                        <apex:column style="font-size:14pt; {!if (item.lineItemStatus = 'SUCCESS', 'color:green;', 'color:red;')}">
+                            <apex:outputText rendered="{!(item.lineItemStatus = 'SUCCESS')}">&#x2714;</apex:outputText>
+                            <apex:outputText rendered="{!(item.lineItemStatus = 'FAILURE')}">&#x2716;</apex:outputText>
+                        </apex:column>
+                        <apex:column value="{!item.opportunityLineItem.PricebookEntry.Name}"/>
+                        <apex:column value="{!item.opportunityLineItem.Description}" style="width:100%;"/>
+                        <apex:column value="{!item.opportunityLineItem.PricebookEntry.ProductCode}"/>
+                        <apex:column headerValue="List Price" >
+                            <apex:outputPanel styleClass="textField">
+                                <apex:inputField id="listPrice" value="{!item.opportunityLineItem.Base_Price__c}" styleClass="textField" style="display:none"/>
+                                <c:OutputCurrency isoCode="{!item.opportunityLineitem.CurrencyIsoCode}" value="{!item.opportunityLineitem.Base_Price__c}"/>
+                            </apex:outputPanel>
+                        </apex:column>
+                        <apex:column headerValue="Adjusted Price" value="{!item.opportunityLineItem.Adjusted_Price__c}"/>
+                        <apex:column headerValue="Discretionary Discount" value="{!item.opportunityLineItem.Discretionary_Discount_Amount__c}"/>
+                        <apex:column headerValue="One-Time Discount" value="{!item.opportunityLineItem.One_time_Discount_Amount__c}"/>
+                        <!-- US82558 -->
+                        <!-- <apex:column headerValue="Sales Price ({!opportunity.CurrencyIsoCode})"  rendered="{!ISPICKVAL($User.UserType, 'Standard') || Region == 'EMEA'}"> -->
+                        <apex:column headerValue="Sales Price ({!opportunity.CurrencyIsoCode})"  rendered="{!ISPICKVAL($User.UserType, 'Standard')}">
+
+                             <apex:inputField value="{!item.opportunityLineitem2.UnitPrice}" onfocus="storeElement(this,'UnitPrice');" onchange="setTimeout(function(){confirmDeactivateQuotes(this,'UnitPrice');},50);" rendered="{!AND(isForecastAllowed,NOT(isOppLocked),NOT(isPartnerUser))}" styleClass="textField"/>
+                             <c:OutputCurrency isoCode="{!item.opportunityLineitem.CurrencyIsoCode}" value="{!item.opportunityLineitem2.unitPrice}" rendered="{!OR(NOT(isForecastAllowed),isOppLocked,isPartnerUser)}"/>
+                        </apex:column>
+                        <apex:column headerValue="Quantity" value="{!item.opportunityLineItem.Quantity}"/>
+                        <apex:column headerValue="Total Price" rendered="{!ISPICKVAL($User.UserType, 'Standard')}">
+                            <c:OutputCurrency id="totalPrice" isoCode="{!item.opportunityLineitem.CurrencyIsoCode}" value="{!item.opportunityLineitem.unitPrice*item.opportunityLineitem.Quantity}"/>
+                        </apex:column>
+                        <apex:column headerValue="New Or Renewal">
+                            <apex:selectList value="{!item.opportunityLineItem.NewOrRenewal__c}" size="1" styleClass="textField" onfocus="storeElement(this,'NewOrRenewal');" onchange="setTimeout(function(){confirmDeactivateQuotes(this,'NewOrRenewal');},50);">
+                                <apex:selectOptions value="{!NewOrRenewalOptions}"/>
+                            </apex:selectList>
+                        </apex:column>
+                        <apex:column headerValue="Contract Number/Login" style="width:auto;">
+                            <apex:inputField value="{!item.opportunityLineItem.Contract_Numbers__c}" onfocus="storeElement(this,'ContractNumbers');" onchange="setTimeout(function(){confirmDeactivateQuotes(this,'ContractNumbers');},50);" styleClass="textField"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </div>
+                <div id="tab-2" class="tab-content">
+                    <apex:pageBlockTable id="lineItems1" value="{!lineItems}" var="item" rowClasses="{!IF(ISPICKVAL($User.UserType, 'Standard'),'oddRow,oddRow,evenRow,evenRow','')}">
+                        <apex:column headerValue="Delete">
+                            <apex:inputCheckBox value="{!item.isBeingRemovedSecTab}" />
+                        </apex:column>
+                        <apex:column style="font-size:14pt; {!if (item.lineItemStatus = 'SUCCESS', 'color:green;', 'color:red;')}">
+                            <apex:outputText rendered="{!(item.lineItemStatus = 'SUCCESS')}">&#x2714;</apex:outputText>
+                            <apex:outputText rendered="{!(item.lineItemStatus = 'FAILURE')}">&#x2716;</apex:outputText>
+                        </apex:column>
+                     <!--   <apex:column value="{!item.opportunityLineItem.PricebookEntry.Name}"/> -->
+                        <apex:column value="{!item.opportunityLineItem.PricebookEntry.ProductCode}"/>    <!--field added-->
+                     <!--   <apex:column value="{!item.opportunityLineItem.UnitPrice}"/> -->
+                        <apex:column value="{!item.opportunityLineItem.Quantity}"/>
+
+                        <apex:column value="{!item.opportunityLineItem.ActualStartDate__c}"/>
+                        <apex:column value="{!item.opportunityLineItem.ActualEndDate__c}"/>
+                        <apex:column headerValue="Total Price" rendered="{!ISPICKVAL($User.UserType, 'Standard')}">
+                            <c:OutputCurrency id="totalPrice" isoCode="{!item.opportunityLineitem.CurrencyIsoCode}" value="{!item.opportunityLineitem.unitPrice*item.opportunityLineitem.Quantity}"/>
+                        </apex:column><!--Total price field added-->
+                        <apex:column value="{!item.opportunityLineItem.Contract_Numbers__c}"/>
+                        <apex:column value="{!item.opportunityLineItem.Description}" style="width:100%;"/>
+                        <apex:column headerValue="Entitle To Sales Account">
+                            <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Sales_Account__c}" id="entitleSalesAccountId"/>
+                            <div style="width:220px;display:block;"><apex:inputText id="entitleSalesAccountIdText"  onchange="copyNullValue('{!$Component.entitleSalesAccountIdText}','{!$Component.entitleSalesAccountId}')" value="{!item.entitleSalesAccountName}" style="width:180px;display:inline;"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="if(confirmDeactivateQuotesEntitleToSalesAccount()){getSalesAccount('{!$Component.entitleSalesAccountIdText}','{!$Component.entitleSalesAccountId}','{!$Component.entitleAccountIdText}','{!$Component.entitleAccountId}','{!$Component.entitleAddressIdIdText}','{!$Component.entitleAddressId}','{!$Component.entitleContactIdText}','{!$Component.entitleContactId}');}" class="lookupIcon" src="/s.gif" /></div></div>
+                        </apex:column>
+                        <apex:column headerValue="Entitle To Account">
+                            <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Account__c}" id="entitleAccountId"/>
+                            <div style="width:220px;display:block;"><apex:inputText id="entitleAccountIdText" onchange="copyNullValue('{!$Component.entitleAccountIdText}','{!$Component.entitleAccountId}')" value="{!item.entitleAccountName}" style="width:180px;display:inline;" html-readonly="readonly"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="if(confirmDeactivateQuotesEntitleToAccount()){getEBSAccount('{!$Component.entitleSalesAccountId}','{!$Component.entitleAccountIdText}','{!$Component.entitleAccountId}');}" class="lookupIcon" src="/s.gif" /></div></div>
+                        </apex:column>
+                        <apex:column headerValue="Entitle To Address">
+                            <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Address__c}"  id="entitleAddressId"/>
+                            <div style="width:220px;display:block;"><apex:inputText id="entitleAddressIdIdText" onchange="copyNullValue('{!$Component.entitleAddressIdIdText}','{!$Component.entitleAddressId}')" value="{!item.entitleAddressName}" style="width:180px;display:inline;" html-readonly="readonly"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="if(confirmDeactivateQuotesEntitleToAddress()){getAddresses123('{!$Component.entitleSalesAccountId}','{!$Component.entitleAddressIdIdText}','{!$Component.entitleAddressId}');}" class="lookupIcon" src="/s.gif" /></div></div>
+                        </apex:column>
+                        <apex:column headerValue="Entitle To Contact">
+                            <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Contact__c}"  id="entitleContactId"/>
+                            <div style="width:220px;display:block;"><apex:inputText id="entitleContactIdText"  onchange="copyNullValue('{!$Component.entitleContactIdText}','{!$Component.entitleContactId}')" value="{!item.entitleContactName}" style="width:180px;display:inline;" html-readonly="readonly"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="if(confirmDeactivateQuotesEntitleToContact()){getContacts('{!$Component.entitleSalesAccountId}','{!$Component.entitleContactIdText}','{!$Component.entitleContactId}','{!$Component.rhnEntitlementLoginText}');}" class="lookupIcon" src="/s.gif" /></div></div>
+                        </apex:column>
+                        <apex:column headerValue="RHN Entitlement Login" style="width:auto;">
+                            <apex:inputText value="{!item.rhnEntitlementLogin}" id="rhnEntitlementLoginText" style="width:180px;display:inline;" html-readonly="readonly"/>
+                        </apex:column>
+                        <!-- apex:column breakBefore="true" colspan="9" style="width:100%">
+                          <apex:outputPanel layout="block" style="width:100%">
+                            <apex:pageBlockSection columns="5" showHeader="false">
+                              <apex:outputPanel layout="block" styleClass="lookupField" style="width:220px;">
+                                <apex:outputLabel value="Entitle To Sales Account" for="entitleSalesAccountIdText" style="font-weight:bold;"/>
+                                <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Sales_Account__c}" id="entitleSalesAccountId"/>
+                                <div style="width:220px;display:block;"><apex:inputText id="entitleSalesAccountIdText"  onchange="copyNullValue('{!$Component.entitleSalesAccountIdText}','{!$Component.entitleSalesAccountId}')" value="{!item.entitleSalesAccountName}" style="width:180px;display:inline;"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="getSalesAccount('{!$Component.entitleSalesAccountIdText}','{!$Component.entitleSalesAccountId}','{!$Component.entitleAccountIdText}','{!$Component.entitleAccountId}','{!$Component.entitleAddressIdIdText}','{!$Component.entitleAddressId}','{!$Component.entitleContactIdText}','{!$Component.entitleContactId}')" class="lookupIcon" src="/s.gif" /></div></div>
+                              </apex:outputPanel>
+                              <apex:outputPanel layout="block" styleClass="lookupField" style="width:220px;">
+                                <apex:outputLabel value="Entitle To Account" for="entitleAccountIdText" style="font-weight:bold;"/>
+                                <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Account__c}" id="entitleAccountId"/>
+                                <div style="width:220px;display:block;"><apex:inputText id="entitleAccountIdText" onchange="copyNullValue('{!$Component.entitleAccountIdText}','{!$Component.entitleAccountId}')" value="{!item.entitleAccountName}" style="width:180px;display:inline;" html-readonly="readonly"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="getEBSAccount('{!$Component.entitleSalesAccountId}','{!$Component.entitleAccountIdText}','{!$Component.entitleAccountId}')" class="lookupIcon" src="/s.gif" /></div></div>
+                              </apex:outputPanel>
+                              <apex:outputPanel layout="block" styleClass="lookupField" style="width:220px;">
+                                <apex:outputLabel value="Entitle To Address" for="entitleAddressIdIdText" style="font-weight:bold;"/>
+                                <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Address__c}"  id="entitleAddressId"/>
+                                <div style="width:220px;display:block;"><apex:inputText id="entitleAddressIdIdText" onchange="copyNullValue('{!$Component.entitleAddressIdIdText}','{!$Component.entitleAddressId}')" value="{!item.entitleAddressName}" style="width:180px;display:inline;" html-readonly="readonly"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="getAddresses123('{!$Component.entitleSalesAccountId}','{!$Component.entitleAddressIdIdText}','{!$Component.entitleAddressId}')" class="lookupIcon" src="/s.gif" /></div></div>
+                              </apex:outputPanel>
+                              <apex:outputPanel layout="block" styleClass="lookupField" style="width:220px;">
+                                <apex:outputLabel value="Entitle To Contact" for="entitleContactIdText" style="font-weight:bold;"/>
+                                <apex:inputText style="display:none" value="{!item.opportunityLineItem.Entitle_To_Contact__c}"  id="entitleContactId"/>
+                                <div style="width:220px;display:block;"><apex:inputText id="entitleContactIdText"  onchange="copyNullValue('{!$Component.entitleContactIdText}','{!$Component.entitleContactId}')" value="{!item.entitleContactName}" style="width:180px;display:inline;" html-readonly="readonly"/><div style="width:20px;display:inline;"><img style="cursor:pointer" onclick="getContacts('{!$Component.entitleSalesAccountId}','{!$Component.entitleContactIdText}','{!$Component.entitleContactId}','{!$Component.rhnEntitlementLoginText}')" class="lookupIcon" src="/s.gif" /></div></div>
+                              </apex:outputPanel>
+                              <apex:outputPanel layout="block" style="width:200px;">
+                                <apex:outputLabel value="RHN Entitlement Login" for="rhnEntitlementLoginText" style="font-weight:bold;"/>
+                                <div style="width:200px;display:block;"><apex:inputText value="{!item.rhnEntitlementLogin}" id="rhnEntitlementLoginText" style="width:180px;display:inline;" html-readonly="readonly"/></div>
+                              </apex:outputPanel>
+                            </apex:pageBlockSection>
+                          </apex:outputPanel>
+                        </apex:column -->
+                    </apex:pageBlockTable>
+                </div>
+                <div id="tab-3" class="tab-content">
+                    <apex:pageBlockTable id="lineItems2" value="{!lineItems}" var="item" rowClasses="{!IF(ISPICKVAL($User.UserType, 'Standard'),'oddRow,oddRow,evenRow,evenRow','')}">
+                        <apex:column headerValue="Delete">
+                            <apex:inputCheckBox value="{!item.isBeingRemovedTrdTab}" />
+                        </apex:column>
+                        <apex:column style="font-size:14pt; {!if (item.lineItemStatus = 'SUCCESS', 'color:green;', 'color:red;')}">
+                            <apex:outputText rendered="{!(item.lineItemStatus = 'SUCCESS')}">&#x2714;</apex:outputText>
+                            <apex:outputText rendered="{!(item.lineItemStatus = 'FAILURE')}">&#x2716;</apex:outputText>
+                        </apex:column>
+                       <!-- <apex:column value="{!item.opportunityLineItem.PricebookEntry.Name}"/>-->
+                        <apex:column value="{!item.opportunityLineItem.PricebookEntry.ProductCode}"/>    <!--field added-->
+                       <!-- <apex:column value="{!item.opportunityLineItem.UnitPrice}"/>-->
+                        <apex:column value="{!item.opportunityLineItem.Quantity}"/>
+                        <apex:column value="{!item.opportunityLineItem.ActualStartDate__c}"/>
+                        <apex:column value="{!item.opportunityLineItem.ActualEndDate__c}"/>
+                         <apex:column headerValue="Total Price" rendered="{!ISPICKVAL($User.UserType, 'Standard')}">
+                            <c:OutputCurrency id="totalPrice" isoCode="{!item.opportunityLineitem.CurrencyIsoCode}" value="{!item.opportunityLineitem.unitPrice*item.opportunityLineitem.Quantity}"/>
+                        </apex:column>                      <!--Total price field added-->
+                        <apex:column value="{!item.opportunityLineItem.Contract_Numbers__c}"/>      <!--Contract Number field added-->
+                        <apex:column value="{!item.opportunityLineItem.Description}" style="width:100%;"/>
+
+                        <apex:column headerValue="Code - Description: amount">
+                           <apex:repeat value="{!item.codeDiscountAmountList}" var="codeDiscountAmount">
+                                <apex:outputText >{!codeDiscountAmount}<br/></apex:outputText>
+                           </apex:repeat>
+                        </apex:column>
+                     </apex:pageBlockTable>
+                </div>
+            </div>      
+            <apex:pageBlockButtons id="pbbutnid" location="both"> 
+                <apex:commandButton value="{!$Label.First_MP}" action="{!first}" rerender="pageBlockId" status="status" disabled="{!disableFirst}"/>
+                <apex:commandButton value="{!$Label.Previous_MP}" action="{!Previous}" rerender="pageBlockId" status="status" disabled="{!disablePrevious}"/>
+                <apex:commandButton value="{!$Label.Next_MP}" action="{!Next}" reRender="pageBlockId" status="status" disabled="{!disableNext}"/>
+                <apex:commandButton value="{!$Label.Last_MP}" action="{!last}" reRender="pageBlockId" status="status" disabled="{!disableLast}"/>&nbsp;&nbsp;
+                <apex:actionStatus id="status" startText="Please Wait..."/>             
+            </apex:pageBlockButtons>            
+            <!-- container -->
+            <!-- highlight rows when 0 is returned as the list price from the pricing call -->
+            <script>
+                var objTable = document.getElementById("{!$Component.lineItems}");
+                var objRows = objTable.getElementsByTagName("tr");
+
+                //
+                // loop through the rows of the line items table
+                //
+
+                for (var i = 1; i < objRows.length; i++) {
+
+                    var objListPrice
+                    var objCells = objRows[i].getElementsByTagName("td");
+
+                    //
+                    // loop through the cells to find the list price input field
+                    //
+
+                    for (var j = 0; j < objCells.length; j++) {
+                        var objInput = objCells[j].getElementsByTagName("input");
+
+                        if (objInput.length > 0) {
+                            if (objInput[0].id.indexOf("listPrice") != -1)
+                                objListPrice = objInput[0];
+                        }
+                    }
+
+                    //
+                    // set the background color for a row that has a list price of 0
+                    //
+
+                    if (parseInt(objListPrice.value) == 0)
+                        objRows[i].style.backgroundColor = '#BBBBFF';
+                }                               
+            </script>
+        </apex:pageBlock>      
+    </apex:form>
+
+    <!-- Popup Code -->
+    <div class = "RH_bg-fade"></div>
+    <div class = "RH_modal-window">
+        <div class = "RH_modal-head">
+            <!--------- Popup Group Member Header ----------->
+            <div class = "modal-group-header RH_left" id = "RH_header">
+              <!--  Test Header -->
+            </div>
+            <!--------- End Group Member Header ---------
+            <a class = "modal-close" href = "javascript: void(0);" onclick = "hideModal()"></a> -->
+        </div>
+        <!--------- Popup Group Member Content ----------->
+        <div class = "RH_modal-content" id = "RH_body">
+            <div id="SalesAccountTable">
+            </div>
+        </div>
+
+        <!--------- End Popup Group Member Content ----------->
+        <div class = "RH_modal-btm">
+            <!--------- Popup Popup Group Member Footer ----------->
+            <div class = "modal-footer" id = "RH_footer">
+                <button type = "button" class="RH_closePopup" id="closePopup" >Proceed</button>
+                <button type = "button" class="RH_closePopup" onclick="hideThisPopup();" id="closePopup" >Cancel</button>
+            </div>
+            <!--------- End Popup Popup Group Member Footer ----------->
+        </div>
+     </div>
+     <!--------- End Popup ----------->
+
+    <script>
+        function getLookupElementById(elementId) {
+            var e = document.getElementById(elementId+'_lkid');
+            if(e == null) {
+                e = document.getElementById(elementId);
+            }
+            return e;
+        }
+    </script>
+
+    <script>
+        // search for sales accounts
+        function getSalesAccount(salesAccountText,salesAccountId,AccountText,AccountId,addressText,addressId,contactText,contactId){
+            salesAccountTextData = getLookupElementById(salesAccountText).value;
+            // if search criteria is present
+            if(salesAccountTextData.length > 2){
+                Opportunity_ProductPricingController.salesAccountSearch(salesAccountTextData, function(result, event)
+                {
+                    if (event.status)
+                    {
+                        var salesAccountIdText = getLookupElementById(salesAccountId).value;
+                        // convert JSON string to JSON Object
+                        var jsonData = removeQuotes(result);
+                        $("#closePopup").attr('onclick','').unbind('click');
+                        // build dynamic Table to be displayed in the popup
+                        var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                        table += '<thead><tr><th>Select</th><th>Account Name</th><th>CDH Party Number</th><th>Billing Address</th><th>Account Owner</th><th>Record Type</th><th>EBS Account Number(s)</th><th>Account Classification</th><th>Phone</th><th>Fax</th></tr></thead><tbody>';
+                        var jsonDataLength = jsonData.length - 1;
+                        for(i = jsonDataLength ; i >= 0 ; i--){
+                            table+='<tr><td width="40px"><input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" '+(salesAccountIdText == jsonData[i].RecId?'checked="checked" ':'')+' /><span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td><td>'+jsonData[i].RecName+'</td><td>'+jsonData[i].PartyNumber+'</td><td>'+jsonData[i].AccBillingAddress+'</td><td>'+jsonData[i].OwnerName+'</td><td>'+jsonData[i].RecordType+'</td><td>'+jsonData[i].EbsAcc+'</td><td>'+jsonData[i].Classification+'</td><td>'+jsonData[i].Phone+'</td><td style="width:auto;">'+jsonData[i].Fax+'</td></tr>';
+                        }
+                        table+='</tbody></table>';
+                        salesAccPopUp = true;
+                        // append to division
+                        $("#SalesAccountTable").html( table );
+                        // initialize data table
+                        $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                        $('#RH_header').html('Search Sales Account');
+                        // display popup
+                        showModel();
+                        // functions on buttons
+                        $("#closePopup").click(function(){
+                            addDataToField(salesAccountId,salesAccountText);
+                            document.getElementById(AccountText).value = '';
+                            document.getElementById(AccountId).value = '';
+                            document.getElementById(addressText).value = '';
+                            document.getElementById(addressId).value = '';
+                            document.getElementById(contactText).value = '';
+                            document.getElementById(contactId).value = '';
+                        });
+                    }
+                }, {escape:true});
+            }
+            // prompt user to enter search criteria
+            else{
+                alert('Please enter search criteria');
+            }
+        }
+    </script>
+
+    <script>
+        // Get all related EBS Accounts for the selcted Sales account
+        function getEBSAccount(salesaccountId,EBSAccount,EBSAccountId){
+            console.log(salesaccountId);
+            console.log(EBSAccount);
+            console.log(EBSAccountId);
+            salesaccountIdText = getLookupElementById(salesaccountId).value;
+            if(salesaccountIdText == null || salesaccountIdText == ''){
+                    alert('Please select Sales Account');
+            }else{
+                    Opportunity_ProductPricingController.EBSAccountSearch(salesaccountIdText, function(result, event)
+                    {
+                        if (event.status)
+                        {
+                            var ebsAccountIdText = getLookupElementById(EBSAccountId).value;
+                            // convert JSON String to JSON Object
+                            var jsonData = removeQuotes(result);
+                            // Build Dynamic table
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                            table += '<thead><tr><th>Select</th><th>EBS Account Number</th><th>EBS Party Number</th><th>EBS Party Name</th><th>Primary EBS Account</th><th>Account Description</th></tr></thead><tbody>';
+                            var jsonDataLength = jsonData.length - 1;
+                            var tableRowNum = 1;
+                            for(i = jsonDataLength ; i >= 0 ; i--){
+                                table+='<tr><td width="40px"><input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" '+(ebsAccountIdText == jsonData[i].RecId?'checked="checked" ':'')+' /><span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td><td>'+jsonData[i].RecName+'</td><td>'+jsonData[i].PartyNumber+'</td><td>'+jsonData[i].PartyName+'</td>';
+                                //Bill to
+                                if(jsonData[i].BillTo == "checked")
+                                    table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                                else
+                                    table += '<td><input type="checkbox" disabled="true"/></td>';
+                                table += '<td style="width:auto;">'+jsonData[i].Description+'</td>';
+                                table +='</tr>';
+                                tableRowNum++;
+                            }
+                            $('#RH_header').html('Search EBS Accounts');
+                            table+='</tbody></table>';
+
+                            // append the table to division
+                            $("#SalesAccountTable").html( table );
+                            // Initialize data table
+                            $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                            // show popup
+                            showModel();
+                            $("#closePopup").click(function(){
+                                addDataToField(EBSAccountId,EBSAccount);
+                            });
+                        }
+                    }, {escape:true});
+            }
+        }
+    </script>
+
+    <script>
+        // method to get all related address for selected sales account
+        function getAddresses123(salesaccountId,billAddress,billAddressId){
+            console.log('-------------'+salesaccountId);
+            console.log('-------------'+billAddress);
+            console.log('-------------'+billAddressId);
+            salesaccountIdText = getLookupElementById(salesaccountId).value;
+            if(salesaccountIdText == null || salesaccountIdText == ''){
+                alert('Please select Sales Account');
+            }else{
+                Opportunity_ProductPricingController.AddressSearch(salesaccountIdText, function(result, event)
+                {
+                    if (event.status)
+                    {
+                        console.log('-------------'+salesaccountId);
+                        console.log('-------------'+billAddress);
+                        console.log('-------------'+billAddressId);
+                        // convert JSON String to JSOn Object
+                        var billAddressIdText = getLookupElementById(billAddressId).value;
+                        var jsonData = removeQuotes(result);
+                        $("#closePopup").attr('onclick','').unbind('click');
+                        var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                        table += '<thead><tr><th>Select</th><th>Address 1</th><th>Address 2</th><th>City</th><th>State</th><th>Province</th><th>Country</th><th>Zip/Postal Code</th><th>Bill-To</th><th>Ship-To</th><th>Entitle-To</th><th>Sold-To</th><th>Address Number</th></tr></thead><tbody>';
+                        var jsonDataLength = jsonData.length - 1;
+                        for(i = jsonDataLength ; i >= 0 ; i--){
+                            // create complete address details to be displayed on the input field
+                            table +='<tr>';
+                            table += '<td width="40px"><input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" '+(billAddressIdText == jsonData[i].RecId?'checked="checked" ':'')+' /><span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td>';
+                            table += '<td>'+jsonData[i].AddressOne+'</td>';
+                            table += '<td>'+jsonData[i].AddressTwo+'</td>';
+                            //table += '<td>'+jsonData[i].AddressThree+'</td>';
+                            table += '<td>'+jsonData[i].City+'</td>';
+                            table += '<td>'+jsonData[i].State+'</td>';
+                            table += '<td>'+jsonData[i].Province+'</td>';
+                            table += '<td>'+jsonData[i].Country+'</td>';
+                            table += '<td>'+jsonData[i].zipPostal+'</td>';
+                            //Bill to
+                            if(jsonData[i].BillTo == "checked")
+                                table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                            else
+                                table += '<td><input type="checkbox" disabled="true"/></td>';
+                            //Shipto
+                            if(jsonData[i].ShipTo == "checked")
+                                table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                            else
+                                table += '<td><input type="checkbox" disabled="true"/></td>';
+                            // Entitle to
+                            if(jsonData[i].EntitleTo == "checked")
+                                table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                            else
+                                table += '<td><input type="checkbox" disabled="true"/></td>';
+                            // Sold to
+                            if(jsonData[i].SoldTo == "checked")
+                                table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                            else
+                                table += '<td><input type="checkbox" disabled="true"/></td>';
+                            //table += '<td>'+jsonData[i].partySiteNumber+'</td>';
+                            table += '<td style="width:auto;">'+jsonData[i].AddressNumber +'</td>';
+                            table +='</tr>';
+                        }
+                        table+='</tbody></table>';
+                        // append to table
+                        $("#SalesAccountTable").html( table );
+                        // initialize data table
+                        $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                        $('#RH_header').html('Search Address');
+                        // show popup
+                        showModel();
+
+                            $("#closePopup").click(function(){
+                                console.log('-------------12'+billAddress);
+                                console.log('-------------12'+billAddressId);
+                                addDataToField(billAddressId,billAddress);
+                            });
+                        }
+                }, {escape:true});
+            }
+        }
+    </script>
+
+    <script>
+        // get all related contacts for the sals account selected
+        function getContacts(salesaccountId,Contact,ContactId,rhnEntitlementLoginId){
+            console.log(salesaccountId);
+            console.log(Contact);
+            console.log(ContactId);
+            console.log(rhnEntitlementLoginId);
+            salesaccountIdText = getLookupElementById(salesaccountId).value;
+            var rhnEntitlementLoginIdText = document.getElementById(rhnEntitlementLoginId).value;
+            if(salesaccountIdText == null || salesaccountIdText == ''){
+                alert('Please select Sales Account');
+            }else{
+                Opportunity_ProductPricingController.ContactSearch(salesaccountIdText, function(result, event)
+                {
+                    if (event.status)
+                    {
+                        var contactIdText = getLookupElementById(ContactId).value;
+                        // convert JSON Data to JSON object
+                        var jsonData = removeQuotes(result);
+                        $("#closePopup").attr('onclick','').unbind('click');
+                        // build dynamic table
+                        var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                        table += '<thead><tr><th>Select</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Department</th><th>Phone</th><th>CDH Party Number</th><th>RHN Entitlement Login</tr></thead><tbody>';
+                        var rhnEntitlementLoginMap = new Object();
+                        var jsonDataLength = jsonData.length - 1;
+                        var tableRowNum = 1;
+                        for(i = jsonDataLength ; i >= 0 ; i--){
+                            //alert(jsonData[i].AccName);
+                            table+='<tr><td width="40px"><input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" '+(contactIdText == jsonData[i].RecId?'checked="checked" ':'')+'/><span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td><td>'+jsonData[i].firstName+'</td><td>'+jsonData[i].lastName+'</td><td>'+jsonData[i].Email+'</td><td>'+jsonData[i].Department+'</td><td>'+jsonData[i].contactPhone+'</td><td>'+jsonData[i].contactPartyNumber+'</td><td style="width:auto;">'+jsonData[i].rhnEntitlementLogin+'</td></tr>';
+                            rhnEntitlementLoginMap[jsonData[i].RecId] = jsonData[i].rhnEntitlementLogin;
+                            tableRowNum++;
+                        }
+                        table+='</tbody></table>';
+
+                        // append table to the division
+                        $("#SalesAccountTable").html( table );
+
+                        // initialize data table
+                        $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                        $('#RH_header').html('Search Contacts');
+                        // show popup
+                        showModel();
+                        $("#closePopup").click(function(){
+                            addDataToField(ContactId,Contact);
+                            assignRHNEntitlementLogin(ContactId,rhnEntitlementLoginId,rhnEntitlementLoginMap);
+                        });
+                    }
+                }, {escape:true});
+            }
+        }
+    </script>
+
+    <script>
+        function assignRHNEntitlementLogin(contactId,rhnEntitlementLoginId,rhnEntitlementLoginMap) {
+            var rhnEntitlementLogin = null;
+            var contactIdText = getLookupElementById(contactId).value;
+            if(contactIdText != null) {
+                rhnEntitlementLogin = rhnEntitlementLoginMap[contactIdText];
+            }
+            document.getElementById(rhnEntitlementLoginId).value = (rhnEntitlementLogin != null) ? rhnEntitlementLogin : '';
+        }
+    </script>
+
+    <script>
+        // once a record is selected in the popup, this method will put the relavent data in the fields
+        function addDataToField(idFieldData,inputField){
+            var idFieldData = idFieldData;
+            var inputField = inputField;
+            console.log('--------------------123'+idFieldData);
+            console.log('--------------------123'+inputField);
+            // check if any record is selected
+            if ($('input[name=accountRec]:checked').length > 0) {
+                var selectedSalesAccount = $('input[name=accountRec]:checked').val();
+                var accountName = $('#'+selectedSalesAccount).html();
+                document.getElementById(idFieldData).value = selectedSalesAccount;
+                document.getElementById(inputField).value = accountName;
+                // hide popup
+                $('.RH_modal-window').css('display','none');
+                $('.RH_bg-fade').fadeOut('slow');
+                $('body').css('overflow','auto');
+            }else{
+                // if no record is selected, just close the popup
+                $('.RH_modal-window').css('display','none');
+                $('.RH_bg-fade').fadeOut('slow');
+                $('body').css('overflow','auto');
+            }
+        }
+    </script>
+
+    <script>
+        // remove quate from json string
+        function removeQuotes(mystring) {
+
+            newString = mystring.replace(/&(lt|gt|quot);/g, function (m, p) {
+                //console.log(p);
+                return (p == "lt") ? "<" : ((p == "gt") ? ">" : "\"");
+            });
+
+            //var newJ= $.parseJSON(newString);
+            var  newJ = eval ("(" + newString+ ")");
+            return newJ;
+        }
+    </script>
+
+    <script>
+        var salesAccPopUp = false;
+
+        // Popup code
+        function showModel(){
+            var scrollPos = $(window).scrollTop();
+            var width = $(window).width();
+            var height = $(window).height();
+            var top = 150;
+            if(height < 500) {
+               top = 0;
+            }
+            else if(height < 800) {
+               top = (height - 500)/2;
+            }
+            scrollPos =  scrollPos-50;
+            $('.RH_modal-window').css('position','fixed');
+            $('.RH_modal-window').css('max-width',width+'px');
+            $('.RH_modal-window').css('max-height',(height - 2*top)+'px');
+//          if(salesAccPopUp){
+                salesAccPopUp = false;
+                $('.RH_modal-window').css('width',width+'px');
+                $('.RH_modal-window').css('height','');
+                $('.RH_modal-window').css('left','0');
+                $('.RH_modal-window').css('margin-left','0');
+//          } else {
+//              $('.RH_modal-window').css('width','');
+//              $('.RH_modal-window').css('left','');
+//              $('.RH_modal-window').css('margin-left','');
+//          }  
+            $('.RH_modal-window').css('overflow','auto');
+//          var scrollPos = $(window).scrollTop();
+//          scrollPos =  scrollPos-50;
+//          if(salesAccPopUp){
+//              salesAccPopUp = false;
+//              $('.RH_modal-window').css('width','100%');
+//              $('.RH_modal-window').css('left','0');
+//              $('.RH_modal-window').css('margin-left','0');
+//          } else {
+//              $('.RH_modal-window').css('width','100%');
+//              $('.RH_modal-window').css('left','0');
+//              $('.RH_modal-window').css('margin-left','0');
+//          }
+//          $('.RH_modal-window').css('top',scrollPos+'px');
+            $('#RH_header').show();
+            $('#RH_body').show();
+            $('#RH_footer').show();
+            $('body').css('overflow','hidden');
+            $('.RH_bg-fade').fadeIn('slow');
+            $('.RH_modal-window').slideDown('slow');
+        }
+
+        // method to hide popup
+        function hideThisPopup(){
+            $('.RH_modal-window').css('display','none');
+            $('.RH_bg-fade').fadeOut('slow');
+            $('body').css('overflow','auto');
+        }
+
+        $(document).ready(function(){
+
+            if ({!isPartnerUser}) {
+                $('#tab_2').remove();
+                $('#tab_3').remove();
+                $('#RH_footer').remove();
+            }
+            $('ul.tabs li').click(function(){
+                var tab_id = $(this).attr('data-tab');
+
+                $('ul.tabs li').removeClass('current');
+                $('.tab-content').removeClass('current');
+
+                $(this).addClass('current');
+                $("#"+tab_id).addClass('current');
+            })
+
+        })
+    </script>
+
+</apex:page>

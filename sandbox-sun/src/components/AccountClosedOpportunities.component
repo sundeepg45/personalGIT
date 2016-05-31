@@ -1,0 +1,64 @@
+<apex:component controller="AccountComponentController">
+	<apex:attribute name="value" description="Account to show" type="Account" required="true" assignto="{!account}" />
+	<apex:attribute name="showSalesTeam" description="Should the salesteam be displayed" type="Boolean" required="false" default="false" assignto="{!needSalesTeam}" />
+	<apex:attribute name="showStage" description="Should the stage be displayed" type="Boolean" required="false" default="false" />
+	<apex:attribute name="showHeader" description="True if the header should be displayed" type="Boolean" required="false" default="true" />
+	<apex:outputPanel rendered="{!showHeader}" layout="block" styleClass="pbSubheader tertiaryPalette">
+		<h3>CLOSED OPPORTUNITIES (Current and Past 3 Quarters) <span class="titleSeparatingColon">:</span></h3>
+	</apex:outputPanel>
+	<div class="pbSubsection">
+		<table style="font-size: 100%;padding-left:1em" class="detailList" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+				<apex:componentBody />
+				<apex:repeat value="{!ClosedOpportunityList}" var="opportunity">
+					<apex:outputPanel rendered="{!showStage}" layout="none">
+						<tr bgcolor="#CCCFFF">
+							<td width="40%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Opportunity Name</b></td>
+							<td width="20%" align="left" style="padding-right:5px"><b>Stage</b></td>
+							<td width="20%" align="left" style="padding-right:5px"><b>Amount</b></td>
+							<td width="20%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Close date</b></td>
+						</tr>
+						<tr>
+							<td align="left" class="dataCol" style="padding-right:5px"><c:OutputString value="{!opportunity.Name}">&#160;</c:OutputString></td>
+							<td align="left" class="dataCol" style="padding-right:5px"><c:OutputString value="{!opportunity.StageName}">&#160;</c:OutputString></td>
+							<td align="left" class="dataCol" style="padding-right:5px"><c:OutputCurrency isoCode="{!opportunity.CurrencyIsoCode}" value="{!NULLVALUE(opportunity.Amount,0)}" /></td>
+							<td align="left" class="dataCol" style="padding-right:5px"><apex:outputField value="{!opportunity.CloseDate}"/></td>
+						</tr>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!NOT(showStage)}" layout="none">
+						<tr>
+							<td width="50%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Opportunity Name</b></td>
+							<td width="20%" align="left" style="padding-right:5px"><b>Amount</b></td>
+							<td width="20%" align="left" style="white-spacing:nowrap;padding-right:5px"><b>Closed Date</b></td>
+						</tr>
+						<tr>
+							<td align="left" style="padding-right:5px"><c:OutputString value="{!opportunity.Name}">&#160;</c:OutputString></td>
+							<td align="left" style="padding-right:5px"><c:OutputCurrency isoCode="{!opportunity.CurrencyIsoCode}" value="{!NULLVALUE(opportunity.Amount,0)}" /></td>
+							<td align="left" style="padding-right:5px"><apex:outputField value="{!opportunity.CloseDate}"/></td>
+						</tr>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!showSalesTeam}" layout="none">
+						<tr>
+							<td colspan="{!IF(showStage,4,3)}" style="padding-right:5px"><b>Sales Team</b></td>
+						</tr>
+						<tr>
+							<td align="left" style="padding-right:5px"><b>Team Member</b></td>
+							<td align="left" style="padding-right:5px"><b>Role</b></td>
+							<td>&#160;</td>
+						</tr>
+						<apex:repeat value="{!opportunity.OpportunityTeamMembers}" var="teamMember">
+							<tr>
+								<td class="dataCol" align="left" style="padding-right:5px"><c:OutputString value="{!teamMember.User.Name}">&#160;</c:OutputString></td>
+								<td class="dataCol" align="left" style="padding-right:5px"><c:OutputString value="{!teamMember.TeamMemberRole}">&#160;</c:OutputString></td>
+								<td colspan="{!IF(showStage,2,1)}">&#160;</td>
+							</tr>
+						</apex:repeat>
+						<tr>
+							<td colspan="{!IF(showStage,4,3)}">&#160;</td>
+						</tr>
+					</apex:outputPanel>
+				</apex:repeat>
+			</tbody>
+		</table>
+	</div>
+</apex:component>

@@ -1,0 +1,658 @@
+<!--
+* ReferenceEdge
+* 
+* Point of Reference, Inc. - Copyright 2014 All rights reserved.
+*
+* @company : Point of Reference, Inc.
+* @website : www.point-of-reference.com
+*
+* Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+* WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+* POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+* MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+* AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+* ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+* WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+* WRITTEN CONSENT FROM COMPANY.
+-->
+<apex:page controller="refedge.RfSearchController" sidebar="false" id="pageId" tabStyle="RE_Search__tab">
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Sction Header-->
+    <apex:sectionHeader title="{!$Label.RF_Filters}" help="RfSearchHelpPage"  rendered="{!isFullLicenseAccessible}"/>
+
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+
+    <!-- Add JavaScript & Jquery-->
+    <script language="javascript" type="text/javascript">
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        jQuery(".content img").css("background-image","none");
+        jQuery(".content img").attr("src","{!URLFOR($Resource.refedge__RESearchFilterIcons, 'filter-icon.png')}");
+    </script>
+
+    <style type="text/css">
+        /* ---------------------- Div width -------------------------- */
+        .divClass{ 
+            width:900px;
+        }
+        /* ----------Change width here for item container------------- */
+        #divUlId li { 
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word; 
+        }
+
+        /* ----------Change width here for item container------------- */
+        .divClass div { 
+            width:100%;
+            float:left;
+        }
+
+        .rightImage {
+            display:inline-block; width:15px;
+        }                    
+
+        /* ----------Change item width here -------------------------- */
+        #divUlId li > * { 
+            table-layout:fixed; 
+            width:150px; 
+            overflow:hidden; 
+        }
+
+        /* ----------------- Item text aliment ----------------------- */
+        .divClass li { 
+            color:#333; 
+            text-align:left;
+        }
+
+        .pbTitle{
+            display:none;
+        }
+
+        .ulClass{ 
+            table-layout:fixed; 
+            width:250px; 
+            overflow:hidden; 
+            float : left;
+            list-style-type: none;
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word;
+        }  
+    </style>
+
+    <!-- Form -->
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">    
+        <!-- Action Fuctions for Referenceability -->  
+        <apex:actionFunction name="selectReferenceabilityType" reRender="opReferenceability" action="{!referenceabilityWrapper.setReferenceabilityTypes}" oncomplete="PORHideLoading();">
+            <apex:param name="param1" value="" assignTo="{!referenceabilityWrapper.referenceabilityTypeId}"/>
+        </apex:actionFunction> 
+
+        <!-- Action Fuctions for Content Languages-->
+        <apex:actionFunction name="selectContentLanguage" reRender="opContLang" action="{!contentSearch.setContentLanguages}" oncomplete="PORHideLoading();">
+            <apex:param name="param1" value="" assignTo="{!contentSearch.selectedContentLanguageName}"/>
+        </apex:actionFunction>
+
+        <!-- Action Fuctions for Content Types-->
+        <apex:actionFunction name="selectContentType" reRender="opContentTypes" action="{!contentSearch.setContentTypes}" oncomplete="PORHideLoading();">
+            <apex:param name="param1" value="" assignTo="{!contentSearch.selectedContentTypeName}"/>
+        </apex:actionFunction>
+
+        <!-- Action Fuctions for Attribute-->  
+        <apex:actionFunction name="selectAttribute" reRender="opAttributes" action="{!attributeWrapper.setAttributes}" immediate="false" oncomplete="PORHideLoading();">
+            <apex:param name="selectedLabelId" value="" assignTo="{!attributeWrapper.selectedLabelId}"/>
+            <apex:param name="param1" value="" assignTo="{!attributeWrapper.attributeId}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="setTheFeaturedCheckbox" action="{!contentSearch.setTheFeaturedCheckbox}" oncomplete="PORHideLoading();" rerender="pbsCtId,contentTypesDiv"/>
+        
+        <!-- Page Block -->
+        <apex:pageBlock id="pbId">
+            <apex:variable value="FALSE" var="dateIndex"/>
+            
+            <apex:repeat value="{!filterList}" var="filter">
+            <!-- Page Block Section for Referencability-->
+            <apex:PageBlockSection id="pbsRefId" columns="1"> 
+                <apex:outputPanel layout="block" id="opReferenceability" rendered="{!AND(showAccount,Not(filter.refedge__From_Mapping__c),filter.refedge__Field_API_Name__c=='Referenceability')}">
+                    <div class="divClass">
+                        <div>
+                            <div style="width: 50%;text-align:left;float:left;text-indent:50px;font-size: 150%;"> {!$Label.Referenceability} </div>
+                            <apex:outputPanel layout="block" style="width: 30%;float:right;text-align:right;" rendered="{! referenceabilityWrapper.referenceabilityTypeWrapper != null && referenceabilityWrapper.referenceabilityTypeWrapper.size > 0}">
+                                <div style="text-align:right;"> 
+                                    <apex:outputPanel id="iconblockId" layout="block" style="float:left;margin-top: 5px;margin-right: 9px;">
+                                        <span style="float:left;" class="helpButton" id="helpImg1-_help"> 
+                                            <apex:outputLabel value=""/> 
+                                            <img id="helpImg1" class="helpOrb" src="/s.gif" style="float:left;margin-top: 5px;margin-right: 9px;"/> 
+                                            <script>
+                                                sfdcPage.setHelp('helpImg1', '{!$Label.Any_All_helpText}');
+                                                var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+                                                var isIE7 = (navigator.appVersion.indexOf('MSIE 7.')==-1) ? false : true;
+                                                var helpImg = document.getElementById('helpImg1');
+                                                if(isIE7)
+                                                helpImg.style.marginRight = "6px";
+                                                else if(isIE)
+                                                helpImg.style.marginRight = "0px";
+                                                else
+                                                helpImg.style.marginRight = "9px";                         
+                                            </script> 
+                                        </span>
+                                    </apex:outputPanel>
+                                    <apex:selectRadio style="float:left;" layout="lineDirection" value="{!filterLogics[filter.refedge__Field_API_Name__c].operatorSelected}">
+                                        <apex:selectOptions value="{!logicsWithName}"/>
+                                    </apex:selectRadio>
+                                    <div style="float: right;width: 60%;margin-top: 5px;">
+                                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Select_All}" action="{!referenceabilityWrapper.selectAllReferenceabilityTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opReferenceability,pbsIs"/>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Clear_All}" action="{!referenceabilityWrapper.clearAllReferenceabilityTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opReferenceability,pbsIs"/>                            
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </div>
+                        <div>
+                            <!-- Output Panel for Referenciability records--> 
+                            <apex:outputPanel rendered="{! referenceabilityWrapper.referenceabilityTypeWrapper != null && referenceabilityWrapper.referenceabilityTypeWrapper.size > 0}">
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!referenceabilityWrapper.referenceabilityTypeWrapper}" var="referenceabilityType"
+                                    first="0" rows="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3) + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 0, 1,0)}">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">                                  
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!referenceabilityType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectReferenceabilityType('{!JSENCODE(referenceabilityType.refType.Id)}');return false;">
+                                                            <apex:outputLabel value="{!referenceabilityType.refType.Name}" style="font-weight:{!HTMLENCODE(referenceabilityType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!referenceabilityWrapper.referenceabilityTypeWrapper}" var="referenceabilityType"
+                                    first="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3) + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 0, 1,0)}" 
+                                    rows="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3) + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 1, 1,0)}">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">                                      
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!referenceabilityType.fontWeight !='normal'}" height="12px" width="12px"/>                                           
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectReferenceabilityType('{!JSENCODE(referenceabilityType.refType.Id)}');return false;">
+                                                            <apex:outputLabel value="{!referenceabilityType.refType.Name}" style="font-weight:{!HTMLENCODE(referenceabilityType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>     
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!referenceabilityWrapper.referenceabilityTypeWrapper}" var="referenceabilityType"
+                                    first="{!FLOOR(referenceabilityWrapper.referenceabilityTypeWrapper.size/3)*2 + if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 0, if(MOD(referenceabilityWrapper.referenceabilityTypeWrapper.size,3) > 1,2,1) ,0)}" rows="">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">                                
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!referenceabilityType.fontWeight !='normal'}" height="12px" width="12px"/>                                           
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectReferenceabilityType('{!JSENCODE(referenceabilityType.refType.Id)}');return false;">
+                                                        <apex:outputLabel value="{!referenceabilityType.refType.Name}" style="font-weight:{!HTMLENCODE(referenceabilityType.fontWeight)};cursor:pointer;" />
+                                                    </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul> 
+                            </apex:outputPanel> 
+                            <!-- Output Panel for No Record found-->  
+                            <apex:outputPanel rendered="{!referenceabilityWrapper.referenceabilityTypeWrapper.size = null || referenceabilityWrapper.referenceabilityTypeWrapper.size = 0 }">                                  
+                                <ul class="ulClass">                                    
+                                    <li>
+                                        <apex:outputLabel value="{!$Label.No_Data_Found}"/>
+                                    </li>
+                                </ul>
+                            </apex:outputPanel>          
+                        </div> 
+                    </div>
+                    <apex:variable value="TRUE" var="dateIndex"/>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+
+            <!-- Page Block Section for Content Language-->
+            <apex:PageBlockSection id="pbsContLangId"> 
+                <apex:outputPanel id="opContLang" rendered="{!AND(showRefContent,Not(filter.refedge__From_Mapping__c),NOT(refMatch),filter.refedge__Field_API_Name__c=='Content Language')}">
+                    <div class="divClass">
+                        <div>
+                            <div style="width: 50%;text-align:left;float:left;text-indent:50px;font-size: 150%;"> {!$Label.Content_Language} </div>
+                            <apex:outputPanel layout="block" style="width: 30%;float:right;text-align:right;" rendered="{! contentSearch.contentLanguages != null && contentSearch.contentLanguages.size > 0}">
+                                <div style="text-align:right;"> 
+                                    <apex:outputPanel id="iconblockId" layout="block" style="float:left;margin-top: 5px;margin-right: 9px;">
+                                        <span style="float:left;" class="helpButton" id="helpImg2-_help"> 
+                                            <apex:outputLabel value=""/> 
+                                            <img id="helpImg2" class="helpOrb" src="/s.gif" style="float:left;margin-top: 5px;margin-right: 9px;"/> 
+                                            <script>
+                                                sfdcPage.setHelp('helpImg2', '{!$Label.Any_All_helpText}');
+                                                var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+                                                var isIE7 = (navigator.appVersion.indexOf('MSIE 7.')==-1) ? false : true;
+                                                var helpImg = document.getElementById('helpImg2');
+                                                if(isIE7)
+                                                helpImg.style.marginRight = "6px";
+                                                else if(isIE)
+                                                helpImg.style.marginRight = "0px";
+                                                else
+                                                helpImg.style.marginRight = "9px";                         
+                                            </script> 
+                                        </span>
+                                    </apex:outputPanel>
+                                    <apex:selectRadio style="float:left;" layout="lineDirection" value="{!filterLogics[filter.refedge__Field_API_Name__c].operatorSelected}">
+                                        <apex:selectOptions value="{!logicsWithName}"/>
+                                    </apex:selectRadio>
+                                    <div style="float: right;width: 60%;margin-top: 5px;">
+                                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Select_All}" action="{!contentSearch.selectAllContentLanguages}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opContLang,pbsIs"/>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Clear_All}" action="{!contentSearch.clearAllContentLanguages}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opContLang,pbsIs"/>                            
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                    <div class="ContLangDiv">
+                        <div>
+                            <apex:outputPanel rendered="{!contentSearch.contentLanguages != null && contentSearch.contentLanguages.size > 0}">
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!contentSearch.contentLanguages}" var="contLang"
+                                    first="0" rows="{!FLOOR(contentSearch.contentLanguages.size/3) + if(MOD(contentSearch.contentLanguages.size,3) > 0, 1,0)}">
+                                        <li >
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!contLang.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectContentLanguage('{!JSENCODE(contLang.contentLanguageName)}');return false;">
+                                                            <apex:outputLabel value="{!contLang.contentLanguageName}" style="font-weight:{!HTMLENCODE(contLang.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!contentSearch.contentLanguages}" var="contLang"
+                                    first="{!FLOOR(contentSearch.contentLanguages.size/3) + if(MOD(contentSearch.contentLanguages.size,3) > 0, 1,0)}" 
+                                    rows="{!FLOOR(contentSearch.contentLanguages.size/3) + if(MOD(contentSearch.contentLanguages.size,3) > 1, 1,0)}">
+                                        <li >
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!contLang.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectContentLanguage('{!JSENCODE(contLang.contentLanguageName)}');return false;">
+                                                            <apex:outputLabel value="{!contLang.contentLanguageName}" style="font-weight:{!HTMLENCODE(contLang.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>     
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!contentSearch.contentLanguages}" var="contLang"
+                                    first="{!FLOOR(contentSearch.contentLanguages.size/3)*2 + if(MOD(contentSearch.contentLanguages.size,3) > 0, if(MOD(contentSearch.contentLanguages.size,3) > 1,2,1) ,0)}" rows="">
+                                        <li >
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!contLang.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectContentLanguage('{!JSENCODE(contLang.contentLanguageName)}');return false;">
+                                                            <apex:outputLabel value="{!contLang.contentLanguageName}" style="font-weight:{!HTMLENCODE(contLang.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>                                                             
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!contentSearch.contentLanguages.size = 0}">                                
+                                <ul class="ulClass">                                    
+                                    <li>
+                                        <apex:outputLabel value="{!$Label.No_Data_Found}"/>
+                                    </li>
+                                </ul>
+                            </apex:outputPanel> 
+                        </div>
+                    </div>
+                    <apex:variable value="TRUE" var="dateIndex"/>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+
+            <!-- Page Block Section for Content Types-->
+            <apex:PageBlockSection id="pbsCtId"> 
+                <apex:outputPanel id="opContentTypes" rendered="{!AND(showRefContent,NOT(refMatch),Not(filter.refedge__From_Mapping__c), filter.refedge__Field_API_Name__c=='Content Types')}">
+                    <div class="divClass">
+                        <div>
+                            <div style="width: 50%;text-align:left;float:left;text-indent:50px;font-size: 150%;"> {!$Label.Content_Types} 
+                            <!-- <Apex:outputPanel >
+                                <apex:image title="Featured Content" url="{!URLFOR($Resource.refedge__starImages,'startImages/starchecked.png')}" onclick="setTheFeaturedCheckbox();PORShowLoading();" rendered="{!contentSearch.featuredChecked}"/>
+                                <apex:image url="{!URLFOR($Resource.refedge__starImages,'startImages/startunchecked.png')}" onclick="setTheFeaturedCheckbox();PORShowLoading();" rendered="{!!contentSearch.featuredChecked}"/>
+                            </Apex:outputPanel> -->
+                            </div>
+                            <apex:outputPanel layout="block" style="width: 30%;float:right;text-align:right;" rendered="{!contentSearch.contentTypes != null && contentSearch.contentTypes.size > 0}">
+                                <div style="text-align:right;"> 
+                                    <apex:outputPanel id="iconblockId" layout="block" style="float:left;margin-top: 5px;margin-right: 9px;">
+                                        <span style="float:left;" class="helpButton" id="helpImg3-_help">
+                                            <apex:outputLabel value=""/> 
+                                            <img id="helpImg3" class="helpOrb" src="/s.gif" style="float:left;margin-top: 5px;margin-right: 9px;"/> 
+                                            <script>
+                                                sfdcPage.setHelp('helpImg3', '{!$Label.Any_All_helpText}');
+                                                var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+                                                var isIE7 = (navigator.appVersion.indexOf('MSIE 7.')==-1) ? false : true;
+                                                var helpImg = document.getElementById('helpImg3');
+                                                if(isIE7)
+                                                helpImg.style.marginRight = "6px";
+                                                else if(isIE)
+                                                helpImg.style.marginRight = "0px";
+                                                else
+                                                helpImg.style.marginRight = "9px";                         
+                                            </script> 
+                                        </span>
+                                    </apex:outputPanel>
+                                    <apex:selectRadio style="float:left;" layout="lineDirection" value="{!filterLogics[filter.refedge__Field_API_Name__c].operatorSelected}">
+                                        <apex:selectOptions value="{!logicsWithName}"/>
+                                    </apex:selectRadio>
+                                    <div style="float: right;width: 60%;margin-top: 5px;">
+                                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Select_All}" action="{!contentSearch.selectAllContentTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opContentTypes"/>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Clear_All}" action="{!contentSearch.clearAllContentTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opContentTypes"/>                            
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                    <div class="contentTypesDiv">
+                        <div>
+                            <apex:outputPanel rendered="{!contentSearch.contentTypes != null && contentSearch.contentTypes.size > 0}">
+                                <div style="float:left;width:100%;padding-left: 8%;">
+                                    <Apex:outputPanel rendered="{!showFeaturedContentIcons}">
+                                        <apex:outputPanel rendered="{!contentSearch.featuredChecked}">
+                                            <apex:image url="{!$Resource.refedge__Tick}"  height="12px" width="12px"/>
+                                            <apex:outputLabel value="{!$Label.Featured_Content}" style="font-weight:bold;cursor:pointer;" />
+                                            <apex:image title="{!$Label.Featured_Content}" url="{!URLFOR($Resource.refedge__starImages,'startImages/starchecked.png')}" onclick="setTheFeaturedCheckbox();PORShowLoading();" />
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!!contentSearch.featuredChecked}">
+                                            <apex:outputLabel value="{!$Label.Featured_Content}" />
+                                            <apex:image title="{!$Label.Featured_Content}" url="{!URLFOR($Resource.refedge__starImages,'startImages/startunchecked.png')}" onclick="setTheFeaturedCheckbox();PORShowLoading();" rendered="{!!contentSearch.featuredChecked}"/>
+                                        </apex:outputPanel>
+                                    </Apex:outputPanel>
+                                </div>
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!contentSearch.contentTypes}" var="contentType"
+                                    first="0" rows="{!FLOOR(contentSearch.contentTypes.size/3) + if(MOD(contentSearch.contentTypes.size,3) > 0, 1,0)}">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!contentType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectContentType('{!JSENCODE(contentType.contentTypeName)}');return false;">
+                                                            <apex:outputLabel value="{!contentType.contentTypeName}" style="font-weight:{!HTMLENCODE(contentType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!contentSearch.contentTypes}" var="contentType"
+                                    first="{!FLOOR(contentSearch.contentTypes.size/3) + if(MOD(contentSearch.contentTypes.size,3) > 0, 1,0)}" 
+                                    rows="{!FLOOR(contentSearch.contentTypes.size/3) + if(MOD(contentSearch.contentTypes.size,3) > 1, 1,0)}">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!contentType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectContentType('{!JSENCODE(contentType.contentTypeName)}');return false;">
+                                                            <apex:outputLabel value="{!contentType.contentTypeName}" style="font-weight:{!HTMLENCODE(contentType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>     
+                                <ul class="ulClass">
+                                    <apex:repeat value="{!contentSearch.contentTypes}" var="contentType"
+                                    first="{!FLOOR(contentSearch.contentTypes.size/3)*2 + if(MOD(contentSearch.contentTypes.size,3) > 0, if(MOD(contentSearch.contentTypes.size,3) > 1,2,1) ,0)}" rows="">
+                                        <li>
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!contentType.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectContentType('{!JSENCODE(contentType.contentTypeName)}');return false;">
+                                                            <apex:outputLabel value="{!contentType.contentTypeName}" style="font-weight:{!HTMLENCODE(contentType.fontWeight)};cursor:pointer;" />
+                                                        </apex:outputLink>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>                                                             
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!contentSearch.contentTypes.size = 0}">                                
+                                <ul class="ulClass">                                    
+                                    <li>
+                                        <apex:outputLabel value="{!$Label.No_Data_Found}"/>
+                                    </li>
+                                </ul>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                    <apex:variable value="TRUE" var="dateIndex"/>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+            
+            <!-- Page Block Section for Attributes--> 
+            <apex:PageBlockSection id="pbsAttrId" columns="1">
+                <apex:outputPanel layout="block" id="opAttributes" rendered="{!AND(NOT(ISBLANK(filter.refedge__Field_API_Name__c)),NOT(filter.refedge__From_Mapping__c),NOT(ISNULL(filter.refedge__Field_API_Name__c)), filter.refedge__Field_API_Name__c != 'Content Types', filter.refedge__Field_API_Name__c != 'Content Language', filter.refedge__Field_API_Name__c != 'Referenceability')}">
+                        <div class="divClass">
+                            
+                            <div>
+                                <div style="width: 50%;text-align:left;float:left;text-indent:50px;font-size: 150%;"> {!filter.refedge__Label__c} </div>
+                                <apex:outputPanel layout="block" style="width: 30%;float:right;text-align:right;" rendered="{!attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c] > 0}">
+                                    <div style="text-align:right;"> 
+                                        <apex:outputPanel id="iconblockId" layout="block" style="float:left;margin-top: 5px;margin-right: 9px;">
+                                            <span style="float:left;" class="helpButton" id="helpImg4-_help"> 
+                                                <apex:outputLabel value=""/> 
+                                                <img id="helpImg4" class="helpOrb" src="/s.gif" style="float:left;margin-top: 5px;margin-right: 9px;"/> 
+                                                <script>
+                                                    sfdcPage.setHelp('helpImg4', '{!$Label.Any_All_helpText}');
+                                                    var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+                                                    var isIE7 = (navigator.appVersion.indexOf('MSIE 7.')==-1) ? false : true;
+                                                    var helpImg = document.getElementById('helpImg4');
+                                                    if(isIE7)
+                                                    helpImg.style.marginRight = "6px";
+                                                    else if(isIE)
+                                                    helpImg.style.marginRight = "0px";
+                                                    else
+                                                    helpImg.style.marginRight = "9px";                         
+                                                </script> 
+                                            </span>
+                                        </apex:outputPanel>
+                                        <apex:selectRadio style="float:left;" layout="lineDirection" value="{!filterLogics[filter.refedge__Field_API_Name__c].operatorSelected}">
+                                            <apex:selectOptions value="{!logicsWithName}"/>
+                                        </apex:selectRadio>
+                                        <div style="float: right;width: 60%;margin-top: 5px;">
+                                            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Select_All}" action="{!attributeWrapper.selectAllAttributeTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opAttributes">
+                                                <apex:param name="selectedLabelId" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                            </apex:commandLink>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Clear_All}" action="{!attributeWrapper.clearSelectedAttributeTypes}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="opAttributes">
+                                                <apex:param name="selectedLabelId" value="{!filter.refedge__Field_API_Name__c}" assignTo="{!attributeWrapper.selectedLabelId}"/>
+                                            </apex:commandLink>                            
+                                        </div>
+                                    </div>
+                                </apex:outputPanel>
+                            </div>
+                            <div> 
+                                <!-- Output Panel for Attribute records-->
+                                <apex:outputPanel rendered="{!attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c] > 0}"> 
+                                    <ul class="ulClass"> 
+                                        <apex:variable var="rows" value="{!FLOOR(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c]/3) + if(MOD(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c],3) > 0, 1,0)}" />
+                                        <apex:repeat value="{!attributeWrapper.mapAllAttributesLabel[filter.refedge__Field_API_Name__c]}" var="attribute" first="0" rows="{!rows}">
+                                            <li>
+                                                <table>
+                                                    <tr>
+                                                        <td style="width:13px;">
+                                                            <apex:image url="{!$Resource.refedge__Tick}" rendered="{!attribute.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                        </td>
+                                                        <td style="width: 200px;">
+                                                            <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectAttribute('{!JSENCODE(attribute.attributeLabel.Label__c)}','{!JSENCODE(attribute.attributeLabel.Attribute__c)}');return false;">
+                                                                <apex:outputLabel value="{!attribute.attributeLabel.Attribute__r.Name}" style="font-weight:{!HTMLENCODE(attribute.fontWeight)};cursor:pointer;" />
+                                                            </apex:outputLink>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>
+                                    <ul class="ulClass">
+                                        <apex:variable var="startVal" value="{!FLOOR(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c]/3) + if(MOD(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c],3) > 0, 1,0)}" />
+                                        <apex:variable var="rows" value="{!FLOOR(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c]/3) + if(MOD(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c],3) > 1, 1,0)}" /> 
+                                        <apex:repeat value="{!attributeWrapper.mapAllAttributesLabel[filter.refedge__Field_API_Name__c]}" var="attribute" 
+                                        first="{!startVal}" rows="{!rows}">
+                                            <li>
+                                                <table>
+                                                    <tr>
+                                                        <td style="width:13px;">
+                                                            <apex:image url="{!$Resource.refedge__Tick}" rendered="{!attribute.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                        </td>
+                                                        <td style="width: 200px;">
+                                                            <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectAttribute('{!JSENCODE(attribute.attributeLabel.Label__c)}','{!JSENCODE(attribute.attributeLabel.Attribute__c)}');return false;">
+                                                                <apex:outputLabel value="{!attribute.attributeLabel.Attribute__r.Name}" style="font-weight:{!HTMLENCODE(attribute.fontWeight)};cursor:pointer;" />
+                                                            </apex:outputLink>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>                                
+                                    <ul class="ulClass">
+                                        <apex:variable var="startVal" value="{!FLOOR(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c]/3)*2 + if(MOD(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c],3) > 0, if(MOD(attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c],3) > 1,2,1) ,0)}" />                                     
+                                        <apex:repeat value="{!attributeWrapper.mapAllAttributesLabel[filter.refedge__Field_API_Name__c]}" var="attribute"  first="{!startVal}" rows="0">
+                                            <li>
+                                                <table>
+                                                    <tr>
+                                                        <td style="width:13px;">
+                                                            <apex:image url="{!$Resource.refedge__Tick}" rendered="{!attribute.fontWeight !='normal'}" height="12px" width="12px"/>
+                                                        </td>
+                                                        <td style="width: 200px;">
+                                                            <apex:outputLink style="text-decoration:none;" value="#" onclick="PORShowLoading();selectAttribute('{!JSENCODE(attribute.attributeLabel.Label__c)}','{!JSENCODE(attribute.attributeLabel.Attribute__c)}');return false;">
+                                                                <apex:outputLabel value="{!attribute.attributeLabel.Attribute__r.Name}" style="font-weight:{!HTMLENCODE(attribute.fontWeight)};cursor:pointer;" />
+                                                            </apex:outputLink>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>
+                                </apex:outputPanel>    
+                                
+                                <!-- Output Panel for No Record found--> 
+                                <apex:outputPanel rendered="{!attributeWrapper.labelSizeMap[filter.refedge__Field_API_Name__c] = 0}">                                
+                                    <ul class="ulClass">    
+                                        <li>
+                                            <apex:outputLabel value="{!$Label.No_Data_Found}" />
+                                        </li>
+                                    </ul>
+                                </apex:outputPanel>                                 
+                            </div>
+                        </div>
+                        <apex:variable value="TRUE" var="dateIndex"/>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+            
+            <!-- Related Mapping Div -->
+            <apex:PageBlockSection id="pbsRelatedMappingId" columns="1"> 
+                <apex:outputPanel layout="block" id="relatedMappingId" rendered="{!AND(showRefContent,NOT(refMatch),filter.refedge__From_Mapping__c)}">
+                    <div class="divClass">
+                        <div>
+                            <div style="width: 50%;text-align:left;float:left;text-indent:50px;font-size: 150%;"> {!filter.refedge__Label__c} </div>
+                        </div>
+                        <div>
+                            <!-- Output Panel for Referenciability records--> 
+                            <apex:outputPanel >
+                                <ul class="ulClass" style="width:100%;">
+                                    <li>
+                                            <table>
+                                                <tr>
+                                                    <td >                                  
+                                                        
+                                                        <apex:commandLink value="{!$Label.See_All}" action="{!goToTheRelatedSearch}" > 
+                                                            <apex:param name="attMapId" assignTo="{!relatedMappingController.attributeMappingId}" value="{!filter.refedge__Field_API_Name__c}" />
+                                                        </apex:commandLink>
+                                                    </td>
+                                                    
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    
+                                </ul>
+                                 
+                            </apex:outputPanel> 
+                            <!-- Output Panel for No Record found-->  
+                                     
+                        </div> 
+                    </div>
+                    <apex:variable value="TRUE" var="dateIndex"/>
+                </apex:outputPanel>
+            </apex:PageBlockSection>
+            
+            <apex:outputPanel layout="block" rendered="{!dateIndex}" style="border-bottom: 1px solid #dbdbdb;"></apex:outputPanel>
+            <apex:variable value="FALSE" var="dateIndex"/>
+            </apex:repeat>
+            <!-- Page Block Buttons Top-->
+            <apex:pageBlockButtons id="pbbIdTop" location="top" >
+                <div style="width:100%;">
+                    <div style="float:left ; width: 40%;">
+                        <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_RF_Search}" id="backCmdLinkId" action="{!backToSearch}"/>
+                    </div>
+                    <div style="float:left ; width: 20%;">
+                        <apex:commandButton value="{!$Label.Done}" id="doneCmdBtnId" action="{!backToSearch}"/>
+                    </div>
+                </div>
+            </apex:pageBlockButtons>
+            <!-- Page Block Buttons Bottom-->
+            <apex:pageBlockButtons id="pbbIdBottom" location="bottom">
+                <div style="width:100%;">
+                    <div style="float:left ; width: 20%;text-indent:40%;">
+                        <apex:commandButton value="{!$Label.Done}" id="doneCmdBtnId" action="{!backToSearch}"/>
+                    </div>
+                </div>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

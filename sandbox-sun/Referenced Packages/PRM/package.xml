@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PRM</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <description>Partner relationship management enables companies to collaborate more effectively with their partners to increase channel revenues while driving partner adoption and loyalty.</description>
+    <namespacePrefix>xforce_prm</namespacePrefix>
+    <setupWeblink>PRM_Setup</setupWeblink>
+    <types>
+        <members>PRM</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>PRM_Setup</members>
+        <name>CustomPageWebLink</name>
+    </types>
+    <types>
+        <members>PRMLogo</members>
+        <name>Document</name>
+    </types>
+    <version>33.0</version>
+</Package>

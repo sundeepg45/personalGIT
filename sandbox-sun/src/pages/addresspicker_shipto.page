@@ -1,0 +1,230 @@
+<apex:page title="Shipping Address Selection"  standardController="Opportunity" extensions="OpportunityAddressControllerExtension" id="select_shipto">
+  <apex:stylesheet value="/css/ie_global.css" />
+  <apex:stylesheet value="/css/ie_navigation.css" />
+  <apex:stylesheet value="/css/accounts_styles.css" />
+  <apex:includeScript value="{!$Resource.VisualForceUtils}"/>
+  <script type="text/javascript">
+var disabled=true;
+function confirmSubmit()
+{
+    var c=!disabled;
+    if(c) 
+    {
+        c=window.confirm("Are you sure?");
+        if(!c)
+        {
+            alert("No Records will be updated");
+            window.top.document.location.href="/{!Opportunity.Id}";
+        }
+    }
+    return c;
+}
+
+function setAddress(street,city,state,postalcode,country,asidbt)
+{
+   document.getElementById("select_shipto:buttons:street").value=street;
+   document.getElementById("select_shipto:buttons:city").value=city;
+   document.getElementById("select_shipto:buttons:state").value=state;
+   document.getElementById("select_shipto:buttons:postalcode").value=postalcode;
+   document.getElementById("select_shipto:buttons:country").value=country;
+   document.getElementById("select_shipto:buttons:asidbt").value=asidbt;
+   document.getElementById("select_shipto:buttons:select").disabled=false;
+   disabled=false;
+   return true;
+}
+  </script>
+  <body>
+  <table width="50%">
+    <tr>
+      <td width="25%" style="white-spacing:nowrap" valign="top" class="dataLabel">Account Name:</td>
+      <td class="dataField">
+        <a color="#FFFFFF" target="_top" href="/{!Opportunity.Account.Id}">
+          <apex:outputText value="{!Opportunity.Account.Name}" /><br />
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td class="bodyBold" colspan="5" style="white-spacing:nowrap">Address Information:</td>
+    </tr>
+    <tr>
+      <td class="blackLine" colspan="5"><img src="/s.gif" /></td>
+    </tr>
+    <tr>
+      <td width="25%" style="white-spacing:nowrap" valign="top" class="dataLabel">Primary Shipping Address:</td>
+      <td>
+        <apex:outputText value="{!Opportunity.Account.ShippingStreet}" /><br />
+        <apex:outputText value="{!Opportunity.Account.ShippingCity}" /><br />
+        <apex:outputText value="{!Opportunity.Account.ShippingState}" /><br />
+        <apex:outputText value="{!Opportunity.Account.ShippingPostalCode}" /><br />
+        <apex:outputText value="{!Opportunity.Account.ShippingCountry}" /><br />
+        <apex:outputText value="{!Opportunity.Account.ASIDST__c}" />
+      </td>
+    </tr>
+  </table>
+  <br />
+  <form name="Multi_Address">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" id="addresses">
+      <tr><td colspan="17" class="blackLine"><img src="/s.gif" /></td></tr>
+      <tr class="opportunitiesTab">
+        <td class="columnHeadInactiveBlack"> Account</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> Address</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> City</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> State</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> Zip</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> Country</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> ASIDST</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveBlack"> Currency</td>
+        <td width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td></td>
+      </tr>
+      <tr><td colspan="17" class="blackLine"><img src="/s.gif" /></td></tr>
+      <tr class="accountsTab">
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.Name}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.ShippingStreet}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.ShippingCity}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.ShippingState}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.ShippingPostalCode}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.ShippingCountry}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.ASIDST__c}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <apex:outputText value="{!Opportunity.Account.CurrencyIsoCode}" />
+        </td>
+        <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+        <td class="columnHeadInactiveWhite">
+          <input type="radio" name="ids" onclick="setAddress('{!JSINHTMLENCODE(Opportunity.Account.ShippingStreet)}','{!JSINHTMLENCODE(Opportunity.Account.ShippingCity)}','{!JSINHTMLENCODE(Opportunity.Account.ShippingState)}','{!JSINHTMLENCODE(Opportunity.Account.ShippingPostalCode)}','{!JSINHTMLENCODE(Opportunity.Account.ShippingCountry)}','{!JSINHTMLENCODE(Opportunity.Account.ASIDST__c)}');" value="{!Opportunity.Account.Id}" />
+        </td>
+      </tr>
+      <apex:repeat value="{!ShippingAccountList}" var="account">
+        <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(account.Name))}">
+        <tr style="background-color: #EEEEEE">
+          <td>
+            <apex:outputText value="{!account.Name}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.ShippingStreet}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.ShippingCity}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.ShippingState}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.ShippingPostalCode}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.ShippingCountry}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.ASIDST__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!account.CurrencyIsoCode}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <input type="radio" name="ids" onclick="setAddress('{!JSINHTMLENCODE(account.ShippingStreet)}','{!JSINHTMLENCODE(account.ShippingCity)}','{!JSINHTMLENCODE(account.ShippingState)}','{!JSINHTMLENCODE(account.ShippingPostalCode)}','{!JSINHTMLENCODE(account.ShippingCountry)}','{!JSINHTMLENCODE(account.ASIDST__c)}');" value="{!account.Id}" />
+          </td>
+        </tr>
+        </apex:outputPanel>
+      </apex:repeat>
+      <apex:repeat value="{!NonPrimaryShippingAddressList}" var="address">
+        <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(address.Account__r.Name))}">
+        <tr style="background-color: #EEEEEE">
+          <td>
+            <apex:outputText value="{!address.Account__r.Name}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.ShippingAddress__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.ShippingCity__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.ShippingState__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.ShippingZipPostalCode__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.ShippingCountry__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.ASIDST__c}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <apex:outputText value="{!address.CurrencyIsoCode}" />
+          </td>
+          <td bgcolor="#666666" width="1" style="white-spacing:nowrap"><img src="/s.gif" /></td>
+          <td>
+            <input type="radio" name="ids" onclick="setAddress('{!JSINHTMLENCODE(address.ShippingAddress__c)}','{!JSINHTMLENCODE(address.ShippingCity__c)}','{!JSINHTMLENCODE(address.ShippingState__c)}','{!JSINHTMLENCODE(address.ShippingZipPostalCode__c)}','{!JSINHTMLENCODE(address.ShippingCountry__c)}','{!JSINHTMLENCODE(address.ASIDST__c)}');" value="{!address.Id}" />
+          </td>
+        </tr>
+        </apex:outputPanel>
+      </apex:repeat>
+      <tr><td colspan="17" class="blackLine"><img src="/s.gif" /></td></tr>
+    </table>
+    <br />
+    <script type="text/javascript">
+    alternate('addresses',5,1,['#EEEEEE','#DDDDDD']);
+    </script>
+  </form>
+  <apex:form id="buttons" >
+    <div align="center">
+      <apex:commandButton styleClass="button" value="Select" onclick="return confirmSubmit();" action="{!save}" id="select" />
+      <apex:commandButton styleClass="button" value="Cancel" action="{!cancel}" />
+      <apex:inputHidden value="{!Opportunity.ShippingAddress__c}" id="street" />
+      <apex:inputHidden value="{!Opportunity.ShippingCity__c}" id="city" />
+      <apex:inputHidden value="{!Opportunity.ShippingState__c}" id="state" />
+      <apex:inputHidden value="{!Opportunity.ShippingZipPostalCode__c}" id="postalcode" />
+      <apex:inputHidden value="{!Opportunity.ShippingCountry__c}" id="country" />
+      <apex:inputHidden value="{!Opportunity.ASIDST__c}" id="asidbt" />
+    </div>
+  </apex:form>
+  <script>
+  document.getElementById("select_shipto:buttons:select").disabled=true;
+  </script>
+  </body>
+</apex:page>

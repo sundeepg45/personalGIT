@@ -1,0 +1,103 @@
+<apex:component controller="EnhancedRelatedListController" >
+	<apex:attribute name="sequenceNumber" description="Update to force a refresh" type="Integer" required="false" assignTo="{!sequence}"/>
+	<apex:attribute name="var" description="The variable to represent the record being displayed" type="String" />
+	<apex:attribute name="labelVar" description="The variable to represent the column label" type="String" />
+	<apex:attribute name="object" description="Name of the object to display" type="String" required="true" assignTo="{!queryObject}" />
+	<apex:attribute name="fields" description="Comma separated list of fields to display.  Use a blank fieldname for columns that are defined within the component body." type="String" required="true" assignTo="{!queryFields}" />
+	<apex:attribute name="sortFields" description="Comma separated list of fields name to use for sorting a column.  Use a blank fieldname to parse based on fields an order." type="String" required="false" assignTo="{!sortFieldsString}" />
+	<apex:attribute name="noSort" description="If true, disables all column sorting." type="Boolean" required="false" assignTo="{!noSort}" default="false" />
+	<apex:attribute name="labels" description="Comma separated list of fields labels to dispay.  If not provided it will be determined.  A special value of _hidden_ maybe used to hide a column." type="String" required="false" assignTo="{!fieldLabelListString}" />
+	<apex:attribute name="conditions" description="Query conditions that will be used for this component." type="String" required="false" assignTo="{!queryConditions}" />
+	<apex:attribute name="order" description="Query order by option." type="String" required="false" assignTo="{!queryOrderBy}" />
+	<apex:attribute name="limit" description="Query limit" type="Integer" required="false" assignTo="{!queryLimit}" default="1000" />
+	<apex:attribute name="recordsPerPage" description="How many records to display per page" type="Integer" required="false" assignTo="{!pageSize}" />
+	<apex:attribute name="actionField" description="Field to link to an action" type="String" required="false" />
+	<apex:attribute name="actionFunction" description="Function that will be called when clicking on the action field" type="String" required="false" />
+	<apex:attribute name="style" description="CSS style for the div block" type="String" default=""/>
+	<apex:attribute name="styleClass" description="CSS class for the div block." type="String" default="bPageBlock brandSecondaryBrd secondaryPalette"/>
+	<apex:attribute name="panelStyle" description="CSS style for the panel block" type="String" default=""/>
+	<apex:attribute name="panelClass" description="CSS class for the panel block." type="String" default="pbBody"/>
+	<apex:attribute name="tableStyle" description="CSS style for the table block." type="String" default="border:0px;padding:0px;border-spacing:0px;"/>
+	<apex:attribute name="tableClass" description="CSS class for the table block." type="String" default="list"/>
+	<apex:attribute name="theadStyle" description="CSS style for the thead block." type="String" default=""/>
+	<apex:attribute name="theadClass" description="CSS class for the thead block." type="String" default=""/>
+	<apex:attribute name="theadRowStyle" description="CSS style for the thead.tr block." type="String" default="position:relative"/>
+	<apex:attribute name="theadRowClass" description="CSS class for the thead.tr block." type="String" default="headerRow"/>
+	<apex:attribute name="theadCellStyle" description="CSS style for the thead.tr.th block." type="String" default=""/>
+	<apex:attribute name="theadCellClass" description="CSS class for the thead.tr.th block." type="String" default="zen-deemphasize headerCell"/>
+	<apex:attribute name="tbodyStyle" description="CSS style for the tbody block." type="String" default=""/>
+	<apex:attribute name="tbodyClass" description="CSS class for the tbody block." type="String" default=""/>
+	<apex:attribute name="tbodyRowStyle" description="CSS style for the tbody tr block." type="String" default=""/>
+	<apex:attribute name="tbodyRowClass" description="CSS class for the tbody tr block." type="String" default="dataRow"/>
+	<apex:attribute name="tbodyCellStyle" description="CSS style for the tbody tr.th block." type="String" default=""/>
+	<apex:attribute name="tbodyCellClass" description="CSS class for the tbody tr.th block." type="String" default="dataCell"/>
+	<div class="{!styleClass}" style="{!style}">
+		<apex:outputPanel id="list" layout="block" styleClass="{!panelClass}" style="{!panelStyle}" rendered="{!records.size != 0}">
+			<table class="{!tableClass}" style="{!tableStyle}">
+				<thead class="{!theadClass}" style="{!theadStyle}">
+					<tr class="{!theadRowClass}" style="{!theadRowStyle}">
+						<apex:repeat var="column" value="{!columns}">
+							<apex:outputPanel layout="none" rendered="{!column.label != '_hidden_'}">
+								<th class="{!theadCellClass}" style="{!theadCellStyle}">
+									<apex:commandLink action="{!column.sortField}" value="{!column.label}" rendered="{!NOT(ISBLANK(column.sortTo))}" rerender="list"/>
+									<apex:outputText value="{!column.label}" rendered="{!ISBLANK(column.sortTo)}"/>
+								</th>
+							</apex:outputPanel>
+						</apex:repeat>
+					</tr>
+				</thead>
+				<tbody class="{!tbodyClass}" style="{!tbodyStyle}">
+					<apex:repeat var="record" value="{!records}">
+						<tr class="{!tbodyRowClass}" style="{!tbodyRowStyle}">
+							<apex:repeat var="column" value="{!columns}">
+								<apex:outputPanel layout="none" rendered="{!column.label != '_hidden_'}">
+									<td class="{!tbodyCellClass}" style="{!tbodyCellStyle}">
+										<apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(column.fieldName))}">
+											<apex:outputField value="{!record[column.fieldName]}" rendered="{!OR(AND(ISBLANK(actionField),ISBLANK(actionFunction)),column.fieldName!=IF(ISBLANK(actionField),columns[0].fieldName,actionField))}"/>
+											<apex:outputLink value="/{!record.Id}" rendered="{!AND(ISBLANK(actionFunction),column.fieldName=actionField)}">
+												<apex:outputField value="{!record[column.fieldName]}" />
+											</apex:outputLink>
+											<apex:outputLink onclick="{!actionFunction}('{!record.Id}');return false;" value="javascript:{!actionFunction}('{!record.Id}')" rendered="{!AND(NOT(ISBLANK(actionFunction)),column.fieldName=IF(ISBLANK(actionField),columns[0].fieldName,actionField))}">
+												<apex:outputField value="{!record[column.fieldName]}" />
+											</apex:outputLink>
+										</apex:outputPanel>
+										<apex:componentBody rendered="{!ISBLANK(column.fieldName)}">
+											<apex:variable var="{!var}" value="{!record}"/>
+											<apex:variable var="{!labelVar}" value="{!column.label}"/>
+										</apex:componentBody>
+									</td>
+								</apex:outputPanel>
+							</apex:repeat>
+						</tr>
+					</apex:repeat>
+				</tbody>
+			</table>
+		</apex:outputPanel>
+		<apex:outputPanel layout="block" rendered="{!OR(controller.HasPrevious,controller.HasNext)}">
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!first}" rerender="list" rendered="{!controller.HasPrevious}">First</apex:commandlink>
+				<apex:outputText rendered="{!NOT(controller.HasPrevious)}" value="First"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!previous}" rerender="list" rendered="{!controller.HasPrevious}">Previous</apex:commandlink>
+				<apex:outputText rendered="{!NOT(controller.HasPrevious)}" value="Previous"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!next}" rerender="list" rendered="{!controller.HasNext}">Next</apex:commandlink>
+				<apex:outputText rendered="{!NOT(controller.HasNext)}" value="Next"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!last}" rerender="list" rendered="{!controller.HasNext}">Last</apex:commandlink>
+				<apex:outputText rendered="{!NOT(controller.HasNext)}" value="Last"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputText value="({0} of {1})">
+				<apex:param value="{!controller.PageNumber}"/>
+				<apex:param value="{!pageCount}"/>
+			</apex:outputText>
+		</apex:outputPanel>
+		<apex:outputPanel id="norecords" layout="block" styleClass="{!styleClass}" style="{!style}" rendered="{!records.size = 0}">
+			<hr />
+			<apex:outputText value="{!$Label.No_records_to_display}" />
+		</apex:outputPanel>
+	</div>
+</apex:component>

@@ -1,0 +1,5 @@
+<apex:page standardController="Account">
+
+    <apex:listViews type="Partner_Registration__c" />
+
+</apex:page>

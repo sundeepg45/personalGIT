@@ -1,0 +1,15 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt" tabStyle="Partner_Registration__c" >
+    <apex:form >
+        <apex:pageblock title="New Registration Created">
+            <apex:pageMessages />
+            <p><apex:outputText value="{!$Label.Partner_Registration_Submit_for_Approval_Instructions}" rendered="false"/></p>
+           
+            <apex:commandButton action="{!submitForApproval}" value="{!$Label.Partner_Registration_Submit_for_Approval}" rendered="{!isRegApprovalSubmitted==false}"/> 
+    
+            <p>
+            <apex:outputLink value="{! '/' + reg.Id}"><apex:outputText value="{!$Label.Partner_Registration_Return_To_Registration_Record}"/> {!reg.Name}</apex:outputLink>
+            </p>
+        </apex:pageblock>
+    </apex:form>
+    
+</apex:page>

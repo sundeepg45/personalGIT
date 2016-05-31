@@ -1,0 +1,172 @@
+<apex:page controller="LineStagingPagingController" showheader="false" sidebar="false" tabstyle="Opportunity_Header_Staging__c">
+<style> 
+      .activeTab {
+         background-color: #236FBD; 
+         color:white; 
+         background-image:none;
+      }
+      .inactiveTab {  
+         background-color: lightgrey; 
+         color:black; 
+         background-image:none;
+      }   
+      .RH_OrderDetails_Header_Padding{
+         background: #f8f8f8;      
+      }
+      .RH_MenuTitle{
+         padding:10px;
+         background-color: #d3d3d3;
+         border-radius:5px;
+         font-size:12px;
+         font-family:arial;
+         font-weight:bold;
+         cursor:pointer;
+      }
+      .RH_firsrMenuTitle{
+         margin-top:10px;
+      }
+      .RH_Hide{
+         display:none;
+      } 
+      .RH_contentOutlineBorder{
+         border:1px solid #d3d3d3;
+         margin : 10px 0px 0px 50px;
+         width:1100px;
+         padding:10px;
+      }
+        
+    </style>
+
+<script>
+     var selectedLineIndex = 'test';                            
+     // method for showing and hiding contents
+      function showHideContent(contentNumber){    
+             if(document.getElementById('content'+contentNumber).style.display == 'block'){
+               document.getElementById('content'+contentNumber).style.display = 'none'; 
+             }else{
+               selectedLineIndex = contentNumber; 
+               document.getElementById('content'+contentNumber).style.display = 'block';
+             } 
+      }  
+      
+      function hiddenOrDisabledOrReadOnly(a) {     
+      
+      }
+</script>
+
+  <apex:form >
+    <apex:sectionHeader title="{!$Label.Opportunity_Header_Staging}" subtitle="{!headerName}"/>
+    <apex:pageblock id="lineStagingRelatedList" title="{!$Label.Opportunities_Line_Staging}">       
+       <apex:pageBlockButtons >
+          <apex:commandButton value="{!$Label.Copy_Entitle_To_From_Header}" action="{!copyEntitleToFromHeaderInformation}" status="copyLoading" rerender="lineStagingPanel, errorMsg" oncomplete="showHideContent(selectedLineIndex);"/>
+          <apex:commandButton value="{!$Label.Save}" action="{!saveLineStaging}" status="saveLoading" rerender="lineStagingPanel, errorMsg" />
+          <apex:commandButton value="Save & Close" action="{!saveAndCancel}" status="saveLoading" rerender="lineStagingPanel, errorMsg" oncomplete="window.close();"/>
+          <input type="button" value="{!$Label.Cancel_Button_Value}" onclick="window.close()" class="btn"/>                      
+          <apex:actionStatus id="copyLoading" startText="Copying..." />
+          <apex:actionStatus id="saveLoading" startText="Saving..." />
+       </apex:pageBlockButtons>
+       <apex:panelGrid columns="5" id="buttonsGridTop" style="padding-left:83%; text-align:right;">
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="First" action="{!first}" disabled="{!!hasPrevious}" status="loadingStatus1"/>
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="Previous" action="{!previous}" disabled="{!!hasPrevious}" status="loadingStatus1"/>
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="Next" action="{!next}" disabled="{!!hasNext}" status="loadingStatus1"/>
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="Last" action="{!last}" disabled="{!!hasNext}" status="loadingStatus1"/> 
+         <apex:actionStatus id="loadingStatus1" startText="{!$Label.Loading}" />       
+       </apex:panelGrid><br/>
+       <table class="list" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+             <tr class="headerRow">                
+                <th scope="col" class="zen-deemphasize" width="13%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Name.label}</th>
+                <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Product_Code__c.label}</th>
+                <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Product_Code_Oracle__c.label}</th>
+                <th scope="col" class="DateElement zen-deemphasize" width="7%">{!$ObjectType.Opportunity_Line_Staging__c.fields.ActualEndDate__c.label}</th>
+                <th scope="col" class="DateElement zen-deemphasize" width="7%">{!$ObjectType.Opportunity_Line_Staging__c.fields.ActualStartDate__c.label}</th>
+                <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Base_Price__c.label}</th>
+                <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Quantity__c.label}</th>
+                <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.UnitPrice__c.label}</th>
+                <th scope="col" class="CurrencyElement zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Total_Price__c.label}</th>
+             </tr>
+          </tbody>
+       </table>                      
+       <div class="RH_OrderDetails_Header_Padding">
+       <apex:outputPanel id="lineStagingPanel">
+       <apex:variable value="{!0}" var="counter"/>
+       <apex:repeat value="{!relatedOpptyLineStagingList}" var="line" rendered="{!AND(relatedOpptyLineStagingList != null, relatedOpptyLineStagingList.size > 0)}">
+          <div>
+             <div onclick="showHideContent({!counter});" id="header1" class="RH_MenuTitle RH_firsrMenuTitle">
+               <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                 <tbody> 
+                   <tr>
+                     <td width="14%">&nbsp;
+                       {!line.Name}
+                     </td>
+                     <td width="10%">&nbsp;
+                       <apex:outputField value="{!line.Product_Code__c}"/>
+                     </td>
+                     <td width="10%">&nbsp;
+                       {!line.Product_Code_Oracle__c}
+                     </td>
+                     <td width="7%">
+                       <apex:outputField value="{!line.ActualEndDate__c}"/>
+                     </td>
+                     <td width="7%">&nbsp;
+                       <apex:outputField value="{!line.ActualStartDate__c}"/>
+                     </td>
+                     <td width="10%" style="text-align:right;">&nbsp;
+                       <apex:outputField value="{!line.Base_Price__c}"/>
+                     </td>
+                     <td width="10%" style="text-align:right;">&nbsp;
+                       <apex:outputField value="{!line.Quantity__c}"/>
+                     </td>
+                     <td width="10%" style="text-align:right;">&nbsp;
+                       <apex:outputField value="{!line.UnitPrice__c}"/>
+                     </td>                    
+                     <td width="10%" style="text-align:right;">&nbsp;
+                       <apex:outputField value="{!line.Total_Price__c}"/>
+                     </td>
+                   </tr>  
+                 </tbody>
+               </table>                           
+             </div>
+             <div id="content{!counter}" class="RH_Hide RH_contentOutlineBorder">                
+                <apex:pageBlocksection title="{!$Label.Opportunity_Line_Staging_Information}" collapsible="true">                    
+                   <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Oppty_Line_Staging_Information_FieldSet}"  var="f">
+                      <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                      <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                   </apex:repeat>
+                </apex:pageBlocksection>
+                <apex:pageBlocksection title="{!$Label.Entitle_To_Account_Information}" collapsible="true">                   
+                   <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Entitle_To_Account_Information_FieldSet}"  var="f">
+                      <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                      <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                   </apex:repeat>                   
+                </apex:pageBlocksection>
+                <apex:pageBlocksection title="{!$Label.Entitle_To_Address_Information}" collapsible="true">                   
+                   <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Entitle_To_Address_Information_FieldSet}"  var="f">
+                      <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                      <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                   </apex:repeat>                   
+                </apex:pageBlocksection>
+                <apex:pageBlocksection title="{!$Label.Entitle_To_Contact_Information}" collapsible="true">                   
+                   <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Entitle_To_Contact_Information_Field_Set}"  var="f">
+                      <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                      <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                   </apex:repeat>
+                </apex:pageBlocksection>                   
+             </div>
+          </div>    
+          <apex:variable var="counter" value="{!counter+1}"/>         
+       </apex:repeat>
+       </apex:outputPanel> 
+       </div>       
+       <apex:outputLabel value="{!$Label.No_records_to_display}" rendered="{!AND(relatedOpptyLineStagingList != null, relatedOpptyLineStagingList.size <= 0)}" styleClass="noRowsHeader"/>
+       <br/>
+       <apex:panelGrid columns="5" id="buttonsGridBottom" style="padding-left:83%; text-align:right;">
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="First" action="{!first}" disabled="{!!hasPrevious}" status="loadingStatus"/>
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="Previous" action="{!previous}" disabled="{!!hasPrevious}" status="loadingStatus"/>
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="Next" action="{!next}" disabled="{!!hasNext}" status="loadingStatus"/>
+         <apex:commandButton reRender="lineStagingRelatedList, buttonsGridBottom, buttonsGridTop" value="Last" action="{!last}" disabled="{!!hasNext}" status="loadingStatus"/> 
+         <apex:actionStatus id="loadingStatus" startText="{!$Label.Loading}" />       
+       </apex:panelGrid>
+    </apex:pageblock>    
+  </apex:form>
+</apex:page>

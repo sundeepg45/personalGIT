@@ -1,0 +1,49 @@
+<apex:page controller="Renewal_CotermRevertController" tabStyle="Opportunity">
+
+	<style type="text/css">
+	
+        .info {
+        	display: block;
+        	font-weight: bold;
+        	color: darkred;
+        	margin: 15px;
+        	text-align: center;
+        }
+        
+    </style>
+    
+	<apex:form id="frm">
+		<apex:pageMessages />
+		<apex:outputLabel styleClass="info" value="There are no expiring products to revert" style="display:block; margin-bottom:10px;" rendered="{!if (renewalOpportunities.size = 0, true, false)}"/>
+		
+		<apex:pageBlock title="Renewal Opportunities" rendered="{!if ((renewalOpportunities.size = 0), false, true)}">
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton value="Revert Expiring Products" action="{!revertProducts}"/>
+				<apex:commandButton value="Cancel" action="{!cancel}"/>
+			</apex:pageBlockButtons>
+		
+            <apex:pageBlockTable value="{!renewalOpportunities}" var="renewal">
+                <apex:column width="5%">
+                     <apex:inputCheckBox value="{!renewal.selected}" />
+                </apex:column>
+                
+                <apex:column headerValue="Opportunity Number" width="15%">
+                    <apex:outputText value="{!renewal.opportunity.OpportunityNumber__c}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Opportunity Name">
+                	<apex:outputText value="{!renewal.opportunity.Name}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Account Name">
+                    <apex:outputText value="{!renewal.opportunity.account.name}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Oracle Account Number">
+                    <apex:outputText value="{!renewal.opportunity.account.OracleAccountNumber__c}"/>
+                </apex:column>
+                
+            </apex:pageBlockTable>
+		</apex:pageBlock>
+	</apex:form> 
+</apex:page>

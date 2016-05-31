@@ -1,0 +1,3 @@
+<apex:page standardController="Opportunity" extensions="HashIdControllerExtension" action="{!hashIdIfClone}" cache="false" readOnly="false">
+	<c:RecordTypeSelect ent="Opportunity" apiName="Opportunity"/>
+</apex:page>

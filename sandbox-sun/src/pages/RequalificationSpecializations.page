@@ -1,0 +1,73 @@
+<apex:page controller="RequalificationController"
+    title="Requalification: Specializations">
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+    </style>
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.PRQ_Specializations_Title}"/></h2>
+            </div>
+        </div>
+    </div>
+    
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText escape="false" value="{!$Label.PRQ_Specializations_Text}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+
+    <apex:form >
+	    <apex:pageBlock title="{!$Label.PRQ_Specializations_Title}">
+	        <apex:pageBlockTable value="{!requalPoints}" var="points" id="pointsTable" rowClasses="odd,even" styleClass="tableClass">
+	            <apex:column >
+	                <apex:facet name="header">{!$Label.PRQ_Specialization_Col_Specialization}</apex:facet>
+	                <apex:outputText id="txtPointsSpecialization" value="{!points.Specialization__c}" />
+	            </apex:column>
+	            <apex:column >
+	                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesUsers}" escape="false"/></apex:facet>
+	                <apex:outputText id="txtPointsSalesUsers" value="{!floor(points.Sales_Users__c)} / {!floor(points.Needed_Sales_Users__c)}"/>
+	            </apex:column>
+	            <apex:column >
+	                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesUsers}" escape="false"/></apex:facet>
+	                <apex:outputText id="txtPointsPresalesUsers" value="{!floor(points.PreSales_Users__c)} / {!floor(points.Needed_PreSales_Users__c)}"/>
+	            </apex:column>
+	            <apex:column >
+	                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryUsers}" escape="false"/></apex:facet>
+	                <apex:outputText id="txtPointsDeliveryUsers" value="{!floor(points.Delivery_Users__c)} / {!floor(points.Needed_Delivery_Users__c)}"/>
+	            </apex:column>
+	            <apex:column >
+	                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_SalesPoints}" escape="false"/></apex:facet>
+	                <apex:outputText id="txtPointsSales" value="{!floor(points.Sales_Points__c)} / {!floor(points.Needed_Sales_Points__c)}"/>
+	            </apex:column>
+	            <apex:column >
+	                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_PreSalesPoints}" escape="false"/></apex:facet>
+	                <apex:outputText id="txtPointsPresales" value="{!floor(points.PreSales_Points__c)} / {!floor(points.Needed_PreSales_Points__c)}"/>
+	            </apex:column>
+	            <apex:column >
+	                <apex:facet name="header"><apex:outputText value="{!$Label.PRQ_Specialization_Col_DeliveryPoints}" escape="false"/></apex:facet>
+	                <apex:outputText id="txtPointsDelivery" value="{!floor(points.Delivery_Points__c)} / {!floor(points.Needed_Delivery_Points__c)}"/>
+	            </apex:column>
+
+	        </apex:pageBlockTable>
+
+            <br/>
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Save_and_Back_to_Requalification_Home}"
+                            action="/apex/RequalificationHome" />
+                        <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" value="{!$Label.RequalificationHome_Confirm}" action="{!confirmSpecializations}"
+                            styleClass="col1" disabled="{!requalRec.SpecializationsConfirmed__c}" />
+                       <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1" rendered="{!NOT(isLastPage)}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

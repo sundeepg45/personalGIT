@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>POR Nomination with letterhead</description>
+    <encodingKey>UTF-8</encodingKey>
+    <letterhead>POR_Nomination_Letterhead</letterhead>
+    <name>POR Nomination for Account</name>
+    <style>freeForm</style>
+    <subject>New Account Nomination</subject>
+    <textOnly>A new Account has been nominated to the Reference Program.
+
+Account: {!Nomination__c.Account__c}
+Nominated By: {!Nomination__c.CreatedBy}
+
+{!Nomination__c.Link}</textOnly>
+    <type>html</type>
+</EmailTemplate>

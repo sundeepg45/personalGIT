@@ -1,0 +1,27 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_RegisterThankYou_App_Has_Been_Sumbitted}"/></div>
+        <p>
+            <apex:outputText rendered="{!NOT(isCCP)}" value="{!$Label.Onboarding_RegisterThankYou_For_Your_Intrest_In_Joining}"/>
+            <apex:outputText rendered="{!isCCP}" value="{!$Label.Onboarding_JoinThankYou_Thank_You_For_Your_Interest_CCP}"/>
+        </p>
+        <!--  <p><apex:outputLink value="#">Print your application</apex:outputLink></p> -->
+        <p>
+            <apex:outputText rendered="{!NOT(isCCP)}" value="{!$Label.Onboarding_RegisterThankYou_Email_Confirming_Your_App}"/>
+            <apex:outputText rendered="{!isCCP}" value="{!$Label.Onboarding_RegisterThan_You_Email_Confirming_Your_App_CCP}"/>
+        </p>
+        
+        
+        <apex:outputPanel rendered="{!isCCP}">
+            <p>
+                <apex:outputText rendered="{!IsCCP}" value="{!$Label.Onboarding_JoinThankYou_CCP_Terms_Follow_Up}" />
+            </p>        
+        </apex:outputPanel>
+        <p><apex:outputText value="{!$Label.Onboarding_RegisterThankYou_Best_Regards}"/></p>
+        <p>
+            <apex:outputText rendered="{!NOT(isCCP)}" value="{!$Label.Onboarding_JoinThankYou_The_Partner_Program}"/>
+            <apex:outputText rendered="{!isCCP}" value="{!$Label.Onboarding_JoinThankYou_The_Partner_Program_CCP}"/>
+        </p>
+    </apex:outputPanel>
+</apex:page>

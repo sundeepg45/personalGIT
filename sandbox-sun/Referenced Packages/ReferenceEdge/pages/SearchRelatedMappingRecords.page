@@ -1,0 +1,161 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page sidebar="false" controller="refedge.RfSearchController" tabStyle="RE_Search__tab"> 
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:sectionHeader title="{!$Label.RF_Filters}" help="RfSearchHelpPage"  rendered="{!isFullLicenseAccessible}"/>
+    <c:POR_ModalLoader id="PORLoader"/>
+    <script>
+        function doSearch() {
+            var searchText = jQuery('input:text[id*=inputTextId]').val();
+            if (searchText.trim().length <2) {
+                alert('{!$Label.Atleast_two_characters}');
+                return false;
+            }
+            else {
+                PORShowLoading();
+                searchRecord(searchText.trim());
+            }
+        }
+    </script>
+    
+    <script language="javascript" type="text/javascript">
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        jQuery(".content img").css("background-image","none");
+        jQuery(".content img").attr("src","{!URLFOR($Resource.refedge__RESearchFilterIcons, 'filter-icon.png')}");
+    </script>
+    <style type="text/css">
+        /* ---------------------- Div width -------------------------- */
+        .divClass{ 
+            width:100%;
+        }
+        /* ----------Change width here for item container------------- */
+        #divUlId li { 
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word; 
+        }
+
+        /* ----------Change width here for item container------------- */
+        .divClass div { 
+            width:100%; 
+            //float:left;
+        }
+
+        .rightImage {
+            display:inline-block; width:15px;
+        }                    
+
+        /* ----------Change item width here -------------------------- */
+        #divUlId li > * { 
+            table-layout:fixed; 
+            width:150px; 
+            overflow:hidden; 
+        }
+
+        /* ----------------- Item text aliment ----------------------- */
+        .divClass li { 
+            color:#333; 
+            text-align:left;
+        }
+
+        .pbTitle{
+            display:none;
+        }
+
+        .ulClass{ 
+            table-layout:fixed; 
+            width:250px; 
+            overflow:hidden; 
+            float : left;
+            list-style-type: none;
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word;
+        } 
+        td{
+            padding-right:20px;
+        } 
+        /*li{
+            height : 20px;
+        }*/ 
+    </style>
+    
+        <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+            <apex:actionFunction name="searchRecord" action="{!relatedMappingController.searchRecords}" reRender="frmId" oncomplete="PORHideLoading();">
+                <apex:param name="searchParam" value="" assignTo="{!relatedMappingController.inputTextValue}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="saveTheSelected" action="{!relatedMappingController.saveTheSelected}" rerender="sectionId" oncomplete="PORHideLoading();">
+                <apex:param name="searchParam" value="" assignTo="{!relatedMappingController.inputTextValue}"/>
+            </apex:actionFunction>
+            
+            <apex:pageBlock id="pbId">
+                <apex:pageBlockButtons id="pbbIdTop" location="top" >
+                    <div style="width:100%;">
+                        <div style="float:left ; width: 40%;">
+                            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_RF_Search}" id="backCmdLinkId" action="{!dontSaveTheSelections}"/>
+                        </div>
+                        
+                        <div style="float:left ; width: 20%;">
+                            <apex:commandButton value="{!$Label.Done}" action="{!backToSearch}"/>
+                        </div>
+                    </div>
+                </apex:pageBlockButtons>
+                <apex:PageBlockSection id="sectionId" title="{!$Label.Search_Filter_Result_Logic}" columns="1">
+                    <apex:outputPanel styleClass="divClass" layout="block" style="width:100%;float:left;" >
+                        <div>
+                            <table style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:25%;">
+                                            {!$Label.Filter_Name}
+                                        </th>
+                                        <th>
+                                            <span style="padding-left:5px;">Any</span> <span style="padding-left:30px;">All</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <apex:repeat value="{!filterLogicsList}" var="filterLogic">
+                                        <tr>
+                                            <td style="border-bottom:1px solid rgb(221, 221, 221);width:25%;">
+                                                <div>
+                                                    {!filterLogics[filterLogic].filterName}
+                                                </div>
+                                            </td>
+                                            <td style="border-bottom:1px solid rgb(221, 221, 221);">
+                                                <apex:selectRadio layout="lineDirection" value="{!filterLogics[filterLogic].operatorSelected}">
+                                                    <apex:selectOptions value="{!logics}"/>
+                                                 </apex:selectRadio>
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                </tbody>
+                            </table>
+                        </div>
+                    </apex:outputPanel>
+                </apex:PageBlockSection>
+            </apex:pageBlock>
+            
+        </apex:form>
+    
+</apex:page>

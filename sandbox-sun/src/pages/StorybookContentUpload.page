@@ -1,0 +1,63 @@
+<apex:page standardController="ContentVersion" extensions="StorybookContentUpload" tabStyle="Document">
+    <apex:pageMessages />
+    <apex:form >
+        <apex:pageBlock title="Storybook Content Upload">
+
+            <apex:pageBlockSection columns="2" showHeader="false" collapsible="false">
+                <apex:selectList label="Content Source" value="{!fileSource}" size="1">
+                    <apex:actionSupport event="onchange" action="{!updateSections}"/>
+                    <apex:selectOption itemValue="blank" itemLabel="Select Source"/>
+                    <apex:selectOption itemValue="local" itemLabel="Upload from Local Machine"/>
+                    <apex:selectOption itemValue="library" itemLabel="Select from Library"/>
+                </apex:selectList>
+                <apex:commandLink action="{!URLFOR($Action.Storybook__c.new)}" value="Create New Storybook"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!showLocalInput}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Publish to Selected Library" action="{!uploadFile}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Upload Local File" columns="2" id="localSection" showHeader="false" collapsible="false">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="File" for="inputFileElement"/>
+                    <apex:inputFile id="inputFileElement" style="width:100%" value="{!fileBody}" filename="{!fileName}"/ >
+                </apex:pageBlockSectionItem>
+                <apex:selectList label="Content Destination Library" value="{!fileDestination}" size="1">
+                    <apex:selectOptions value="{!libraryOptions}"/>
+                </apex:selectList>
+                <apex:selectList label="Language" value="{!uploadLanguage}" size="1">
+                    <apex:selectOptions value="{!languageOptions}"/>
+                </apex:selectList>
+                <apex:selectList label="Expiration Date" value="{!uploadExpirationDate}" size="1">
+                    <apex:selectOptions value="{!expirationDateOptions}"/>
+                </apex:selectList>
+                <apex:selectList label="Document Type" value="{!uploadDocumentType}" size="1">
+                    <apex:selectOptions value="{!documentTypeOptions}"/>
+                </apex:selectList>
+                <apex:inputText label="Description" value="{!uploadDescription}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!showLibraryInput}" mode="edit">
+            <apex:pageBlockSection title="Attach Library Item to Storybook" columns="1" id="librarySection" showHeader="false" collapsible="false">
+                {!$Label.SearchForContent} <apex:inputText value="{!contentSearchString}"/>
+                <apex:commandButton value="Search" action="{!searchForContent}"/>
+
+                <apex:pageBlockTable rendered="{!contentResults!=null && contentResults.size>0}" value="{!contentResults}" var="item">
+                    <apex:column value="{!item.Title}"/>
+                    <apex:column value="{!item.Language}"/>
+                    <apex:column value="{!item.Description}"/>
+                    <apex:column value="{!contentIdToOwningLibrary[item.id]}" headerValue="Library"/>
+                    <apex:column value="{!item.Document_Type__c}"/>
+                    <apex:column headerValue="Select Storybook">
+                        <apex:inputField value="{!item.Storybook__c}"/>
+                        <apex:commandLink action="{!updateLineItem}" value="Save">
+                            <apex:param name="theContentItem" value="{!item.id}" assignTo="{!updateLineItemId}"/>
+                        </apex:commandLink>
+                    </apex:column>
+
+                </apex:pageBlockTable>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>33.0</apiVersion>
+    <availableInTouch>true</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Custom Page to Request Matrix for create Field Label or Attribute Label with  &apos;visible&apos; and &apos;Required&apos; relationship used for Reference use request (Bound 3).</description>
+    <label>RequestSettingMatrix</label>
+</ApexPage>

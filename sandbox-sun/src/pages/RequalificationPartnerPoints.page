@@ -1,0 +1,166 @@
+<apex:page controller="RequalificationController" title="{!$Label.Requalification_Home}: {!$Label.Requalification_Points_Informartion}">
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+        #tooltip {
+			position: absolute;
+			z-index: 3000;
+			border: 1px solid #111;
+			background-color: #eee;
+			padding: 5px;
+			opacity: 0.85;
+		}
+		#tooltip h3, #tooltip div { margin: 0; }
+
+		.greenbox { 
+			background-color: #adff2f; 
+		}
+		.yellowbox { 
+			background-color: #FFFF33; 
+		}
+		.redbox { 
+			background-color: #c00;
+		}
+		.redbox span {
+			color: white;
+			font-weight: bold;
+		}
+			 
+		.redbox a, .redbox a:hover, .redbox a:visited { 
+			color: white;
+		}
+		
+		body .bPageBlock {
+			width: 50%;
+		}
+    </style>
+    
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="{! URLFOR($Resource.JQueryDimentions) }"></script>
+	<script type="text/javascript" src="{! URLFOR($Resource.JQueryBGIFrame) }"></script>
+	<script type="text/javascript" src="{! URLFOR($Resource.JQueryToolTip) }"></script>
+
+	<script type="text/javascript">
+		$.noConflict(); 
+		jQuery(document).ready(function() {
+  			jQuery('#activePointsHint').tooltip({
+  				bodyHandler: function() { 
+        			return '{! $Label.PP_Total_capped_Points_Tip }';
+        		},
+				showURL: false
+  			});
+  			jQuery('#totalPointsHint').tooltip({
+  				bodyHandler: function() {
+        			return '{! $Label.PP_Total_Uncapped_Points_Tip }';
+        		},
+				showURL: false
+  			});
+		});
+	</script>
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.Requalification_Partner_Points}"/></h2>
+                <apex:pageMessages />   
+            </div>
+        </div>
+    </div>
+
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText escape="false" value="{!$Label.PRQ_Points_Text}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <div class="pbBody">
+		<table class="list" border="0" cellspacing="0" cellpadding="0">
+			<tbody>
+				<tr>
+					<td align="right">{! $Label.PP_Acc_Current_Points }:</td>
+					<apex:outputText rendered="{!requalRec.Points_Partner_Value__c >= requalRec.Points_Requirement__c}">
+						<td class="greenbox"><apex:outputField value="{!requalRec.Points_Partner_Value__c}" id="ActivePointsMeet"/> <a href="#" id="activePointsHint" onclick="return false;">{! $Label.PP_What_Is_This }</a></td>
+					</apex:outputText>
+					<apex:outputText rendered="{!requalRec.Points_Partner_Value__c < requalRec.Points_Requirement__c}">
+						<td class="redbox"><apex:outputField value="{!requalRec.Points_Partner_Value__c}" id="ActivePointsMiss"/> <a href="#" id="activePointsHint" onclick="return false;">{! $Label.PP_What_Is_This }</a></td>
+					</apex:outputText>
+				</tr>
+				<tr>
+					<td align="right">{! $Label.PP_Acc_Required_Points }:</td>
+					<td><apex:outputField value="{!requalRec.Points_Requirement__c}" id="RequiredPoints"/></td>
+				</tr>
+				<tr>
+					<td align="right">{! $Label.PP_Usr_PreSales_Points}:</td>
+					<td><apex:outputField value="{!AccountPoints.PreSales_Points__c}" id="ActivePresalesPoints"/></td>
+				</tr>
+				<tr>
+					<td align="right">{! $Label.PP_Usr_Sales_Points }:</td>
+					<td><apex:outputField value="{!AccountPoints.Sales_Points__c}" id="ActiveSalesPoints"/></td>
+				</tr>
+				<tr>
+					<td align="right">{! $Label.PP_Usr_Delivery_Points }:</td>
+					<td><apex:outputField value="{!AccountPoints.Delivery_Points__c}" id="ActiveDeliveryPoints"/></td>
+				</tr>
+				<tr>
+					<td align="right">{! $Label.PP_Acc_Total_Uncapped_Points }: </td>
+					<td class="yellowbox"><apex:outputField value="{!AccountPoints.Total_Uncapped_Points__c}" id="TotalPoints"/> <a id="totalPointsHint" href="#" onclick="return false;">{! $Label.PP_What_Is_This }</a></td>
+				</tr>
+				<tr>
+					<td align="right">{! $Label.PP_Acc_Total_Lifetime_Points }: </td>
+					<td><apex:outputField value="{!AccountPoints.Total_Lifetime_Points__c}" id="TotalLifetimePoints"/></td>
+				</tr>
+			</tbody>
+		</table>
+		<br/>
+		<div>{!$Label.Partner_Points_24_Hours_Delay_Warning}</div>			
+		
+		<br/>
+		<div class="bRelatedList">
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody">
+					<table class="list" border="0" cellspacing="0" cellpadding="0">
+						<tbody>
+							<tr class="headerRow"> 
+							  <th>{! $Label.PP_Acc_Contact_Name }</th>
+							  <th>{! $Label.PP_Acc_Points }</th>
+							  <th>{! $Label.PP_Acc_User_Score_Card }</th>
+							</tr>
+							<apex:outputText rendered="{!PartnerContacts.size > 0}">
+								<apex:repeat var="up" value="{!PartnerContacts}">
+								<tr id="{!up.Contact__r.Id}">
+									<td><a onclick="if(!confirm('{!$Label.Requalification_LeavingRequalWarning}')){ return false; }" href="/{!up.Contact__r.Id}"><apex:outputField id="ContactName" value="{!up.Contact__r.Name}"/></a></td>
+									<td><apex:outputField id="ActivePonitsContact" value="{!up.Current_Points__c}"/></td>
+									<td><a onclick="if(!confirm('{!$Label.Requalification_LeavingRequalWarning}')){ return false; }" href="/apex/PartnerPointsUserScorecard?id={!up.Contact__c}">{! $Label.PP_Acc_View }</a></td>
+								</tr>
+								</apex:repeat>
+							</apex:outputText>
+							<apex:outputText rendered="{!PartnerContacts.size == 0}">
+							    <tr id="NoRows">
+							    	<td colspan="3">{! $Label.Requalification_PP_No_Points }</td>
+							    </tr>
+							</apex:outputText>
+						</tbody>				
+		           </table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+ 
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Back_to_Requalification_Home}" action="/apex/RequalificationHome" />
+                          <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" value="{!$Label.RequalificationHome_Confirm}" action="{!confirmPP}" styleClass="col1" disabled="{!requalRec.PointsConfirmed__c}"/>
+                           <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

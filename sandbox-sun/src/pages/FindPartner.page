@@ -1,0 +1,909 @@
+<apex:page controller="PFController" showHeader="false" sidebar="false" cache="true" expires="1">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Find a Red Hat Partner</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!-- CSS Files -->
+    <apex:stylesheet value="{!$Resource.Finder_Catalog_CSS}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery-ui.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery.flip.min.js')}"></script>
+    <!--
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/all.js')}"></script>
+-->
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?client=gme-redhatinc&sensor=false"></script>
+    <apex:includeScript value="{!$Resource.PartnerSharedScripts}"/>
+
+    <script type="text/javascript" src="//www.redhat.com/assets/js/tracking/s_code.js"></script>
+    <script>
+      s.pageName = "rh | partner center | " + document.location.pathname.toLowerCase();
+      s.server = s.channel = "partner center";
+      s.prop4 = s.eVar23 = encodeURI(window.location.search).toLowerCase();
+      s.prop21 = s.eVar18 = encodeURI(window.location.hostname+window.location.pathname).toLowerCase();
+    </script>
+    <script type="text/javascript" src="//www.redhat.com/assets/js/tracking/rh_omni_footer.js"></script>
+
+    <script type="text/javascript">
+
+    var $j = jQuery.noConflict();
+      $j(document).ready(function() {
+          initialize();
+      });
+    </script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if IE 9]>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css" rel="stylesheet')}" />
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+  </head>
+
+  <body id="find-partner">
+  <div class="red-hat-content">
+    <section class="header-band">
+      <c:PartnerFinderHeader /><!-- include partnerFinderHeader until dynamic header is ready to use -->
+      <div id="main-header-wrap">
+        <div class="container">
+          <div class="content-wrap row">
+            <h1>Find a Red Hat Business Partner</h1>
+            <div class="sub-head"></div>
+          </div><!-- /.content-wrap /.row -->
+        </div><!-- /.container -->
+      </div><!-- /.main-header-wrap -->
+    </section><!-- /.header-band -->
+
+    <div class="find-form container">
+      <apex:messages />
+
+      <!-- =================================== F O R M ================================ -->
+
+      <apex:form id="mainForm" >
+        <!--
+        <div class="row first-row" id="searchButton">
+          <div class="col-xs-2 input-container">
+              <apex:commandButton id="btnSearch" action="{!ExecuteSearch}" onmouseover="geoCodeAddress();" value="{!$Label.Custom_Reference_Search_Button}"/> &nbsp;
+          </div>
+        </div>
+        -->
+        <section class="section-1">
+            <div class="row">
+              <div class="col-xs-3 input-container">
+                  <label>Partner Name</label>
+                  <div>
+                      <!--<input type="text" class="form-control">-->
+                      <apex:inputField id="txtNameOrKeywords" value="{!searchForm.NameOrKeywords__c}" styleClass="form-control"  html-placeholder="Search"/>
+                      <apex:inputHidden id="hidAdvancedSearchOpen" value="{!searchForm.AdvancedSearchOpen__c}"/>
+                      <!--<span class="input-group-btn">-->
+                          <!--<apex:commandButton id="btnSearch" action="{!ExecuteSearch}" onmouseover="geoCodeAddress();" value="" styleClass="btn search-btn ease"/>-->
+                          <!--
+                          <apex:commandButton id="btnSearch" action="{!ExecuteSearch}" onmouseover="geoCodeAddress();" value="{!$Label.Custom_Reference_Search_Button}" styleClass="btn search-btn"/>
+                          -->
+                          <!--<button class="btn btn-default" type="button">Go!</button>-->
+                      <!--</span>-->
+                  </div><!-- /input-group -->
+                  <!--
+                  <apex:inputField id="txtNameOrKeywords" value="{!searchForm.NameOrKeywords__c}"/>
+                  <apex:inputHidden id="hidAdvancedSearchOpen" value="{!searchForm.AdvancedSearchOpen__c}"/>
+                  -->
+              </div>
+              <div class="col-xs-4 input-container">
+                <label>Partner Type</label><span class="partner-type-help" data-toggle="tooltip" data-placement="bottom" title="<ul>
+                    <li><span>{!$Label.Help_Corporate_Reseller}</span> - {!$Label.Help_Corporate_Reseller_Desc}</li>
+                    <li><span>{!$Label.Help_Distributor}</span> - {!$Label.Help_Distributor_Desc}</li>
+                    <li><span>{!$Label.Help_ISV}</span> - {!$Label.Help_ISV_Desc}</li>
+                    <li><span>{!$Label.Help_Alliance_OEM}</span> - {!$Label.Help_Alliance_OEM_Desc}</li>
+                    <li><span>{!$Label.Help_Cloud_SP}</span> - {!$Label.Help_Cloud_SP_Desc}</li>
+                    <li><span>{!$Label.Help_Solution_Provider}</span> - {!$Label.Help_Solution_Provider_Desc}</li>
+                    <li><span>{!$Label.Help_SI}</span> - {!$Label.Help_SI_Desc}</li>
+                    <li><span>{!$Label.Help_Training_Partner}</span> - {!$Label.Help_Training_Partner_Desc}</li>
+                  </ul>"><i class="fa fa-question-circle"></i></span>
+                <div class="dropdown-arrow partner-type">
+                    <apex:inputField id="cboPartnerType" onchange="updatePartnerFilters();" value="{!searchForm.PartnerType__c}"/>
+                </div>
+              </div>
+              <div class="col-xs-5">
+                  <div class="vertical" id="locationBasedSearch">
+                    <label>Partner Location</label>
+                    <apex:inputHidden id="hidProximitySearch" value="{!searchForm.ProximitySearch__c}"/>
+                    <div class="input-container">
+                        <div class="dropdown-arrow">
+                            <apex:selectList id="cboCountry" value="{!searchForm.Country__c}" size="1">
+                                <apex:selectOption itemLabel="{!$Label.PF_Search_Loc_Worldwide}" itemValue="" />
+                                <apex:selectOptions value="{!SelectableCountryOptions}"/>
+                                <apex:actionSupport event="onchange" rerender="state"/>
+                            </apex:selectList>
+                        </div>
+                    </div>
+                    <div id="proximitySearchBlock" style="display:none;">
+                      <img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/up-arrow.png')}" class="proximity-search-arrow"/>
+                      <!--<i class="fa fa-angle-up"></i>-->
+                      <i class="fa fa-times ease"></i>
+                      <apex:outputLabel value="{!$Label.PF_Loc_MSG_address_returned_state}" for="cboState"/>
+                      <apex:outputPanel id="state">
+                        <apex:selectList id="cboState" value="{!searchForm.StateProvince__c}" size="1" disabled="{!SelectableStateOptionsSize == 0}" rendered="{!SelectableStateOptionsSize > 0}">
+                            <apex:selectOption itemLabel="{!$Label.PF_Loc_Field_Select_State}" itemValue="" />
+                            <apex:selectOptions value="{!SelectableStateOptions}" />
+                        </apex:selectList>
+                        <apex:inputField id="txtState" value="{!searchForm.StateProvince__c}" rendered="{!SelectableStateOptionsSize == 0}" styleClass="txtState"/>
+                                  <script type="text/javascript">
+                                    toggleProximityFields(true);
+                                    toggleProximityFields(getElementByPartialId('select','.*cboCountry').selectedIndex > 0);
+                                    if (getElementByPartialId('select','.*cboCountry').selectedIndex > 0 && getElementByPartialId('select','.*cboState')){
+                                      getElementByPartialId('select','.*cboState').focus();
+                                    } else {
+                                      getElementByPartialId('input','.*txtState').focus();
+                                    }
+                                  </script>
+                      </apex:outputPanel>
+                      <apex:outputLabel value="{!$ObjectType.PFSearchForm__c.fields.City__c.label}" for="cboDistance"/>
+                      <apex:inputField id="txtCity" onchange="geoCodeAddress();" value="{!searchForm.City__c}" styleClass="txtCity"/>
+                        <apex:outputLabel value="{!$Label.PF_Loc_Field_Distance}" for="cboDistance"/>
+                        <apex:inputField styleClass="inline" id="cboDistance" value="{!searchForm.Distance__c}" style="width: 80px; margin:0 5px;"/>
+                        <apex:inputField styleClass="inline" id="cboDistanceMetric" value="{!searchForm.DistanceMetric__c}" style="width: 100px;"/>
+                        <apex:inputHidden id="hidLat" value="{!searchForm.Latitude__c}"/>
+                        <apex:inputHidden id="hidLng" value="{!searchForm.Longitude__c}"/>
+                    </div>
+                  </div><!-- /.vertical -->
+              </div>
+            </div>
+        </section>
+
+        <section class="section-2">
+            <div id="partnerLevel" class="row">
+                <div class="col-xs-6">
+                    <label>{!$ObjectType.PFSearchForm__c.fields.PartnerTier__c.label}</label>
+                    <apex:selectList id="optPartnerTiers" multiselect="true" value="{!partnerLevelList}">
+                        <apex:selectoptions value="{!partnerLevelOptions}"></apex:selectoptions>
+                    </apex:selectList>
+                      <p class="info"><i class="fa fa-info-circle"></i><span>Hold Ctrl (Windows/Linux) / Command (Mac) button to select multiple options</span></p>
+                </div>
+                <div id="onlyReseller" class="col-xs-6 input-container location-select">
+                    <label>{!$ObjectType.PFSearchForm__c.fields.Specialization__c.label}</label>
+                    <apex:selectList styleClass="checkList" id="optPartnerSpecialization" multiselect="true" value="{!partnerSpecializationList}">
+                        <apex:selectoptions value="{!partnerSpecializationOptions}"></apex:selectoptions>
+                    </apex:selectList>
+                    <p class="info"><i class="fa fa-info-circle"></i><span>Hold Ctrl (Windows/Linux) / Command (Mac) button to select multiple options</span></p>
+                </div>
+
+                <!-- vertical div old spot was here -->
+
+            </div>
+            <div class="row">
+              <div class="col-xs-4 submit-search-btn">
+              <ul>
+                <li><apex:commandButton id="btnSearch" action="{!ExecuteSearch}" onmouseover="geoCodeAddress();" value="{!$Label.Custom_Reference_Search_Button}" styleClass="btn search-btn"/></li>
+                <li><apex:commandButton id="btnReset" action="{!ClearSearch}" value="{!$Label.Finder_Search_Reset}" styleClass="btn search-btn previous"/></li>
+              </ul>
+                  <!--<button class="btn btn-default" type="button">Go!</button>-->
+              </div>
+            </div>
+        </section>
+      </apex:form>
+    </div>
+
+    <!-- =============================== M A P ============================= -->
+    <apex:outputPanel rendered="{!result.ctx.hasProximityResults}">
+      <div class="map-wrapper">
+        <div class="container">
+          <div class="map">
+            <div id="map_canvas" class="map-container"></div>
+          </div>
+        </div>
+      </div>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!NOT(searching)}">
+      <div class="map-wrapper">
+        <div class="container">
+          <div class="map">
+            <div id="map_canvas" class="map-container">
+              <img src="{!URLFOR($Resource.Finder_Global_Map)}"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </apex:outputPanel>
+
+    <!-- ============================= F E A T U R E D ======================= -->
+<!--
+    <apex:outputPanel rendered="{!result.ctx.hasCountrySearch}">
+    <section class="partners featured">
+      <div class="container">
+        <div class="row">
+          <h1>Featured Partners</h1>
+          <div class="row content-box-3up">
+            <apex:repeat value="{!result.featuredPartners}" var="featured">
+              <div class="col-xs-4">
+                  <div class="box fpcard flipbox flip-card front">
+                    <div class="flipbox-content">
+                      <div class="flipbox-img">
+                        <apex:image rendered="{!NOT(ISNULL(featured.logoAttachmentId))}" value="{!URLFOR($Action.Attachment.Download, featured.logoAttachmentId)}" styleClass="img-responsive" alt=""/>
+                      </div>
+                      <h3>{!featured.PartnerName}</h3>
+                      <apex:repeat value="{!featured.specializations}" var="spec">
+                        <p>{!spec}</p>
+                      </apex:repeat>
+                    </div>
+                  </div>
+                <div class="reverse-content" style="display:none">
+                <div class='flipbox-content'><i class='fa fa-times close'></i>
+                  <h3>{!featured.PartnerName}</h3>
+                  <p>{!featured.briefDesc}</p>
+                  <a target="_blank" href="PFPartnerDetail?id={!featured.partnerId}" class='btn'>Learn More</a>
+                </div>
+                </div>
+              </div>
+            </apex:repeat>
+
+
+          </div>
+        </div>
+      </div>
+    </section>
+    </apex:outputPanel>
+-->
+
+    <!-- ============================ C A R D S ==================== -->
+    <apex:outputPanel rendered="{!NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+    <div id="content-block">
+      <div class="container">
+        <apex:pageBlock id="resultsPane">
+            <apex:include pageName="PFPartnerResultPage" />
+        </apex:pageBlock>
+      </div>
+    </div>
+    </apex:outputPanel>
+
+    <section class="partner-finder promo-banner">
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12">
+            <h1>{!$Label.Find_Certified_Hardware_Software_and_Cloud_Providers}</h1>
+            <ul class="list-inline btn-container">
+              <li><a href="https://access.redhat.com/certifications" target="_blank" class="btn ease">{!$Label.Find_Now}</a></li>
+            </ul><!-- /.list-inline /.btn-container -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+      <!--<c:PartnerFinderFooter/>--><!-- include partnerFinderFooter until dynamic Footer is ready to use -->
+
+  </div><!-- /.red-hat-content -->
+  </body>
+
+ <style>
+  .red-hat-content .header-band {
+    height: auto !important;
+    padding-bottom: 40px !important;
+  }
+  .map-wrapper{
+    background: #f0f0f0;
+  }
+  .map-wrapper .container{
+    padding: 0;
+  }
+  .map-wrapper .container.bubble-container{
+    width: 350px !important;
+    height: 250px !important;
+  }
+  .flip-card{
+    height: 354px !important;
+  }
+  .flip-card h3{
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .flipbox-content{
+    padding: 3em 2em 5.000em 2em;
+  }
+  .flipbox-content h3{
+    font-family: 'Overpass Bold';
+  }
+  .flipbox-img{
+    margin-bottom: 40px;
+    height: 150px;
+  }
+  .flipbox-img img{
+    /* width: 200px; */
+    margin: 0 auto;
+    display: block;
+  }
+  .company-info{
+    color: #fff;
+  }
+  .back p, .back li, .back h3{
+    color: #fff !important;
+  }
+  .back .close{
+    color: #fff;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    font-size: 20px;
+    opacity: 1;
+  }
+  .back .btn{
+    position: absolute;
+    bottom: 20px;
+  }
+  .flipbox-content .logo{
+    height: 60px;
+    width: 100px;
+    margin-bottom: 25px;
+  }
+  .flipbox-content .logo img{
+    width: 58%;
+  }
+  .flipbox-content .company-info{
+    margin-bottom: 25px;
+  }
+  .box.back{
+    cursor: default !important;
+  }
+  .bPageBlock{
+    border-bottom: 0px solid #eaeaea !important; /*override salesforce styles*/
+    border-top: 0px solid #eaeaea !important; /*override salesforce styles*/
+  }
+  .red-hat-content .input-container input, .input-container select{
+    width: 100%;
+    padding-left: 5px !important;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    line-height: 1.42857143 !important;
+  }
+  .red-hat-content .form-control{
+    width: 100% !important;
+  }
+  .red-hat-content .input-container .search-btn{
+    border: 0px;
+    font-family: FontAwesome !important;
+    padding-left: 22px !important;
+    background-color: #c00;
+    color: #FFF;
+    display: inline-block !important;
+    width: 120px !important;
+    transition: background-color 0.3s ease;
+  }
+  .red-hat-content .input-container .search-btn:hover{
+    font-family: FontAwesome !important;
+    padding-left: 22px !important;
+    background-color: #b00;
+    color: #FFF;
+  }
+  .checkList td label{
+    margin-left: 10px;
+  }
+  .partner-type select{
+    width: 100% !important;
+  }
+  .section-1{
+    margin-bottom: 30px;
+    margin-right: 7px;
+  }
+  .location-select select{
+    width: 100% !important;
+  }
+  .section-1 .vertical{
+    width: 100%;
+  }
+  .info{
+    margin-top: 5px !important;
+  }
+  .info .fa-info-circle{
+    color: #c00;
+    font-size: 20px;
+  }
+  .info span{
+    position: relative;
+    top: -2px;
+    margin-left: 5px;
+  }
+  #proximitySearchBlock{
+    padding: 10px;
+    border: 1px solid #aaa;
+    margin-top: 20px;
+  }
+  #proximitySearchBlock .fa-angle-up{
+    color: #aaa;
+    position: absolute;
+    top: 71px;
+    left: 47px;
+    background: #fff;
+    font-size: 24px;
+  }
+  #proximitySearchBlock .proximity-search-arrow{
+    position: absolute;
+    top: -8px;
+    left: 16px;
+  }
+  #proximitySearchBlock .fa-times{
+    position: absolute;
+    cursor: pointer;
+    z-index: 1000;
+    color: #888;
+    font-size: 18px;
+    top: 0;
+    right: 0;
+    margin: 2px;
+  }
+  #proximitySearchBlock .fa-times:hover{
+    color: #333;
+  }
+  /*for absolute positioned STATE / PROVINCE popup*/
+  /* comment out next 2 section if you want to go back to block level styling */
+  #proximitySearchBlock{
+    padding: 10px;
+    border: 1px solid #aaa;
+    margin-top: 20px;
+    position: absolute;
+    z-index: 1000;
+    background: #fff;
+
+    -webkit-box-shadow: 1px 1px 5px 0px rgba(50, 50, 50, 0.5);
+    -moz-box-shadow: 1px 1px 5px 0px rgba(50, 50, 50, 0.5);
+    box-shadow: 2px 3px 5px -2px rgba(50, 50, 50, 0.5);
+  }
+  #proximitySearchBlock .fa-angle-up {
+      color: #aaa;
+      position: absolute;
+      top: -16px;
+      left: 26px;
+      background: #fff;
+      font-size: 24px;
+  }
+  /* END CODE for absolute positioned STATE / PROVINCE popup*/
+
+  .txtCity, .txtState{
+    margin-bottom: 10px !important;
+    width: 100%;
+  }
+  .red-hat-content .section-2 select[multiple], .red-hat-content .section-2 select[size] {
+    height: 98px !important;
+    font-size: 17px;
+  }
+  .dropdown-arrow.partner-type select{
+    width: 106% !important;
+  }
+  .bPageBlock{
+    background-color: #fff !important;
+    border: none !important;
+  }
+  .map_container{
+    display: none !important;
+  }
+  .apexp .bPageBlock.apexDefaultPageBlock .pbBody{
+    margin: 0 !important;
+  }
+  #content-block{
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 20px;
+  }
+  .search-btn{
+    width: 120px;
+  }
+  .submit-search-btn{
+    margin-top: 30px;
+  }
+  .submit-search-btn li{
+    display: inline-block;
+    margin-right: 10px;
+  }
+  #proximitySearchBlock span select{
+      margin-bottom: 15px !important;
+  }
+  .pagination a:hover{
+    background-color: #f0f0f0 !important;
+  }
+  .pagination .current{
+    background-color: #000 !important;
+    color: #fff !important;
+  }
+  .input-container label{
+    margin-right: 10px;
+  }
+
+/*======== partner type tooltip styles ========*/
+  .fa-question-circle{
+    color: #c00;
+  }
+  .tooltip{
+    width: 400px !important;
+  }
+  .tooltip-inner{
+    text-align: left !important;
+    width: 400px !important;
+    max-width: 400px !important;
+  }
+  .tooltip-inner ul{
+    padding: 0;
+    margin-left: 5px;
+    margin-top: 5px;
+  }
+  .tooltip-inner li{
+    list-style: none;
+  }
+  .tooltip-inner li span{
+    font-family: 'Overpass Bold';
+  }
+
+  /*======== map bubble styles ========*/
+  .red-hat-content .map-location-info {
+    width: 326px;
+    background-color: #fff;
+    padding: 10px 12px 10px;
+    position: absolute;
+    z-index: 2;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+  .red-hat-content .map-location-info:after {
+    content: '\f0d7';
+    font-family: 'FontAwesome';
+    color: #fff;
+    font-size: 85px;
+    line-height: 0.3;
+    width: 56px;
+    position: absolute;
+    left: 0;
+  }
+  .map-wrapper {
+    overflow: hidden;
+  }
+  .pagination a{
+    color: #000 !important;
+    border: none !important;
+    font-family: 'Overpass Bold';
+  }
+  /*======== Promo banner style ========*/
+  .partner-finder.promo-banner{
+    height: auto !important;
+    /*background: url('images/offset_93637_2000x365.jpg') no-repeat scroll center center transparent !important;*/
+    background: url("{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/offset_93637_2000x365.jpg')}") no-repeat scroll center center transparent !important;
+
+    padding: 2.4em 0px !important;
+    color: #FFF;
+  }
+  .partner-finder.promo-banner h1 {
+    margin-top: 5px;
+    margin-bottom: 25px;
+    font-family: "Overpass Bold";
+    font-size: 3.214em;
+    color: #FFF;
+    text-transform: none !important;
+  }
+  .red-hat-content .header-wrapper{
+    background: none !important;
+  }
+  .noSidebarCell, .sidebarCell .fixed {
+    padding: 0px !important;
+  }
+  .bodyDiv .outerNoSidebar {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .nav.navbar-nav li{
+    margin-bottom: 0 !important;
+  }
+  .nav.navbar-nav a{
+    cursor: pointer;
+  }
+
+  /* TOP NAV STYLE OVERIDES TO MAKE IT LOOK LIKE REDHAT.COM */
+  .red-hat-content .secondary-nav li > a{
+    padding: 12px 0px 5px !important;
+    color: #646464 !important;
+    font-size: 11px !important;
+  }
+  .red-hat-content .secondary-nav li > a.logo{
+      padding: 1px 0 0 0 !important;
+  }
+  /*======== media queries ========*/
+  @media (max-width: 800px) {
+    .red-hat-content .map-container{
+      height: 300px;
+    }
+    .red-hat-content .map-location-info {
+      top: 40px;
+    }
+  }
+ </style>
+ <script type="text/javascript">
+
+
+    var geocoder;
+    var map;
+    var marker = null;
+    var lastAddress = '';
+    var showAdvLink='{!$Label.PF_Search_Section_FilterOptions}';
+    var hideAdvLink = '{!$Label.PF_Search_Section_Hide_FilterOptions}';
+
+    // Wait for boolean
+    var geocoding = false;
+
+    function initialize() {
+        toggleProximityFields(getElementByPartialId('select','.*cboCountry').selectedIndex > 0);
+        updatePartnerFilters();
+        geocoder = new google.maps.Geocoder();
+        if (getElementByPartialId('input','.*hidAdvancedSearchOpen').value == 'true'){
+            toggleAdvancedSearch();
+        }
+
+        $j('.partners').on('click', '.fpcard.front', cardClickFront);
+        $j('.partners').on('click', '.fpcard .close', cardClickBack);
+
+    }
+
+    function cardClickFront() {
+        var card = $j(this).closest('.fpcard');
+        var parent = $j(card).parent()
+        $j(card).removeClass('front');
+        $j(card).addClass('back');
+        var rev = $j(this).next('.reverse-content');
+        $j(card).flip({
+            direction:'lr',
+            color: '#444',
+            content: rev
+        });
+        //$j('.close', parent).on('click', cardClickBack);
+    }
+
+    function cardClickBack() {
+        var card = $j(this).closest('.fpcard');
+        $j(card).removeClass('back');
+        $j(card).addClass('front');
+        $j(card).revertFlip();
+    }
+
+    function geoCodeAddress(){
+        var address = '';
+        var city = '';
+        if (getElementByPartialId('input','.*txtCity') && getElementByPartialId('input','.*txtCity').value != ''){
+            address += getElementByPartialId('input','.*txtCity').value;
+            city = getElementByPartialId('input','.*txtCity').value;
+        }
+        if (getElementByPartialId('select','.*cboState') && getElementByPartialId('select','.*cboState').selectedIndex != 0){
+            address += address.length > 0 ? ', ' : '';
+            address += getElementByPartialId('select','.*cboState').value;
+        }
+        if (getElementByPartialId('select','.*cboCountry') && getElementByPartialId('select','.*cboCountry').selectedIndex != 0){
+            address += address.length > 0 ? ', ' : '';
+            address += getElementByPartialId('select','.*cboCountry').value;
+        }
+
+        if (city != '' && address != '' && lastAddress != address){
+            startGeoCode = true;
+            log('Geocoding "' + address + '"');
+            geocoding = false;
+            geocoder.geocode( { 'address': address}, function(results, status) {
+                geocoding = false;
+                if (status == google.maps.GeocoderStatus.OK) {
+                  lastAddress = address;
+                    getElementByPartialId('input','.*hidLng').value = results[0].geometry.location.lng();
+                    getElementByPartialId('input','.*hidLat').value = results[0].geometry.location.lat();
+                    log('Address "' + address + '" is at\n Lng ' + getElementByPartialId('input','.*hidLng').value + ' - Lat ' + getElementByPartialId('input','.*hidLat').value);
+                } else {
+                    log("{!$Label.PF_Loc_MSG_address_validation_not}" + status);
+                    getElementByPartialId('input','.*hidLng').value = '';
+                    getElementByPartialId('input','.*hidLat').value = '';
+                    if (status == google.maps.GeocoderStatus.ZERO_RESULTS){
+                        alert("{!$Label.PF_Loc_MSG_Address_not_located}");
+                    } else {
+                        alert("{!$Label.PF_Loc_MSG_address_validation_not}" + status);
+                    }
+                }
+            });
+            while (geocoding){
+                // Wait
+            }
+        } else if ((city == '' || address == '') && lastAddress != address ) {
+            log('Geocode Cleared');
+            lastAddress = null;
+            getElementByPartialId('input','.*hidLng').value = '';
+            getElementByPartialId('input','.*hidLat').value = '';
+        } else {
+            log('Address already geocoded to ' + getElementByPartialId('input','.*hidLng').value + ',' + getElementByPartialId('input','.*hidLat').value);
+        }
+    }
+
+    function toggleProximityFields(isProximitySearch){
+        if (isProximitySearch){
+            jQuery('#proximitySearchBlock').show();
+            getElementByPartialId('input','.*hidProximitySearch').value = 'true';
+        } else{
+            jQuery('#proximitySearchBlock').hide();
+            getElementByPartialId('input','.*hidProximitySearch').value = 'false';
+        }
+    }
+
+    function updatePartnerFilters(){
+//        jQuery('#onlyISV').hide();
+        jQuery('#onlyReseller').hide();
+        jQuery('#partnerLevel').show();
+//        jQuery('#onlyTraining').hide();
+        var type = getElementByPartialId('select','.*cboPartnerType').value;
+//        if (type.indexOf('ISV') > -1){
+//            jQuery('#onlyISV').show();
+//        }
+        if (type.indexOf('Solution Provider') > -1 || type.indexOf('Reseller') > -1){
+            jQuery('#onlyReseller').show();
+        }
+        if (type.indexOf('Service/Cloud Provider') > -1) {
+            jQuery('#partnerLevel').hide();
+        }
+//        else if (type.indexOf('Training') > -1){
+//            jQuery('#onlyTraining').show();
+//        }
+    }
+
+    function hideSearchButton(){
+        jQuery('#searchButton').hide();
+    }
+
+    function showSearchButton(){
+        jQuery('#searchButton').show();
+    }
+
+    //hide state/province modal window
+    jQuery('#proximitySearchBlock .fa-times').click(function(){
+        jQuery('#proximitySearchBlock').fadeOut();
+    });
+
+    //init tooltip and enable html in tooltip
+    jQuery('.partner-type-help').tooltip({html:true});
+
+
+
+
+  //card flip animation
+
+
+  /*
+  $j('.partners.featured .card-1').click(function(){
+    if($j( this ).hasClass( 'card-back-1' )){
+      $j( this ).revertFlip();
+      $j( this ).removeClass('card-back-1');
+    }else{
+      $j( this ).addClass('card-back-1');
+        $j( this ).flip({
+            direction:'lr',
+            color: '#444',
+            content:"<div class='tile-close'><i class='fa fa-times'></i></div><div class='flipbox-content'><div class='logo'><img src='/resource/1409936699000/partnerCenterResources/partnerCenterResources/images/partner-logos/cisco-logo-white.png' alt='Cisco logo' class='img-responsive'></div><p class='company-info'>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p><a class='btn' href='#''>LEARN MORE</a></div>"
+        });
+    }
+  });
+`*/
+
+
+
+
+  //.card-1 flip
+/*
+  $j('.partners').on('click', '.card-1.front', function() {
+    $j('.card-1').removeClass('front');
+    $j('.card-1').addClass('back');
+    $j(".card-1").flip({
+        direction:'lr',
+        color: '#444',
+        content:"<div class='flipbox-content'><i class='fa fa-times close'></i><p>Inflexible infrastructure keeps businesses from achieving a competitive edge. Companies need a platform that lets them deploy, automate, manage, and expand their datacenter and evolve to cloud. Moving to open infrastructure makes it possible to deliver innovative solutions and respond quickly to business demands.</p><ul class='box-list'><li>Freeing IT budgets for innovation</li><li>Unlock the value of existing IT assets</li><li>Improve IT productivity and accelerate innovation</li></ul><a href='/Fastrax_Datacenter_infrastructure' class='btn'>Learn More</a></div>"
+    });
+  });
+  //.card-1 revert flip
+  $j('.partners').on('click', '.card-1 .close', function() {
+      $j('.card-1').removeClass('back');
+      $j('.card-1').addClass('front');
+    $j(".card-1").revertFlip();
+  });
+
+  //.card-2 flip
+  $j('.partners').on('click', '.card-2.front', function() {
+    $j('.card-2').removeClass('front');
+    $j('.card-2').addClass('back');
+    $j(".card-2").flip({
+        direction:'lr',
+        color: '#444',
+        content:"<div class='flipbox-content'><i class='fa fa-times close'></i><p>Inflexible infrastructure keeps businesses from achieving a competitive edge. Companies need a platform that lets them deploy, automate, manage, and expand their datacenter and evolve to cloud. Moving to open infrastructure makes it possible to deliver innovative solutions and respond quickly to business demands.</p><ul class='box-list'><li>Freeing IT budgets for innovation</li><li>Unlock the value of existing IT assets</li><li>Improve IT productivity and accelerate innovation</li></ul><a href='/Fastrax_Datacenter_infrastructure' class='btn'>Learn More</a></div>"
+    });
+  });
+  //.card-2 revert flip
+  $j('.partners').on('click', '.card-2 .close', function() {
+      $j('.card-2').removeClass('back');
+      $j('.card-2').addClass('front');
+    $j(".card-2").revertFlip();
+  });
+
+  //.card-3 flip
+  $j('.partners').on('click', '.card-3.front', function() {
+    $j('.card-3').removeClass('front');
+    $j('.card-3').addClass('back');
+    $j(".card-3").flip({
+        direction:'lr',
+        color: '#444',
+        content:"<div class='flipbox-content'><i class='fa fa-times close'></i><p>Inflexible infrastructure keeps businesses from achieving a competitive edge. Companies need a platform that lets them deploy, automate, manage, and expand their datacenter and evolve to cloud. Moving to open infrastructure makes it possible to deliver innovative solutions and respond quickly to business demands.</p><ul class='box-list'><li>Freeing IT budgets for innovation</li><li>Unlock the value of existing IT assets</li><li>Improve IT productivity and accelerate innovation</li></ul><a href='/Fastrax_Datacenter_infrastructure' class='btn'>Learn More</a></div>"
+    });
+  });
+  //.card-3 revert flip
+  $j('.partners').on('click', '.card-3 .close', function() {
+      $j('.card-3').removeClass('back');
+      $j('.card-3').addClass('front');
+    $j(".card-3").revertFlip();
+  });
+
+  //.card-4 flip
+  $j('.partners').on('click', '.card-4.front', function() {
+    $j('.card-4').removeClass('front');
+    $j('.card-4').addClass('back');
+    $j(".card-4").flip({
+        direction:'lr',
+        color: '#444',
+        content:"<div class='flipbox-content'><i class='fa fa-times close'></i><p>Inflexible infrastructure keeps businesses from achieving a competitive edge. Companies need a platform that lets them deploy, automate, manage, and expand their datacenter and evolve to cloud. Moving to open infrastructure makes it possible to deliver innovative solutions and respond quickly to business demands.</p><ul class='box-list'><li>Freeing IT budgets for innovation</li><li>Unlock the value of existing IT assets</li><li>Improve IT productivity and accelerate innovation</li></ul><a href='/Fastrax_Datacenter_infrastructure' class='btn'>Learn More</a></div>"
+    });
+  });
+  //.card-4 revert flip
+  $j('.partners').on('click', '.card-4 .close', function() {
+      $j('.card-4').removeClass('back');
+      $j('.card-4').addClass('front');
+    $j(".card-4").revertFlip();
+  });
+
+  //.card-5 flip
+  $j('.partners').on('click', '.card-5.front', function() {
+    $j('.card-5').removeClass('front');
+    $j('.card-5').addClass('back');
+    $j(".card-5").flip({
+        direction:'lr',
+        color: '#444',
+        content:"<div class='flipbox-content'><i class='fa fa-times close'></i><p>Inflexible infrastructure keeps businesses from achieving a competitive edge. Companies need a platform that lets them deploy, automate, manage, and expand their datacenter and evolve to cloud. Moving to open infrastructure makes it possible to deliver innovative solutions and respond quickly to business demands.</p><ul class='box-list'><li>Freeing IT budgets for innovation</li><li>Unlock the value of existing IT assets</li><li>Improve IT productivity and accelerate innovation</li></ul><a href='/Fastrax_Datacenter_infrastructure' class='btn'>Learn More</a></div>"
+    });
+  });
+  //.card-5 revert flip
+  $j('.partners').on('click', '.card-5 .close', function() {
+      $j('.card-5').removeClass('back');
+      $j('.card-5').addClass('front');
+    $j(".card-5").revertFlip();
+  });
+
+  //.card-6 flip
+  $j('.partners').on('click', '.card-6.front', function() {
+    $j('.card-6').removeClass('front');
+    $j('.card-6').addClass('back');
+    $j(".card-6").flip({
+        direction:'lr',
+        color: '#444',
+        content:"<div class='flipbox-content'><i class='fa fa-times close'></i><p>Inflexible infrastructure keeps businesses from achieving a competitive edge. Companies need a platform that lets them deploy, automate, manage, and expand their datacenter and evolve to cloud. Moving to open infrastructure makes it possible to deliver innovative solutions and respond quickly to business demands.</p><ul class='box-list'><li>Freeing IT budgets for innovation</li><li>Unlock the value of existing IT assets</li><li>Improve IT productivity and accelerate innovation</li></ul><a href='/Fastrax_Datacenter_infrastructure' class='btn'>Learn More</a></div>"
+    });
+  });
+  //.card-6 revert flip
+  $j('.partners').on('click', '.card-6 .close', function() {
+      $j('.card-6').removeClass('back');
+      $j('.card-6').addClass('front');
+    $j(".card-6").revertFlip();
+  });
+  */
+
+</script>
+</apex:page>

@@ -1,0 +1,75 @@
+<apex:page controller="PartnerTierControllerExt" tabStyle="Account" action="{!validatePendingTierChange}">
+    <apex:sectionHeader title="Partner Tier" description="Change Partner Tier for Account" />
+    <apex:form id="ChangePartnerTierForm">
+        <apex:pageBlock title="Change Partner Tier" rendered="{!validationFailed}" >
+            <br/>
+            <apex:pageMessages />
+            <br/>
+            <apex:pageBlockButtons >
+                 <apex:commandButton action="{!back}" value="Cancel" id="BackButton" immediate="true"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:pageBlock title="Change Partner Tier" mode="edit" rendered="{!NOT(validationFailed)}" >
+            <apex:pageBlockButtons rendered="{!NOT(completed)}">
+                <apex:commandButton action="{!submitTierChangeRequest}" value="Save" id="SaveButton"/>
+                <apex:commandButton action="{!back}" value="Cancel" id="BackButton" immediate="true"/>
+            </apex:pageBlockButtons>
+            <br/>
+            <apex:pageMessages />
+            <br/>
+            <apex:pageBlockSection title="Select Tier" columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Account Name:"/>
+                    <apex:outputText value="{!partnerProgram.Account__r.Name}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Program Name:"/>
+                    <apex:outputText value="{!partnerProgram.Program_Name__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Current Tier:"/>
+                    <apex:outputText value="{!partnerProgram.Tier__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Requested Tier:"/>
+                    <apex:selectList value="{!partnerProgramApprovalRequest.Tier__c}" required="true">
+                        <apex:selectOptions value="{!availableTiers}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock title="Account Activation FCPA Compliance" rendered="{!isUnaffiliated}">
+            <p>In order to activate this account a designated contact will be notified by email to complete the FCPA questionnaire using a provided link.</p>
+            <p>Once the contact has provided this information the tier change request will enter the approval process.</p>
+            <br />
+            <apex:pageBlockSection title="Select an existing contact, if available">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Select an existing contact from the account"/>
+                    <apex:selectList value="{!selectedContact}" size="1">
+                        <apex:selectOptions value="{!accountContacts}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Otherwise provide a contact email address">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="First Name"/>
+                    <apex:inputText value="{!contactFirstName}" size="40"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Last Name"/>
+                    <apex:inputText value="{!contactLastName}" size="40"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Email"/>
+                    <apex:inputText value="{!contactEmail}" size="40"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Language for Email"/>
+                    <apex:selectList value="{!selectedLanguage}" size="1">
+                        <apex:selectOptions value="{!languages}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

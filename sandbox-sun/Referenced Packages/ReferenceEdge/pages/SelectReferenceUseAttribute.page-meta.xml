@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>33.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Custom Page for &apos;Select/Edit Values&apos; link for select Attributes from selected label from matrix page on Reference Use Request Page (Bound 3)</description>
+    <label>SelectReferenceUseAttribute</label>
+</ApexPage>

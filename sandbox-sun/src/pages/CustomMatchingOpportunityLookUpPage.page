@@ -1,0 +1,47 @@
+<apex:page controller="CustomMatchingOpportunityController" title="Search" showHeader="false" sideBar="false" tabStyle="Opportunity_Header_Staging__c" id="pg" >
+ 
+ <script  type="text/javascript">
+ function GoToJs(inputvalue,inputvalue1){
+    var SelValue1 = inputvalue1;
+    var ValToBeAssigned1 = '{!TextBoxID}';
+    parent.window.opener.document.getElementById('{!TextBoxID}').value = SelValue1;
+    
+    var SelValue = inputvalue;
+    var ValToBeAssigned = '{!TextBox}';
+ 
+    parent.window.opener.document.getElementById('{!TextBox}').value = SelValue;
+    parent.window.opener.document.getElementById('{!TextBox}').focus();
+    top.parent.window.close();
+ }
+ 
+ </script>
+ 
+  <apex:form >
+  
+  <apex:outputPanel id="page" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+    <apex:sectionHeader title="Lookup"/>
+    
+        <apex:actionRegion >  
+          <apex:outputPanel id="top" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+            <apex:outputLabel value="Search" style="font-weight:Bold;padding-right:10px;" for="txtSearch"/>
+            <apex:inputText id="txtSearch" value="{!searchString}" />
+              <span style="padding-left:5px"><apex:commandButton id="btnGo" value="Go" action="{!Search}" rerender="searchResults"></apex:commandButton></span>
+          </apex:outputPanel>
+ 
+          <apex:outputPanel id="pnlSearchResults" style="margin:10px;height:350px;overflow-Y:auto;" layout="block">
+            <apex:pageBlock id="searchResults"> 
+              <apex:pageBlockTable value="{!results}" var="a" id="tblResults">
+                <apex:column >
+                  <apex:facet name="header">
+                    <apex:outputPanel >Name</apex:outputPanel>
+                  </apex:facet>                  
+                   <apex:outputLink value="javascript:top.window.opener.lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}" onclick="GoToJs('{!a.Opportunity_Name__c}','{!a.Opportunity__c}')">{!a.Opportunity_Name__c}</apex:outputLink>     
+                </apex:column>
+              </apex:pageBlockTable>
+            </apex:pageBlock>
+          </apex:outputPanel>
+        </apex:actionRegion>
+ 
+  </apex:outputPanel>
+  </apex:form>
+</apex:page>

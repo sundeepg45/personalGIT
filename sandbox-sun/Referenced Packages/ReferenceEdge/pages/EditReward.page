@@ -1,0 +1,84 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Reward__c" extensions="refedge.EditRewardController" sideBar="false" id="pageId" tabStyle="refedge__Reward__c">
+    <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/> 
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <script>
+        jQuery(window).load(function() {
+            if({!isIssue} == true && document.getElementById('pageId:frmId:pbId:pbsId:expiredId').checked == true){
+                document.getElementById('pageId:frmId:pbId:pbsId:amountId').disabled = true;
+            }
+        });
+        function changeExpiredDate(isExpired){
+            if(isExpired == true){
+                document.getElementById('pageId:frmId:pbId:pbsId:amountId').disabled = true;
+                document.getElementById('pageId:frmId:pbId:pbsId:exdateId').value = '{!todayDate}';
+            }
+            else{
+                document.getElementById('pageId:frmId:pbId:pbsId:amountId').disabled = false;
+                document.getElementById('pageId:frmId:pbId:pbsId:exdateId').value = '{!updatedExpiredDate}';
+            }
+        }
+        function changeExpired(expiredDate){
+            if('{!expiredDate}' != expiredDate){
+                document.getElementById('pageId:frmId:pbId:pbsId:expiredId').checked = false;
+                document.getElementById('pageId:frmId:pbId:pbsId:amountId').disabled = false;
+            }
+        }
+    </script>
+    <!-- Form -->
+    <apex:form id="frmId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <!-- Section Header-->
+        <apex:sectionHeader title="{!IF(isIssue,$Label.Issue_Reward, $Label.Redeem_Reward)}"/>
+        <!-- Page Block -->
+        <apex:pageBlock id="pbId" title="{!IF(isIssue,$Label.Issue_Reward, $Label.Redeem_Reward)}" mode="edit">
+            <!-- Page Block Buttons-->
+            <apex:pageBlockButtons id="pbbId">
+                <apex:commandButton value="{!$Label.Save}" action="{!save}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            
+            <!-- Page Block Section-->
+            <apex:pageBlockSection id="pbsId" columns="1" title="{!$Label.Information}">
+                <apex:outputField value="{!reward.refedge__Account__c}"/>
+                <apex:outputField value="{!reward.refedge__Contact__c}"/>
+                <apex:outputField value="{!reward.refedge__Referenceability_Type__c}" rendered="{!isIssue}"/>
+                <apex:inputField value="{!reward.refedge__Amount__c}" id="amountId" required="true">
+                    <apex:outputLabel value="{!$Label.Cannot_Exceed}" rendered="{!!isIssue}"/>
+                </apex:inputField>
+                <apex:outputText label="{!$Label.Available_Balance}" value="{!availableBalance}" rendered="{!!isIssue}"/>
+                <apex:inputField value="{!reward.refedge__Comments__c}"/>
+                <apex:inputField id="expiredId" value="{!reward.refedge__Expired__c}" rendered="{!isIssue}" onchange="changeExpiredDate(this.checked);return false;"/>
+                <apex:inputField id="exdateId" value="{!reward.refedge__Expiration_Date__c}" rendered="{!isIssue}" onchange="changeExpired(this.value);return false;"/>
+            </apex:pageBlockSection>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

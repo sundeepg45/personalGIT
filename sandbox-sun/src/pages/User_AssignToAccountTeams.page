@@ -1,0 +1,36 @@
+<apex:page controller="User_AssignToAccountTeams" tabStyle="User">
+    <apex:sectionHeader title="{!$ObjectType.User.LabelPlural}" subtitle="Assign To Account Teams" />
+
+    <apex:form >
+        <apex:pageBlock title="Assign To Account Teams" mode="Edit">
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!executeAssignment}" value="Apply Changes" />
+            </apex:pageBlockButtons>
+        
+            <apex:pageMessages />
+
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <apex:outputText value="New Account Team Member (User ID)" />
+                    </apex:outputPanel>
+
+                    <apex:outputPanel >
+                        <apex:inputText value="{!attachment.OwnerId}" required="true"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel >
+                        <apex:outputText value="List Of Account IDs (CSV File)" />
+                    </apex:outputPanel>
+
+                    <apex:outputPanel >
+                        <apex:inputFile value="{!attachment.Body}" contentType="text/csv" accept="csv" required="true" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

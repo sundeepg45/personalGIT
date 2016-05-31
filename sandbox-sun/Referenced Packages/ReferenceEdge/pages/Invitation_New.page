@@ -1,0 +1,520 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RfSearchController" id="pageId" sidebar="false" tabStyle="RE_Search__tab">
+    <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+<!--     <apex:stylesheet value="{!URLFOR($Resource.BootstrapFiles,'bootstrap.css')}"/> -->
+    <!-- Add CSS-->
+    <style type="text/css">
+        .ui-dialog-titlebar,.ui-widget-header {
+            border: 1px solid #79B4CD !important;
+        }
+        a.boxclose{
+            float: right;
+            margin-top: -24px;
+            cursor: pointer;
+            color: #fff;
+            border: 1px solid #AEAEAE;
+            border-radius: 16px;
+            background: #605F61;
+            font-size: 23px;
+            font-weight: bold;
+            display: inline-block;
+            line-height: 0px;
+            padding: 10px 3px;     
+        }
+        .boxclose:before {
+            content: "?";
+        
+        }
+        .collapse {
+            display: none;
+        }
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style>
+    <!-- Script-->
+    <script>
+        var lookupwindow =''; 
+        var lookUpWindowOpen = false;
+        var contactIds = '{!invitationcontroller.contactIds}';
+        var coworkerIds = '{!invitationcontroller.coworkerIds}';
+        var searchText = '';
+        var previousMsg = '@@@m@@@';
+        var previousDate = '@@@d@@@';
+        //for Ipad
+        var newWin = null; 
+        var popupflag = false;
+        var currentPgName = '';
+        //this method call on mouse over on Image 
+        var IE = document.all?true:false;
+        var tempX = 0;
+        var tempY = 0;
+
+        function showDiv(contentId, refconId, e) {     
+            if (IE) { 
+                tempX = e.clientX + document.body.scrollLeft;
+                tempY = e.clientY + document.body.scrollTop;
+            } 
+            else {  
+                tempX = e.pageX;
+                tempY = e.pageY;
+            } 
+            fetchContentItem(contentId, refconId);
+        }
+        
+        function showDivOncompleteAction() {
+            document.getElementById('pageId:frmId:dvContentDetails').style.display = 'block';
+            document.getElementById('pageId:frmId:dvContentDetails').style.left = tempX+'px';
+            document.getElementById('pageId:frmId:dvContentDetails').style.top = (tempY-100)+'px';
+        }
+        
+        //this method call on mouse out on Image 
+        function hideDiv() {
+            document.getElementById('pageId:frmId:dvContentDetails').style.display = 'none';
+        }
+        
+        //Method to open Link
+        function openLinkContent(contentUrl) {
+            if (contentUrl.indexOf("http://")>=0 || contentUrl.indexOf("https://")>=0) 
+                window.open('','_blank').location.href = contentUrl;
+            else
+                window.open('','_blank').location.href = 'http://'+contentUrl;
+        }
+        function ShowLookup(currentPageName){
+            if(!lookUpWindowOpen){
+                lookUpWindowOpen = true;
+                
+                // Get the user agent string & device Name
+                var deviceAgent = navigator.userAgent;
+                var ios = deviceAgent.toLowerCase().match(/(iphone|ipod|ipad)/);
+                    popupflag = true;
+                    currentPgName = currentPageName;
+                    
+                    if(currentPageName == '{!$Page.InvitationContactsLookup}'){
+                        newWin = window.open(encodeURI(currentPageName + '?strText=' + contactIds),'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no'); 
+                    }
+                    else if(currentPageName == '{!$Page.InvitationCoworkersLookup}'){
+                        newWin = window.open(encodeURI(currentPageName + '?strText=' + coworkerIds),'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+                    }
+                lookUpWindowOpen = false;
+            }  
+            return false;                              
+        } 
+        
+        function closePopup(recepientIds, EmailIds){  
+            
+            if (null != newWin){  
+                newWin.close(); 
+                if(typeof EmailIds != 'undefined'){
+                    if(popupflag){
+                        if(currentPgName == '{!$Page.InvitationContactsLookup}'){
+                            document.getElementById("pageId:frmId:pbId:pbsId2:pbsConItemId:txtContacts").value = EmailIds;
+                            contactIds = recepientIds;
+                            PORShowLoading();
+                            jsSetContactEmailIds(EmailIds,contactIds);
+                        }
+                        if(currentPgName == '{!$Page.InvitationCoworkersLookup}'){
+                            document.getElementById("pageId:frmId:pbId:pbsId2:pbsCoworkerItemId:txtCoworker").value = EmailIds;
+                            coworkerIds = recepientIds;
+                            PORShowLoading();
+                            jsSetCoworkerEmailIds(EmailIds,coworkerIds);
+                        }
+                        popupflag = false;
+                    }
+                }
+            }    
+        } 
+        
+        function  assignParameters(){
+            jsDoneAction();
+        }
+        
+        function  checkTemplate(){
+            var temp = document.getElementById('pageId:frmId:pbId:pbsId3:pbsCTId:microSiteId').value;
+            if(temp.trim() == ''){
+                alert('{!$Label.SELECT_MICROSITE}');
+                return false;
+            }
+            else
+                jsSetDefaultTemplate();
+        }
+        
+        
+        function jsAction() {
+            previewEmailJs();
+            return false;
+        }
+        
+        function jsShowRefContents(){
+            showRefContents();
+        }
+        
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+    </script>
+    <apex:outputPanel id="micrositePanelId">
+        <script>
+            function previewMicrosite(){
+                var temp = document.getElementById('pageId:frmId:pbId:pbsId3:pbsCTId:microSiteId').value;
+                if(temp.trim() == ''){
+                    alert('{!$Label.SELECT_MICROSITE}');
+                    return false;
+                }
+                else{
+                    window.open('{!$Page.refedge__MicrositePreview}?micrositeId='+temp+'&selectRefContent={!URLENCODE(invitationcontroller.selectedRefContents)}&internalPreview=true' ,'_blank');
+                }
+            }
+        </script>
+    </apex:outputPanel>
+    <!-- Form -->
+    
+    
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader subtitle="{!$Label.New_Invitation}" title="{!$Label.Invitation_Edit}"/>
+        <div align="left">   
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_RF_Search}" action="{!invitationToSearch}" id="backCmdLinkId" rendered="{!!invitationcontroller.isSubmitted}"/>
+        </div>
+        
+        <!-- Page Block -->
+        <apex:actionFunction name="fetchContentItem"  action="{!invitationcontroller.fetchHoverContentItem}" reRender="pgmsgId, dvContentDetails" oncomplete="showDivOncompleteAction();">
+            <apex:param name="contId" value="" assignTo="{!invitationcontroller.hoverContentId}"/>
+            <apex:param name="refContId" value="" assignTo="{!invitationcontroller.hoverRefContentId}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="downloadSingleContent" reRender="pgmsgId" action="{!invitationcontroller.singleContentDownload}" />
+        <apex:actionFunction name="jsMicrosite" rerender="pbsId3" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="jsShowCoworkers" action="{!invitationcontroller.showCoworkers}" rerender="coworkersLinkPanel, opCoworkerId, lblCoWorkers" />
+        <apex:actionFunction name="jsSetDefaultTemplate" action="{!invitationcontroller.setDefaultTemplate}" rerender="pgmsgId"/>
+        <apex:actionFunction name="previewEmailJs" immediate="false" action="{!invitationcontroller.previewEmail}" rerender="jsPanel" oncomplete="previewEmail();"/>
+        <apex:actionFunction name="jsSetContactEmailIds" rerender="pgmsgId" oncomplete="PORHideLoading();">
+            <apex:param name="contactEmailIds" assignTo="{!invitationcontroller.contactEmailIds}" value=""/>
+             <apex:param name="contactIds" assignTo="{!invitationcontroller.contactIds}" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="jsSetCoworkerEmailIds" rerender="pgmsgId" oncomplete="PORHideLoading();">
+            <apex:param name="coworkerEmailIds" assignTo="{!invitationcontroller.coworkerEmailIds}" value=""/>
+            <apex:param name="coworkerIds" assignTo="{!invitationcontroller.coworkerIds}" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="jsDoneAction" action="{!invitationcontroller.createInvitation}" rerender="pgmsgId,frmId" oncomplete="PORHideLoading();"/>
+        
+        <apex:actionFunction name="showRefContents" action="{!invitationcontroller.showRefContents}" rerender="pgmsgId,opSelectedRefContents" oncomplete="PORHideLoading();"/>
+        <apex:actionFunction name="jsRemoveContent" action="{!invitationcontroller.removeContent}" oncomplete="PORHideLoading();" reRender="pgmsgId,opSelectedRefContents,micrositePanelId" >
+            <apex:param name="contentToRemove" value="" assignTo="{!invitationcontroller.contentIdToRemove}" />
+        </apex:actionFunction>
+        <apex:outputPanel id="mainBlockId">
+            <!-- Page Block -->
+            <apex:pageBlock id="submittedId"  rendered="{!invitationcontroller.isSubmitted}">
+                <apex:pageMessage summary="{!$Label.Invitation_sent}" severity="INFO" strength="3" /> 
+                <apex:commandButton value="{!$Label.Back_to_Opportunity}" action="{!invitationcontroller.returnOpportunity}" rendered="{!NOT(ISBLANK(invitationcontroller.opportunityId))}"/>
+                <apex:commandButton value="{!$Label.Back_to_Case}" action="{!invitationcontroller.returnOpportunity}" rendered="{!NOT(ISBLANK(invitationcontroller.caseId))}"/>  
+                <apex:commandButton value="{!$Label.Back_to_RF_Search}" action="{!invitationcontroller.returnOpportunity}" rendered="{!AND(ISBLANK(invitationcontroller.opportunityId),ISBLANK(invitationcontroller.caseId),ISBLANK(invitationcontroller.leadId))}"/>
+                <apex:commandButton value="{!$Label.Back_to_SearchLead}" action="{!invitationcontroller.returnOpportunity}" rendered="{!NOT(ISBLANK(invitationcontroller.leadId))}"/> 
+            </apex:pageBlock>
+            
+            <!-- Page Block -->
+            <apex:pageBlock id="pbId" mode="edit"  rendered="{!NOT(invitationcontroller.isSubmitted)}">
+                <!-- Page Block Section 1-->
+                <apex:pageBlockSection id="pbsId2" columns="1">
+                    <apex:pageBlockSectionitem id="pbsConItemId">
+                        <apex:outputLabel value="{!$Label.To_Contacts}"/>
+                        <apex:outputPanel id="opContactsId">
+                            <apex:actionRegion >
+                                <div style="float:left">
+                                <apex:inputTextarea disabled="true" id="txtContacts" style="margin-left:0px;width:500px;" value="{!invitationcontroller.contactEmailIds}"/>&nbsp;&nbsp;
+                                </div>
+                                <div style="float:left">
+                                <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="return ShowLookup('{!$Page.refedge__InvitationContactsLookup}');" title="{!$Label.Contacts_Lookup_New_Window}"/>
+                                </div>
+                            </apex:actionRegion>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionitem>
+                    <apex:pageBlockSectionitem id="pbsCoworkerItemId" >
+                        <apex:outputPanel id="lblCoWorkers" >
+                            <apex:outputLabel value="{!$Label.To_Co_workers}" />
+                        </apex:outputPanel>
+                        <apex:outputPanel id="opCoworkerId" >
+                            <apex:actionRegion >
+                                <div style="float:left">
+                                    <apex:inputTextarea disabled="true" id="txtCoworker" style="margin-left:0px;width:500px;" value="{!invitationcontroller.coworkerEmailIds}"/>&nbsp;&nbsp;
+                                </div>
+                                <div style="float:left">
+                                    <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="return ShowLookup('{!$Page.refedge__InvitationCoworkersLookup}');" title="{!$Label.Co_workers_Lookup_New_Window}"/>
+                                </div>
+                            </apex:actionRegion> 
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionitem>
+                    <apex:pageBlockSectionItem >    
+                        <apex:outputLabel value="{!$Label.Subject}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                                <apex:inputField value="{!invitationcontroller.invitation.refedge__Subject__c}" id="subId" style="width:500px;"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionitem id="pbsMsgItemId">
+                        <apex:outputLabel value="{!$Label.Message}"/>
+                        <apex:outputPanel >
+                            <div style="float:left">
+                                <apex:inputField value="{!invitationcontroller.invitation.refedge__Message__c}" id="messageId" style="width:500px;"/> 
+                            </div>
+                            
+                            <div style="float:left">
+                                <apex:commandLink style="color:#5C95C4;" value="{!$Label.Preview_E_mail}" onclick="return jsAction();"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionitem>
+                </apex:pageBlockSection>
+                
+                <!-- Page Block Section 2-->
+                <apex:pageBlockSection id="pbsId1" columns="1" title="{!$Label.Invitation_Settings}">
+                    <apex:inputField label="{!$Label.Invitation_Name}" value="{!invitationcontroller.invitation.Name}" id="nameId" style="width:20%"/>
+                    <apex:pageBlockSectionitem id="pbsInvExpItemId" >
+                        <apex:outputLabel value="{!$Label.Invitation_Expiration}" />
+                        <apex:outputPanel styleClass="requiredInput" layout="block">
+                            <div class="requiredBlock"></div>
+                            <apex:inputField label="{!$Label.Invitation_Expiration}" value="{!invitationcontroller.invitation.refedge__Invitation_Expiration__c}" id="expId"/>
+                            <B><apex:outputLabel value="(max {!TEXT(invitationcontroller.maximumExpirationDays)} days)" /></B>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionitem>
+                    
+                    <apex:outputField value="{!invitationcontroller.invitation.refedge__Opportunity__c}" id="oppId" rendered="{!NOT(ISNULL(invitationcontroller.invitation.refedge__Opportunity__c))}"/>
+                    <apex:inputField label="{!$Label.Notes}" value="{!invitationcontroller.invitation.refedge__Notes__c}" id="noteId" style="width:20%"/>
+                </apex:pageBlockSection>    
+                <!-- Page Block Section 3-->
+                <apex:pageBlockSection id="pbsId3" columns="1" title="{!$Label.Microsite}">
+                    <apex:pageBlockSectionItem id="pbsCTId">    
+                        <apex:outputLabel value="{!$Label.Current_Template}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                                <apex:selectList size="1" label="{!$Label.Current_Template}" value="{!invitationcontroller.invitation.refedge__Microsite__c}" onchange="PORShowLoading();jsMicrosite();return false;" id="microSiteId">
+                                    <apex:selectOptions value="{!invitationcontroller.microsites}"/>
+                                </apex:selectList>
+                                <apex:commandLink id="defaultTemplateId" style="color:#5C95C4;" value="{!$Label.Save_as_my_default_template}" onclick="checkTemplate(); return false;"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionitem id="pbsItemId" >
+                        <apex:outputLabel value="{!$Label.Microsite}" />
+                        <apex:commandLink value="{!$Label.Preview_Microsite}" onclick="previewMicrosite(); return false;"/>
+                    </apex:pageBlockSectionitem>
+                    <apex:pageBlockSectionitem id="invcontentsId" >
+                        <apex:outputLabel value="{!$Label.Invitation_Contents}" />
+                        <apex:outputPanel >
+                            <apex:commandLink value="{!$Label.Manage}" onclick="PORShowLoading();jsShowRefContents(); return false;"/>&nbsp;&nbsp;
+                            <apex:commandLink value="{!$Label.Add_Content}" action="{!invitationToSearch}" id="addContentId"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionitem>
+                    <apex:outputPanel id="opSelectedRefContents">
+                        <apex:pageBlockSection collapsible="false" id="pbstableId" columns="1" title="{!$Label.Included_Reference_Content}" rendered="{!AND(invitationcontroller.isRefcontentBlock, invitationcontroller.listReferenceContent.size > 0)}">
+                            <apex:pageBlockTable value="{!invitationcontroller.listReferenceContent}" var="cw" id="pbtContent" >
+                                <apex:column headerValue="{!$Label.Action}" >
+                                    <apex:commandLink style="color:#5C95C4;" value="{!$Label.Delete}" onclick="PORShowLoading();jsRemoveContent('{!JSENCODE(cw.refContent.id)}'); return false;"/>
+                                </apex:column>
+                                <apex:column >
+                                    <apex:image onclick="showDiv('{!JSENCODE(cw.refContent.refedge__Content_ID__c)}', '{!JSENCODE(cw.refContent.Id)}', event);" url="{!URLFOR($Resource.refedge__ExtensionImages, cw.fileTypeImagePath)}" width="16" height="16" style="vertical-align: middle; margin-right: 0.4em;cursor:pointer;" />
+                                </apex:column> 
+                                <apex:column headerValue="{!$Label.Title}" style="min-width:200px;">
+                                    <apex:outputText value="{!cw.refContent.refedge__Title__c}"/> 
+                                </apex:column>
+                                
+                                <apex:column headerValue="{!$Label.Type}" value="{!cw.refContent.Reference_Content_Type__r.refedge__Name__c}"/> 
+                                
+                                <apex:column headervalue="{!$Label.Account}">
+                                    <apex:outputLink value="{!cw.accountIds}" id="accName" target="_blank">
+                                        <apex:outputText value="{!cw.accountName}"/>
+                                    </apex:outputLink>
+                                </apex:column>
+                            </apex:pageBlockTable>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+                
+                <!-- Page Block Buttons-->
+                <apex:pageBlockButtons id="pbbId">
+                    <apex:commandButton value="{!$Label.Send}" onclick="PORShowLoading();assignParameters();return false" id="doneId"/>
+                    <apex:commandButton value="{!$Label.Cancel}" action="{!backToSearch}" id="cancelId"/>
+                </apex:pageBlockButtons>
+             
+                <apex:outputPanel id="jsPanel">
+                    <script>
+                        var msg = '{!JSENCODE(invitationcontroller.message)}';
+                        var date = '{!JSENCODE(invitationcontroller.datetext)}';
+                        function previewEmail() {
+                            var temp = jQuery("#emailPreviewDiv").html().replace(previousMsg,msg);
+                            temp = temp.replace(previousDate,date);
+                            jQuery("#emailPreviewDiv").html(temp);
+                            jQuery("#emailPreviewDiv").dialog({
+                                height    : 600,
+                                width     : 800,
+                                modal     : true,
+                                resizable : false,  
+                            });
+                            previousMsg = msg;
+                            previousDate = date;
+                        }
+                    </script>
+                </apex:outputPanel>
+            </apex:pageblock>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="emailPreviewDivId">
+            <div id="emailPreviewDiv" title="{!$Label.E_mail_Preview}" style="display:none;white-space: pre;">
+                <apex:outputText value="{!invitationcontroller.templateBody}" escape="false"/>
+            </div>
+        </apex:outputPanel>
+        
+        
+        <!-- Div for on Mouse hover -->
+        <apex:outputPanel style="display:none;width:450px;position:absolute;z-index:1000;scroll-y:auto;" id="dvContentDetails">
+            <apex:pageBlock rendered="{!invitationcontroller.hoverContentVersion.Id != null}" id="contPbId">
+                <div style="font-size:15px;">
+                    <strong>{!invitationcontroller.hoverContentVersion.Title}</strong>
+                    <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                </div>
+                <div style="height:10px;clear:both; "></div>
+                <apex:outputPanel layout="block" style="word-break: break-word;-ms-word-break:break-all;">
+                    <apex:pageBlockSection columns="1" id="contentPbsId" >
+                        <apex:outputField id="summaryId" label="{!$Label.Summary}:" value="{!invitationcontroller.hoverContentVersion.Description}"/>
+                        <apex:outputField label="{!$Label.File_Size}:" value="{!invitationcontroller.hoverContentVersion.ContentSize}"/>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            
+                <apex:pageBlockButtons location="bottom">
+                    <apex:commandButton value="{!$Label.Open}" onclick="openLinkContent('{!JSENCODE(invitationcontroller.hoverContentVersion.ContentUrl)}'); return false;" rendered="{!invitationcontroller.hoverContentVersion.FileType = 'LINK'}"/>
+                    <apex:commandButton value="{!$Label.Download}" onclick="downloadSingleContent(); return false;" rendered="{!AND(invitationcontroller.hoverContentVersion.FileType != 'LINK', isCRMContentUser)}"/>
+                    <apex:commandButton value="{!$Label.View_Details}" onclick="window.open('/{!JSENCODE(invitationcontroller.hoverRefContentId)}', '_blank'); return false;" rendered="{!isCRMContentUser}"/>
+                </apex:pageBlockButtons>
+            </apex:pageBlock>
+        
+            <apex:pageBlock rendered="{!AND(invitationcontroller.hoverContentVersion.Id == null,NOT(invitationcontroller.customRefContent),invitationcontroller.refInterview.size = 0) }">
+                <div style="font-size:15px;">
+                    <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                </div>
+                <apex:outputLabel value="{!$Label.Content_View_Permission_Message}"/>
+            </apex:pageBlock>
+            
+            <apex:pageBlock rendered="{!AND(invitationcontroller.hoverContentVersion.Id == null,invitationcontroller.customRefContent) }">
+                <div style="font-size:15px;">
+                    <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                </div>
+                <apex:pageBlockSection rendered="{!invitationcontroller.refContentFields.size > 0}" columns ="1">
+                    <strong>{!invitationcontroller.referenceContentTitle}</strong>
+                    <apex:repeat value="{!invitationcontroller.refContentFields}" var="rcf">
+                        <apex:repeat value="{!invitationcontroller.customContentTypeFields}" var="fieldAPIName">
+                            <apex:outputField style="font-weight:normal;" value="{!rcf[fieldAPIName]}"/>
+                        </apex:repeat>  
+                    </apex:repeat>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            <apex:outputPanel rendered="{!invitationcontroller.refInterview.size >0}" layout="block" style="width:100%;max-height:200px;background-color:white;">
+                <div style="font-size:15px;">
+                    <a class="boxclose" id="boxclose" onclick="hideDiv();"></a>
+                </div>
+                <div class="panel-group" id="accordion" style="width:100%;float:left;background:#EAEAEA;max-height:200px;overflow-y:auto;">
+                    <div class="panel panel-default" style="float:right;width:100%;border:1px solid #BFBFBF;margin-top: -1px;">
+                        <div id="contentDetails" class="imageDiv" style="background-color: #f8f8f8;border:2px solid gray;border-radius:1px;width:100%;height:100%;">
+                            <apex:outputPanel layout="block" >
+                                <apex:outputPanel id="imagePanel" styleClass="imagePanelClass" style="width:100%;float:left;text-align:left;padding-left: 10px;">
+                                <apex:outputLabel value="" />
+                                <apex:outputField styleclass="ImageClass" id="imageIds" value="{!invitationcontroller.refInterviewRecord.refedge__Photograph__c}" />
+                            </apex:outputPanel>
+                            <apex:outputPanel style="width:100%;float:left;font-weight:bold;font-size:14px;padding-top: 2%;">
+                                <apex:outputLabel value="" />
+                                    <apex:outputText style="padding-left: 10px;font-weight:bold;" value="{!invitationcontroller.refInterviewRecord.Reference_Content__r.refedge__Title__c}" />
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                            <apex:outputPanel style="width:100%;float:left;padding-left:10px;">
+                                <div style="float:left;width:100%;">
+                                    <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrptInfo">
+                                        <apex:outputLabel style="font-weight:bold;cursor:pointer;" value="{!$Label.Reference_Interview_Info}" />
+                                    </a>
+                                </div>
+                                <div id="collapseTrnanscrptInfo" style="float:left;width:100%;" class="panel-collapse collapse">
+                                    <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Speaker_info__c.label}" />&nbsp;
+                                    <apex:outputField value="{!invitationcontroller.refInterviewRecord.refedge__Speaker_info__c}" />
+                                    <br/>
+                                    <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_website__c.label}" />&nbsp;
+                                    <apex:commandLink style="color:blue" value="{!invitationcontroller.refInterviewRecord.refedge__Org_website__c}" onClick="openSite('{!invitationcontroller.refInterviewRecord.refedge__Org_website__c}');return false;" />
+                                    <br/>
+                                    <apex:outputLabel style="font-weight:bold;" value="{!$ObjectType.refedge__Reference_Interview__c.fields.refedge__Org_description__c.label}" />&nbsp;
+                                    <apex:outputField value="{!invitationcontroller.refInterviewRecord.refedge__Org_description__c}" />
+                                </div>
+                            </apex:outputPanel>
+                            <table style="width:100%;float:left;margin-top:1%;">
+                                <tbody style="width:100%;">
+                                    <apex:repeat value="{!invitationcontroller.refInterviewRecord.Interview_Topics__r}" var="interviewTopic">
+                                        <tr style="width:100%;">
+                                            <td style="width:100%;border: 1px solid #ececec;">
+                                                <div style="float:left;width:100%;padding-left: 10px;">
+                                                    <a data-toggle="collapse" data-parent="#accordion" style="float:left;width:80%;" href="#collapseTrnanscrpt{!interviewTopic.id}">
+                                                        <apex:outputLabel style="font-weight:bold;cursor:pointer;" value="{!interviewTopic.refedge__Question__c}" />
+                                                    </a>
+                                                </div>
+                                                <div id="collapseTrnanscrpt{!interviewTopic.id}" style="float:left;width:100%;" class="panel-collapse collapse in">
+                                                    <apex:outputPanel rendered="{!interviewTopic.refedge__Video_Url_Embed__c != null}">
+                                                        <iframe id="player" width="420" height="315" src="{!interviewTopic.Video_Url_Embed__c}?showinfo=0&rel=0&modestbranding=1"/>
+                                                        <script src="https://www.youtube.com/iframe_api"></script>
+                                                    </apex:outputPanel>
+                                                    <apex:outputLabel style="font-weight:normal;padding-left: 10px;" value="{!interviewTopic.refedge__Transcript__c}" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </apex:outputPanel>
+    </apex:form> 
+    
+    <style>
+        .textStyle{
+            font-family: arial,sans-serif;
+            font-size: 120%;
+        }
+    </style>
+</apex:page>

@@ -1,0 +1,55 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Interview_Topic__c" extensions="refedge.InterviewTopicExtension" sidebar="false"> 
+    <apex:pageMessages />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <script>
+        function downloadFile(){
+             window.open('','_blank').location.href = '/servlet/servlet.FileDownload?file='+'{!JSENCODE(attachmentId)}';
+        }
+    </script>
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader title="{!$Label.Reference_Interview_Topic_Edit}" subtitle="{!$Label.New_Reference_Interview_Topic}"/>
+        <apex:pageBlock id="pbId" title="{!$Label.Reference_Interview_Topic_Edit}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}" action="{!Save}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!Cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.Information}" id="pbsId" columns="1">
+                <apex:inputField value="{!interviewTopic.refedge__Interview_Question__c}"/>
+                <apex:inputField value="{!interviewTopic.refedge__Transcript__c}"/>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.refedge__Interview_Topic__c.fields.refedge__Video_URL__c.InlineHelpText}">
+                    <apex:outputLabel style="margin-right: 0px;" value="{!$ObjectType.refedge__Interview_Topic__c.fields.refedge__Video_URL__c.Label}"/>
+                    <apex:inputField value="{!interviewTopic.refedge__Video_URL__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(contentFileName))}">
+                    <apex:outputLabel style="margin-right: 0px;" value="{!$Label.File}"/>
+                    <apex:commandLink value="{!contentFileName}" onclick="downloadFile();return false;"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

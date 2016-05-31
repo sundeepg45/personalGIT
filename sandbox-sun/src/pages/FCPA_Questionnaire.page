@@ -1,0 +1,295 @@
+<apex:page controller="FCPA_Questionnaire" showHeader="false" sidebar="false" cache="false" action="{!init}">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+  <meta name="viewport" content="width=1200"/>
+  <title>Red Hat Partnership Application</title>
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+  <!--CSS Files -->
+  <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+  <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+  <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+  <!--JS Files -->
+
+  <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+  <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+  <![endif]-->
+
+  <!--[if IE 9]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css" rel="stylesheet')}" />
+  <![endif]-->
+  <!--[if lt IE 8]>
+  <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+  <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+  <![endif]-->
+
+  <script type="text/javascript" src="{!$Label.Red_Hat_Omniture_Script_Header}"></script>
+  <script>
+    surl = document.location.pathname;
+    pagename = surl.substring(1,surl.length);
+    s.pageName = "rh | partner center | " + pagename.toLowerCase();
+    s.server = s.channel = "partner center";
+    s.prop21 = s.eVar18 = encodeURI(window.location.hostname+window.location.pathname).toLowerCase();
+  </script>
+  <script type="text/javascript" src="{!$Label.Red_Hat_Omniture_Script_Footer}"></script>
+
+</head>
+
+<style>
+    .content-wrapper h2{
+        text-align: center;
+    }
+    .red-hat-content .user-signup .input-container{
+        margin: 20px 0;
+    overflow: hidden;
+    }
+    .red-hat-content .user-signup .input-container label {
+        width: 39% !important;
+    }
+    .red-hat-content .user-signup .input-container .input-field {
+        width: 58% !important;
+    }
+    .underlying-facts, .underlying-facts-input{
+        float: left;
+    }
+    .underlying-facts-input textarea{
+        height: 100px;
+        width: 100%;
+        max-width: 100%;
+        margin-left: 15px;
+    }
+    .submit-btn-container{
+        border-top: 1px solid #CCC;
+        clear: both;
+        text-align: center;
+    }
+    .submit-btn-container .btn{
+        margin-top: 20px;
+    }
+    .red-hat-content .input-container input{
+         width: 18px;
+         margin: 0 auto;
+    }
+    .red-hat-content .input-container input, .input-container select{
+        height: 20px;
+        margin-top: 0;
+    }
+    .red-hat-content .user-signup .input-container label {
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+    .label-inline td{
+        padding-left: 15px;
+    }
+    .red-hat-content .user-signup .input-container .input-field label{
+        width: 100% !important;
+        text-align: center;
+    }
+    input[type=radio]{
+        display: block;
+        width: 18px;
+        margin: 0 auto;
+    }
+    #terms .panel-body{
+        border-top: 1px solid #eee !important;
+    }
+    .terms-header{
+        text-align: center;
+        margin-bottom: 20px !important;
+    }
+    .more-info-header{
+        display: block !important;
+        text-align: center;
+    }
+    .more-info-links{
+        margin-top: 20px !important;
+    }
+    .more-info-links li{
+        padding-bottom: 10px !important;
+    }
+    .more-info-links a:hover{
+        color: #08C0FC !important;
+    }
+    #declinedTermsText textarea{
+        width: 100%;
+        max-width: 100%;
+    }
+</style>
+
+<body id="fcpa">
+<div class="red-hat-content">
+  <div class="user-header">
+    <div class="container">
+      <div class="row">
+        <div class="row">
+          <div class="col-xs-5">
+            <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+          </div><!-- /.col-xs-5 -->
+          <div class="col-xs-7">
+              <div class="description">{!$Label.FCPA_Questionnaire_Title}</div>
+          </div><!-- /.col-xs-7 -->
+        </div><!-- /.row -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+  </div><!-- /.partner-portal-header -->
+
+  <div class="apply-content-wrap user-signup">
+  <apex:form id="mainForm">
+    <div class="container">
+      <div class="row">
+        <div class="content-wrapper">
+          <apex:pageMessages />
+            <apex:outputPanel rendered="{!NOT(completed) && NOT(isError)}">
+            <div>
+              <h2 style="margin-top: 0px;">{!$Label.Onboarding_RegisterProfile_With_Respect_To_Any_Officer}</h2>
+              <div class="input-container" requiredradio="true">
+                <label for="cboGovernmentPosition" class="required-field">{!$Label.Onboarding_RegisterProfile_Do_They_Act_In_Government_Pos}</label>
+                <div class="input-field">
+                  <apex:selectRadio value="{!program.Government_Position__c}"  id="cboGovernmentPosition" styleClass="label-inline" required="true">
+                      <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                      <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                  </apex:selectRadio>
+                </div>
+                <label id="txtGovtErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+              </div><!-- /.input-container -->
+              <div class="input-container" requiredradio="true">
+                <label for="cboHaveBeenConvicted" class="required-field">{!$Label.Onboarding_RegisterProfile_Have_You_Committed_A_Crime}</label>
+                <div class="input-field">
+                  <apex:selectRadio value="{!program.Convicted__c}"  id="cboHaveBeenConvicted" styleClass="label-inline" required="true">
+                      <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                      <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                  </apex:selectRadio>
+                </div>
+                <label id="txtCrimeErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+              </div><!-- /.input-container -->
+              <div class="input-container">
+                <label for="underlyingFacts" class="underlying-facts">{!$Label.Onboarding_RegisterProfile_Underlying_Facts}</label>
+                <div class="input-field underlying-facts-input">
+                  <apex:inputTextarea value="{!program.FCPA_Underlying_Facts__c}" id="underlyingFacts"/>
+                </div>
+              </div><!-- /.input-container -->
+            </div>
+            <div id="terms">
+              <div class="panel-body">
+                <apex:outputPanel id="agreementsPanel" rendered="{!hasAgreements}">
+                <script>
+                    $('#section4title').text("{!$Label.Onboarding_RegisterAgreements_T_and_C}");
+                    $('[id$=buttonSubmitApproval]').val("{!$Label.Onboarding_RegisterDemographics_Submit_For_Approval}");
+                    $('#section4whatsthis').attr('data-original-title', "{!$Label.Onboarding_Register_Tooltip_Legal_Terms}");
+                    // if ('{!partnerType}' == 'PARTNER_TYPE.SERVICECLOUD_PROVIDER') {
+                    //   $('#section4title').text("{!$Label.CCSP_Onboarding_Terms_Title}");
+                    //   $('[id$=buttonSubmitApproval]').val("{!$Label.Submit}");
+                    //   $('#section4whatsthis').attr('data-original-title', "{!$Label.CCSP_Section_4_Whats_This}");
+                    // }
+                    // if ('{!partnerType}' == 'Embedded') {
+                    //   $('#section4title').text("{!$Label.Embedded_Onboarding_Terms_Title}");
+                    //   $('[id$=buttonSubmitApproval]').val("{!$Label.Submit}");
+                    //   $('#section4whatsthis').attr('data-original-title', "{!$Label.Embedded_Section_4_Whats_This}");
+                    // }
+                </script>
+                    <p class="terms-header">{!$Label.Onboarding_RegisterAgreements_Accept_Terms}</p>
+                    <div id="pdf" class="terms-body">
+                      <object type="application/pdf" height="900" id="pdf_content" width="100%" data="/partner/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}">Your browser doesn't support PDF viewing. To see the PDF click the link: <a target="_blank" href="/partner/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}">Download PDF</a></object>
+                    </div>
+                    <hr />
+                </apex:outputPanel>
+                <apex:outputPanel id="linksPanel" rendered="{!hasAgreements}">
+                <label class="more-info-header">{!$Label.ONB_Need_More_Information}</label>
+                    <ul class="more-info-links">
+                        <apex:repeat var="agreement" value="{!agreements}">
+                            <apex:variable var="agreementAttachmentNumber" value="{!VALUE('1')}" />
+
+                               <apex:repeat var="agreementAttachment" value="{!agreement.Attachments}">
+                                <li>
+                                <apex:outputLink target="_blank" value="/servlet/servlet.FileDownload?file={!agreementAttachment.Id}">
+                                    <apex:outputText value="{0}">
+                                        <apex:param value="{!IF((Find('.',agreementAttachment.Name) == 0), agreementAttachment.Name, (LEFT(agreementAttachment.Name,(Find('.',agreementAttachment.Name) -1))))}" />
+                                    </apex:outputText>
+                                 </apex:outputLink>
+                                 <!-- <apex:outputText value=" ({0})" rendered="{!(agreement.IsSignatureRequired__c || selectedCountry.IsAgreementSignatureRequired__c)}">
+                                        <apex:param value="{!$Label.Onboarding_RegisterAgreements_Sig_required}" />
+                                 </apex:outputText> -->
+                                </li>
+                                <apex:variable var="agreementAttachmentNumber" value="{!agreementAttachmentNumber + 1}" />
+                            </apex:repeat>
+                        </apex:repeat>
+                    </ul>
+                <div class="input-container" id="termsAcceptanceSection">
+                    <label for="terms-accept" class="label-inline required-field">{!$Label.Onboarding_RegisterAgreements_Ack_terms}</label>
+                    <div class="input-field">
+                        <apex:selectRadio id="agreeTermsSelect" value="{!agreeTerms}" styleClass="label-inline" onchange="handleAgreeTerms(this);">
+                            <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes" />
+                            <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                        </apex:selectRadio>
+                    </div>
+                    <label id="txtCrimeErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                </div>
+                <div class="panel-body" style="{!IF(agreeTerms == 'No', '', 'display:none')}" id="declinedTermsPanel">
+                  <div class="input-container">
+                      <label for="declinedTermsText" class="label-inline required-field">{!$Label.Onboarding_RegisterAgreements_If_Declined_Why}</label>
+                      <div class="input-field" id="declinedTermsText">
+                          <apex:inputTextArea id="declinedReason" value="{!declinedReason}" />
+                      </div>
+                      <label id="txtCrimeErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                  </div><!-- /.input-container -->
+                </div>
+                </apex:outputPanel>
+              </div><!-- /.panel-body -->
+              <div class="clearfix"></div>
+            </div><!-- /#terms -->
+            <div class="submit-btn-container">
+                <apex:commandButton id="submitButton" action="{!submitButton}" value="{!$Label.Submit}" styleClass="ease" onclick="return validateBeforeSubmit()"/>
+            </div>
+            </apex:outputPanel>
+        </div> <!-- content-wrapper -->
+    </div> <!-- row -->
+</div> <!-- container -->
+</apex:form>
+</div>
+<script>
+function handleAgreeTerms(el) {
+    var checked = $(el).filter(':checked');
+    if (checked.val() == 'Yes') {
+        //$('#customTermsPanel').hide();
+        $('#declinedTermsPanel').hide();
+    }
+    else {
+        $('#declinedTermsPanel').show();
+        //$('#customTermsPanel').show();
+    }
+}
+
+// $('input[id$=submitButton]').on('click', function(e) {
+//     var agreeTerms = $('input[name$=agreeTermsSelect]:checked').val();
+//         if ({!hasAgreements} && agreeTerms != null && agreeTerms == 'No') {
+//             var declinedVal = $('textarea[id$=declinedReason]').val();
+//             if (declinedVal == undefined || declinedVal == null || declinedVal.length == 0) {
+//                 // put up a REQUIRED message
+//                 e.preventDefault();
+//                 return false;
+//             }
+//         }
+//         if ({!hasAgreements} && agreeTerms == null) {
+//             e.preventDefault();
+//             return false;
+//         }
+// });
+
+</script>
+</div> <!-- redhat-content -->
+</body>
+
+</apex:page>

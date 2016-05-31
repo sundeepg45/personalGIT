@@ -1,0 +1,8 @@
+<apex:page standardController="SubscriptionPartner__c" >
+	<apex:detail subject="{!Id}"
+		inlineEdit="true"
+		relatedList="true"
+		relatedListHover="true"
+		showChatter="true"
+		title="true" />
+</apex:page>

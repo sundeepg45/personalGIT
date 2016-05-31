@@ -1,0 +1,467 @@
+<apex:page showHeader="false" standardController="Opportunity" extensions="GlobalOrderManagementControllerExtension" id="GlobalOrderManagementForm">
+<head>
+<apex:stylesheet value="/css/ie_global.css"/>
+<apex:stylesheet value="/css/ie_navigation.css"/>
+<apex:stylesheet value="/css/accounts_styles.css"/>
+<title>Global Order Management Form</title>
+<style>
+td { padding-left: 1ex; padding-right: 1ex }
+th { padding-left: 1ex; padding-right: 1ex; text-align: left; font-weight: bold }
+div { padding-bottom: 1ex }
+</style>
+</head>
+<body>
+<apex:outputText rendered="false" value="{!Opportunity.Super_Region__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.Owner.UserRole.Name}"/>
+<apex:outputText rendered="false" value="{!Opportunity.Owner.Region__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.ContractStartDate__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.ContractEndDate__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.Credit_Card_Number__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.ExpirationDate__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.Operating_Unit__c}"/>
+<apex:outputText rendered="false" value="{!Opportunity.Id}"/>
+<div style="display:none">
+isNA={!isNA}
+isLATAM={!isLATAM}
+isEMEA={!isEMEA}
+isAPAC={!isAPAC}
+</div>
+<div>
+  <table border="0" width="100%" id="table1">
+    <tr style="background-color: #CCCCCC">
+      <td align="center" width="40%">
+        <b><font size="3">Global Order Management Form</font></b>
+      </td>
+    </tr>
+  </table>
+</div>
+<div>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+<tr>
+<th width="20%">Opportunity Number</th>
+<td width="40%"><apex:outputText value="{!Opportunity.OpportunityNumber__c}"/></td>
+<th width="20%">Oracle Order #</th>
+<td width="20%"><apex:outputText value="{!Opportunity.OracleOrderNumber__c}"/></td>
+</tr>
+<tr>
+<th width="20%">Opportunity Type</th>
+<td width="40%"><apex:outputText value="{!Opportunity.OpportunityType__c}"/></td>
+<th width="20%"><apex:outputText value="{!$ObjectType.Opportunity.Fields.FulfillmentChannel__c.Label}"/></th>
+<td width="20%"><apex:outputText value="{!Opportunity.FulfillmentChannel__c}"/></td>
+</tr>
+<tr>
+<th width="20%">Sales Rep</th>
+<td width="40%"><apex:outputText value="{!Opportunity.Owner.FirstName} {!Opportunity.Owner.LastName}"/></td>
+<th width="20%">Oracle Invoice #</th>
+<td width="20%"></td>
+</tr>
+<tr>
+<th width="20%"></th>
+<td width="40%"></td>
+<th width="20%">SEA Stage</th>
+<td width="20%"><apex:outputText value="{!Opportunity.SEA_Stage__c}"/></td>
+</tr>
+</table>
+</div>
+<div>
+<table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+ <tr>
+ <td width="26%"></td>
+ <th width="37%" style="background-color: #CCCCCC">Ship To</th>
+ <th width="37%" style="background-color: #CCCCCC">Bill To</th>
+ </tr> 
+ <tr>
+ <th width="26%">Company Name</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Sales_Account__r.Name}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.bill_To_Sales_Account__r.Name}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Account Alias Name</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Sales_Account__r.Account_Alias_Name__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Sales_Account__r.Account_Alias_Name__c}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">VAT Registration #</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Sales_Account__r.VATNumber__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.bill_To_Sales_Account__r.VATNumber__c}" /></td>
+ </tr> 
+ <tr>
+ <th width="26%">Oracle Account #</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Account__r.CDH_Party_Number__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.bill_To_Account__r.CDH_Party_Number__c}" /></td>
+</tr> 
+<tr>
+ <th width="26%">Address Line 1</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Address__r.Address_Line1__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Address__r.Address_Line1__c}" /></td>
+ </tr> 
+ <tr>
+ <th width="26%">City</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Address__r.City__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Address__r.City__c}" /></td>
+ </tr> 
+ <tr>
+ <th width="26%">State/Providence</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Address__r.State__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Address__r.State__c}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Postal/Zip Code</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Address__r.Zip_Postal_Code__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Address__r.Zip_Postal_Code__c}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Country</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Address__r.Country__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Address__r.Country__c}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Contact Name</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Contact__r.Name}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Contact__r.Name}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Contact Department</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.Ship_To_Contact__r.Department}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Contact__r.Department}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Contact Email</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.ship_To_Contact__r.Email}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.Bill_To_Contact__r.Email}" /></td>
+ </tr>
+ <tr>
+ <th width="26%">Contact Phone</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.ship_To_Contact__r.Phone}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.bill_To_Contact__r.Phone}" /></td>
+ </tr>
+
+ <tr>
+ <th width="26%">RHN Entitlement Login</th>
+ <td width="37%"><apex:outputText value="{!Opportunity.ship_To_Contact__r.LoginName__c}" /></td>
+ <td width="37%"><apex:outputText value="{!Opportunity.ship_To_Contact__r.LoginName__c}" /></td>
+ </tr>
+</table>
+</div>
+<div>
+  <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+    <tr>
+      <th width="20%">Payment Type</th>
+      <td width="80%" colspan="3"><apex:outputText value="{!Opportunity.PaymentType__c}" /></td>
+    </tr>
+    <tr>
+      <th width="20%">Purchase Order #</th>
+      <td width="30%"><apex:outputText value="{!Opportunity.PONumber__c}" /></td>
+      <th width="20%">Credit Card #</th>
+      <td width="30%"><apex:outputText value="{!creditCardNumber}" /></td>
+    </tr>
+    <tr>
+      <th width="20%">Pay Now</th>
+      <td width="30%"><apex:outputText value="{!Opportunity.Pay_Now__c}" /></td>
+      <th width="20%">Credit Card Type</th>
+      <td width="30%"><apex:outputText value="{!Opportunity.CreditCardType__c}" /></td>
+   </tr>
+   <!--Modified for OCT'2011 Release Case RH-00083511 :(1st Year Payment, 2nd Year Payment, 3rd Year Payment, 4th Year Payment, 5th Year Payment, 6th Year Payment). by Kalidass -->
+    <tr style="display: {!IF(NULLVALUE(Opportunity.Year1PaymentAmount__c,0)>0 && Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">1st Year Payment</th>
+      <td width="30%">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Year1PaymentAmount__c}"/>
+      </td>
+      <th width="20%">Name on Credit Card</th>
+      <td width="30%"><apex:outputText value="{!Opportunity.NameOnCard__c}" /></td>
+    </tr>
+    <tr style="display: {!IF(NULLVALUE(Opportunity.Year2PaymentAmount__c,0)>0 && Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">2nd Year Payment</th>
+      <td width="30%">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Year2PaymentAmount__c}"/>
+      </td>
+      <th width="20%">Credit Card Expiration Date</th>
+      <td width="30%">{!ExpirationDate}</td>
+    </tr>
+     <tr style="display: {!IF(NULLVALUE(Opportunity.Year3PaymentAmount__c,0)>0 && Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">3rd Year Payment</th>
+      <td width="80%" colspan="3">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Year3PaymentAmount__c}"/>
+      </td>
+    </tr>
+     <tr style="display: {!IF(NULLVALUE(Opportunity.Year4PaymentAmount__c,0)>0 && Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">4th Year Payment</th>
+      <td width="80%" colspan="3">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Year4PaymentAmount__c}"/>
+      </td>
+    </tr>
+     <tr style="display: {!IF(NULLVALUE(Opportunity.Year5PaymentAmount__c,0)>0 && Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">5th Year Payment</th>
+      <td width="80%" colspan="3">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Year5PaymentAmount__c}"/>
+      </td>
+    </tr>
+     <tr style="display: {!IF(NULLVALUE(Opportunity.Year6PaymentAmount__c,0)>0 && Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">6th Year Payment</th>
+      <td width="80%" colspan="3">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Year6PaymentAmount__c}"/>
+      </td>
+    </tr>
+    <tr style="display: {!IF(Opportunity.Pay_Now__c='Yes','table-row','none')}">
+      <th width="20%">Contract Start Date</th>
+      <td width="30%">{!ContractStartDate}</td>
+      <th width="20%">Name on Credit Card</th>
+      <td width="30%"><apex:outputText value="{!Opportunity.NameOnCard__c}" /></td>
+    </tr> 
+    <tr style="display: {!IF(Opportunity.Pay_Now__c='Yes','table-row','none')}">
+      <th width="20%">Contract End Date</th>
+      <td width="30%">{!ContractEndDate}</td>
+      <th width="20%">Credit Card Expiration Date</th>
+      <td width="30%">{!ExpirationDate}</td>
+    </tr> 
+ 
+    <tr style="display: {!IF(Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">Contract Start Date</th>
+      <td width="80%" colspan="3">{!ContractStartDate}</td>
+    </tr>
+    <tr style="display: {!IF(Opportunity.Pay_Now__c='No','table-row','none')}">
+      <th width="20%">Contract End Date</th>
+      <td width="80%" colspan="3">{!ContractEndDate}</td>
+    </tr>
+    <tr>
+      <th width="20%">Special Instructions</th>
+      <td width="80%" colspan="3"><apex:outputText value="{!Opportunity.PO_Special_Instructions__c}" /></td>
+    </tr>
+    <tr>
+      <th width ="20%" colspan="2">Related Statement of Work/WO (MSA Customers Only)</th>
+      <td width ="80%" colspan="2"><apex:outputText value="{!Opportunity.Statement_of_Work_Reference__c}" /></td>
+    </tr>
+    </table>
+    </div>
+<div>
+  <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+    <tr style="background-color: #CCCCCC"> 
+      <th width="20%" colspan="4">Credit Information</th>
+    </tr>
+    <tr>
+      <th width="20%">Credit Status</th>
+      <td width="30%">
+        <apex:outputText value="{!Credit.Credit_Stage__c}" />
+      </td>
+      <th width="20%">Credit Limit</th>
+      <td width="30%">
+        <c:OutputCurrency isoCode="{!Credit.CurrencyISOCode}" value="{!Credit.Credit_Limit__c}"/>
+      </td>
+    </tr>
+    <tr>
+      <th width="20%">AR Balance</th>
+      <td width="30%">
+        <c:OutputCurrency isoCode="{!Credit.CurrencyISOCode}" value="{!Credit.A_R_Past_Due_Amount__c}"/>
+      </td>
+      <th width="20%">AR Past Due Amount</th>
+      <td width="30%">
+        <c:OutputCurrency isoCode="{!Credit.CurrencyISOCode}" value="{!Credit.A_R_Past_Due_Amount__c}"/>
+      </td>
+    </tr>
+    <tr>
+      <th width="20%">Payment Terms</th>
+      <td width="30%">
+        <apex:outputField value="{!Credit.Payment_Terms__c}" />
+      </td>
+      <th width="20%">Comments From Credit</th>
+      <td width="30%">
+        <apex:outputField value="{!Credit.Comments__c}" />
+      </td>
+    </tr>
+  </table>
+</div>
+<div style="display: {!IF(isAPAC,'block','none')}">
+  <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+    <tr>
+      <th width="100%">Credit Limit Approved by Finance (APAC only – Direct Orders more than USD 25,000.00): Name, signature and date</th>
+    </tr>
+    <tr>
+      <td width="100%"></td>
+    </tr>
+  </table>
+</div>
+<div>
+  <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+    <tr style="background-color: #CCCCCC">
+      <th width="10%" colspan="11">Purchase Summary</th>
+    </tr>
+    <tr>
+    <td colspan="2" align="center"><b>Currency</b></td>
+    <td colspan="3"><apex:outputText value="{!Opportunity.CurrencyIsoCode}"/></td>
+    <td colspan="2" align="center"><b>Override Reason</b></td>
+    <td colspan="4"><apex:outputText value="{!Opportunity.PriceOverrideReason__c}"/></td>
+    </tr>
+    <tr>
+      <td width="7%"><b>New or Renewal</b></td>
+      <td width="7%"><b>Contract Numbers</b></td>
+      <td width="7%"><b>Qty/No. InstlSts.</b></td>
+      <td width="7%"><b>RH SKU</b></td>
+      <td width="16%"><b>Product Description</b></td>
+      <td width="7%"><b>Start Date</b></td>
+      <td width="7%"><b>End Date</b></td>
+      <td width="7%"><b>Per Unit Fee</b></td>
+      <td width="7%"><b>Total Fee per SKU</b></td>
+      <!--<td width="7%"><b>Override Reason</b></td>-->
+      <td width="7%"><b>One Time Discount</b></td>
+      <td width="7%"><b>Discretionary Discount</b></td>
+    </tr>
+    <script>
+    var product_number=0;
+    </script>
+    <apex:repeat value="{!OpportunityLineItemList}" var="product" id="product">
+      <tr>
+        <td width="7%">
+          <apex:outputText value="{!product.NewOrRenewal__c}" />
+        </td>
+        <td width="7%">
+          <apex:outputText value="{!product.Contract_Numbers__c}" />
+        </td>
+        <td width="7%">
+          <apex:outputText value="{!IF(CONTAINS('.',TEXT(product.Quantity)),LEFT(TEXT(product.Quantity),FIND('.',TEXT(product.Quantity))),TEXT(product.Quantity))}" />
+        </td>
+        <td width="7%">
+          <apex:outputText value="{!if (product.Configured_SKU__c = '', product.PricebookEntry.ProductCode, product.Configured_SKU__c)}" />
+        </td>
+        <td width="16%">
+          <apex:outputText value="{!product.Description}" />
+        </td>
+        <td width="7%">         
+          <apex:outputField value="{!product.ActualStartDate__c}" />
+        </td>
+        <td width="7%">
+          <apex:outputField value="{!product.ActualEndDate__c}" />
+        </td>
+        <td width="7%" align="right">
+          <apex:outputText value="{0, number, #,###,###,###,###,###.##}">
+              <apex:param value="{!product.UnitPrice}" />
+          </apex:outputText>
+        </td>
+        <td width="7%" align="right">
+          <apex:outputText value="{0, number, #,###,###,###,###,###.##}">
+              <apex:param value="{!product.TotalPrice}"/>
+          </apex:outputText>
+        </td>
+       <!-- <td width="7%" align="right">
+          <apex:outputText value="{!BLANKVALUE(product.PriceOverrideReason__c,IF(OR(ISBLANK(product.Base_Price__c),ISBLANK(product.UnitPrice)),'',Opportunity.PriceOverrideReason__c))}"/>
+        </td>-->
+        <td width="7%" >
+          <apex:outputText value="{0, number, #,###,###,###,###,###.##}">
+              <apex:param value="{!product.One_Time_Discount__c}"/>
+          </apex:outputText>
+        </td>
+        <td width="7%" >
+          <apex:outputText value="{0, number, #,###,###,###,###,###.##}">
+              <apex:param value="{!product.Discretionary_Discount_Amount__c}"/>
+          </apex:outputText>
+        </td>
+      </tr>
+    </apex:repeat>
+  </table>
+</div>
+<div>
+  <table width="100%" style="white-space:pre">
+    <tr> 
+      <td width="10%"></td>
+      <td width="15%"></td>
+      <td width="15%"></td>
+      <td width="10%"></td>
+      <td width="20%"></td>
+      <th width="10%">Total Fees</th>
+      <td width="20%">
+        <c:OutputCurrency isoCode="{!Opportunity.CurrencyISOCode}" value="{!Opportunity.Amount}"/>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%"></td>
+      <td width="15%"></td>
+      <td width="15%"></td>
+      <td width="10%"></td>
+      <td width="20%"></td>
+      <th width="10%">GST/VAT %</th>
+      <td width="20%"></td>
+    </tr>
+    <tr> 
+      <td width="10%"></td>
+      <td width="15%"></td>
+      <td width="15%"></td>
+      <td width="10%"></td>
+      <td width="20%"></td>
+      <th width="10%">Grand Total</th>
+      <td width="20%"></td>
+    </tr>
+  </table>
+</div>
+<apex:repeat value="{!RecentApprovalCustomList}" var="dummy" first="0" rows="1">
+  <div>
+    <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+      <tr style="background-color: #CCCCCC">
+        <th width="100%">Approvals</th>
+      </tr>
+    </table>
+    <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+      <tr>
+        <th width="20%">Type</th>
+        <th width="30%">Approved By</th>
+        <th width="50%">Approved Information</th>
+      </tr>
+      <apex:repeat value="{!RecentApprovalCustomList}" var="approval">
+        <tr>
+          <td width="20%"><apex:outputText value="{!approval.RecordType.Name}" /></td>
+          <td width="30%"><apex:outputText value="{!approval.ApprovedBy__r.Name}" /><br /><apex:outputText value="{!approval.ApprovedByOther__c}" /></td>
+          <td width="50%"><apex:outputText rendered="{!CONTAINS(approval.RecordType.Name,'Pricing Discount')}" value="{!approval.PricingDiscountApproved__c}" /></td>
+        </tr>
+      </apex:repeat>
+    </table>
+  </div>
+</apex:repeat>
+<div style="display:{!IF(isEMEA,'block','none')}">
+  <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
+    <tr bgcolor="CCCCCC">
+      <th width="30%" colspan="5">Red Hat Finance Checklist</th>
+    </tr>
+    <tr>
+      <th width="30%" rowspan="2">Signed Agreement</th>
+      <td width="20%">SA</td>
+      <td width="20%">Distributor</td>
+      <td width="15%">Training Partner</td>
+      <td width="15%">Business Partner</td>
+    </tr>
+    <tr>
+      <td width="20%">MSA/Framework Agreement</td>
+      <td width="20%">Statement of Work(WO)</td>
+      <td width="15%" colspan="2">Other (specify) -</td>
+    </tr>
+    <tr> 
+      <th width="30%" rowspan="2">Customer Order:</th>
+      <td width="20%">Purchase Order</td>
+      <td width="20%">Signed Letter</td>
+      <td width="15%" colspan="2">Not required</td>
+    </tr>
+    <tr>
+      <td width="20%" colspan="4">Other (specify) -</td>
+    </tr>
+
+    <tr>
+      <th width="30%">Credit Terms on PO:</th>
+      <td width="20%"></td>
+      <td width="20%"><b>RH Legal Entity on PO:</b></td>
+      <td width="15%" colspan="2"></td>
+    </tr>
+
+    <tr>
+      <th width="30%">VAT Number:</th>
+      <td width="20%">EU</td>
+      <td width="20%">Non EU</td>
+      <td width="15%" colspan="2"></td>
+    </tr>
+    <tr>
+      <th width="30%">Credit Policy:</th>
+      <td width="20%">&lt;2k Euro/USD</td>
+      <td width="20%">&lt;1.5 GDB</td>
+      <td width="15%" colspan="2"></td>
+    </tr>
+  </table>
+</div>
+<div><br/> <center><b>Disclaimer :</b> All SFDC credit decisions are preliminary to Oracle, which is the final system of record for credit actions.  Any changes to credit items in SalesForce will affect the final credit decision in Oracle.</center></div>
+</body>
+</apex:page>

@@ -1,0 +1,8 @@
+<apex:component controller="MSSectionController">
+	<apex:attribute name="pageController" description="" type="MSController" required="true" assignTo="{!ctrl}"/>
+	<apex:attribute name="sectionKey" description="" type="String" required="false" assignTo="{!sectionKey}"/>
+	<apex:attribute name="annotation" description="" type="String" required="false" assignTo="{!annotation}"/>
+	<apex:outputPanel rendered="{!canRender}">
+		<apex:componentBody />
+	</apex:outputPanel>
+</apex:component>

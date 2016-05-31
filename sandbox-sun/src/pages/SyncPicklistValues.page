@@ -1,0 +1,9 @@
+<apex:page controller="SyncPicklistValuesController" showHeader="true" sidebar="true">
+<apex:sectionHeader title="Sync Picklist Values (IT Use Only)"/>
+<apex:form >
+	<apex:commandButton onclick="return confirm('If you continue all picklist values for Region and Subregion on the user record will be deleted and replaced with values built from the Region table.');" action="{!syncUserRegionPicklistValues}" value="Sync User Region Picklist Values" id="syncUserRegionButton"/>
+	<apex:commandButton onclick="return confirm('If you continue all picklist values for Region and Subregion on the user record will be deleted.');" action="{!clearUserRegionPicklistValues}" value="Clear User Region Picklist Values" id="clearUserRegionButton"/>
+	<br/>
+	<apex:inputTextarea cols="80" rows="35" value="{!log}"/>
+</apex:form>
+</apex:page>

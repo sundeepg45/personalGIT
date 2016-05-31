@@ -1,0 +1,3 @@
+<apex:page controller="ExtUserService" contentType="application/json" showHeader="false" sidebar="false" standardStylesheets="false" action="{!doUserLookup}">
+{!jsonResult}
+</apex:page>

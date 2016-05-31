@@ -1,0 +1,6 @@
+<apex:page standardController="Action_Items__c">
+<p><a href="/{!Action_Items__c.Teaming_Agreement__c}">Back to the Teaming Agreement: {!Action_Items__c.Teaming_Agreement__r.Name} </a></p>
+<apex:detail id="pagelayout_ai" subject="{!Action_Items__c.Id}" relatedList="false" relatedListHover="TRUE" inlineEdit="true"/>
+
+
+</apex:page>

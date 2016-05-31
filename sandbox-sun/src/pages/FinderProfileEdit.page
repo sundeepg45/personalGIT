@@ -1,0 +1,118 @@
+<apex:page controller="FinderProfileEditController" showHeader="true" sidebar="true" action="{!onLoad}">
+
+    <apex:pageMessage title="Successful" detail="{!$Label.Logo_is_successfully_updated}" severity="info" rendered="{!logoAttached}"/>
+    <apex:form rendered="{!NOT(logoAttached)}">
+        <apex:pageBlock title="{!$Label.Edit_Partner_Locator_Title} {!account.Name}" mode="edit">
+
+            <apex:pageMessage title="{!$Label.This_information_is_published_to_Partner_Locator}"
+                severity="info" strength="2" rendered="{!account.Is_Partner_Published__c}"/>
+            <apex:pageMessage title="{!$Label.This_information_is_not_published_to_Partner_Locator}"
+                severity="info" strength="2" rendered="{!NOT(account.Is_Partner_Published__c)}"/>
+            <br/>
+
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="{!$Label.FPE_Save}"/>
+                <apex:commandButton action="{!cancel}" immediate="true" value="{!$Label.FPE_Cancel}"/>
+                <apex:commandButton action="{!publish}" value="{!$Label.FPE_Unpublish}" rendered="{!account.Is_Partner_Published__c}"/>
+                <apex:commandButton action="{!publish}" value="{!$Label.FPE_Publish}" rendered="{!NOT(account.Is_Partner_Published__c)}"/>
+                <apex:commandButton value="{!$Label.FPE_Preview_Locator_Profile_Details_Page}" onclick="window.open('/apex/PFPartnerDetail?id={!Account.Id}'); return false;"/>
+            </apex:pageBlockButtons>
+
+            <!--<h2 class="step-num">{!$Label.Step_1}</h2>-->
+                <apex:pageBlockSection showHeader="true" title="{!$Label.Enter_Company_Information}" columns="1">
+                <apex:inputField value="{!account.Description_of_Business__c}" required="true"/>
+                <apex:outputText label="{!$Label.FPE_Description_of_Business_Preview_Label}" escape="false" value="{!account.Description_of_Business__c}"/>
+                <apex:inputField value="{!account.Industry_Focus__c}"/>
+                <apex:inputField value="{!account.Company_Email_Address__c}"/>
+                <apex:inputField value="{!account.Phone}"/>
+                <apex:inputField value="{!account.Website}"/>
+            </apex:pageBlockSection>
+
+            <br/>
+            <!--<h2 class="step-num">{!$Label.Step_2}</h2>-->
+            <apex:pageBlockSection showHeader="true" title="{!$Label.Add_Locations}" columns="1">
+                <center><apex:commandButton action="{!create}" value="{!$Label.New_Partner_Location}"/></center>
+                <apex:pageBlockTable value="{!locations}" var="location" rendered="{!NOT(ISNULL(locations))}">
+                    <apex:column rendered="{!isInternalUser}">
+                        <apex:outputLink value="/apex/manageLocation?id={!location.id}&retURL=/apex/FinderProfileEdit?id={!account.Id}">{!$Label.FPE_Edit}</apex:outputLink>
+                        &nbsp;|&nbsp;
+                        <apex:outputLink value="{!URLFOR($Action.Partner_Location__c.Delete,location.Id,[retURL='/apex/FinderProfileEdit?id='&account.Id])}" onclick="return window.confirm('{!$Label.FPE_Are_you_sure}');">{!$Label.FPE_Del}</apex:outputLink>
+                    </apex:column>
+                    <apex:column rendered="{!NOT(isInternalUser)}">
+                        <apex:outputLink value="/apex/manageLocation?id={!location.id}&retURL=/apex/FinderProfileEdit">{!$Label.FPE_Edit}</apex:outputLink>
+                        &nbsp;|&nbsp;
+                        <apex:outputLink value="{!URLFOR($Action.Partner_Location__c.Delete,location.Id,[retURL='/apex/FinderProfileEdit'])}" onclick="return window.confirm('{!$Label.FPE_Are_you_sure}');">{!$Label.FPE_Del}</apex:outputLink>
+                    </apex:column>
+                    <apex:column value="{!location.Name}"/>
+                    <apex:column value="{!location.Street__c}"/>
+                    <apex:column value="{!location.City__c}"/>
+                    <apex:column value="{!location.State_Province__c}"/>
+                    <apex:column value="{!location.Country__c}"/>
+                    <apex:column value="{!location.Is_Primary__c}"/>
+                    <apex:column value="{!location.Validated__c}"/>
+                </apex:pageBlockTable>
+                <apex:outputLabel value="{!$Label.FPE_No_records_to_display}" rendered="{!(ISNULL(locations))}" styleClass="noRowsHeader"></apex:outputLabel>
+            </apex:pageBlockSection>
+            <br/>
+            <br/>
+            <!--h2 class="step-num">{!$Label.Step_3}</h2>-->
+            <apex:pageBlockSection showHeader="true" title="{!$Label.FPE_Add_Logo}" columns="1" rendered="{!NOT(logoAttached)}">
+                <apex:outputField value="{!logoRecord.name}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Partner_Logo}" for="account__name"/>
+                    <apex:image height="auto" width="150" rendered="{!NOT(ISNULL(logoAttachment.id))}" value="{!URLFOR($Action.Attachment.Download, logoAttachment.id)}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageMessage title="Logo is updated for the account {!account.name}" detail="Logo is updated" severity="info" rendered="{!logoAttached}"/>
+                <apex:pageMessage title="{!$Label.Partner_Logo_does_not_exist} {!account.name}"
+                    detail="{!$Label.to_add_a_logo_click_browse_and_select_an_image} {!MAX_BLOB_SIZE_IN_KB} KB. {!$Label.For_best_results_ensure_logo_is_150_pixels_wide}"
+                    severity="info" strength="2"
+                    rendered="{!ISNULL(logoAttachment)}"/>
+                <apex:pageMessage title="{!$Label.the_logo_displayed_is_active_for_account} {!account.name}"
+                    detail="{!$Label.to_add_a_logo_click_browse_and_select_an_image} {!MAX_BLOB_SIZE_IN_KB} KB. {!$Label.For_best_results_ensure_logo_is_150_pixels_wide}"
+                    severity="info"
+                    strength="2"
+                    rendered="{!NOT(ISNULL(logoAttachment))}"/>
+                <apex:inputFile contentType="{!attachmentContentType}"
+                    size="60"
+                    fileName="{!attachmentFileName}"
+                    value="{!attachmentFile}"/>
+                <apex:commandButton value="{!$Label.Partner_Logo_replace_button}" action="{!replaceLogo}" rendered="{!NOT(ISNULL(logoAttachment))}"/>
+                <apex:commandButton value="{!$Label.FPE_Partner_Logo_add_button}" action="{!replaceLogo}" rendered="{!ISNULL(logoAttachment)}"/>
+            </apex:pageBlockSection>
+
+            <!--
+            <apex:pageBlockSection rendered="{!logoAttached}">
+                <apex:pageMessage title="Logo is updated for the account {!account.name}" detail="Logo is updated" severity="info" rendered="{!logoAttached}"/>
+                <apex:outputText rendered="{!logoAttached}" id="logoAttached" value="Logo is Successfully uploaded"> </apex:outputText>
+
+                        <apex:pageMessage rendered="{!logoAttached}" id="logoAttached" value="Logo is Successfully uploaded"> </apex:pageMessage>
+            </apex:pageBlockSection>
+            -->
+
+
+        </apex:pageBlock>
+    </apex:form>
+    <style>
+    .pbSubheader{
+        margin-top: 0px;
+    }
+    .step-num{
+        margin-left: 5px;
+    }
+    .detailList td.first textarea{
+        width: 670px !important;
+        max-width: 670px !important;
+    }
+    .pbSubsection .detailList .first .btn{
+        display: block !important;
+        margin: 0px auto !important;
+    }
+    .pbBottomButtons .pbTitle{
+        display: none !important;
+    }
+    .pbBottomButtons .pbButtonb {
+        text-align: center !important;
+    }
+    </style>
+</apex:page>

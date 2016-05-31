@@ -1,0 +1,160 @@
+<apex:page controller="PartnerUserInvitationController"  showHeader="false" standardStylesheets="true" sidebar="false" action="{!handleUserInvitation}">
+
+ <!-- apex:stylesheet value="{!URLFOR($Resource.Onboarding_ScreenCSS)}" / -->
+    <apex:stylesheet value="https://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="https://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Partner_Onboarding_CSS}" />
+    
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    <script type="text/javascript">
+        $.noConflict(); 
+
+        jQuery(document).ready(function() {
+            document.getElementById('{!$Component.mainForm.buttonSave}').disabled = true;
+            jQuery.ajax({
+               url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/getUserInfo', 
+               dataType: 'jsonp',  
+               success:  function(jsonResult) {
+                   if (eval(jsonResult.complete)) {
+                       document.getElementById('{!$Component.mainForm.txtFirstName}').value = jsonResult.payload.firstName;
+                       document.getElementById('{!$Component.mainForm.txtLastName}').value = jsonResult.payload.lastName;
+                       document.getElementById('{!$Component.mainForm.txtStreet}').value = jsonResult.payload.street;
+                       document.getElementById('{!$Component.mainForm.txtCity}').value = jsonResult.payload.city;
+                       document.getElementById('{!$Component.mainForm.txtState}').value = jsonResult.payload.state;
+                       document.getElementById('{!$Component.mainForm.txtPostalCode}').value = jsonResult.payload.postalcode;
+                       document.getElementById('{!$Component.mainForm.txtPhone}').value = jsonResult.payload.phone;
+                       document.getElementById('{!$Component.mainForm.txtLogin}').value = jsonResult.payload.login;
+                       document.getElementById('{!$Component.mainForm.buttonSave}').disabled = false;
+                   }
+               }    
+            });
+        });
+        
+        function showOrHideDeclinedReasonPanel(element, elementName) {
+            elval = element.value;
+            if (elval == 'Yes') {
+                document.getElementById(elementName).style.display = 'none';
+            }
+            else if (elval == 'No') {
+                document.getElementById(elementName).style.display = 'inline';
+            }
+            else {
+                document.getElementById(elementName).style.display = 'none';
+            }
+        }
+    </script>
+        
+    <div id="container">
+        <div id="shell-top-simple">
+            <div class="wrap">
+                <div id="header">
+                    <div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div><!-- end logo -->
+					<div id="login-pre">
+		                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso/logout.html">{!$Label.Onboarding_Header_Log_Out}</a>
+		            </div>
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+                <div id="content">
+                    <div id="content-full" style="background: none;">
+        <apex:pageMessages id="pageMessage" />
+        <apex:form id="mainForm" rendered="{!joinAcceptance != 'No'}">
+                    <apex:outputPanel layout="block">
+                 <apex:outputPanel >{!$Label.Do_you_accept}</apex:outputPanel>
+                 <apex:selectRadio id="acceptOrDecline" onclick="showOrHideDeclinedReasonPanel(this, '{!$Component.declinedReasonPanel}');" value="{!joinAcceptance}" layout="pageDirection"> 
+                     <apex:selectOption id="selectOptionAccept" itemLabel="{!$Label.Partner_User_Accept}" itemValue="Yes" />
+                     <apex:selectOption id="selectOptionDecline" itemLabel="{!$Label.Partner_User_Decline}" itemValue="No" />
+                </apex:selectRadio>
+                <apex:outputPanel id="declinedReasonPanel" style="display:none">
+                    <apex:outputText value="{!$Label.Partner_User_Please_Provide_Explaination}"/> <br/>
+                    <apex:inputTextarea cols="50" rows="5" value="{!declinedJoinReason}" id="txtDeclineReason"/>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:outputPanel >
+                <apex:commandButton action="{!continueInvitation}" value="Continue" styleClass="rowbutton" id="buttonSave"/>
+            </apex:outputPanel>
+            
+            <apex:inputHidden id="txtFirstName" value="{!formFirstName}"/>
+            <apex:inputHidden id="txtLastName" value="{!formLastName}"/>
+            <apex:inputHidden id="txtStreet" value="{!formStreet}"/>
+            <apex:inputHidden id="txtCity" value="{!formCity}"/>
+            <apex:inputHidden id="txtState" value="{!formState}"/>
+            <apex:inputHidden id="txtPostalCode" value="{!formPostalCode}"/>
+            <apex:inputHidden id="txtPhone" value="{!formPhone}"/>
+            <apex:inputHidden id="txtLogin" value="{!formLogin}"/>
+        </apex:form>
+
+</div><!-- end content-full -->
+                </div> <!-- end_content-->
+            </div><!-- end-wrap -->
+        </div><!--end shell-top-simple -->  
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+                    
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>{!$Label.Onboarding_Copyright}</li>
+                            <li>|</li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">{!$Label.Onboarding_Privacy_Policy}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">{!$Label.Onboarding_Terms_Of_Use}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">{!$Label.Onboarding_Patent_Promise}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">{!$Label.Onboarding_Careers_Link}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">{!$Label.Onboarding_Trademark_guidelines}</a></li>
+                            
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_About_Red_Hat}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">{!$Label.Onboarding_Contact_us}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">{!$Label.Onboarding_Site_map}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">{!$Label.Onboarding_FAQs}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">{!$Label.Onboarding_Supplier_requirements}</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div>
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+
+    <style type="text/css">
+    .messageTable { width: 100%; border: 2px solid red; margin-bottom: 1em; }
+    .messageTable h4 { color: red; }
+    </style>
+
+    <style type="text/css">
+    table.multiSelectPicklistTable select { width: auto; min-width: 265px; }
+    .simpleRow p { margin: 0; }
+    .simpleRow > label:first-child { display: none; }
+
+    .rowform { position: relative; vertical-align: middle; padding: 0; margin-bottom: 10px; }
+    .rowform .radioButtons label { float: none; width: auto; padding-right: 2em; }
+    .rowform .radioButtons td { padding: 0; width: 200px; }
+    .rowform .radioButtons td input { padding: 0; margin: 0; width: 20px; }
+    .rowform .requiredBlock { background-color:#CC0000; bottom: 1px; left: -5px; position :absolute; top: 1px; width: 3px; display: block; }
+    .rowform .note { margin-left: 5px; }
+    </style>
+
+</apex:page>

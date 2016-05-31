@@ -1,0 +1,18 @@
+<apex:page controller="SalesPortalController" sidebar="false" showHeader="false" contentType="text/html; charset=UTF-8" title="Sales Portal Status" cache="true" expires="600"  extensions="ProxyLoginCheckController" action="{!checkProxyLogins}">
+<apex:stylesheet value="{!urlfor($Resource.SalesPortal, '/sales_portal.css')}"/>
+<apex:stylesheet value="{!urlfor($Resource.SalesPortalCustomCSS) }"/>
+<!-- <script type="text/javascript" src="{!URLFOR($Resource.FrameSizePublisher)}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.FrameSizeReceiver)}"></script>
+<script src="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"></script> -->
+<style type="text/css">
+Body { Background: transparent; }
+</style>
+<div class="content-block" id="status-bar">
+	<apex:outputText escape="false" value="{!statusBar.HTML}"/>
+</div>
+<!-- <script type="text/javascript">
+jQuery(document).ready(function(){
+	FrameSizePublisher.init();
+});
+</script> -->
+</apex:page>

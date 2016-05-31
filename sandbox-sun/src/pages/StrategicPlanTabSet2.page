@@ -1,0 +1,22 @@
+﻿<apex:page controller="TabUIController" showHeader="true" tabStyle="StrategicPlan__c">
+    <apex:stylesheet value="/sCSS/27.0/sprites/1297816277000/Theme3/default/gc/versioning.css" />
+    <apex:stylesheet value="/sCSS/27.0/sprites/1297816277000/Theme3/default/gc/extended.css" />﻿
+    <div style="display:none">
+        <apex:detail subject="{!tabId['StrategicPlan__c']}" title="true" showChatter="true" relatedList="false" rendered="{!NOT(ISBLANK(tabId['StrategicPlan__c']))}"/>
+    </div>
+    <apex:sectionHeader title="{!$ObjectType.StrategicPlan__c.Label}" subtitle="New {!$ObjectType.StrategicPlan__c.Label}" rendered="{!ISBLANK(tabId['StrategicPlan__c'])}" />
+    <apex:tabPanel switchType="server" value="{!activeTab}" styleClass="theTabPanel" tabClass="theTabPanel" contentClass="tabContent" activeTabClass="activeTab" inactiveTabClass="inactiveTab">
+        <apex:tab label="Plan Overview" name="StrategicPlan__c">
+            <apex:include pageName="StrategicPlanTab"/>
+        </apex:tab>
+        <apex:tab label="Strategies" name="StrategicPlan_Strategy__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <apex:include pageName="StrategicPlan_StrategyTab"/>
+        </apex:tab>
+        <apex:tab label="Solutions" name="StrategicPlan_Solution__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <apex:include pageName="StrategicPlan_SolutionTab"/>
+        </apex:tab>  
+        <apex:tab label="Actions" name="StrategicPlan_Action__c" rendered="{!NOT(AND(activeTab='StrategicPlan__c',activeTabMode='new'))}">
+            <!-- apex:include pageName="StrategicPlan_ActionTab"/ -->
+        </apex:tab>  
+    </apex:tabPanel>
+</apex:page>

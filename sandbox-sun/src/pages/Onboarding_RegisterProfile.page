@@ -1,0 +1,179 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+ 
+    <apex:includeScript value="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
+    <script type="text/javascript">
+        $.noConflict(); 
+
+        jQuery(document).ready(function() {
+            if (document.getElementById('{!$Component.mainForm.txtStreet}').value.length == 0) {
+                jQuery.ajax({
+                   url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/getUserInfo', 
+                   dataType: 'jsonp',  
+                   success:  function(jsonResult) {
+                       if (eval(jsonResult.complete)) {
+                           document.getElementById('{!$Component.mainForm.txtStreet}').value = jsonResult.payload.street;
+                           document.getElementById('{!$Component.mainForm.txtCity}').value = jsonResult.payload.city;
+                           document.getElementById('{!$Component.mainForm.cboState}').value = jsonResult.payload.state;
+                           document.getElementById('{!$Component.mainForm.txtPostalCode}').value = jsonResult.payload.postalcode;
+                           document.getElementById('{!$Component.mainForm.txtPhone}').value = jsonResult.payload.phone;
+                       }
+                   }    
+                });
+            }
+        });
+    </script>
+
+    <apex:outputPanel layout="none">
+        <h4><apex:outputText value="{!$Label.Onboarding_RegisterProfile_App_To_Become_Partner}"/></h4>
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_And_Contact_Info}"/></div>
+    </apex:outputPanel>
+
+    <apex:form id="mainForm">
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_Name}"/></apex:outputLabel>
+            <apex:outputPanel >{!Lead.Company}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_Address}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputTextArea value="{!Lead.Street}"  id="txtStreet"/>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_City}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputText value="{!Lead.City}"  id="txtCity"/>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_State_Province}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" rendered="{!SelectableStateOptionsSize != 0}" />
+            <apex:selectList value="{!Lead.State}" size="1" disabled="{!SelectableStateOptionsSize == 0}" id="cboState"> 
+                <apex:selectOption itemLabel="- Select State/Province -" itemValue="" />
+                <apex:selectOptions value="{!SelectableStateOptions}" />
+            </apex:selectList>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_Country}"/></apex:outputLabel>
+            <apex:outputPanel >{!Lead.Country}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Company_Postal_Code}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputText value="{!Lead.PostalCode}"  id="txtPostalCode"/>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block" rendered="{!selectedCountry.SearchByVAT__c}">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_VAT_Number}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputText value="{!Lead.VATNumber__c}"  id="txtVATNumber"/>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Contact_Email}"/></apex:outputLabel>
+            <apex:outputPanel >{!Lead.Email}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Phone_Number}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputText value="{!Lead.Phone}"  id="txtPhone"/>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Phone_Example}"/><br />
+                <apex:outputText value="{!$Label.Onboarding_RegisterProfile_Phone_Intl_Example}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Website}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:inputText value="{!Lead.Website}"  id="txtWebsite"/>
+        </apex:outputPanel> 
+        
+        <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Additional_Countries_Opps}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+                <apex:selectList value="{!AdditionalCountriesOfOperations}" size="5" multiselect="true"  id="cboCountryOpperations">
+                    <apex:selectOptions value="{!AdditionalCountriesOfOperationsOptions}" />
+                </apex:selectList>
+            <apex:outputPanel >
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Control_Click}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel> 
+        
+        <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_If_Other_Countries}"/></apex:outputLabel>
+            <apex:inputText value="{!Lead.Other_Countries__c}"  id="txtOtherCountries"/>
+        </apex:outputPanel> 
+        
+        <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Industry_Focus}"/></apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:selectList value="{!IndustryFocus}" size="5" multiselect="true"  id="cboIndustryFocus">
+                <apex:selectOptions value="{!IndustryFocusOptions}" />
+            </apex:selectList>
+            <apex:outputPanel > 
+                <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Control_Click}"/></p>
+            </apex:outputPanel>
+        </apex:outputPanel>
+
+         <apex:outputPanel styleClass="" layout="block" rendered="{!Lead.Country == 'US'}">
+            <p style="font-weight: bold"><apex:outputText value="{!$Label.Is_primary_market_public_sector}"/></p>
+        </apex:outputPanel>
+        
+        <apex:outputPanel styleClass="rowform" layout="block" rendered="{!Lead.Country == 'US'}"> 
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:outputPanel styleClass="radioButtons">
+                <apex:selectRadio value="{!Lead.Is_Primary_Public_Sector__c}"  id="cboIsPrimaryPublicSector">
+                    <apex:selectOption itemLabel="No (most common)" itemValue="No"  id="optPPSNo"/>
+                    <apex:selectOption itemLabel="Yes (least common)" itemValue="Yes"  id="optPPSYes"/>
+                </apex:selectRadio>
+<!-- 
+                <br />&nbsp;&nbsp;
+                <apex:outputLabel value="{!$Label.Markets_your_company_sells_into}"/>
+                <apex:selectList value="{!PublicSectorMarket}" size="3" multiselect="true"  id="cboPublicSectorMarket">
+                    <apex:selectOptions value="{!PublicSectorMarketOptions}" />
+                </apex:selectList>
+-->
+            </apex:outputPanel>
+
+        </apex:outputPanel><apex:outputPanel styleClass="rowform" layout="block" rendered="{!Lead.Country == 'US'}"> 
+            <apex:outputLabel value="{!$Label.Markets_your_company_sells_into}"/>
+            <apex:selectList value="{!PublicSectorMarket}" size="3" multiselect="true"  id="cboPublicSectorMarket">
+                <apex:selectOptions value="{!PublicSectorMarketOptions}" />
+            </apex:selectList>
+
+        </apex:outputPanel> <apex:outputPanel styleClass="" layout="block">
+            <p style="font-weight: bold"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_With_Respect_To_Any_Officer}"/></p>
+        </apex:outputPanel>
+
+        <apex:outputPanel styleClass="" layout="block">
+            <p><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Do_They_Act_In_Government_Pos}"/></p>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block"> 
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:outputPanel styleClass="radioButtons">
+                <apex:selectRadio value="{!Lead.Do_they_act_in_any_government_position__c}"  id="cboGovernmentPosition">
+                    <apex:selectOption itemLabel="Yes" itemValue="Yes"  id="optGovYes"/>
+                    <apex:selectOption itemLabel="No" itemValue="No"  id="optGovNo"/>
+                </apex:selectRadio>
+            </apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="" layout="block">
+            <p><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Have_You_Committed_A_Crime}"/></p>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel styleClass="requiredBlock" />
+            <apex:outputPanel styleClass="radioButtons">
+                <apex:selectRadio value="{!Lead.Have_they_been_convicted__c}"  id="cboHaveBeenConvicted">
+                    <apex:selectOption itemLabel="Yes" itemValue="Yes"  id="optConvYes"/>
+                    <apex:selectOption itemLabel="No" itemValue="No"  id="optConvNo"/>
+                </apex:selectRadio>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:outputPanel >
+            <apex:outputPanel styleClass="" layout="block">
+                <p><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Underlying_Facts}" /></p>
+            </apex:outputPanel>
+            <apex:outputPanel styleClass="rowform" layout="block" >
+                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                <apex:outputPanel styleClass="requiredBlock" />
+                <apex:inputTextarea value="{!Lead.FCPA_Underlying_Facts__c}" id="underlyingFacts"/>
+            </apex:outputPanel>             
+        </apex:outputPanel>
+        
+        
+        <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel id="buttonPanel">
+                <apex:commandButton action="{!registerProfileSubmit}" value="Save & Continue" styleClass="rowbutton" id="buttonSubmit"/>
+                <apex:commandButton action="{!registerProfileCancel}" value="Back" styleClass="rowbutton" id="buttonBack"/>
+            </apex:outputPanel>
+        </apex:outputPanel></fieldset>
+    </apex:form>
+</apex:page>

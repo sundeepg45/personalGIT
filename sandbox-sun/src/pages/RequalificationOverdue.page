@@ -1,0 +1,90 @@
+<apex:page showHeader="false" standardStylesheets="true" sidebar="false" controller="RequalificationOverdueController">
+
+    <apex:stylesheet value="http://www.redhat.com/s/partner_onboarding.css" />
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    
+    <div id="wrapo">
+	    <div id="wrapi">
+		    <div id="main">
+
+			    <apex:outputPanel layout="none">
+			    <div id="utility-links">
+				    <div id="utilityAccount">
+				        <p>
+				           <span class="hide"><strong>{!$Label.Onboarding_Header_Account_Links}</strong> </span>
+				           <a id="utilityCart" href="{!$Label.Red_Hat_Domain_Name}/wapps/store/cart.html">{!$Label.Onboarding_Header_Cart}</a> <span class="accentPipe">|</span>
+				                    <script type="text/javascript">
+				                      &lt;!--
+				                      function redirect() {
+				                        var pathName = window.location.pathname;
+				                        var redirectUrl = "{!$Label.Red_Hat_Domain_Name}/wapps/sso/logout.html";
+				
+				                        if (!pathName.match(/wapps\/sso/)) {
+				                            var url = escape(window.location);
+				                            url = url.replace(/\//g, "%2F");  // Replace /'s with %2F's
+				                            redirectUrl = redirectUrl + "?redirect=" + url;
+				                        }
+				
+				                        window.location = redirectUrl;
+				                      }
+				                      // --&gt;
+				                    </script>
+				
+				                   <a id="header_register_link" href="{!$Label.Red_Hat_Domain_Name}/wapps/ugc/register.html">{!$Label.Onboarding_Header_Register}</a> <span class="accentPipe">|</span>
+				                   <a id="header_login_link" onclick="redirect(); return false" href="{!$Label.Red_Hat_Domain_Name}/wapps/sso/logout.html">{!$Label.Onboarding_Header_Log_Out}</a>
+				        </p>
+				    </div>    
+				</div>    
+			    </apex:outputPanel>
+			
+			    <apex:outputPanel layout="none">
+			        <div id="header">
+			        <div id="branding">
+			        <h1 class="hide"><apex:outputText value="{!$Label.Onboarding_Label_Red_Hat}" escape="false"/></h1>
+			        <a id="rh-logo" href="http://www.redhat.com" title="Red Hat"><img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" /></a></div>
+			        </div>
+			    </apex:outputPanel>
+			
+			    <div id="content-wrap">
+				    <div id="content-full">
+						<apex:form >
+							<h1><apex:outputText value="{!$Label.Requalification_Overdue_Title}"/></h1><br/>
+							<apex:commandLink action="{!createRequalOverdueCase}"><apex:outputText value="{!$Label.Requalification_Overdue_Create_Case_Link}"/></apex:commandLink><br/>
+						</apex:form>
+				
+					     <!-- End of content-wrap, content-full, and col2right -->
+				    </div>
+			    </div>
+		    
+			    <apex:outputPanel layout="none">
+			        <div id="footer">
+				        <ul class="separate">
+				            <li class="first"><a href="{!$Label.Red_Hat_Domain_Name}/legal/privacy_statement.html"><strong><apex:outputText value="{!$Label.Onboarding_Privacy_Policy}"/></strong></a></li>
+				            <li><a href="{!$Label.Red_Hat_Domain_Name}/legal/legal_statement.html"><apex:outputText value="{!$Label.Onboarding_Terms_Of_Use}"/></a></li>
+				            <li><a href="{!$Label.Red_Hat_Domain_Name}/legal/patent_policy.html"><apex:outputText value="{!$Label.Onboarding_Patent_Promise}"/></a></li>
+				            <li><a href="{!$Label.Red_Hat_Domain_Name}"><apex:outputText value="{!$Label.Onboarding_Go_To_Corporate_Site}"/></a></li>
+				        </ul>
+				        <p><apex:outputText value="{!$Label.Onboarding_Copyright}"/></p>
+			        </div>
+			    </apex:outputPanel>
+			
+			    <!-- End of wrapo, wrapi, and main -->
+		    </div>
+	    </div>
+    </div>
+
+    <style type="text/css">
+	    .messageTable { width: 100%; border: 2px solid red; margin-bottom: 1em; }
+	    .messageTable h4 { color: red; }
+	    table.multiSelectPicklistTable select { width: auto; min-width: 265px; }
+	    .simpleRow p { margin: 0; }
+	    .simpleRow > label:first-child { display: none; }
+	
+	    .rowform { position: relative; vertical-align: middle; padding: 0; margin-bottom: 10px; }
+	    .rowform .radioButtons label { float: none; width: auto; padding-right: 2em; }
+	    .rowform .radioButtons td { padding: 0; }
+	    .rowform .radioButtons td input { padding: 0; margin: 0; }
+	    .rowform .requiredBlock { background-color:#CC0000; bottom: 1px; left: -5px; position :absolute; top: 1px; width: 3px; display: block; }
+	    .rowform .note { margin-left: 5px; }
+    </style>
+</apex:page>

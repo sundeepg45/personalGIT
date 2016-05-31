@@ -1,0 +1,184 @@
+<apex:page controller="SpecialDealRegistrationController" showHeader="true" sidebar="true">
+
+    <apex:pageBlock rendered="{!NOT(hasDealRegAccess)}">
+        <h1 class="alert-message"><i class="fa fa-exclamation-circle"></i><apex:outputText value="{!$Label.You_must_have_access_to_deal_registration}"/></h1>
+    </apex:pageBlock>
+
+    <apex:form rendered="{!hasDealRegAccess}">
+        <apex:pageBlock title="{!$Label.SDR_New} {!lead.Special_Deal_Type__c} {!$Label.SDR_Lead}" mode="edit">
+
+            <apex:pageMessages />
+
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.SDR_Save}" action="{!save}"/>
+                <apex:commandButton value="{!$Label.SDR_Cancel}" immediate="true" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection title="{!$Label.SDR_Lead_info}" columns="1">
+                <apex:inputField value="{!lead.Marketing_Program_na__c}"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="{!$Label.SDR_Customer_info}" columns="2">
+
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.SDR_Lead_owner}"/>
+                        <apex:outputField value="{!me.Name}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$ObjectType.Lead.fields.FirstName.Label}"/>
+                        <apex:outputpanel >
+                            <apex:inputField value="{!lead.Salutation}"/>
+                            <apex:inputField value="{!lead.FirstName}"/>
+                        </apex:outputpanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:inputField value="{!lead.LastName}"/>
+                    <apex:inputField value="{!lead.Title}"/>
+                    <apex:inputField value="{!lead.Decision_Role__c}" required="true"/>
+                    <apex:inputField value="{!lead.PrimaryJobFunction__c}"/>
+                    <apex:inputField value="{!lead.Company}"/>
+                    <apex:inputField value="{!lead.Country_of_Order__c}"/>
+                    <apex:outputField value="{!lead.LeadSourceDetail__c}"/>
+                    <apex:outputField value="{!lead.Reasons_for_Rejection__c}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.Revenue_Type__c}" required="true"/>
+                    <apex:outputField value="{!lead.Deal_Registration_Status__c}"/>
+                    <apex:inputField value="{!lead.Stage__c}"/>
+                    <apex:inputField value="{!lead.Email}" required="true"/>
+                    <apex:inputField value="{!lead.Phone}"/>
+                    <apex:inputField value="{!lead.MobilePhone}"/>
+                    <apex:inputField value="{!lead.Status}"/>
+                </apex:pageBlockSection>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection showHeader="true" title="{!$Label.SDR_Opp_details}" columns="2">
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.Deal_Type__c}" required="true"/>
+                    <apex:inputField value="{!lead.Deal_Registration__c}"/>
+                    <apex:inputField value="{!lead.Deal_Source__c}"/>
+                    <apex:inputField value="{!lead.Deal_Registration_Classification__c}" required="true"/>
+                    <apex:inputField value="{!lead.Project_Budgeted__c}"/>
+                    <apex:inputField value="{!lead.Project_Budget_Amount__c}"/>
+                    <apex:inputField value="{!lead.Red_Hat_Subscription_Revenue__c}" required="true"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.Competitive_Deal__c}"/>
+                    <apex:inputField value="{!lead.Competition__c}"/>
+                    <apex:inputField value="{!lead.Competition_Details_if_Other__c}"/>
+                    <apex:inputField value="{!lead.Distributor__c}" required="true"/>
+                    <apex:inputField value="{!lead.Distributor_if_other__c}"/>
+                    <apex:inputField value="{!lead.Estimated_Close_Date__c}" required="true"/>
+                    <apex:outputField value="{!lead.Deal_Approved_Date__c}"/>
+                    <apex:outputField value="{!lead.Registration_Expiration__c}"/>
+                    <apex:inputField value="{!lead.Do_they_have_funding_for_this_quarter__c}" required="true"/>
+                    <apex:inputField value="{!lead.Does_customer_have_an_open_source_strate__c}" required="true"/>
+                </apex:pageBlockSection>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="{!$Label.SDR_Partner_info}" columns="2">
+
+                <apex:pageBlockSection columns="1">
+                    <apex:outputField value="{!lead.Reseller_First_Name__c}"/>
+                    <apex:outputField value="{!lead.Reseller_Last_Name__c}"/>
+                    <apex:outputField value="{!lead.Reseller_Company_Name__c}"/>
+                    <apex:outputField value="{!lead.Reseller_Phone__c}"/>
+                    <apex:outputField value="{!lead.Reseller_Email__c}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem helpText="{!$ObjectType.Lead.fields.Are_you_the_Sales_Rep_for_this_Lead__c.InlineHelpText}">
+                        <apex:outputLabel value="{!$ObjectType.Lead.fields.Are_you_the_Sales_Rep_for_this_Lead__c.Label}"/>
+                        <apex:inputField value="{!lead.Are_you_the_Sales_Rep_for_this_Lead__c}" required="true"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:inputField value="{!lead.Sales_Rep_Name__c}"/>
+                    <apex:inputField value="{!lead.Sales_Rep_Phone__c}"/>
+                    <apex:inputField value="{!lead.Sales_Rep_Email__c}"/>
+                </apex:pageBlockSection>
+
+            </apex:pageBlockSection>
+            <div class="Project-Description">
+                <apex:pageBlockSection title="{!$Label.SDR_Project_description}" columns="1">
+                    <apex:pageBlockSection columns="1">
+                        <apex:inputField value="{!lead.Project_Description__c}" required="true"/>
+                        <apex:inputField value="{!lead.Value_Added_Sales_Activity__c}"/>
+                        <apex:inputField value="{!lead.Value_Added_Sales_Activity_Description__c}" required="true"/>
+                        <apex:inputField value="{!lead.Value_Added_Services_Proposed__c}"/>
+                        <apex:inputField value="{!lead.Value_Added_Services_Proposed_Desc__c}" required="true"/>
+                    </apex:pageBlockSection>
+                </apex:pageBlockSection>
+            </div>
+
+            <apex:pageBlockSection title="{!$Label.SDR_Lead_notes}" columns="2">
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.Products_of_Interest__c}" required="true"/>
+                    <apex:inputField value="{!lead.Do_they_need_a_Red_Hat_Technical_resourc__c}"/>
+                    <apex:inputField value="{!lead.Are_you_purchasing_Hardware_deployment__c}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.OEM_hardware_options__c}" required="true"/>
+                    <apex:inputField value="{!lead.Other_OEM_Hardware__c}"/>
+                </apex:pageBlockSection>
+
+            </apex:pageBlockSection>
+            <div class="Address-Information">
+                <apex:pageBlockSection title="{!$Label.SDR_Address_info}" columns="1">
+
+                    <apex:pageBlockSection columns="1">
+                        <apex:outputField value="{!lead.Address_Instructions__c}"/>
+                        <apex:inputField value="{!lead.Street}"/>
+                        <apex:inputField value="{!lead.City}"/>
+                        <apex:inputField value="{!lead.State}" required="true"/>
+                        <apex:inputField value="{!lead.PostalCode}"/>
+                        <apex:inputField value="{!lead.Country}" required="true"/>
+                    </apex:pageBlockSection>
+
+                </apex:pageBlockSection>
+            </div>
+
+            <apex:pageBlockSection title="{!$Label.SDR_Language_preference}" columns="2">
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.LanguagePreference__c}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.LanguagePreferenceOther__c}"/>
+                </apex:pageBlockSection>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="{!$Label.SDR_Oracle_info}" columns="1">
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!lead.RHNLogin__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+    </apex:form>
+    <style>
+    .alert-message{
+        font-size: 20px;
+    }
+    .alert-message i{
+        color: #c00;
+        font-size: 25px;
+        margin-right: 10px;
+    }
+    .Project-Description textarea{
+        width: 670px;
+        max-width: 670px;
+    }
+    .Address-Information textarea, .Address-Information input{
+        width: 360px;
+        max-width: 360px;
+    }
+    </style>
+</apex:page>

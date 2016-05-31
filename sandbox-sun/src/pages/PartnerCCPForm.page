@@ -1,0 +1,182 @@
+<apex:page standardController="Partner_CCP_Form__c" extensions="PartnerCCPFormControllerExt" showHeader="true" standardStylesheets="true" sidebar="true">
+
+<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+
+
+<apex:form id="mainForm">
+ 
+    <apex:pageBlock id="mainBlock" title="CCP Approval Form">
+        <apex:pageBlockButtons > 
+            <apex:commandButton action="{!submit}" value="Save" id="SaveButton"/>
+            <apex:commandButton action="{!cancel}" value="Cancel" id="CancelButton"/>
+        </apex:pageBlockButtons>
+        
+        <apex:pageMessages />
+
+        <apex:pageBlockSection id="mainSection" columns="2">
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Partner Name"/>
+                <apex:outputText value="{!name}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Account Manager"/>
+                <apex:outputText value="{!ownerName}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Website__c.Label}"/>
+                </apex:outputPanel>
+                <apex:inputField required="true" value="{!record.Website__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <!-- skip a column -->
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Expected_Contract_Close_Date__c.Label}"/>
+                    <br /><i style="font-size:smaller">Expected close date of CCP contract signing</i>
+                </apex:outputPanel>
+                <apex:inputField required="true" value="{!record.Expected_Contract_Close_Date__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <!-- skip a column -->
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Description_of_Services__c.Label}"/>
+                    <br /><i style="font-size:smaller">Description of the type of service(s) they provide, i.e. public cloud, private dedicated managed service</i>
+                </apex:outputPanel>
+                <apex:inputTextArea required="true" cols="50" rows="7" value="{!record.Description_of_Services__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <!-- skip a column -->
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputLabel value="Type of Service"/>
+                </apex:outputPanel>
+                <apex:inputField value="{!record.Type_of_Service__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Regions__c.Label}"/>
+                </apex:outputPanel>
+                <apex:inputField required="true" value="{!record.Regions__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem id="standardCCPSection">
+                <apex:outputLabel value="Standard CCP Appendix and/or Partner Acceptance Documentation?"/>
+                <!-- 
+                <apex:inputField onclick="toggleEnabled('{!$Component.mainForm.mainBlock.mainSection.PAD_Section.PAD_Details}');" value="{!record.Standard_CCP_Documentation__c}"/>
+                -->
+                <apex:selectRadio onchange="toggleEnabledStandardCCP(this.value);" required="true" value="{!record.Standard_CCP_Documentation__c}">
+                    <apex:selectOption itemValue="Yes" itemLabel="Yes" />
+                    <apex:selectOption itemValue="No" itemLabel="No" />
+                </apex:selectRadio>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem id="PAD_Section" >
+                <apex:outputPanel >
+                <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.PAD_Details__c.Label}"/>
+                    <br /><i style="font-size:smaller">if applicable</i>
+                </apex:outputPanel>
+                <apex:inputTextArea id="PAD_Details" cols="50" rows="7" value="{!record.PAD_Details__c}" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                <apex:outputLabel value="Moving customer or partner to compliant CCP Partnership?"/>
+                    <br /><i style="font-size:smaller">Is this a situation where we are moving a customer or non-CCP partner to a compliant CCP partnership?</i>
+                </apex:outputPanel>
+                <!-- 
+                <apex:inputField onclick="toggleEnabled('{!$Component.mainForm.mainBlock.mainSection.movingSection.Moving_Details}');" value="{!record.Moving_to_Compliant_CCP__c}"/>
+                -->
+                <apex:selectRadio onchange="toggleEnabledMoving(this.value);" required="true" value="{!record.Moving_to_Compliant_CCP__c}">
+                    <apex:selectOption itemValue="Yes" itemLabel="Yes" />
+                    <apex:selectOption itemValue="No" itemLabel="No" />
+                </apex:selectRadio>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem id="movingSection" >
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Moving_Details__c.Label}"/>
+                    <br /><i style="font-size:smaller">if applicable</i>
+                </apex:outputPanel>
+                <apex:inputTextArea id="Moving_Details" cols="50" rows="7" value="{!record.Moving_Details__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Has technical qualification call occurred?"/>
+                <!-- 
+                <apex:inputField required="true" value="{!record.Has_Tech_Qualification_Call__c}"/>
+                -->
+                <apex:selectRadio required="true" value="{!record.Has_Tech_Qualification_Call__c}">
+                    <apex:selectOption itemValue="Yes" itemLabel="Yes" />
+                    <apex:selectOption itemValue="No" itemLabel="No" />
+                </apex:selectRadio>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <!-- skip a column -->
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Hypervisor and/or Cloud Infrastructure Type"/>
+                <apex:inputField required="true" value="{!record.Cloud_Infrastructure_Type__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Cloud_Infrastructure_Details__c.Label}"/>
+                    <br /><i style="font-size:smaller">If Other, provide details</i>
+                </apex:outputPanel>
+                <apex:inputTextArea cols="50" rows="7" value="{!record.Cloud_Infrastructure_Details__c}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Notes__c.Label}"/>
+                <apex:inputTextArea cols="50" rows="7" value="{!record.Notes__c}"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+<!--  
+    <fieldset class="fieldsetform">
+        <apex:outputPanel layout="block">
+            <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Expected_Contract_Close_Date__c.Label}"/>
+            <apex:inputText value="{!ccpForm.Expected_Contract_Close_Date__c}"/>
+        </apex:outputPanel>
+        <apex:outputPanel layout="block">
+            <apex:outputLabel value="{!$ObjectType.Partner_CCP_Form__c.Fields.Description_of_Services__c.Label}"/>
+            <apex:inputTextArea cols="50" rows="7" value="{!ccpForm.Description_of_Services__c}"/>
+        </apex:outputPanel>
+    </fieldset>
+-->
+</apex:form>
+
+
+<script type="text/javascript">
+
+function toggleEnabledStandardCCP(val) {
+    var e = document.getElementById('{!$Component.mainForm.mainBlock.mainSection.PAD_Section.PAD_Details}');
+    
+    if (e != null) {
+        e.disabled = val == 'No' ? false : "disabled";
+    }
+}
+
+function toggleEnabledMoving(val) {
+    var e = document.getElementById('{!$Component.mainForm.mainBlock.mainSection.movingSection.Moving_Details}');
+    
+    if (e != null) {
+        e.disabled = val == 'Yes' ? false : "disabled";
+    }
+}
+
+
+
+$(document).ready(function() {
+    var ccpd = '{!record.Standard_CCP_Documentation__c}';
+    if (ccpd == '' || ccpd == 'Yes') {
+        document.getElementById('{!$Component.mainForm.mainBlock.mainSection.PAD_Section.PAD_Details}').disabled = "disabled";
+    }
+    var moving = '{!record.Moving_to_Compliant_CCP__c}';
+    if (moving == '' || moving == 'No') {
+        document.getElementById('{!$Component.mainForm.mainBlock.mainSection.movingSection.Moving_Details}').disabled = "disabled";
+    }
+});
+
+</script>
+
+</apex:page>

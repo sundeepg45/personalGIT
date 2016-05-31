@@ -1,0 +1,36 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+
+        
+	<div id="dot-links">
+      <ul id="newPromoNav">
+            <li id="newPromoOne"><a href="RHEV_main" title="Get involved."></a></li>
+<!-- 
+            <li id="newPromoTwo"><a href="RHEV_main" title="VMware customers are worried."></a></li>
+-->
+            <li id="newPromoThree"><a href="RHEV_main" title="Leading organizations lead with RHEV."></a></li>
+        </ul>
+    </div><!-- /#dot-links -->
+    <div id="newPromoHome">
+        <div id="newPromoSlides" style="margin-left: -22px;">               
+            <div>
+                <img src="{!URLFOR($Resource.RHEV_zip, 'i/bird_bg1_1003x422.jpg')}" alt="" />
+                <div id="top_level_message" style="position: relative; z-index:60; margin-top: -280px; margin-left: 35px;">Don't get locked in</div>
+                <div id="supporting_message" style="position: relative; z-index:60; margin-top: 0px; margin-left: 40px;">Break free and get virtualization that puts you in control.</div>
+            </div>
+<!-- 
+            <div style="display:none">
+                <img src="{!URLFOR($Resource.RHEV_zip, 'i/bird_bg2_1003x422.jpg')}" alt="" />
+                <div id="top_level_message" style="position: relative; z-index:60; margin-top: -270px; margin-left: 35px;">You have a choice</div>
+                <div id="supporting_message" style="position: relative; z-index:60; margin-top: 0px; margin-left: 40px;">Performance and scalability. Security and agility. Manageable virtualization at a lower cost.</div>
+            </div>
+-->       
+            <div style="display:none">
+                <img src="{!URLFOR($Resource.RHEV_zip, 'i/bird_bg3_1003x422.jpg')}" alt="" />
+                <div id="top_level_message" style="position: relative; z-index:60; margin-top: -280px; margin-left: 35px;">Red Hat<br />Enterprise Virtualization 3</div>
+                <div id="supporting_message" style="position: relative; z-index:60; margin-top: 0px; margin-left: 40px;">It's your virtualization. Not theirs.</div>
+            </div>
+        </div><!-- /#newPromoSlides -->
+        
+    </div><!-- /#newPromoHome -->
+
+</apex:page>

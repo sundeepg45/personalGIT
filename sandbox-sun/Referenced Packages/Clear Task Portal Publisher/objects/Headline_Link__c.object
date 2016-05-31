@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>Individual links for portal components</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>false</enableReports>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Active__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>An active link will be considered for inclusion but the underlying user security and publish dates will determine if the link appears</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Check to have the link available for the portal.</inlineHelpText>
+        <label>Active</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Display_Name__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Optionally use a different name than the record name.</inlineHelpText>
+        <label>Display Name</label>
+        <length>80</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>End_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>If there is no end date, the link will displayed as long as both the :
+•	Start Date is blank  or &gt;= the current date 
+•	Active field is True</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Optionally specify the last date the link will appear in the portal</inlineHelpText>
+        <label>End Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Headline_Link_Group__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Note: A single link record can be included in a Headline and Headline Link Group simultaneously</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Populate with a reference to the parent headline link group</inlineHelpText>
+        <label>Headline Link Group</label>
+        <referenceTo>Headline_Link_Group__c</referenceTo>
+        <relationshipLabel>Headline Links</relationshipLabel>
+        <relationshipName>Headline_Links</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Headline__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Note: A single link record can be included in a Headline and Headline Link Group simultaneously</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Populate with a reference to the parent headline</inlineHelpText>
+        <label>Headline</label>
+        <referenceTo>Headline__c</referenceTo>
+        <relationshipLabel>Headline Links</relationshipLabel>
+        <relationshipName>Headline_Links</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Newline__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Set to true to place the link in a new row under the previous</inlineHelpText>
+        <label>Newline</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Open_In_New_Window__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>When checked, opens the URL in a new window otherwise opens in the current window</inlineHelpText>
+        <label>Open In New Window</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Publish__c</fullName>
+        <deprecated>false</deprecated>
+        <description>The formula will evaluate to 1 if all of the following conditions are met:
+•	Active = True
+•	Start Date is blank or &lt;= the current date
+•	End Date is blank or &gt;= the current date
+Otherwise, the formula evaluates to 0 and the link will not be displayed</description>
+        <externalId>false</externalId>
+        <formula>IF( 
+AND(
+  Active__c = true, 
+  OR(ISNULL(Start_Date__c), Start_Date__c &lt;= TODAY()), 
+  OR(ISNULL(End_Date__c), End_Date__c &gt;= TODAY())
+) ,
+1, 0 
+)</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Return a 1 (True) or 0 (False) to indicate if the link will display based on the active, start and end date fields</inlineHelpText>
+        <label>Publish</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Show_New__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Set to true to display &quot;NEW!&quot; at the end of the link</inlineHelpText>
+        <label>Show New</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Sort_Order__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Determines the placement of the link relative to the other links in the parent component</inlineHelpText>
+        <label>Sort Order</label>
+        <precision>3</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Start_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>If no start date is specified, the link will be displayed as long as both the:
+•	End Date is blank or &gt;= current date
+•	Active field is set to True</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Specify a start date for the link to show</inlineHelpText>
+        <label>Start Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>URL_Preview__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>HYPERLINK( URL__c, Display_Name__c, IF( Open_In_New_Window__c,&quot;_blank&quot;, &quot;_self&quot;) )</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <inlineHelpText>Shows how the link will appear in the application.</inlineHelpText>
+        <label>URL Preview</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>URL__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>The URL the link goes to.</inlineHelpText>
+        <label>URL</label>
+        <length>120</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>Headline Link</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>Headline__c</columns>
+        <columns>Headline_Link_Group__c</columns>
+        <columns>Publish__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <listViews>
+        <fullName>My_Headline_Links</fullName>
+        <columns>NAME</columns>
+        <columns>Headline__c</columns>
+        <columns>Headline_Link_Group__c</columns>
+        <columns>Publish__c</columns>
+        <filterScope>Mine</filterScope>
+        <label>My Headline Links</label>
+    </listViews>
+    <listViews>
+        <fullName>NotPublished</fullName>
+        <columns>NAME</columns>
+        <columns>Headline__c</columns>
+        <columns>Headline_Link_Group__c</columns>
+        <columns>Publish__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>Publish__c</field>
+            <operation>equals</operation>
+            <value>0</value>
+        </filters>
+        <label>Not Published</label>
+    </listViews>
+    <listViews>
+        <fullName>Published</fullName>
+        <columns>NAME</columns>
+        <columns>Headline__c</columns>
+        <columns>Headline_Link_Group__c</columns>
+        <columns>Publish__c</columns>
+        <filterScope>Everything</filterScope>
+        <filters>
+            <field>Publish__c</field>
+            <operation>equals</operation>
+            <value>1</value>
+        </filters>
+        <label>Published</label>
+    </listViews>
+    <nameField>
+        <label>Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Headline Links</pluralLabel>
+    <searchLayouts>
+        <customTabListAdditionalFields>Headline__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Headline_Link_Group__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Publish__c</customTabListAdditionalFields>
+        <lookupDialogsAdditionalFields>Headline__c</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>Headline_Link_Group__c</lookupDialogsAdditionalFields>
+        <lookupDialogsAdditionalFields>Publish__c</lookupDialogsAdditionalFields>
+        <lookupPhoneDialogsAdditionalFields>Publish__c</lookupPhoneDialogsAdditionalFields>
+        <searchFilterFields>NAME</searchFilterFields>
+        <searchFilterFields>Headline__c</searchFilterFields>
+        <searchFilterFields>Headline_Link_Group__c</searchFilterFields>
+        <searchFilterFields>Publish__c</searchFilterFields>
+        <searchResultsAdditionalFields>Headline__c</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>Headline_Link_Group__c</searchResultsAdditionalFields>
+        <searchResultsAdditionalFields>Publish__c</searchResultsAdditionalFields>
+    </searchLayouts>
+    <sharingModel>Private</sharingModel>
+    <validationRules>
+        <fullName>Headline_or_Headline_Link_Group_Required</fullName>
+        <active>true</active>
+        <errorConditionFormula>AND(
+   ISBLANK( Headline__c ),
+   ISBLANK( Headline_Link_Group__c ) 
+)</errorConditionFormula>
+        <errorMessage>Either or both the Headline or the Headline Link Group fields are required</errorMessage>
+    </validationRules>
+</CustomObject>

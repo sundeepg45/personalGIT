@@ -1,0 +1,643 @@
+<apex:page name="navPage" controller="CommunitiesNavigationController" showheader="false" sidebar="false" standardStylesheets="false">
+
+    <!--CSS Files -->
+    <!--<link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <!--<link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+    -->
+
+    <!--JS Files -->
+
+    <!--<script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>-->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+
+
+
+  <script>
+      if ({!isExternalUser} == false) {
+          window.rh_webstats.prop2 = window.rh_webstats.evar22 = "{!currentLanguage}";
+          window.rh_webstats.prop14 = window.rh_webstats.evar27 = "authenticated";
+          window.rh_webstats.eVar36 = "pc|{!partyNumber}|{!u.FederationIdentifier}";
+          window.rh_webstats.prop3 = window.rh_webstats.evar19 = "{!accountCountry}";
+      }
+      else {
+          window.rh_webstats.prop14 = window.rh_webstats.evar27 = "public";
+      }
+  </script>
+
+    <script>
+      console.log(jQuery.fn.jquery);
+      var $j = jQuery.noConflict();
+
+      function updateUserLanguage(newLanguage){
+        var theUserId = $j('#userId').val();
+        console.log('changing FROM: ' + $j("#currentLang").val());
+        console.log('changing TO: ' + newLanguage);
+        console.log('user Id: ' + theUserId);
+        if($j("#currentLang").val() != newLanguage){
+          document.getElementById('language-status').innerHTML = 'Updating language preference...';
+          Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.CommunitiesNavigationController.updateUserLanguage}',
+            theUserId,
+            newLanguage,
+            function(result,event){
+              var fullUrl = window.top.location.href;
+              var shortUrl = window.top.location.protocol + '//' + window.top.location.hostname + window.top.location.pathname;
+              shortUrl += '?language='+result;
+              console.log('redirect URL: ' + shortUrl);
+              window.top.location = shortUrl;
+            }
+          );
+        }
+      }
+
+      function runSearch(){
+        var searchString = document.getElementById("search-field").value;
+        var objName = document.getElementById("object-name").value;
+        console.log(searchString);
+        console.log(objName);
+        if(searchString != null && searchString != ''){
+          Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.CommunitiesNavigationController.executeSearch}',
+            objName,
+            searchString,
+            function(result,event){
+              if(event.status){
+                window.top.location.href = result;
+              }
+            },
+            {escape: false}
+          );
+        }
+      }
+
+
+      $j( document ).ready(function() {
+        if ({!isRequalOverdue}) {
+          top.location.href = "/apex/RequalificationOverdue";
+          return;
+        }
+
+
+        //Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.CommunitiesNavigationController.getLanguage}',function(result,event){
+        //  $j.get( "/s/SetLanguage?language=" + result , function( data ) {});
+        //});
+
+          // ===================================================== \\
+          // ====== make navigation sticky on window scroll ====== \\
+          // ===================================================== \\
+
+           $j(window).scroll(function() {
+             var scroll = $j(window).scrollTop();
+
+             if (scroll >= 40) {
+               $j('.main-nav-wrapper').addClass('main-nav-sticky');
+               $j('.main-subnav').addClass('main-subnav-sticky');
+               $j('.secondary-nav').css(('margin-bottom' ), 80);
+               $j('.go-to-top').fadeIn();
+             } else {
+               $j('.main-nav-wrapper').removeClass('main-nav-sticky');
+               $j('.main-subnav').removeClass('main-subnav-sticky');
+               $j('.secondary-nav').css(('margin-bottom' ), 0);
+               $j('.go-to-top').fadeOut();
+             }
+           });
+
+          // ============================================== \\
+          // ====== scroll to top of window function ====== \\
+          // ============================================== \\
+
+          $j('.go-to-top').click(function() {
+              $j("html, body").animate({ scrollTop: 0 }, "slow");
+              return false;
+          });
+
+
+
+         // Store hidden subnav elements in variables \\
+
+         var $jnavItem1_dropDown = $j(".Dashboard-dropdown");
+         var $jnavItem2_dropDown = $j(".Programs-dropdown");
+         var $jnavItem3_dropDown = $j(".Training-dropdown");
+         var $jnavItem4_dropDown = $j(".Technologies-dropdown");
+         var $jnavItem5_dropDown = $j(".Resources-dropdown");
+         var $jnavItem6_dropDown = $j(".Help-dropdown");
+         var $jsearch_utility = $j(".utility-content");
+         var $jlanguage_utility = $j(".language-picker");
+
+
+
+         // =============================================================== \\
+         // ====== Store hidden nav and subnav elements in variables ====== \\
+         // =============================================================== \\
+
+
+         var $jnavItem1 = $j('.main-nav ul li:nth-child(1)').attr("class");
+         var $jnavItem1Dropdown = $jnavItem1.replace('link','dropdown');
+
+         var $jnavItem2 = $j('.main-nav ul li:nth-child(2)').attr("class");
+         var $jnavItem2Dropdown = $jnavItem2.replace('link','dropdown');
+
+         var $jnavItem3 = $j('.main-nav ul li:nth-child(3)').attr("class");
+         var $jnavItem3Dropdown = $jnavItem3.replace('link','dropdown');
+
+         var $jnavItem4 = $j('.main-nav ul li:nth-child(4)').attr("class");
+         var $jnavItem4Dropdown = $jnavItem4.replace('link','dropdown');
+
+         var $jnavItem5 = $j('.main-nav ul li:nth-child(5)').attr("class");
+         var $jnavItem5Dropdown = $jnavItem5.replace('link','dropdown');
+
+         var $jnavItem6 = $j('.main-nav ul li:nth-child(6)').attr("class");
+         var $jnavItem6Dropdown = $jnavItem6.replace('link','dropdown');
+
+
+         // =================================================== \\
+         // ====== Set display options for nav dropdowns ====== \\
+         // =================================================== \\
+
+         $j('.' + $jnavItem1Dropdown).css({"display": "none", "width": "100%", "position": "absolute", "left": "-1000"});
+         $j('.' + $jnavItem2Dropdown).css({"display": "none", "width": "100%", "position": "absolute", "left": "-1000"});
+         $j('.' + $jnavItem3Dropdown).css({"display": "none", "width": "100%", "position": "absolute", "left": "-1000"});
+         $j('.' + $jnavItem4Dropdown).css({"display": "none", "width": "100%", "position": "absolute", "left": "-1000"});
+         $j('.' + $jnavItem5Dropdown).css({"display": "none", "width": "100%", "position": "absolute", "left": "-1000"});
+         $j('.' + $jnavItem6Dropdown).css({"display": "none", "width": "100%", "position": "absolute", "left": "-1000"});
+
+         // ====== for debugging ====== \\
+         console.log('navItem1='+ $jnavItem1);
+         console.log('navItem1Dropdown='+ $jnavItem1Dropdown);
+         console.log('navItem2='+ $jnavItem2);
+         console.log('navItem2Dropdown='+ $jnavItem2Dropdown);
+         console.log('navItem3='+ $jnavItem3);
+         console.log('navItem3Dropdown='+ $jnavItem3Dropdown);
+         console.log('navItem4='+ $jnavItem4);
+         console.log('navItem4Dropdown='+ $jnavItem4Dropdown);
+         console.log('navItem5='+ $jnavItem5);
+         console.log('navItem5Dropdown='+ $jnavItem5Dropdown);
+         console.log('navItem6='+ $jnavItem6);
+         console.log('navItem6Dropdown='+ $jnavItem6Dropdown);
+
+
+
+         // $j('.bookmark-tooltip').tooltip();
+
+         // ===================================== \\
+         // ====== clear sub-nav functions ====== \\
+         // ===================================== \\
+
+         function clearSubNavHidden(){
+                $j('.main-subnav').slideDown('slow');
+                $j('.' + $jnavItem1Dropdown).animate({"left":"-1000px"}, "fast"); //test
+                $j('.' + $jnavItem1Dropdown).hide();
+                $j('.' + $jnavItem2Dropdown).animate({"left":"-1000px"}, "fast"); //test
+                $j('.' + $jnavItem2Dropdown).hide();
+                $j('.' + $jnavItem3Dropdown).animate({"left":"-1000px"}, "fast"); //test
+                $j('.' + $jnavItem3Dropdown).hide();
+                $j('.' + $jnavItem4Dropdown).animate({"left":"-1000px"}, "fast"); //test
+                $j('.' + $jnavItem4Dropdown).hide();
+                $j('.' + $jnavItem5Dropdown).animate({"left":"-1000px"}, "fast"); //test
+                $j('.' + $jnavItem5Dropdown).hide();
+                $j('.' + $jnavItem6Dropdown).animate({"left":"-1000px"}, "fast"); //test
+                $j('.' + $jnavItem6Dropdown).hide();
+         }
+         function clearSubNavVisible(){
+                $j('.main-subnav').slideUp('slow');
+                $j('.' + $jnavItem1Dropdown).animate({"left":"-1000px"}, "fast");
+                $j('.' + $jnavItem2Dropdown).animate({"left":"-1000px"}, "fast");
+                $j('.' + $jnavItem3Dropdown).animate({"left":"-1000px"}, "fast");
+                $j('.' + $jnavItem4Dropdown).animate({"left":"-1000px"}, "fast");
+                $j('.' + $jnavItem5Dropdown).animate({"left":"-1000px"}, "fast");
+                $j('.' + $jnavItem6Dropdown).animate({"left":"-1000px"}, "fast");
+
+                $j('.' + $jnavItem1Dropdown).fadeOut("fast");
+                $j('.' + $jnavItem2Dropdown).fadeOut("fast");
+                $j('.' + $jnavItem3Dropdown).fadeOut("fast");
+                $j('.' + $jnavItem4Dropdown).fadeOut("fast");
+                $j('.' + $jnavItem5Dropdown).fadeOut("fast");
+                $j('.' + $jnavItem6Dropdown).fadeOut("fast");
+         }
+
+         // ======================================== \\
+         // ====== Utility Dropdown animation ====== \\
+         // ======================================== \\
+
+          $j('.navbar-right .search').click(function(e) {
+              e.preventDefault();
+              if($jsearch_utility.is(':hidden') && $jlanguage_utility.is(':hidden')){
+                  $j('.utility-content').show();
+                  $j('#sliding-utility-panel').slideDown('slow');
+                  $j('.navbar-right .search i').removeClass('fa-search');
+                  $j('.navbar-right .search i').addClass('fa-times-circle-o');
+                  $j('.navbar-right .search').addClass('active');
+              }
+              else if($jlanguage_utility.is(':visible')){
+                  $j('.language-picker').slideUp();
+                  $j('.utility-content').slideDown('slow');
+                  $j('.navbar-right .language i').removeClass('fa-times-circle-o');
+                  $j('.navbar-right .language i').addClass('fa-globe');
+                  $j('.navbar-right .language').removeClass('active');
+                  $j('.navbar-right .search i').removeClass('fa-search');
+                  $j('.navbar-right .search i').addClass('fa-times-circle-o');
+                  $j('.navbar-right .search').addClass('active');
+              }
+              else if($jsearch_utility.is(':visible')){
+                  $j('#sliding-utility-panel').slideUp('slow');
+                  $j('.utility-content').slideUp();
+                  $j('.language-picker').slideUp();
+                  $j('.navbar-right .search i').removeClass('fa-times-circle-o');
+                  $j('.navbar-right .search i').addClass('fa-search');
+                  $j('.navbar-right .search').removeClass('active');
+              }
+          });
+           $j('.navbar-right .language').click(function(e) {
+              e.preventDefault();
+              if($jlanguage_utility.is(':hidden') && $jsearch_utility.is(':hidden')){
+                  $j('.language-picker').show();
+                  $j('#sliding-utility-panel').slideDown('slow');
+                  $j('.navbar-right .language i').removeClass('fa-globe');
+                  $j('.navbar-right .language i').addClass('fa-times-circle-o');
+                  $j('.navbar-right .language').addClass('active');
+              }
+              else if($jsearch_utility.is(':visible')){
+                  $j('.utility-content').slideUp();
+                  $j('.language-picker').slideDown('slow');
+                  $j('.navbar-right .language i').addClass('fa-times-circle-o');
+                  $j('.navbar-right .language i').removeClass('fa-globe');
+                  $j('.navbar-right .language').addClass('active');
+                  $j('.navbar-right .search i').addClass('fa-search');
+                  $j('.navbar-right .search i').removeClass('fa-times-circle-o');
+                  $j('.navbar-right .search').removeClass('active');
+              }
+              else if($jlanguage_utility.is(':visible')){
+                  $j('#sliding-utility-panel').slideUp('slow');
+                  $j('.language-picker').slideUp();
+                  $j('.navbar-right .language i').removeClass('fa-times-circle-o');
+                  $j('.navbar-right .language i').addClass('fa-globe');
+                  $j('.navbar-right .language').removeClass('active');
+              }
+          });
+
+          // ====================================== \\
+          // ====== language picker function ====== \\
+          // ====================================== \\
+
+          $j('.language-picker a').click(function(e){
+              e.preventDefault();
+              $j('.language-picker a').removeClass('active');
+              $j(this).addClass('active');
+          });
+
+         // ===================================== \\
+         // ====== subnavigation animation ====== \\
+         // ==================================== \\
+
+          $j('.' + $jnavItem1).click(function(e) {
+            if($j( '.' + $jnavItem1Dropdown + ' ul' ).length){
+              e.preventDefault();
+
+              if($j('.' + $jnavItem1Dropdown).is(':hidden')){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+                $j('.' + $jnavItem1).addClass('main-active');
+                $j('.' + $jnavItem1Dropdown + ' a').addClass('active');
+                clearSubNavHidden();
+                $j('.' + $jnavItem1Dropdown).fadeIn("fast");
+                $j('.' + $jnavItem1Dropdown).animate({"left":"0"}, "fast");
+              }
+              else if($j('.' + $jnavItem1Dropdown).is(':visible')) {
+                clearSubNavVisible();
+                $j(this).removeClass('main-active');
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+              }
+            }else{
+             //Send to technologies landing page
+            }
+          });
+
+          $j('.' + $jnavItem2).click(function(e) {
+            if($j( '.' + $jnavItem2Dropdown + ' ul' ).length){
+              e.preventDefault();
+
+              if($j('.' + $jnavItem2Dropdown).is(':hidden')){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+                $j('.' + $jnavItem2).addClass('main-active');
+                $j('.' + $jnavItem2Dropdown + ' a').addClass('active');
+                clearSubNavHidden();
+                $j('.' + $jnavItem2Dropdown).fadeIn("fast");
+                $j('.' + $jnavItem2Dropdown).animate({"left":"0"}, "fast");
+              }
+              else if($j('.' + $jnavItem2Dropdown).is(':visible')) {
+                clearSubNavVisible();
+                $j(this).removeClass('main-active');
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+              }
+            }else{
+             //Send to technologies landing page
+            }
+          });
+
+
+          $j('.' + $jnavItem3).click(function(e) {
+            if($j( '.' + $jnavItem3Dropdown + ' ul' ).length){
+              e.preventDefault();
+
+              if($j('.' + $jnavItem3Dropdown).is(':hidden')){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+                $j('.' + $jnavItem3).addClass('main-active');
+                $j('.' + $jnavItem3Dropdown + ' a').addClass('active');
+                clearSubNavHidden();
+                $j('.' + $jnavItem3Dropdown).fadeIn("fast");
+                $j('.' + $jnavItem3Dropdown).animate({"left":"0"}, "fast");
+              }
+              else if($j('.' + $jnavItem3Dropdown).is(':visible')) {
+                clearSubNavVisible();
+                $j(this).removeClass('main-active');
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+              }
+            }else{
+             //Send to technologies landing page
+            }
+          });
+
+          $j('.' + $jnavItem4).click(function(e) {
+            if($j( '.' + $jnavItem4Dropdown + ' ul' ).length){
+              e.preventDefault();
+
+              if($j('.' + $jnavItem4Dropdown).is(':hidden')){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+                $j('.' + $jnavItem4).addClass('main-active');
+                $j('.' + $jnavItem4Dropdown + ' a').addClass('active');
+                clearSubNavHidden();
+                $j('.' + $jnavItem4Dropdown).fadeIn("fast");
+                $j('.' + $jnavItem4Dropdown).animate({"left":"0"}, "fast");
+              }
+              else if($j('.' + $jnavItem4Dropdown).is(':visible')) {
+                clearSubNavVisible();
+                $j(this).removeClass('main-active');
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+              }
+            }else{
+             //Send to technologies landing page
+            }
+          });
+
+          $j('.' + $jnavItem5).click(function(e) {
+            if($j( '.' + $jnavItem5Dropdown + ' ul' ).length){
+              e.preventDefault();
+
+              if($j('.' + $jnavItem5Dropdown).is(':hidden')){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+                $j('.' + $jnavItem5).addClass('main-active');
+                $j('.' + $jnavItem5Dropdown + ' a').addClass('active');
+                clearSubNavHidden();
+                $j('.' + $jnavItem5Dropdown).fadeIn("fast");
+                $j('.' + $jnavItem5Dropdown).animate({"left":"0"}, "fast");
+              }
+              else if($j('.' + $jnavItem5Dropdown).is(':visible')) {
+                clearSubNavVisible();
+                $j(this).removeClass('main-active');
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+              }
+            }else{
+              //Send to resources landing page
+            }
+          });
+
+          $j('.' + $jnavItem6).click(function(e) {
+            if($j( '.' + $jnavItem6Dropdown + ' ul' ).length){
+              e.preventDefault();
+
+              if($j('.' + $jnavItem6Dropdown).is(':hidden')){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+                $j('.' + $jnavItem6).addClass('main-active');
+                $j('.' + $jnavItem6Dropdown + ' a').addClass('active');
+                clearSubNavHidden();
+                $j('.' + $jnavItem6Dropdown).fadeIn("fast");
+                $j('.' + $jnavItem6Dropdown).animate({"left":"0"}, "fast");
+              }
+              else if($j('.' + $jnavItem6Dropdown).is(':visible')) {
+                clearSubNavVisible();
+                $j(this).removeClass('main-active');
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+              }
+            }else{
+             //Send to technologies landing page
+            }
+          });
+
+          // ======================================================================================== \\
+          // ====== function to close subnav if mouse clicks any where other than subnav items ====== \\
+          // ======================================================================================== \\
+
+          $j(document).on("click.menu-outside", function(event){
+              if(!$j(event.target).parents().andSelf().is(".main-nav")&&(!$j(event.target).parents().andSelf().is(".main-subnav"))){
+                $j('.navbar-nav li').removeClass('main-active');
+                $j('.navbar-nav li a').removeClass('active');
+
+                clearSubNavVisible();
+              }
+          });
+      });
+
+    </script>
+
+    <input type="hidden" value="{!currentLanguage}" id="currentLang"/>
+    <input type="hidden" value="{!userId}" id="userId"/>
+
+    <div class="red-hat-content">
+       <div class="header-wrapper">
+          <div class="container">
+            <div class="row">
+              <div class="secondary-nav">
+                <ul class="nav navbar-nav">
+                  <li><a href="https://www.redhat.com" class="redhat-home ease">Redhat.com</a></li>
+                  <li><a href="{!$Label.Communities_Header_Find_a_PartnerURL}" class="ease">{!$Label.Communities_Header_Find_a_Partner}</a></li>
+                  <li><a href="{!$Label.Communities_Header_Become_a_PartnerURL}" class="ease">{!$Label.Communities_Header_Become_a_Partner}</a></li>
+                  <!--<li><a href="#" class="ease">{!$Label.Communities_Header_News_Events}</a></li>-->
+                  <!--<li><a href="{!$Label.Communities_Header_FeedbackURL}" class="ease">{!$Label.Communities_Header_Feedback}</a></li>-->
+                </ul><!-- /.nav -->
+                <ul class="nav navbar-nav navbar-right">
+                  <!-- <li><a href="#" class="bookmark-tooltip ease" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add Bookmark to Your Dashboard"><span class="sr-only"></span><i class="fa fa-star"></i></a></li> -->
+
+                  <!-- *** TO-DO: fix the styling here so that the displays stay in line even when one of the options is hidden -->
+
+                    <li>
+                        <apex:outputPanel rendered="{!!isExternaluser && allowedToSearch}" id="search-icon-panel">
+                            <a href="#" class="search ease"><span class="sr-only">{!$Label.Communities_Header_Search}</span><i class="fa fa-search tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{!$Label.Communities_Header_Search_Tooltip}"></i></a>
+                        </apex:outputPanel>
+                    </li>
+                    <li><a href="{!IF(!isExternalUser, $Label.Communities_Header_LogoutURL, $Label.Communities_Header_RegisterURL)}" class="user ease"><span class="sr-only">{!$Label.Communities_Header_User}</span><i class="fa fa-user tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{!IF(!isExternalUser, $Label.Communities_Header_Logout_Tooltip, $Label.Communities_Header_Register_Tooltip)}"></i></a></li>
+                    <li>
+                        <apex:outputPanel rendered="{!!isExternaluser}">
+                            <a href="#" class="language ease"><span class="sr-only">{!$Label.Communities_Header_Language}</span><i class="fa fa-globe tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="{!$Label.Communities_Header_Language_Tooltip}"></i></a>
+                        </apex:outputPanel>
+                    </li>
+                </ul><!-- /.navbar-right -->
+              </div><!-- /.secondary-nav -->
+            </div><!-- /.row -->
+
+            <div class="row relative-position">
+              <div id="sliding-utility-panel">
+                <div id="search-panel" class="utility-panel open">
+                  <div class="utility-content">
+                    <apex:outputPanel >
+                      <div>
+                        <input id="search-field" type="text" class="search form-control"/>
+                        <span class="input-group-btn">
+                          <!-- *** TO-DO: need to make this button activate on enter key push when typing in the search field -->
+                          <button class="btn ease" type="button" onclick="runSearch()">{!$Label.Communities_Header_Search}</button>
+                        </span>
+                        <select id="object-name">
+                          <apex:repeat value="{!cleanedObjectNames}" var="obj">
+                            <option value="{!obj}">{!obj}</option>
+                          </apex:repeat>
+                        </select>
+                      </div>
+                    </apex:outputPanel>
+                  </div><!-- /.utility-content -->
+                </div><!-- /#search-panel -->
+
+                <!-- *** TO-DO: apply 'active' class only to the currently active language *** -->
+                <div class="language-picker">
+                  <apex:outputPanel rendered="{!!isExternalUser}" id="language-picker-panel">
+                  <div class="col-xs-12">
+                    <h2 id="language-status">{!$Label.CommunitiesHeaderSelectLanguage}</h2>
+                  </div><!-- /.col-xs-12 -->
+                  <div class="col-xs-4">
+                    <ul>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('English')" styleClass="ease">{!$Label.CommunitiesLanguageEnglish}</apex:outputLink>
+                      </li>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('German')" styleClass="ease">{!$Label.CommunitiesLanguageGerman}</apex:outputLink>
+                      </li>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('Japanese')" styleClass="ease">{!$Label.CommunitiesLanguageJapanese}</apex:outputLink>
+                      </li>
+                    </ul>
+                  </div><!-- /.col-xs-4 -->
+                  <div class="col-xs-4">
+                    <ul>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('Portuguese')" styleClass="ease">{!$Label.CommunitiesLanguagePortuguese}</apex:outputLink>
+                      </li>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('Chinese')" styleClass="ease">{!$Label.CommunitiesLanguageChinese}</apex:outputLink>
+                      </li>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('French')" styleClass="ease">{!$Label.CommunitiesLanguageFrench}</apex:outputLink>
+                      </li>
+                    </ul>
+                  </div><!-- /.col-xs-4 -->
+                  <div class="col-xs-4">
+                    <ul>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('Italian')" styleClass="ease">{!$Label.CommunitiesLanguageItalian}</apex:outputLink>
+                      </li>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('Korean')" styleClass="ease">{!$Label.CommunitiesLanguageKorean}</apex:outputLink>
+                      </li>
+                      <li>
+                        <apex:outputLink value="#" onclick="updateUserLanguage('Spanish')" styleClass="ease">{!$Label.CommunitiesLanguageSpanish}</apex:outputLink>
+                      </li>
+                    </ul>
+                  </div><!-- /.col-xs-4 -->
+                  </apex:outputPanel>
+                </div><!-- /.language-picker -->
+              </div><!-- /.sliding-utility-panel -->
+            </div><!-- /.row relative-position -->
+          </div><!-- /.container -->
+
+          <div class="main-nav-wrapper">
+            <div class="container">
+              <apex:outputPanel id="main-nav-items">
+                <div class="row">
+                  <div class="main-nav" role="navigation">
+                    <a href="/s/Homepage" class="logo">redhat</a>
+                    <ul class="nav navbar-nav">
+                      <apex:repeat value="{!sortedNavItems}" var="navItem">
+                        <li class="MainNavItem{!navItem.index}-link" id="{!navItem.id}">
+                          <a href="{!navItem.URL}">{!navItem.label}</a>
+                        </li>
+                      </apex:repeat>
+                    </ul><!-- /.nav -->
+                    <ul class="go-to-top">
+                        <li><img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/top-top-arrow.png')}"/></li>
+                    </ul>
+                  </div><!-- /.main-nav -->
+                </div><!-- /.row -->
+              </apex:outputPanel>
+            </div><!-- /.container -->
+          </div><!-- /.main-nav-wrapper -->
+
+          <div class="main-subnav">
+            <apex:outputPanel id="subnav-container">
+            <div  class="container relative-position">
+
+
+
+
+                    <apex:repeat value="{!sortedNavItems}" var="navItem">
+                      <div class="sub-menu MainNavItem{!navItem.index}-dropdown">
+                        <div class="sub-container clearfix">
+                          <div class="row">
+                    <!-- iterating over top-level parents -->
+
+                            <apex:repeat rendered="{!navItem.children.size>0 && navItem.children!=null}" value="{!navItem.children}" var="navChild">
+                              <!-- iterating over children - these are section-headers -->
+
+                              <div class="col-xs-3">
+                                <h3 class="uppercase"><span id="{!navChild.id}"><a href="{!navChild.URL}">{!navChild.label}</a></span></h3>
+                                <ul>
+                                  <apex:repeat rendered="{!navChild.children.size>0 && navChild.children!=null}" value="{!navChild.children}" var="navGrandchild">
+                                    <!-- iterating over grandchildren - these are links under a section-header -->
+
+                                    <li id="{!navGrandchild.id}">
+                                      <a href="{!navGrandchild.URL}">{!navGrandchild.label}</a>
+                                    </li>
+                                  </apex:repeat> <!-- /.grandchild repeater -->
+                                </ul>
+                              </div> <!-- ./col-xs-3 -->
+                            </apex:repeat>  <!-- /.child repeater -->
+                          </div> <!-- ./row -->
+                          <div class="row">
+                              <div class="col-xs-12 clear-float">
+                                  <a class="go-to-landing-page uppercase ease" href="{!navItem.URL}"><strong>{!$Label.CommunitiesGoTo} {!navItem.Label}</strong><span class="ease">&raquo;</span></a>
+                              </div>
+                          </div>
+                        </div> <!-- ./sub-container clearfix -->
+                      </div> <!--./sub-menu resources-dropdown -->
+                    </apex:repeat> <!-- /.parent repeater -->
+
+            </div> <!-- ./container -->
+
+
+            </apex:outputPanel>
+          </div> <!-- ./main-subnav -->
+       </div> <!-- ./header-wrapper -->
+    </div> <!-- ./red-hat-content -->
+</apex:page>

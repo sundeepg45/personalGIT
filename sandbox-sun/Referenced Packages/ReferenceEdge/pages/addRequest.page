@@ -1,0 +1,164 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page controller="refedge.addRequestController"  tabStyle="refedge__Reference_Request__c" id="pageId" sidebar="false" showheader="false">
+    <!-- Message -->
+    <apex:pageMessages id="msgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <c:POR_ModalLoader id="PORLoader"/>
+    <!-- Add CSS-->
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <style type="text/css">
+        .datePicker{z-index : 9999;}  
+        .ui-dialog-titlebar,.ui-widget-header {background-color:#79B4CD; border: 1px solid #79B4CD !important;}
+        .locationError { color: blue; font-weight: strong;}
+    </style>
+    
+    <script>
+        var isMsgRender = false;
+        var isNameChanged = false;
+        function closeWindow(source){
+            if(!isMsgRender && source == "save") {  
+                window.opener.location.reload();
+                window.close(); 
+            }
+            if(!isMsgRender && source == "saveandnew"){
+                location.reload();
+            }
+            if((source == "cancel")){
+                window.opener.location.reload();
+                window.close(); 
+            }
+        } 
+        function changeName(){
+            isNameChanged = true;
+        }
+        function onSave(){
+            saveRequest(isNameChanged);
+        }
+        function onSaveNew(){
+            saveAndNew(isNameChanged);
+        }
+    </script>
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:outputPanel id="outerBlock">
+            <apex:actionFunction name="saveRequest" action="{!saveRequest}"  oncomplete="closeWindow('save');" rerender="modalPbbId, msgId">
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="saveAndNew" action="{!saveRequest}" oncomplete="closeWindow('saveandnew');" rerender="modalPbbId, msgId">
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="jsSelectedAcc" rerender="outerBlock, msgId" action="{!setAccount}">
+                <apex:param name="accId" assignTo="{!rrA.Account__c}" value=""/>
+                <apex:param name="accName" assignTo="{!accName}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="showAccounts" rerender="outerBlock, msgId" action="{!fetchAccounts}">
+            </apex:actionFunction>
+            <apex:pageBlock id="blockId" rendered="{!!isAccountShow}">
+                
+                <apex:pageBlockButtons >
+                    <apex:commandButton value="{!$Label.Save}" onclick="onSave(); return false;"/>
+                    <apex:commandButton value="{!$Label.Save_and_New}" onclick="onSaveNew();return false;" />
+                    <apex:commandButton value="{!$Label.Cancel}" onclick="closeWindow('cancel');" rerender="modalPbbId, msgId"/> 
+                </apex:pageBlockButtons>
+                
+                <apex:pageBlockSection title="{!$Label.Information}" columns="1" id="modalPbbId">
+                    <Script>
+                        isMsgRender = {!isMessageRender} ;
+                    </Script>
+                    
+                    <apex:pageBlockSectionItem id="refNeededId">
+                        <apex:outputLabel value="{!$Label.Reference_Type_Needed}" />
+                        <apex:outputPanel styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:selectList size="1" value="{!selRefType}" id="selectRefType" style="width:250px">
+                                <apex:selectOptions value="{!referenceabilityTypes}"/>
+                            </apex:selectList>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionitem id="pbsAccountId">
+                        <apex:outputLabel value="{!$ObjectType.refedge__Reference_Request_Account__c.fields.refedge__Account__c.label}"/>
+                        <apex:outputPanel id="opAccountId">
+                            <apex:actionRegion >
+                                <div style="float:left">
+                                <apex:inputText id="searchAccount" value="{!accName}" style="margin-left:0px;width:200px;" onchange="changeName();return false;"/>&nbsp;&nbsp;
+                                </div>
+                                <div style="float:left">
+                                <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="showAccounts();"/>
+                                </div>
+                            </apex:actionRegion>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionitem>
+                    <apex:pageBlockSectionItem id="deadlineId">
+                        <apex:outputLabel value="{!$Label.Deadline}" />
+                        <apex:outputPanel id="panelId" styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:inputField value="{!rrA.refedge__Deadline__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                       
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            <apex:outputPanel rendered="{!isAccountShow}">
+                <script>
+                    jQuery(".content img").css("background-image","none");
+                    jQuery(".content img").attr("src","{!URLFOR($Resource.refedge__RESearchFilterIcons, 'search-icon.png')}");
+                    isNameChanged = false;
+                </script>
+                <apex:sectionHeader id="shLookup" title="{!$Label.Lookup}"  help="RfSearchHelpPage"/>
+                <apex:outputPanel id="opSearch" >
+                    <apex:inputText id="accName" value="{!searchText}" html-placeholder="{!$Label.Search}..."/>&nbsp; 
+                    <apex:commandButton id="btnGo" value="{!$Label.Go}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" action="{!search}" reRender="pgMsg,pbLookup,opMessage,opSearch"/>
+                    <br />
+                    <apex:outputLabel value="{!$Label.Lookup_search_message}" />
+                    <br />
+                    <br />
+                    <apex:outputPanel rendered="{!searchText != ''}">
+                        <apex:commandLink value="{!$Label.Clear_Search_Results}" action="{!search}">
+                            <apex:param value="" name="searchText" assignTo="{!searchText}"/>
+                        </apex:commandLink>
+                        <br/>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                <apex:outputPanel id="opMessage" >
+                    <apex:outputLabel style="color:red;" value="{!$Label.Search_maximun_rows_message}"  rendered="{!accountList.size > 200}"/>
+                </apex:outputPanel>
+                
+                <apex:outputPanel id="pbLookup">
+                    <apex:pageBlock mode="edit">
+                        <apex:pageBlockTable rendered="{!accountList.size >0}" value="{!accountList}" var="acc">
+                            <apex:column headervalue="{!$ObjectType.Account.fields.Name.label}" onclick="jsSelectedAcc('{!JSENCODE(acc.Id)}','{!JSENCODE(acc.Name)}');return false;">
+                                <apex:outputLink value="{!acc.Id}">{!acc.Name}</apex:outputLink>
+                            </apex:column>
+                            <apex:column value="{!acc.Site}" />
+                            <apex:column value="{!acc.Type}" />
+                        </apex:pageBlockTable>
+                        
+                        <apex:pageBlockSection columns="1">
+                            <apex:pageBlockSectionItem rendered="{!accountList.size = 0}" >
+                                <apex:outputLabel style="color:red;" value="{!$Label.No_Records_Found}"></apex:outputLabel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

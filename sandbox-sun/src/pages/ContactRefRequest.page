@@ -1,0 +1,33 @@
+<apex:page Controller="ContactRefRequestController" sidebar="false" showHeader="true"
+    tabStyle="Customer_Reference__c">
+
+    <apex:sectionHeader title="Select Opportunity" subtitle=""/>
+    <apex:form >
+        <apex:pageBlock title="Select the opportunity which this reference is in support of" id="thePageBlock" mode="edit">
+            <center>
+                <apex:pageMessages /> 
+            </center>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Proceed" action="{!proceed}" status="proceedStatus"/>
+                <apex:commandButton value="Cancel" action="{!doCancel}" immediate="true"/>              
+            </apex:pageBlockButtons>
+ 
+            <apex:pageBlockSection columns="1" id="theSection">
+<!--                 <apex:inputField id="oppty" value="{!contactRefRequest.Supported_Opportunity__c}" required="true" />  -->
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
+
+<!--
+    <head>
+        <script type="text/javascript">
+            function alertUser(ele)
+            {
+                if (document.getElementById(ele).value != '')
+                    alert('Your request for the reference contact has been submitted to the reference owner. ');
+            }
+        </script>
+    </head>
+onclick="alertUser('{!$Component.thePageBlock.theSection.oppty}')"
+-->

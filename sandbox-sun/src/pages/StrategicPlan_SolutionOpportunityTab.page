@@ -1,0 +1,20 @@
+<apex:page controller="TabUIController" extensions="StrategicPlan_SolutionControllerExtn" showChat="false" showHeader="false" sidebar="false" id="Opportunities">
+    <apex:form id="headerForm">
+        <apex:actionStatus startText="Refresh in Progress" id="refreshInProgress"/>
+        <c:QueriedList sequenceNumber="{!sequenceNumber}"
+            var="spso"
+            labelVar="columnName"
+            object="StrategicPlan_SolutionOpportunity__c"
+            fields="{!IF($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,',','')}OpportunityLink__c,AccountLink__c,StageName__c,Amount__c,CloseDate__c,StrategicPlan_Solution__c"
+            sortFields="{!IF($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,',','')}Opportunity__r.Name,Opportunity__r.Account.Name,StageName__c,Amount__c,CloseDate__c,StrategicPlan_Solution__r.Name"
+            labels="{!IF($ObjectType.StrategicPlan_SolutionOpportunity__c.deletable,$Label.StrategicPlan_ActionColumn + ',','')}{!$ObjectType.Opportunity.Label},{!$ObjectType.Account.Label},{!$ObjectType.Opportunity.Fields.StageName.Label},{!$ObjectType.Opportunity.Fields.Amount.Label},{!$ObjectType.Opportunity.Fields.CloseDate.Label},{!$ObjectType.StrategicPlan_Solution__c.Label}"
+            conditions="StrategicPlan_Solution__r.StrategicPlan__c='{!StrategicPlanId}'"
+            order="CloseDate__c,StrategicPlan_Solution__r.Name,Opportunity__r.Account.Name,Opportunity__r.Name,Amount__c,Id"
+            recordsPerPage="50">
+            <apex:commandLink action="{!unlinkOpportunity}" value="{!$Label.StrategicPlan_Unlink}" onclick="return confirm('Are you sure you wish to unlink this opportunity?');" immediate="true" status="refreshInProgress" rendered="{!AND(columnName='Action',$ObjectType.StrategicPlan_SolutionOpportunity__c.deletable)}">
+                <apex:param name="solutionOpportunityId" assignTo="{!solutionOpportunityId}" value="{!record.Id}" />
+            </apex:commandLink>
+        </c:QueriedList>
+        <apex:pageMessages id="pageMessages"/>
+    </apex:form>
+</apex:page>

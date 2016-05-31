@@ -1,0 +1,20 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Application_Case_Status}"/></div>
+    </apex:outputPanel>
+
+    <apex:form >
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Issue_Type}"/></apex:outputLabel>
+            <apex:outputPanel id="issueType">{!OnboardingCase.Issue_Type__c}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Number}"/></apex:outputLabel>
+            <apex:outputPanel id="caseNumber">{!OnboardingCase.CaseNumber}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Status}"/></apex:outputLabel>
+            <apex:outputPanel id="caseStatus">{!OnboardingCase.Status}</apex:outputPanel>
+        </apex:outputPanel> </fieldset>
+    </apex:form>
+
+    <apex:outputPanel layout="block"><apex:outputText escape="false" value="{!$Label.Onboarding_DisplayCaseStatus_If_You_Have_Questions}"/></apex:outputPanel>
+</apex:page>

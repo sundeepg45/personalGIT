@@ -1,0 +1,10 @@
+<apex:component controller="UserRecordAccessController">
+	<apex:attribute name="record" description="The record Id to check access for." type="Id" required="true" assignto="{!recordId}" />
+	<apex:attribute name="allAccess" description="True if all access is required" type="Boolean" required="false" assignto="{!requireAllAccess}" />
+	<apex:attribute name="deleteAccess" description="True if delete access is required" type="Boolean" required="false" assignto="{!requireDeleteAccess}" />
+	<apex:attribute name="editAccess" description="True if edit access is required" type="Boolean" required="false" assignto="{!requireEditAccess}" />
+	<apex:attribute name="transferAccess" description="True if transfer access is required" type="Boolean" required="false" assignto="{!requireTransferAccess}" />
+	<apex:attribute name="readAccess" description="True if read access is required" type="Boolean" required="false" assignto="{!requireReadAccess}" />
+	<apex:attribute name="showWithAccess" description="True if the body should be shown when the required access is available." type="Boolean" required="false" assignto="{!requireAccess}" />
+	<apex:componentBody rendered="{!showBody}"/>
+</apex:component>

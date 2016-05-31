@@ -1,0 +1,179 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+ <apex:page standardController="refedge__Attribute_Mapping__c" extensions="refedge.AddAttributeMappingController" id="pageId" sidebar="false">
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:sectionHeader title="{!$Label.T_Attribute_Mapping_Edit}" subtitle="{!$Label.T_New_Attribute_Mapping}" id="shId" rendered="{!isFullLicenseAccessible}"/>
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="jsChangeObject" action="{!changeOject}" immediate="true" oncomplete="PORHideLoading();" rerender="pgmsgId, newOpId, scriptId,test,noteId">
+            <apex:param name="paramObjectValue" assignTo="{!selectedObjectValue}" value="" />
+            <apex:param name="paramObjectLabel" assignTo="{!selectedObjectLabel}" value="" />
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="jsChangeField" action="{!changeField}" immediate="true" oncomplete="PORHideLoading();" rerender="pgmsgId, newOpId, scriptId,test,noteId">
+            <apex:param name="paramFieldValue" assignTo="{!selectedFieldValue}" value="" />
+            <apex:param name="paramFieldLabel" assignTo="{!selectedFieldLabel}" value="" />
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="relatedListSelected" action="{!relatedListSelected}" immediate="true" oncomplete="PORHideLoading();" rerender="pgmsgId, newOpId, scriptId,test,noteId">
+            <apex:param name="paramObjName" assignTo="{!selectedFieldValue}" value=""/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="lookupSelected" action="{!lookupSelected}" immediate="true" oncomplete="PORHideLoading();" rerender="pgmsgId, newOpId, scriptId,test,noteId">
+            <apex:param name="paramObjName" assignTo="{!selectedFieldValue}" value=""/>
+        </apex:actionFunction>
+        <apex:pageBlock id="pbId" title="{!$Label.T_Attribute_Mapping_Edit}" mode="edit">
+            <apex:pageBlockButtons id="pbbId">
+                <apex:commandButton value="{!$Label.Save}" action="{!saveAttributeMapping}" reRender="pgmsgId, newOpId,test,noteId,scriptId"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancelAttributeMapping}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:outputPanel id="newOpId" rendered="{!ISNULL(attributeMapping.Id)}">
+                <apex:pageBlockSection id="newPbsId" title="{!$Label.Information}" columns="1">
+                    <apex:pageBlockSectionItem helpText="{!$ObjectType.refedge__Attribute_Mapping__c.fields.refedge__Object__c.InlineHelpText}" >
+                        <apex:outputLabel value="{!$Label.T_Object}"/>
+                        <apex:outputPanel id="objectId" styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:selectList id="selectedObject" value="{!attributeMapping.refedge__Object__c}" onchange="PORShowLoading();jsChangeObject(this.value, jQuery(this).find(':selected').text().trim());" style="width:144px" size="1" >
+                                <apex:selectOptions value="{!objects}"/>
+                            </apex:selectList>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="{!$Label.PicklistFieldHelptext}">
+                        <apex:outputLabel value="{!$Label.T_PickListField}"/>
+                            <apex:outputPanel id="fieldId" styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:outputPanel id="fieldOpId">
+                                <apex:selectList disabled="{!!showFields}" id="selectedObject" value="{!attributeMapping.refedge__Field_Api_Name__c}" onchange="PORShowLoading();jsChangeField(this.value, jQuery(this).find(':selected').text().trim());" style="width:144px" size="1" >
+                                    <apex:selectOptions value="{!returnFields}"/>
+                                </apex:selectList>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <br/>
+                    
+                   
+                    <apex:pageBlockSectionItem helpText="{!$Label.LookupFieldHelptext}" >
+                        <apex:outputLabel value="{!$Label.Lookup_Field}"/>
+                            <apex:outputPanel id="fieldId" styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:outputPanel id="fieldOpId">
+                                <apex:selectList disabled="{!!lookupSelected}" id="selectedObject" value="{!attributeMapping.refedge__RelationShip_Name__c}" onchange="PORShowLoading();lookupSelected(this.value);" style="width:144px" size="1" >
+                                    <apex:selectOptions value="{!lookUpFieldOptions}"/>
+                                </apex:selectList>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="{!$Label.RelatedListHelptext}">
+                        <apex:outputLabel value="{!$Label.Related_List}"/>
+                            <apex:outputPanel id="relatedListId" styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:outputPanel id="fieldOpId">
+                                <apex:selectList disabled="{!!relatedListSelected}" id="selectedObject" value="{!attributeMapping.refedge__RelationShip_Name__c}" onchange="PORShowLoading();relatedListSelected(this.value);" style="width:144px" size="1" >
+                                    <apex:selectOptions value="{!relatedListOptions}"/>
+                                </apex:selectList>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem helpText="{!$Label.LookupFieldtoMapHelptext}">
+                        <apex:outputLabel value="{!$Label.Lookup_Field_to_Map}"/>
+                            <apex:outputPanel id="relatedListId" styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                            <apex:outputPanel id="fieldOpId">
+                                <apex:selectList id="selectedObject" disabled="{!showFields}" value="{!attributeMapping.refedge__Field_Api_Name__c}"  onchange="PORShowLoading();jsChangeField(this.value, jQuery(this).find(':selected').text().trim());" style="width:144px" size="1" >
+                                    <apex:selectOptions value="{!relatedFieldsOptions}"/>
+                                </apex:selectList>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <br/>
+                    <apex:inputField value="{!attributeMapping.refedge__Attribute_Name__c}"/>
+                    <apex:inputField value="{!attributeMapping.refedge__Filter_Label_Name__c}"/>
+                    <apex:inputField id="inheritableId" value="{!attributeMapping.refedge__Inheritable__c}" rendered="{!!isOppSelected}"/>
+                </apex:pageBlockSection>
+                
+                <apex:outputPanel id="test" >
+                    <apex:pageBlockSection id="autosectionId" columns="1" rendered="{!OR(showFields,isOppProductSelected)}">
+                        <apex:inputField id="autoAddId" value="{!attributeMapping.refedge__Auto_add__c}"/>
+                        <apex:inputField id="autoUpdateId" value="{!attributeMapping.refedge__Auto_update__c}" rendered="{!!isOppSelected}"/>
+                        <apex:inputField id="autodelId" value="{!attributeMapping.refedge__Auto_delete__c}"/>
+                        <apex:inputField id="autoPopuId" value="{!attributeMapping.refedge__Auto_populate__c}"  rendered="{!!isOppSelected}"/>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                <apex:outputPanel id="noteId">
+                    <apex:outputPanel rendered="{!isoppRelatedListSelected}">
+                        <apex:outputText style="margin-left: 42px;" value="{!$Label.Note}:"/>
+                        <ul>
+                            <li style="color:red;">{!$Label.Opportunity_product_Note_1}</li>
+                            <li>{!$Label.Opportunity_product_Note_2}</li>
+                            <li>{!$Label.Opportunity_product_Note_3}</li>
+                        </ul>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:outputPanel>
+                
+            <apex:outputPanel id="editOpId" rendered="{!AND(NOT(ISNULL(attributeMapping.Id)),OR(showFields,isOppProductSelected))}">
+                <apex:pageBlockSection id="editPbsId" title="{!$Label.Information}" columns="1">
+                    <apex:outputField value="{!attributeMapping.refedge__Object__c}"/>
+                    <apex:outputField value="{!attributeMapping.refedge__Field__c}"/>
+                    <apex:outputField value="{!attributeMapping.refedge__Attribute_Name__c}"/>
+                    <apex:outputField value="{!attributeMapping.refedge__Filter_Label_Name__c}"/>
+                    <apex:inputField id="editautoAddId" value="{!attributeMapping.refedge__Auto_add__c}"/>
+                    <apex:inputField id="editautoUpdateId" value="{!attributeMapping.refedge__Auto_update__c}"  rendered="{!!isOppSelected}"/>
+                    <apex:inputField id="editautodelId" value="{!attributeMapping.refedge__Auto_delete__c}"/>
+                    <apex:inputField id="editautoPopuId" value="{!attributeMapping.refedge__Auto_populate__c}"  rendered="{!!isOppSelected}"/>
+                    <apex:inputField id="editinheritableId" value="{!attributeMapping.refedge__Inheritable__c}" rendered="{!!isOppSelected}"/>
+                </apex:pageBlockSection>
+                <script>
+                    document.getElementById('pageId:frmId:pbId:editPbsId:editautoPopuId').disabled = {!isOppSelected};
+                    document.getElementById('pageId:frmId:pbId:editPbsId:editautoUpdateId').disabled = {!isOppSelected};
+                </script>
+            </apex:outputPanel>
+            <apex:outputPanel id="editOpId1" rendered="{!AND(NOT(ISNULL(attributeMapping.Id)),NOT(showFields),NOT(isOppProductSelected))}">
+                <apex:pageBlockSection id="editPbsId1" title="{!$Label.Information}" columns="1">
+                    <apex:outputField value="{!attributeMapping.refedge__Object__c}"/>
+                    <apex:outputField value="{!attributeMapping.refedge__Field__c}"/>
+                    <apex:outputField value="{!attributeMapping.refedge__Attribute_Name__c}"/>
+                    <apex:outputField value="{!attributeMapping.refedge__Filter_Label_Name__c}"/>
+                    <apex:inputField id="inheritableIdedit"  value="{!attributeMapping.refedge__Inheritable__c}" rendered="{!!isOppSelected}"/>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+    
+    <apex:outputPanel id="scriptId" rendered="{!ISNULL(attributeMapping.Id)}">
+        <apex:outputPanel rendered="{!showFields}">
+            <script>
+            document.getElementById('pageId:frmId:pbId:autosectionId:autoPopuId').disabled = {!isOppSelected};
+            document.getElementById('pageId:frmId:pbId:autosectionId:autoUpdateId').disabled = {!isOppSelected};
+        </script>
+        </apex:outputPanel>
+    </apex:outputPanel>
+</apex:page>

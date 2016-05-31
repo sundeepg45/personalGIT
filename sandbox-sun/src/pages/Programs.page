@@ -1,0 +1,1276 @@
+<apex:page showHeader="false" sidebar="false">
+
+
+  <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+  <link rel="stylesheet" href="https://partnercenter.force.com/s/font-awesome2.min.css" />
+  <link rel="stylesheet" href="https://partnercenter.force.com/s/site-com-extranet.css" />
+  <link rel="stylesheet" href="https://partnercenter.force.com/s/red-hat-styles.css" />
+  <!--<link rel="stylesheet" href="https://partnercenter.force.com/s/CommunityBranding" />-->
+  <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+  <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+  <!--<script type="text/javascript" src="https://partnercenter.force.com/s/bootstrap.min.js"></script>-->
+  <script type="text/javascript" src="https://partnercenter.force.com/s/all.js"></script>
+  <!--<script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/all.js')}"></script>-->
+
+
+
+
+    <!--
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+    <link rel="stylesheet" href="https://partnercenter.force.com/s/programs-header-change.css" />
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="https://partnercenter.force.com/s/all.js"></script>
+    <script type="text/javascript" src="https://partnercenter.force.com/s/programsPage.js"></script>
+    <script type="text/javascript" src="https://partnercenter.force.com/s/jquery.cycle2.min.js"></script>
+    -->
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+
+
+<body>
+  <div class="red-hat-content">
+    <div class="programs">
+      <div class="header-wrapper">
+      </div>
+      <section class="business-partners-band has-tabs">
+        <div class="tabs-container" style="display:none;">
+          <div class="container">
+            <h1>Business Partners</h1>
+
+            <ul class="tabs">
+              <li><a href="#" rel="partner-tab1">Solution
+              Providers</a></li>
+
+              <li><a href="#" rel="partner-tab2">Software Vendors</a></li>
+
+              <li><a href="#" rel="partner-tab3">System Integrators</a></li>
+
+              <li><a href="#" rel="partner-tab4">Cloud Providers</a></li>
+
+              <li><a href="#" rel="partner-tab5">Training Partners</a></li>
+            </ul><!-- /.tabs -->
+          </div><!-- /.container -->
+        </div><!-- /.tabs-container -->
+
+        <div class="carousel slide" id="partner-tab1">
+          <div class="carousel-start">
+            <div class="container carousel-start-inner">
+              <div class="container content-3up">
+                <div class="row">
+                  <h1>Introducing Red Hat Connect for Business Partners</h1>
+
+                  <div class="col-xs-9">
+                    <div class="row">
+                      <div class="sub-head">
+                        A vibrant ecosystem of partners around the globe building,
+                        selling, and implementing award-winning customer solutions using
+                        Red Hat technology.
+                      </div>
+
+                      <div class="row">
+                        <div class="col-xs-4">
+                          <div class="box sales-box ease resell-box">
+                            <h3>Resell<br />
+                            Partners</h3>
+                          </div><!-- /.col-xs-4 -->
+                        </div>
+                        <div class="col-xs-4">
+                          <div class="box sales-box ease service-box">
+                          <h3>Service<br />
+                          Providers</h3>
+                        </div><!-- /.col-xs-4 -->
+                        </div>
+                        <div class="col-xs-4">
+                          <div class="box sales-box ease tech-box">
+                            <h3>Technology<br />
+                            Business Partners</h3>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+                      </div>
+                      <ul class="list-inline btn-container">
+                        <li><a href="#" class="btn get-started ease">Learn more</a></li>
+                      </ul><!-- /.list-inline /.btn-container -->
+                    </div><!-- /.row -->
+                  </div><!-- /.col-xs-9 -->
+
+                  <div class="col-xs-3">
+                    <div class="partner-module get-started">
+                      <img src="https://partnercenter.force.com/s/bus-partner-mod.jpg"
+                      alt="" class="img-responsive" />
+
+                      <div class="caption ease">
+                        Welcome to Red Hat Partner Connect. Explore how you can engage
+                        today.
+                      </div><!-- /.caption -->
+                    </div><!-- /.partner-module get-started -->
+                  </div><!-- /.col-xs-3 -->
+                </div><!-- /.row -->
+              </div><!-- /.container /.content-3up -->
+            </div><!-- /.carousel-start-inner -->
+          </div><!-- /.carousel-start -->
+
+          <div class="carousel-inner">
+            <div class="item n1 active">
+              <div class="item-container container">
+                <div class="row">
+                  <h2>STRONGER TOGETHER</h2>
+
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <div class="image">
+                        <img src="https://partnercenter.force.com/s/redhat-plus-algar.png" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-amazon.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-cisco.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-computacenter.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-dell.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-ibm.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-intel.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-netapp.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-shadowsoft.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-tata.png" class="c2" alt=""/>
+                        <img src="https://partnercenter.force.com/s/redhat-plus-uniadex.png" class="c2" alt=""/>
+                      </div><!-- /.image -->
+                    </div><!-- /.col-xs-12 -->
+                  </div><!-- /.row -->
+
+                  <div class="carousel-controls">
+                    <!-- <a class="left" title="Previous"><span class="sr-only">Previous</span></a> -->
+
+                    <div class="learn-more">
+                      <p>Partners around the world are choosing Red Hat to ensure their
+                      success.</p>
+                      <!--<p><a href="#" class="with-white-arrow">See who's connected.</a></p>-->
+                    </div><a class="right ease" title="Next">Up next:<br />
+                    <span>The opportunity</span></a>
+                  </div><!-- /.carousel-controls -->
+                </div><!-- /.row -->
+              </div><!-- /.item-container /.container -->
+            </div>
+
+            <div class="item n2">
+              <div class="item-container container">
+                <div class="row">
+                  <h2>THE OPPORTUNITY</h2>
+
+                  <div class="row">
+                    <div class="col-xs-7">
+                      <div class="video">
+                        <iframe src="//www.youtube.com/embed/H7rFTqSc_I4?rel=0" width=
+                        "606" height="341" frameborder="0" allowfullscreen=
+                        "true"></iframe>
+                      </div><!-- /.video -->
+                    </div><!-- /.col-xs-7 -->
+
+                    <div class="col-xs-5">
+                      <p class="sub-head">It&#146;s a rare convergence of market trends,
+                      customer demand, and an attractive portfolio that provide our
+                      partners with winning opportunities and loyal customers.</p>
+
+                      <p>Scale your business and grow your profits with Red Hat by
+                      leveraging the power of the open source community and our unique
+                      annuity model.</p>
+
+                      <p><a href=
+                      "https://partnercenter.force.com/s/programs_greattimetobeaRHpartner.png?v=1"
+                      class="with-white-arrow">See why it&#146;s a great time to be a Red Hat
+                      partner.</a></p>
+                    </div><!-- /.col-xs-5 -->
+                  </div><!-- /.row -->
+
+                  <div class="carousel-controls">
+                    <a class="left" title="Previous"><span class=
+                    "sr-only">Previous</span></a> <a class="right ease" title="Next">Up
+                    next:<br />
+                    <span>Our ecosystem</span></a>
+                  </div><!-- /.carousel-controls -->
+                </div><!-- /.row -->
+              </div><!-- /.item-container /.container -->
+            </div>
+
+            <div class="item n3">
+              <div class="item-container container">
+                <div class="row">
+                  <h2>OUR ECOSYSTEM</h2>
+
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <p class="sub-head">Partners are the growth engine for Red Hat.
+                      When you win, we win. Our unwavering commitment is to equip you
+                      with the knowledge, skills, people, resources and tools to succeed
+                      as a Red Hat partner.</p>
+
+                      <p>We want to partner with you to jointly target relationships with
+                      leading business and technology organizations to make the most of
+                      the latest innovations and IT solutions.</p>
+
+                      <p>Click on any of the boxes to see the breadth of our
+                      ecosystem.</p>
+                    </div><!-- /.col-xs-6 -->
+
+                    <div class="col-xs-6 card card-container">
+                      <div class="front">
+                        <div class="inner-selection inner-selection-honeycomb">
+                          <a data-n="4" href="#4"></a> <a data-n="2" href="#2"></a>
+                          <a data-n="6" href="#6"></a> <a data-n="1" href="#1"></a>
+                          <a data-n="3" href="#3"></a> <a data-n="7" href="#7"></a>
+                          <a data-n="5" href="#5"></a>
+                        </div><!-- /.inner-selection -->
+                      </div>
+
+                      <div class="back">
+                        <div class="inner-tile">
+                          <div class="cycle-slideshow" data-cycle-fx="scrollHorz" data-cycle-timeout="0" data-cycle-slides="&gt; .item">
+                            <div class="cycle-prev"></div>
+
+                            <div class="cycle-next"></div>
+
+                            <div class="cycle-pager"></div>
+
+                            <div class="item">
+                              <h3>Customers</h3>
+
+                              <ul class="text">
+                                <li>Engage with partners and Red Hat experts</li>
+
+                                <li>Access Red Hat product knowledge</li>
+                              </ul>
+                            </div><!-- /.item -->
+
+                            <div class="item">
+                              <h3>Software (ISV)</h3>
+
+                              <ul class="text">
+                                <li>Build and sell software applications<br/>
+                                designed to be interoperable with Red Hat solutions</li>
+                              </ul>
+
+                              <h3>Our partners:</h3>
+
+                              <ul class="list-inline logos">
+                                <li><img src="https://partnercenter.force.com/s/sap-logo.png" alt="SAP"/></li>
+
+                                <li><img src="https://partnercenter.force.com/s/sas-logo.png" alt="SAS"/></li>
+
+                                <li><img src="https://partnercenter.force.com/s/symantec-logo.png" alt="Symantec"/></li>
+                              </ul>
+                            </div><!-- /.item-->
+
+                            <div class="item">
+                              <h3>Distributors</h3>
+
+                              <ul class="text">
+                                <li>Distribute Red Hat products to Red Hat solution providers</li>
+                              </ul>
+
+                              <h3>Our partners:</h3>
+
+                              <ul class="list-inline logos">
+                                <li><img src=
+                                "https://partnercenter.force.com/s/avnet-logo.png" alt=
+                                "AVNET" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/carasoft-logo.png"
+                                alt="Carasoft" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/ingram-logo.png" alt=
+                                "Ingram Micro" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/synnex-logo.png" alt=
+                                "Synnex" /></li>
+                              </ul>
+                            </div><!-- /.item -->
+
+                            <div class="item">
+                              <h3>Systems integrators</h3>
+
+                              <ul class="text">
+                                <li>Influence sale of Red Hat solutions</li>
+
+                                <li>Implement technology solutions for their
+                                customers</li>
+                              </ul>
+
+                              <h3>Our partners:</h3>
+
+                              <ul class="list-inline logos">
+                                <li><img src=
+                                "https://partnercenter.force.com/s/accenture-logo.png"
+                                alt="Accenture" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/csc-logo.png" alt=
+                                "CSC" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/deloitte-logo.png"
+                                alt="Deloitte" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/hp-logo.png" alt=
+                                "HP" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/tata-logo.png" alt=
+                                "Tata" /></li>
+                              </ul>
+                            </div><!-- /.item -->
+
+                            <div class="item">
+                              <h3>Strategic alliances</h3>
+
+                              <ul class="text">
+                                <li>Sell hardware servers with Red Hat software
+                                installed</li>
+
+                                <li>Extend Red Hat&#146;s brand in the market</li>
+                              </ul>
+
+                              <h3>Our partners:</h3>
+
+                              <ul class="list-inline logos">
+                                <li><img src=
+                                "https://partnercenter.force.com/s/amd-logo.png" alt=
+                                "AMD" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/cisco-logo.png" alt=
+                                "Cisco" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/dell-logo.png" alt=
+                                "Dell" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/fujitsu-logo.png" alt=
+                                "Fujitsu" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/hp-logo.png" alt=
+                                "HP" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/hitachi-logo.png" alt=
+                                "Hitachi" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/ibm-logo.png" alt=
+                                "IBM" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/intel-logo.png" alt=
+                                "Intel" /></li>
+                              </ul>
+                            </div><!-- /.item -->
+
+                            <div class="item">
+                              <h3>Solution providers</h3>
+
+                              <ul class="text">
+                                <li>Market and resell solutions</li>
+
+                                <li>Install and configure Red Hat products</li>
+                              </ul>
+
+                              <h3>Our partners:</h3>
+
+                              <ul class="list-inline logos">
+                                <li><img src=
+                                "https://partnercenter.force.com/s/computacenter-logo.png"
+                                alt="ComputaCenter" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/dltsolutions-logo.png"
+                                alt="DLT Solutions" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/mainline-logo.png"
+                                alt="Mainline Information Systems" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/shadowsoft-logo.png"
+                                alt="Shadow Soft" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/uniadex-logo.png" alt=
+                                "Uniadex" /></li>
+                              </ul>
+                            </div><!-- /.item -->
+
+                            <div class="item">
+                              <h3>Service provider</h3>
+
+                              <ul class="text">
+                                <li>Offer public clouds built on Red Hat
+                                technologies<br/>
+                                certified by Red Hat to be safe, scalable and
+                                supportable</li>
+                              </ul>
+
+                              <h3>Our partners:</h3>
+
+                              <ul class="list-inline logos">
+                                <li><img src=
+                                "https://partnercenter.force.com/s/aws-logo.png" alt=
+                                "Amazon Web Services" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/nttcomm-logo.png" alt=
+                                "NTT Communications" /></li>
+
+                                <li><img src=
+                                "https://partnercenter.force.com/s/savvis-logo.png" alt=
+                                "Savvis" /></li>
+                              </ul>
+                            </div><!-- /.item -->
+                          </div><!-- /.cycle-slideshow -->
+
+                          <div class="tile-close"></div>
+                        </div><!-- /.inner-tile -->
+                      </div><!-- /.back -->
+                    </div><!-- /.col-xs-6 -->
+                  </div><!-- /.row -->
+
+                  <div class="carousel-controls">
+                    <a class="left" title="Previous"><span class="sr-only">Previous</span></a> <a class="right ease" title="Next">Up next:<br/>
+                    <span>Leadership</span></a>
+                  </div><!-- /.carousel-controls -->
+                </div><!-- /.row -->
+              </div><!-- ./item-container /.container -->
+            </div><!-- /.item n3 -->
+
+            <div class="item n4">
+              <div class="item-container container">
+                <div class="row">
+                  <h2>Leadership</h2>
+
+                  <div class="row">
+                    <div class="col-xs-7">
+                      <blockquote>
+                        <p><span>&ldquo;</span> Red Hat established itself as a software
+                        provider more than 20 years ago. Since then, we&#146;ve become the
+                        world&#146;s leading provider of open source software solutions
+                        &ndash; counting more than 90% of the Fortune 500 as customers.
+                        When you partner with Red Hat, you&#146;re partnering with a leader in
+                        the IT space, capable of helping you bring the most innovative,
+                        reliable, and secure solutions to the
+                        enterprise.</p><cite><strong>Jim Whitehurst</strong>, President
+                        and CEO, RED HAT</cite>
+                      </blockquote>
+                    </div><!-- /.col-xs-7 -->
+
+                    <div class="col-xs-5"></div><!-- /.col-xs-5 -->
+                  </div><!-- /.row -->
+
+                  <div class="carousel-controls">
+                    <a class="left" title="Previous"><span class=
+                    "sr-only">Previous</span></a> <a class="right ease" title="Next">Go
+                    to<br />
+                    <span>Beginning</span></a>
+                  </div><!-- /.carousel-controls -->
+                </div><!-- /.row -->
+              </div><!-- ./.item-container /.container -->
+            </div>
+          </div><!-- /.carousel-inner -->
+        </div><!-- /.carousel /.slide -->
+      </section><!-- /.business-partners-band -->
+
+      <div class="explore-band has-tabs resell-partners">
+        <div class="tabs-container">
+          <div class="container">
+            <div class="row">
+              <h1>Resell partners</h1>
+
+              <ul class="tabs secondary">
+                <li class="active"><a href="#" rel="explore1-tab1">Solution providers</a></li>
+
+                <li><a href="#" rel="explore1-tab2">Corporate resellers</a></li>
+
+                <li><a href="#" rel="explore1-tab3">Distributors</a></li>
+              </ul><!-- /.tabs -->
+            </div><!-- /.row -->
+          </div><!-- /.container -->
+        </div><!-- /.tabs-container -->
+
+        <div class="container">
+          <div class="row">
+            <div class="content-wrap" id="explore1-tab1">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Solution providers</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <!--<div class="sub-head">Courses include value pitch, sales<br></br>qualification, competitive positioning,<br></br>objection handling and pricing.
+                        </div>-->
+
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Established technology</h3>
+
+                            <p>Open source technologies are mature and proven in the
+                            enterprise. For all your customer business challenges, Red
+                            Hat offers the full stack of available products.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Customer demand</h3>
+
+                            <p>Whether for the datacenter, cloud or big data, customers
+                            are looking for reliable, flexible and cost effective
+                            solutions. Red Hat has a proven track record of answering
+                            customer demand.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Profitable growth</h3>
+
+                            <p>Partners are the engine of growth for Red Hat. We invest
+                            in our partnership to succeed and build our collective
+                            future.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                          <li>Do you belong to a Red Hat solution provider company?<br />
+                          <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.RESELLER"
+                          class="btn ease">Get access to the partner portal</a></li>
+
+                          <li class="c3"><br />
+                          <br /></li>
+
+                          <li><a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=apply&program=PARTNER_TYPE.RESELLER"
+                          class="btn ease">Apply today</a></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+                        <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin porttitor sit amet urna vitae facilisis. Fusce ac viverra justo. </p>-->
+
+                        <h3>Solution provider program guides</h3>
+
+                        <ul class="list-unstyled">
+                          <li><a href=
+                          "https://partnercenter.force.com/s/programs_RH_solution_provider_APAC.pdf?v=1">
+                          Asia Pacific/Japan</a></li>
+
+                          <li><a href=
+                          "https://partnercenter.force.com/s/programs_RH_solution_provider_EMEA.pdf?v=1">
+                          Europe, Middle East and Africa</a></li>
+
+                          <li><a href=
+                          "https://partnercenter.force.com/s/programs_RH_solution_provider_NA.pdf?v=1">
+                          North America</a></li>
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.partner-module -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-3-up -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+            </div><!-- /.explore-tab1 -->
+
+            <div class="content-wrap" id="explore1-tab2">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Corporate resellers</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Accelerate sales</h3>
+
+                            <p>Achieve greater volumes with the Red Hat portfolio, to
+                            deliver an extensive offering of open source solutions to
+                            your end customers.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Competitive edge</h3>
+
+                            <p>Take advantage of an extensive array of product, sales,
+                            marketing, and technical tools to support your organization
+                            in penetrating new markets and expanding your footprint in
+                            hardware and software sales.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Trusted advisor</h3>
+
+                            <p>Help your customers choose the right solution for their
+                            needs by sharing your expertise of open source models,
+                            technology innovations, and industry approaches.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                          <li>Do you belong to a Red Hat corporate reseller
+                          company?<br />
+                          <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.CORPORATE_RESELLER"
+                          class="btn ease">Get access to the partner portal</a></li>
+
+                          <li class="c3"><br />
+                          <br /></li>
+
+                          <li><a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=apply&program=PARTNER_TYPE.CORPORATE_RESELLER"
+                          class="btn ease">Apply today</a></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3">
+                      <!--<div class="training-module">
+                      <h1>Resources</h1>
+                      <ul class="list-unstyled">
+                        <li><a href="#">Corporate reseller guide</a></li>
+                      </ul><!== /.list-unstyled -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-3-up -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+            <!-- /.training-track-band -->
+          </div><!-- /#explore-tab2 -->
+
+          <div class="content-wrap" id="explore1-tab3">
+            <div class="container">
+              <div class="row">
+                <div class="content-3up">
+                  <h1>Distributors</h1>
+
+                  <div class="col-xs-9">
+                    <div class="row">
+                      <div class="row">
+                        <div class="col-xs-4">
+                          <h3>Exponential growth</h3>
+
+                          <p>We invest in our partners and their businesses in order to
+                          grow our collective success. Close to 70% of Red Hat&#146;s business
+                          is driven through our partner ecosystem, which translates into
+                          steady return on your investment.</p>
+                        </div><!-- /.col-xs-4 -->
+
+                        <div class="col-xs-4">
+                          <h3>Business success</h3>
+
+                          <p>Growing and developing your market share has never been
+                          easier. Take advantage of not only a full range of solutions
+                          and support offerings to address your customers&#146; needs, but
+                          also specific program benefits like order management, rebates,
+                          and renewals.</p>
+                        </div><!-- /.col-xs-4 -->
+
+                        <div class="col-xs-4">
+                          <h3>Trusted portfolio</h3>
+
+                          <p>Both you and your customers can rely on the latest Red Hat
+                          technology, delivered with the expertise of the industry&#146;s
+                          leading open source provider. In addition, gain access to one
+                          of the largest technology certification ecosystems in the world
+                          to ensure top performance for all your business-critical
+                          applications.</p>
+                        </div><!-- /.col-xs-4 -->
+                      </div><!-- /.row -->
+
+                      <ul class="list-inline btn-container">
+                        <li>Do you belong to a Red Hat distributor company?<br />
+                        <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.DISTRIBUTOR"
+                        class="btn ease">Get access to the partner portal</a></li>
+
+                        <li class="c3"><br />
+                        <br /></li>
+                      </ul><!-- /.list-inline /.btn-container -->
+                    </div><!-- /.row -->
+                  </div><!-- /.col-xs-9 -->
+
+                  <div class="col-xs-3">
+                    <div class="training-module">
+                      <h1>Resources</h1>
+
+                      <ul class="list-unstyled">
+                        <li><a href=
+                        "https://partnercenter.force.com/s/programs_RH_disti_EMEA.pdf">
+                        Red Hat EMEA distributor guide</a></li>
+                      </ul><!-- /.list-unstyled -->
+                    </div><!-- /.partner-module -->
+                  </div><!-- /.col-xs-3 -->
+                </div><!-- /.content-wrap -->
+              </div><!-- /.row -->
+            </div><!-- /.container -->
+            <!-- /.training-track-band -->
+          </div><!-- /#explore-tab-3 -->
+        </div><!-- /.container -->
+      </div><!-- /.has-tabs -->
+      </div>
+
+      <div class="explore-band has-tabs service-providers">
+        <div class="tabs-container">
+          <div class="container">
+            <div class="row">
+              <h1>SERVICE PROVIDERS</h1>
+
+              <ul class="tabs secondary">
+                <li class="active"><a href="#" rel="explore2-tab1">CLOUD &amp; SERVICE PROVIDERS</a></li>
+
+                <li><a href="#" rel="explore2-tab2">Systems integrators</a></li>
+
+                <li><a href="#" rel="explore2-tab3">Training partners</a></li>
+              </ul><!-- /.tabs -->
+            </div><!-- /.row -->
+          </div><!-- /.container -->
+        </div><!-- /.tabs-container -->
+
+        <div class="container">
+          <div class="row">
+            <div class="content-wrap" id="explore2-tab1">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>CLOUD &amp; SERVICE PROVIDERS</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <!--<div class="sub-head">Courses include value pitch, sales<br></br>qualification, competitive positioning,<br> </br>objection handling and pricing.
+                        </div>-->
+
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Flexible model</h3>
+
+                            <p>The Red Hat Certified Cloud &amp; Service Providers program provides
+                            flexibility in both technology and benefits to eliminate
+                            expensive barriers to cloud development by providing subscription
+                            models built specifically for hosting and cloud environments.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Built for success</h3>
+
+                            <p>Qualified Certified Cloud &amp; Service Providers can offer Cloud Access, an unique
+                            offering that brings Red Hat product subscriptions to the cloud
+                            through an innovative licensing model and drives easy adoption
+                            for existing Red Hat customers.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Trusted solutions</h3>
+
+                            <p>By using Red Hat, your customers can run the same certified
+                            applications on either a public or private cloud or both, making
+                            application development, deployment, and management consistent
+                            across their entire infrastructure.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+                      </div>
+                    </div>
+                    <div class="col-xs-3">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+
+                        <h3>Red Hat CLOUD &amp; SERVICE PROVIDERS program</h3>
+
+                        <ul class="list-unstyled">
+                          <li><a href=
+                          "https://partnercenter.force.com/s/programs_RH_cloud_providers_global.pdf">
+                          Global program guide</a></li>
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.training-module -->
+                    </div><!-- /.col-xs-3 -->
+
+                    <div class="row">
+                      <div class="col-xs-12" style="margin-top:50px;">
+                      <p style="font-size: 14px;">Do you belong to a Red Hat certified cloud &amp; service provider company?</p>
+                        <ul class="list-inline btn-container" style="margin-top:0;">
+                        <li><a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.SERVICECLOUD_PROVIDER"
+                        class="btn ease">Get access to the partner portal</a></li>
+
+                          <li><a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=apply&program=PARTNER_TYPE.SERVICECLOUD_PROVIDER" class="btn ease">Apply today</a></li>
+
+                          <li><a href=
+                          "http://fte0-redhat.cs20.force.com/finder?program=PARTNER_TYPE.SERVICECLOUD_PROVIDER" class="btn ease">Find a partner</a></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                  </div><!-- /.content-wrap -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+              <!-- /.training-track-band -->
+            </div><!-- /#explore2-tab1 -->
+
+            <div class="content-wrap" id="explore2-tab2">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Systems integrators</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Enterprise credibility</h3>
+
+                            <p>As the world&#146;s most trusted provider of Linux&reg; and open
+                            source technologies, Red Hat supports bringing your customers&#146;
+                            open source strategies into production.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Training and accreditation</h3>
+
+                            <p>Red Hat offers a comprehensive suite of live and online
+                            training courses to empower consultants and architects with the
+                            knowledge and industry-recognized accreditations to build and
+                            implement open solutions.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Succeeding together</h3>
+
+                            <p>Leading global systems integrators and regional/specialized
+                            integrators have successfully partnered with Red Hat to exceed
+                            their customers&#146; expectations, with Red Hat-powered,
+                            industry-specific solutions and infrastructure
+                            implementations.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                          <li>Do you belong to a Red Hat global systems integrator
+                          company?<br />
+                          <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.SI"
+                          class="btn ease">Get access to the partner portal</a></li>
+
+                          <li class="c3"><br />
+                          <br /></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3 c1">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+
+                        <ul class="list-unstyled">
+                          <li><a href="#"></a></li>
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.partner-module -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-wrap -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+              <!-- /.training-track-band -->
+            </div><!-- /.explore2-tab2 -->
+
+            <div class="content-wrap" id="explore2-tab3">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Training partners</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Opportunities for success</h3>
+
+                            <p>As Red Hat grows, the number of trained professionals to
+                            administer our products grows, making now a great opportunity to
+                            resell our training offerings.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Red Hat Training</h3>
+
+                            <p>Red Hat delivers one of the most comprehensive curricula
+                            offered in today&rsquo;s marketplace. Unlike most vendors, we
+                            orient our training and certifications around real-world job
+                            roles and tasks.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Red Hat Certification</h3>
+
+                            <p>Red Hat&rsquo;s performance-based certifications are among the
+                            most highly regarded in the IT industry. This success stems from
+                            a solid track record of benchmarking and hands-on skills
+                            assessment.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                          <li>Do you belong to a Red Hat training partner company?<br />
+                          <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.TRAINING"
+                          class="btn ease">Get access to the partner portal</a></li>
+
+                          <li class="c3"><br />
+                          <br /></li>
+
+                          <li><a href="mailto:training_partner@redhat.com" class=
+                          "btn ease">Inquire about becoming a training partner</a></li>
+
+                          <li class="c3"><br /></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+
+                        <ul class="list-unstyled">
+                          <li><a href="http://redhat.com/training" target="_blank">Red Hat
+                          Training and Certification</a></li>
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.partner-module -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-wrap -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+              <!-- /.training-track-band -->
+            </div><!-- /.explore2-tab3 -->
+          </div><!-- /.row -->
+        </div><!-- /.container -->
+      </div><!-- /.has-tabs -->
+
+      <div class="explore-band has-tabs tech-partners">
+        <div class="tabs-container">
+          <div class="container">
+            <div class="row">
+              <h1>TECHNOLOGY BUSINESS PARTNERS</h1>
+
+              <ul class="tabs secondary">
+                <li class="active"><a href="#" rel="explore3-tab1">Independent Software
+                Vendors</a></li>
+
+                <li><a href="#" rel="explore3-tab2">Embedded</a></li>
+
+                <li><a href="#" rel="explore3-tab3">Alliances</a></li>
+              </ul><!-- /.tabs -->
+            </div><!-- /.row -->
+          </div><!-- /.container -->
+        </div><!-- /.tabs-container -->
+
+        <div class="container">
+          <div class="row">
+            <div class="content-wrap" id="explore3-tab1">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Independent software vendors</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Business growth</h3>
+
+                            <p>Team with an industry leader who can help build your business
+                            with customer-driven technologies, while helping you expand into
+                            new markets. Choose the go-to-market strategy that best meets
+                            your specific business model and market execution plans.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Market success</h3>
+
+                            <p>Our programs help you promote your solutions so you can
+                            generate more leads and drive sales. We offer training and
+                            support resources to help you enhance your products, plan your
+                            business, and improve customer satisfaction.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Customer value</h3>
+
+                            <p>Red Hat offers flexible integration and distribution options.
+                            By adopting Red Hat products as part of your application stack,
+                            you can reduce your customers&rsquo; costs for proprietary
+                            operating system, middleware, and other solution components.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                          <li>Do you belong to a Red Hat independent software vendor
+                          company?<br />
+                          <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.ISV"
+                          class="btn ease">Get access to the partner portal</a></li>
+
+                          <li class="c3"><br />
+                          <br /></li>
+
+                          <li><a href=
+                         "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=apply&program=PARTNER_TYPE.ISV"
+                          class="btn ease">Apply today</a></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+
+                        <ul class="list-unstyled">
+                          <li><a href=
+                          "https://partnercenter.force.com/s/programs_RH_ISV_global.pdf?v=1">Global
+                          ISV program guide</a></li>
+
+                          <li><a href=
+                          "http://partnercenter.force.comhttps://partnercenter.force.com/s/programs_RH_ISV_EMEA.pdf">
+                          EMEA ISV program guide</a></li>
+                          <!--<li><a href="#">Explore Red Hat Programs for Technology Companies</a></li>-->
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.partner-module -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-wrap -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+              <!-- /.training-track-band -->
+            </div><!-- /.explore3-tab1 -->
+
+            <div class="content-wrap" id="explore3-tab2">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Embedded</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Established technology</h3>
+
+                            <p>Red Hat technologies layer on top of the platform to provide
+                            messaging, data
+                            s, and storage solutions that are
+                            certified to work together and supported by the industry leader
+                            in enterprise-class support services. Red Hat is the only open
+                            source technology company that provides an end-to-end solution
+                            for intelligent systems&mdash;from the embedded device to the
+                            datacenter to the cloud&mdash;all using a common
+                            architecture.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Trusted partnership</h3>
+
+                            <p>Through the Red Hat Embedded Program, you benefit from a
+                            stable partnership that offers individualized business terms,
+                            flexible distribution rights, and partner resources so you can
+                            bring higher-revenue products to market. The Red Hat Embedded
+                            Program offers both the technology and support you need to
+                            compete in this market.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Faster time to market</h3>
+
+                            <p>The Red Hat Embedded Program allows you to maintain control of
+                            your relationship with the customer while taking advantage of the
+                            innovative technology and cost benefits of Red Hat solutions. You
+                            can focus on adding strategic business value and bringing
+                            solutions to market faster while Red Hat focuses on the
+                            underlying technology.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                            <p style="font-size: 14px;">{!$Label.Embedded_Join_Question}</p>
+                            <li><a href=
+                                "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=Embedded"
+                                class="btn ease">Get access to the partner portal</a></li>
+                          <li><a href=
+                         "https://webjava-it-sales.devlab.redhat.com/wapps/sfconnector/protected/partner.html?action=apply&program=Embedded"
+                          class="btn ease">Apply today</a></li>
+                          <li><a href="http://redhat.com/embedded" target="_blank" class=
+                          "btn ease">Learn More</a></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+
+                        <ul class="list-unstyled">
+                          <li><a href=
+                          "https://partnercenter.force.com/s/programs_RH_embedded_brief.pdf?v=1">
+                          Red Hat Embedded Program executive brief</a></li>
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.partner-module -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-wrap -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+              <!-- /.training-track-band -->
+            </div><!-- /.explore3-tab2 -->
+
+            <div class="content-wrap" id="explore3-tab3">
+              <div class="container">
+                <div class="row">
+                  <div class="content-3up">
+                    <h1>Strategic alliances</h1>
+
+                    <div class="col-xs-9">
+                      <div class="row">
+                        <div class="row">
+                          <div class="col-xs-4">
+                            <h3>Strong foundation</h3>
+
+                            <p>Together with our strategic alliance partners, we align our
+                            technology and organizational initiatives to solve our customer&#146;s
+                            most challenging business needs with flexible and scalable
+                            solutions.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Long-term commitment</h3>
+
+                            <p>Red Hat and global alliance partners continue to co-invest in
+                            joint technology roadmaps, integrate their hardware and software,
+                            support their products running on each others platforms, and go
+                            to market together.</p>
+                          </div><!-- /.col-xs-4 -->
+
+                          <div class="col-xs-4">
+                            <h3>Continuous innovation</h3>
+
+                            <p>Whether it&#146;s around OpenStack or big data innovations, Red Hat
+                            and our strategic alliances are on the cutting edge of
+                            technology, delivering unparalleled solutions to the
+                            marketplace.</p>
+                          </div><!-- /.col-xs-4 -->
+                        </div><!-- /.row -->
+
+                        <ul class="list-inline btn-container">
+                          <li>Do you belong to a Red Hat strategic alliance partner
+                          company?<br />
+                          <a href=
+                          "{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/partner.html?action=join&program=PARTNER_TYPE.OEM"
+                          class="btn ease">Get access to the partner portal</a></li>
+
+                          <li class="c3"><br />
+                          <br /></li>
+                        </ul><!-- /.list-inline /.btn-container -->
+                      </div><!-- /.row -->
+                    </div><!-- /.col-xs-9 -->
+
+                    <div class="col-xs-3">
+                      <div class="training-module">
+                        <h1>Resources</h1>
+
+                        <ul class="list-unstyled">
+                          <li><a href="http://www.redhat.com/partners/become/alliances/">Read
+                          more about Red Hat alliances</a></li>
+                        </ul><!-- /.list-unstyled -->
+                      </div><!-- /.partner-module -->
+                    </div><!-- /.col-xs-3 -->
+                  </div><!-- /.content-wrap -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+              <!-- /.training-track-band -->
+            </div><!-- /.explore3-tab3 -->
+          </div><!-- /.row -->
+        </div><!-- /.container -->
+      </div><!-- /.has-tabs -->
+
+
+      <section class="insights-band">
+        <div class="container">
+          <div class="row">
+            <h1>Insights and ideas</h1>
+
+            <div class="row content-box-3up">
+              <div class="col-xs-4">
+                <div class="box">
+                  <div class="img-container">
+                    <h2><a href="http://design.avnet.com/axiom/10-things-every-intelligent-system-needs/" target="_blank">Collect, transform and act upon critical data</a></h2>
+                    <img alt='big-data.jpg' src='https://partnercenter.force.com/s/big-data.jpg?v=4' />
+                  </div><!-- /.img-container -->
+                </div>
+                <div class="text-container">
+                  <h3>INTERNET OF THINGS</h3>
+
+                  <p>From sensors and gateways to controllers and enterprise applications, learn
+                  more about Red Hat technology and market opportunities in the Internet of
+                  Things.</p>
+                </div>
+              </div><!-- /. col-xs-4 -->
+
+              <div class="col-xs-4">
+                <div class="box">
+                  <div class="img-container">
+                    <h2><a href="http://www.redhat.com/promo/opencloud/blog/" target="_blank">Red Hat open cloud blogs</a></h2><img alt='real-time.jpg' src= 'https://partnercenter.force.com/s/real-time.jpg?v=3' />
+                  </div><!-- /.img-container -->
+                </div>
+                <div class="text-container">
+                  <h3>OPEN HYBRID CLOUD</h3>
+
+                  <p>Several Red Hatters are demystifying cloud by discussing the work they&#146;re
+                  doing in their personal blogs. Join in the conversation!</p>
+                </div><!-- /.text-container -->
+              </div><!-- /.col-xs-4 -->
+
+              <div class="col-xs-4">
+                <div class="box">
+                  <div class="img-container">
+                    <h2><a href="http://opensource.com" target="_blank">Discover an open source world</a></h2>
+                    <img alt='social.jpg' src='https://partnercenter.force.com/s/social.jpg?v=2' />
+                  </div>
+                </div>
+                <div class="text-container">
+                  <h3>OPEN SOURCE</h3>
+
+                  <p>opensource.com is an online publication focused on how open source is applied to different areas including business, education, government, health, law and other disciplines of life.</p>
+                </div><!-- /.text-container -->
+              </div><!-- /.img-container -->
+            </div><!-- /.col-xs-4 -->
+          </div><!-- /.row .content-box-3up -->
+        </div><!-- /.container -->
+      </section><!-- /.insights-band -->
+    </div>
+  </div>
+</body>
+
+<style>
+    .red-hat-content .c2{
+      display: none;
+    }
+</style>
+  <script type="text/javascript" src="https://partnercenter.force.com/s/jquery.cycle2.min.js"></script>
+
+
+  <link rel="stylesheet" href="https://partnercenter.force.com/s/programs-header-change.css" />
+  <script type="text/javascript" src="https://partnercenter.force.com/s/programsPage.js"></script>
+
+</apex:page>

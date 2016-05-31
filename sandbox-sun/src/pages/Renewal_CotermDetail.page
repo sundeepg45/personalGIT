@@ -1,0 +1,44 @@
+<apex:page controller="Renewal_CotermDetailController" tabStyle="Opportunity">
+	<apex:form id="frm">
+	
+		<apex:pageMessages />
+		<apex:pageBlock title="Renewal Opportunity" mode="detail">
+			
+			<apex:pageBlockSection title="Opportunity Detail" columns="2">
+				<apex:outputField value="{!sourceOpportunity.Name}"/>
+				<apex:outputField value="{!sourceOpportunity.OpportunityNumber__c}"/>
+				<apex:outputField value="{!sourceOpportunity.Account.Name}"/>
+				<apex:outputField value="{!sourceOpportunity.Account.OracleAccountNumber__c}"/>
+				<apex:outputField value="{!sourceOpportunity.CloseDate}"/>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+
+		<apex:pageBlock title="Expiring Products" rendered="{!if ((sourceOpportunity.Expiring_Products__r.size = 0), false, true)}">
+			<apex:pageBlockTable value="{!sourceOpportunity.Expiring_Products__r}" var="expiringProduct">
+				<apex:column value="{!expiringProduct.Name}"/>
+				<apex:column value="{!expiringProduct.Product_Code__c}"/>
+				<apex:column value="{!expiringProduct.Quantity__c}"/>
+				<apex:column value="{!expiringProduct.Sales_Price__c}"/>
+				<apex:column headerValue="Total Price">
+					<c:OutputCurrency isoCode="{!expiringProduct.CurrencyISOCode}" value="{!expiringProduct.Total_Price_Formula__c}"/>
+				</apex:column>
+				<apex:column value="{!expiringProduct.Expiring_Product_Start_Date__c}"/>
+				<apex:column value="{!expiringProduct.Expiring_Product_End_Date__c}"/>
+				<apex:column value="{!expiringProduct.Expiring_Contract_Number__c}"/>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+		
+		<apex:pageBlock title="Products" rendered="{!if ((sourceOpportunity.opportunityLineItems.size = 0), false, true)}">
+			<apex:pageBlockTable value="{!sourceOpportunity.opportunityLineItems}" var="product">
+				<apex:column value="{!product.PricebookEntry.Name}"/>
+				<apex:column value="{!product.Description}" width="25%"/>
+				<apex:column value="{!product.Quantity}"/>
+				<apex:column value="{!product.PricebookEntry.ProductCode}"/>
+				<apex:column value="{!product.Configured_SKU__c}"/>
+				<apex:column value="{!product.UnitPrice}"/>
+				<apex:column value="{!product.TotalPrice}"/>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+		
+	</apex:form> 
+</apex:page>

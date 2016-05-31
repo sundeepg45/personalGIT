@@ -1,0 +1,73 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+ <apex:page id="pgId" controller="refedge.ReminderActionController" sidebar="false" tabStyle="refedge__Hit_List__c">
+    <c:POR_ModalLoader id="PORLoader"/>
+    <script>
+        function calen(curObj){
+            DatePicker.pickDate(true, "pgId:frmId:pbId:SectionId:SectionItemId:dateId", false);
+            jQuery('.datePicker').removeAttr('style');
+            var l = Math.ceil((jQuery(curObj).offset()).left) - 10;
+            var r = Math.ceil((jQuery(curObj).offset()).top) - 90;
+            jQuery('.datePicker').css('display','block').css('left',l+'px').css('top',r+'px');
+        }
+    </script>
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <apex:pageMessages id="msgId"/>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="frmId"  rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:sectionHeader title="{!$Label.Hit_List_Reminder}" subtitle="{!$Label.Set_Reminder_for_Hit_List_Item}"/>
+        <apex:pageBlock id="pbId" mode="Edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}" action="{!saveTask}" rerender="msgId"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.Account_Contact_Information}" id="accConId" rendered="{!hitListObject != null}">
+                <apex:outputField value="{!hitListObject.refedge__Account__c}"/>
+                <apex:outputField value="{!hitListObject.refedge__Contact__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="{!$Label.Reminder_Date_Time}" id="SectionId">
+                <apex:pageBlockSectionItem id="SectionItemId">
+                        <apex:outputLabel value="{!$Label.Date}"/>
+                        <apex:outputPanel id="panelId">
+                            <div class="requiredInput">
+                                <div class="requiredBlock"></div>
+                            <apex:inputtext label="Date" required="true" id="dateId" onclick="calen(this); return false;" value="{!reminderDate}"/>
+                            </div>
+                        </apex:outputPanel>
+                 </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem id="SectionItem1Id">
+                    <apex:outPutLabel value="{!$Label.Time}"/>
+                        <apex:selectList size="1" value="{!timeSelected}" id="selectTime" >
+                            <apex:selectOptions value="{!reminderTime}"/> 
+                        </apex:selectList>
+                 </apex:pageBlockSectionItem>
+                 <apex:inputField required="true" value="{!taskObject.Subject}"/>
+                 <apex:inputField value="{!taskObject.Description}" style="width: 356px;height: 100px;"/>
+                 <apex:inputCheckbox value="{!sendEmail}" label="{!$Label.Send_Notification_Email}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

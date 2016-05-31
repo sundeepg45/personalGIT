@@ -1,0 +1,7 @@
+<apex:component controller="EmailConfirmationURLController" access="global" >
+	<apex:attribute name="userid" description="" type="String" required="false" assignTo="{!userid}"/>
+	<apex:attribute name="email" description="" type="String" required="false" assignTo="{!email}"/>
+	<apex:attribute name="linktext" description="visual part of link" type="String" required="false"/>
+
+	<a href="{!emailConfirmationUrl}">{!linktext}</a>
+</apex:component>

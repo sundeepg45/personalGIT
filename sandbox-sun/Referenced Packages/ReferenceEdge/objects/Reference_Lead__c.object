@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>Custom Object to track Leads for the Reference Program(Bound 8)</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Contact__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Contact</label>
+        <referenceTo>Contact</referenceTo>
+        <relationshipLabel>Reference Leads</relationshipLabel>
+        <relationshipName>Reference_Leads</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Follow_Up_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Follow Up Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Follow_Up_Timeframe__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Follow Up Timeframe</label>
+        <picklist>
+            <picklistValues>
+                <fullName>7 days</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>14 days</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>30 days</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>90 days</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Initial_Notification_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates the date that the FIRST notification was sent to the Reference Lead Owner</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the date that the FIRST notification was sent to the Reference Lead Owner</inlineHelpText>
+        <label>Initial Notification Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Initial_Notification_Sent__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that the FIRST notification was sent to the Reference Lead Owner</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates that the FIRST notification was sent to the Reference Lead Owner</inlineHelpText>
+        <label>Initial Notification Sent</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>No_Response_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates when to set the Reference Lead status to No Response.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates when to set the Reference Lead status to No Response.</inlineHelpText>
+        <label>No Response Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Nominated__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Nominated</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Nomination__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Indicates the Nomination that was created when this lead was converted to a Nomination</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the Nomination that was created when this lead was converted to a Nomination</inlineHelpText>
+        <label>Nomination</label>
+        <referenceTo>Nomination__c</referenceTo>
+        <relationshipLabel>Reference Leads</relationshipLabel>
+        <relationshipName>Reference_Leads</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Notification_Response__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates the response submitted from the VF page.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the response submitted from the VF page.</inlineHelpText>
+        <label>Notification Response</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Yes, this is a very happy account</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Check back with me later</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>I don’t know, I’m not the right person to ask</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Opportunity_Owner__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Opportunity Owner</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>Reference_Leads1</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Other_Info__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Comments</label>
+        <length>32768</length>
+        <trackTrending>false</trackTrending>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
+        <fullName>Reference_Lead_Account__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Reference Lead Account</label>
+        <referenceTo>Account</referenceTo>
+        <relationshipLabel>Reference Leads</relationshipLabel>
+        <relationshipName>Reference_Leads</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Lead_Opportunity__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Reference Lead Opportunity</label>
+        <referenceTo>Opportunity</referenceTo>
+        <relationshipLabel>Reference Leads</relationshipLabel>
+        <relationshipName>Reference_Leads</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Lead_Owner__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>This is typically the Opportunity Owner but could be replaced with another name if the Opportunity Owner is no longer the correct contact</description>
+        <externalId>false</externalId>
+        <inlineHelpText>This is typically the Opportunity Owner but could be replaced with another name if the Opportunity Owner is no longer the correct contact</inlineHelpText>
+        <label>Reference Lead Owner</label>
+        <referenceTo>User</referenceTo>
+        <relationshipName>Reference_Leads</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Lead_Status__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Indicates where this Reference Lead is in the process</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates where this Reference Lead is in the process</inlineHelpText>
+        <label>Reference Lead Status</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Initial notification sent</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Follow up</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Converted to Nomination</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Converted to Program Member</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>No response</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Profile__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>Indicates the Reference Profile that was created when this lead was converted to a Reference Program Member</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the Reference Profile that was created when this lead was converted to a Reference Program Member</inlineHelpText>
+        <label>Reference Profile</label>
+        <referenceTo>Reference_Basic_Information__c</referenceTo>
+        <relationshipLabel>Reference Leads</relationshipLabel>
+        <relationshipName>Reference_Leads</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Reference_Program_Member__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that this lead was converted to a Reference Program Member</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates that this lead was converted to a Reference Program Member</inlineHelpText>
+        <label>Reference Program Member</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Reminder_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates the date that the reminder notification will be sent to the Reference Lead Owner.</inlineHelpText>
+        <label>Reminder Date</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Date</type>
+    </fields>
+    <fields>
+        <fullName>Response_Received__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Indicates that a response of some kind has been submitted from the VF page</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Indicates that a response of some kind has been submitted from the VF page</inlineHelpText>
+        <label>Response Received</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <label>Reference Lead</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>NAME</columns>
+        <columns>Reference_Lead_Account__c</columns>
+        <columns>Reference_Lead_Opportunity__c</columns>
+        <columns>Opportunity_Owner__c</columns>
+        <columns>Reference_Lead_Status__c</columns>
+        <columns>Follow_Up_Date__c</columns>
+        <columns>Nomination__c</columns>
+        <columns>Reference_Profile__c</columns>
+        <columns>Reference_Program_Member__c</columns>
+        <columns>Contact__c</columns>
+        <columns>UPDATEDBY_USER</columns>
+        <columns>Response_Received__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+    </listViews>
+    <nameField>
+        <displayFormat>RL-{0000}</displayFormat>
+        <label>Name</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Reference Leads</pluralLabel>
+    <searchLayouts>
+        <customTabListAdditionalFields>Reference_Lead_Account__c</customTabListAdditionalFields>
+        <customTabListAdditionalFields>Reference_Lead_Status__c</customTabListAdditionalFields>
+    </searchLayouts>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

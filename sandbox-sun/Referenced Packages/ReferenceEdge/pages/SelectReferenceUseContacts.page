@@ -1,0 +1,729 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Reference_Request_Account__c" extensions="refedge.SelectRefUseContactsController" id="pageId" sidebar="false">
+    
+    <!-- Add Component for Desktop Components-->
+    <apex:outputPanel rendered="{!!isSF1}">
+        <c:POR_ModalLoader id="PORLoader"/>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!isSF1}">
+        <c:SF1_POR_ModalLoader id="SF1PORLoader"/>
+    </apex:outputPanel>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            if(document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_0_title_ileinner') != null){
+                PORHideLoading();
+            }
+            else{
+                updateInlineEditingValue(true);
+            }
+        });
+    </script>
+    
+    <apex:outputPanel id="scriptPanel">
+        <script>
+            function approved(){
+                var isRadioSelected=false;
+                var answer;
+                var updateContact = false; 
+                var email = '';
+                var phone = '';
+                var count=0;
+                var title = '';
+                var hasError = false;
+                var conId = '';
+                var inlineModified=false;
+                if(jQuery('input:radio').length == 0)
+                    isRadioSelected = true;
+                else{
+                    jQuery('input:radio').each(function() {
+                          if(jQuery(this).is(':checked')) {
+                               conId = document.getElementById('pageId:formId:refUsePbId:reqResponseId:pbtContact:'+count+':conId').value;
+                               if({!isInlineEditingDisabled}){
+                                    email = document.getElementById('pageId:formId:refUsePbId:reqResponseId:pbtContact:'+count+':emailFieldEdit').value;
+                                    if(email == ''){
+                                        alert('{!$Label.EmailFilledValidation}');
+                                        hasError = true;
+                                    }
+                                    phone = document.getElementById('pageId:formId:refUsePbId:reqResponseId:pbtContact:'+count+':phoneIdEdit').value;
+                                    if(phone == ''){
+                                        alert('{!$Label.PhoneFilledValidation}');
+                                        hasError = true;
+                                    }
+                                    title = document.getElementById('pageId:formId:refUsePbId:reqResponseId:pbtContact:'+count+':titleEdit').value;
+                                    inlineModified = true;
+                               }
+                                else{
+                                    if(document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_'+count+'_emailField') != null){
+                                        email = document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_'+count+'_emailField').value;
+                                        if(email == ''){
+                                            alert('{!$Label.EmailFilledValidation}');
+                                            hasError = true;
+                                        }
+                                        inlineModified = true;
+                                    }
+                                    if(document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_'+count+'_phoneId') != null){
+                                        phone = document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_'+count+'_phoneId').value;
+                                        if(phone == ''){
+                                            alert('{!$Label.PhoneFilledValidation}');
+                                            hasError = true;
+                                        }
+                                        inlineModified = true;
+                                        
+                                    }
+                                    if(document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_'+count+'_title') != null){
+                                        title = document.getElementById('pageId_formId_refUsePbId_reqResponseId_pbtContact_'+count+'_title').value;
+                                    }
+                               }
+                                isRadioSelected = true;
+                          }
+                          count++; 
+                    });
+                }
+                if(!isRadioSelected && !{!approveWithoutContact}){
+                    alert('{!$Label.Select_One_Contact}');
+                    return false;
+                }
+                if((jQuery('.inlineEditModified').length > 0 || inlineModified) && !hasError){
+                    updateContact = confirm('{!$Label.Temporary_changes_contact_Details}');
+                }
+                
+                if(isRadioSelected && !hasError && conId != null && conId != ''){
+                    answer = confirm('{!$Label.Approval_Confirmation}');
+                }
+                else if(!{!approveWithoutContact}){
+                    alert('{!$Label.select_Referenceable_Contact}');
+                    return false;
+                }
+                else if({!approveWithoutContact}){
+                    answer = true;
+                }
+                if(answer && updateContact && !hasError){
+                    approvedRequest(conId,true,email,phone,title);
+                }
+                else if(answer && !updateContact && !hasError){
+                    approvedRequest(conId,false);
+                }
+            }
+            
+            function declined(){
+                var answer = confirm('{!$Label.Decline_Confirmation}'); 
+                if(answer){
+                    declineRequest();
+                }
+            }
+            function checkForApprovedDecline(){
+                var approve = false;
+                var contactId,email,phone,isActive,isInactive,isNoProgramMember,elementId,radioCount,initialContactype,hasError,isRadioSelected,answer;
+                jQuery('input:radio[name=radioButton]').each(function(){
+                    if(jQuery(this).is(':checked')){
+                        if(jQuery(this).val() == 'Approve')
+                            approve = true;
+                    }
+                });
+                if(approve){
+                    contactId = '';
+                    email = '';
+                    phone = '';
+                    isActive = false;
+                    isInactive = false;
+                    isNoProgramMember = false;
+                    radioCount = 0;
+                    hasError = false;
+                    isRadioSelected = false;
+                    answer = false;
+                    if(jQuery('input:radio[name=radioButton1]').length == 0)
+                        isRadioSelected = true;
+                    jQuery('input:radio[name=radioButton1]').each(function(){
+                        if(jQuery(this).is(':checked')){
+                            isRadioSelected = true;
+                            isActive = true;
+                            //elementId = 'pageId_formId_pbtContact'+radioCount+':'
+                            contactId =jQuery(this).val();
+                            email = document.getElementById('pageId:formId:pbtContact:'+radioCount+':email').value;
+                            if(email == ''){
+                                alert('{!$Label.EmailFilledValidation}');
+                                hasError = true;
+                            }
+                            phone = document.getElementById('pageId:formId:pbtContact:'+radioCount+':phone').value;
+                            if(phone == ''){
+                                alert('{!$Label.PhoneFilledValidation}');
+                                hasError = true;
+                            }
+                        }
+                        ++radioCount;
+                    });
+                    if(!isRadioSelected){
+                        alert('{!$Label.Select_One_Contact}'); 
+                        return false;
+                    }
+                    if(isRadioSelected && !hasError && contactId != ''){
+                        answer = confirm('{!$Label.Approval_Confirmation}');
+                    }   
+                    else{
+                        alert('{!$Label.Select_One_Contact}'); 
+                        return false;
+                    }
+                    if(answer && !hasError){
+                        PORShowLoading();
+                        SF1ApproveRequest(contactId,email,phone);
+                    }
+                    
+                    
+                }
+                if(!approve){
+                    var answer = confirm('{!$Label.Decline_Confirmation}'); 
+                    if(answer){
+                        //declineRequest();
+                        PORShowLoading();
+                        SF1declineRequest();
+                    }
+                }
+            }
+            function assignContactJs(conId){
+                if({!isInlineEditingDisabled})
+                    assignContactId(conId);
+                else
+                    assignContactId2(conId);
+            }
+        </script>
+    </apex:outputPanel>
+    <style type="text/css">
+      .inlineEditModified {
+          color: red;
+          font-weight: bold;
+      }
+      .pbSubheader{
+          background-image : none !important;
+          color: white  !important;
+      }
+        body .bPageBlock .pbBody .pbSubheader{
+            color: white  !important;
+        }
+        .requiredLegend{
+            color: white !important;
+        }
+      body .bPageBlock .pbBody .pbSubheader h3, body .bWizardBlock .bPageBlock .pbBody .pbSubheader label{
+          color:white !important;
+      }
+    </style>
+    <apex:outputPanel id="sf1Script" rendered="{!isSF1}">
+    <style>
+        .center{
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+            background-color: #f0f1f2;
+            -webkit-box-flex: 1;
+        }
+        .labelCol1{
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            display: block;
+            word-wrap: break-word;
+            float: left;
+            width:100%;
+            
+            
+        }
+        .labelColLarge{
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            display: block;
+            word-wrap: break-word;
+        }
+        .dataCol{
+            font-size: 15px;
+            color: #3c3d3e;
+            font-weight: normal;
+            min-height: 20px;
+            word-wrap: break-word;
+        }
+        .child1{
+            padding:10px;
+            width:80%;
+            float:left;
+        }
+        .sf1input, .sf1textarea {
+           width:100%;
+           font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+           font-size: 15px;
+           color: #3c3d3e;
+           padding: 7px 14px;
+           line-height: 25px;
+           border: 1px solid #cfd0d2;
+           border-radius: 5px;
+           background-color: #e8eaeb;
+           box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+           box-sizing: border-box;
+           resize: vertical;
+           -webkit-appearance: none;
+           height: 80px;
+           -webkit-user-drag: none;
+           -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+        
+        .sf1input:focus, .sf1textarea:focus {
+           border: 1px solid #bbc0c4;
+           background-color: #fff;
+           outline-style: none;
+        }
+        .container{
+            width:100%;
+            float:left;
+            overflow-x:hidden;
+        }
+        .child2{
+            background-color: rgba(252, 252, 252, 0.95);
+            border: 1px solid #bbc0c4;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            padding:10px;
+            width:100%;
+            float:left;
+        }
+        .requiredField{
+            padding-left: 2px;
+            color: #BD230E;
+            font-family: 'ProximaNovaSoft-Bold';
+        }
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        a{
+            color: #0e7abd;
+            text-decoration: none;
+        }
+        .sf1button {
+        font-size: 16px;
+        color: #44596c;
+        text-shadow: none;
+        margin: 0;
+        padding: 4px 14px;
+        height: 35px;
+        font-size: 16px;
+        font-family: 'ProximaNovaSoft-Semibold';
+        font-weight: normal;
+        border: 1px solid #bbc0c4;
+        border-radius: 5px;
+        background: -moz-linear-gradient(#ffffff,#f1f1f1);
+        background: -webkit-linear-gradient(#ffffff,#f1f1f1);
+        background: -ms-linear-gradient(#ffffff,#f1f1f1);
+        background: linear-gradient(#ffffff,#f1f1f1);
+        box-shadow: none;
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .sf1Button .label{
+            font-size: 16px;
+            color: #44596c;
+            text-shadow: none;
+            cursor: pointer;
+            font-family: 'ProximaNovaSoft-Semibold';
+            display: inline-block;
+        }
+      .sf1OutputLabel{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    </style>
+    <script>
+        function redirectToFeedPage(){
+            if({!!hasError})
+                sforce.one.navigateToURL('/_ui/core/chatter/ui/ChatterPage');
+            else
+                PORHideLoading();
+        }
+        //alert({!hasError});
+    </script>
+    </apex:outputPanel>
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="updateInlineEditingValue" rerender="formId,scriptPanel" onComplete="PORHideLoading();">
+            <apex:param name="isInlineEditingDisabled" assignTo="{!isInlineEditingDisabled}" value=""/>
+        </apex:actionFunction>
+        <apex:pageBlock title="{!$Label.Request_Approval_Decline}" rendered="{!isRecordDeleted}">
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Record_Deleted}"/>
+            <apex:outputPanel rendered="{!!isSF1}">
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="{!$Label.Request_Approval_Decline}" rendered="{!AND(isProcessed, NOT(isRecordDeleted))}" >
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Approve_Decline_already}"/>
+            <apex:outputPanel rendered="{!!isSF1}">
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="{!$Label.Request_Approval_Decline}" rendered="{!AND(NOT(isRecordDeleted),chkManagedRequest)}" >
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.NO_NEED_TO_RESPOND}"/>
+            <apex:outputPanel rendered="{!!isSF1}">
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:pageBlock title="{!$Label.Request_Approval_Decline}" rendered="{!AND(refReqAccount.refedge__Account_Request_Status__c = 'Unavailable', NOT(isRecordDeleted))}" >
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.REQUEST_EXPIRED_NO_NEED_TO_RESPOND}"/>
+            <apex:outputPanel rendered="{!!isSF1}">
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        
+        <apex:pageBlock title="{!$Label.Request_Approval_Decline}" rendered="{!!showPage}" >
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Incorrect_Owner}"/>
+           <apex:outputPanel rendered="{!!isSF1}">
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:outputPanel rendered="{!!isSF1}">
+            <apex:pageBlock title="{!$Label.Request_Approval_Decline}" id="refUsePbId" rendered="{!AND(NOT(isProcessed), NOT(isRecordDeleted),showPage,NOT(chkManagedRequest),NOT(refReqAccount.refedge__Account_Request_Status__c = 'Unavailable'))}" mode="Edit">
+                <apex:actionFunction name="approvedRequest" action="{!approve}" reRender="pgmsgId">
+                    <apex:param name="contactIdParam" value=""  assignTo="{!selectedContactId}"/>
+                    <apex:param name="updateContact" value=""  assignTo="{!isUpdateContact}"/>
+                    <apex:param name="email" assignTo="{!ContactEmail}" value=""/>
+                    <apex:param name="phone" assignTo="{!ContactPhone}" value=""/>
+                    <apex:param name="title" assignTo="{!ContactTitle}" value=""/>
+                </apex:actionFunction>
+                <apex:actionFunction name="declineRequest" action="{!decline}" reRender="pgmsgId"/>
+                <apex:actionFunction name="assignContactId" reRender="reqDetailId,emailColumn,phoneColumn, titleId,pbbId, pgmsgId,scriptPanel2" oncomplete="PORHideLoading();">
+                    <apex:param name="contactIdParam" value=""  assignTo="{!selectedContactId}"/>
+                    <apex:param name="isEditParam" value="true"  assignTo="{!isEdit}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="assignContactId2" reRender="reqDetailId,pbbId, pgmsgId,scriptPanel2" oncomplete="PORHideLoading();">
+                    <apex:param name="contactIdParam" value=""  assignTo="{!selectedContactId}"/>
+                    <apex:param name="isEditParam" value="true"  assignTo="{!isEdit}"/>
+                </apex:actionFunction>
+                
+                <apex:pageBlockSection title="{!$Label.Request_Details}" id="reqDetailId">
+                    <apex:outputText value="{0,date,EEE, MMMM d, yyyy}" label="{!$Label.Request_Creation_Date}">
+                        <apex:param value="{!refReqAccount.CreatedDate}" /> 
+                    </apex:outputText>
+                    <apex:outputField value="{!refReqAccount.refedge__Account__c}"/>
+                    <apex:outputField value="{!refReqAccount.refedge__Requester__c}"/>
+                    <apex:outputField value="{!refReqAccount.refedge__Reference_Type_Needed__c}" label="{!$Label.Reference_Type}"/>
+                    <apex:outputField value="{!refRequest.Opportunity__r.AccountId}" rendered="{!NOT(ISBLANK(refRequest.Opportunity__r.AccountId))}" label="{!$Label.Opportunity_Account}"/>
+                    <apex:outputField value="{!refRequest.refedge__Opportunity__c}" rendered="{!NOT(ISBLANK(refRequest.refedge__Opportunity__c))}" label="{!$Label.Opportunity_Name}"/>
+                </apex:pageBlockSection>
+            
+                <apex:pageBlockSection title="{!$Label.Request_Response}"  columns="1" id="reqResponseId">
+                        <apex:outputPanel id="pbbId">
+                            <apex:commandButton style="margin-left: 40%;" value="{!$Label.Approve}" onclick="approved();return false;"/>
+                            <apex:commandButton value="{!$Label.Decline}" onclick="declined();return false;"/>
+                            <apex:commandButton value="{!$Label.Cancel}" action="{!returnHomePage}"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!contacts.size > 0}">
+                            <h3>{!$Label.select_appropriate_contact}</h3>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel rendered="{!contacts.size == 0}">
+                            {!$Label.add_contacts_to_account_for_request}
+                            <h3><apex:commandLink value="{!$Label.add_the_contact}" action="{!addNewContact}"/></h3>
+                            {!$Label.Add_contacts_to_account_for_request2}
+                        </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!contacts.size > 0}">
+                    <div id="tab1" style="max-height:215px;overflow:scroll;">
+                    <apex:pageBlockTable value="{!contacts}" var="con" id="pbtContact" >
+                        <apex:column id="radioButtonId" style="width: 40px;" headerValue="{!$Label.Select_Activate}">
+                            <apex:outputPanel rendered="{!OR(AND(contactMap[con.Id].Referenceability_Status__c != 'Inactive',contactMap[con.Id].Referenceability_Status__c != ''),isShowInactive)}">
+                                <input type="radio" name="radioCheck" class="radioClass" onclick="PORShowLoading();assignContactJs('{!JSENCODE(con.id)}');"/>
+                            </apex:outputPanel>
+                            <apex:commandButton value="{!$Label.Activate}" action="{!actvateContact}" reRender="reqResponseId" rendered="{!AND(OR(contactMap[con.Id].Referenceability_Status__c == 'Inactive',contactMap[con.Id].Referenceability_Status__c == ''),NOT(isShowInactive))}">
+                                <apex:param name="conId" value="{!con.Id}" assignTo="{!activeContactId}" />
+                            </apex:commandButton>
+                            <apex:inputhidden id="conId" value="{!con.Id}"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="{!$Label.Name}" style="width: 250px;">
+                            <apex:outputLink value="/{!con.Id}">{!con.Name}</apex:outputLink>
+                        </apex:column>
+                        
+                        <apex:column id="titleId" headervalue="{!$Label.Title}" style="width: 200px;"> 
+                            <apex:outputfield id="title" value="{!con.Title}" rendered="{!OR(!isInlineEditingDisabled, con.id != selectedContactId)}">  
+                                <apex:inlineeditsupport changedstyleclass="myBoldClass" event="ondblclick"/>
+                            </apex:outputfield>
+                            <apex:inputfield id="titleEdit" value="{!con.Title}" rendered="{!AND(isInlineEditingDisabled,isEdit, con.id == selectedContactId)}"/>  
+                        </apex:column>                      
+                        <apex:column id="emailColumn" style="width: 300px;">
+                            <apex:facet name="header"><div class="requiredInput"><div class="requiredBlock"></div>{!$Label.Email}</div></apex:facet> 
+                            <apex:outputfield id="emailField" value="{!con.Email}" rendered="{!OR(!isInlineEditingDisabled, con.id != selectedContactId)}">  
+                                <apex:inlineeditsupport changedstyleclass="myBoldClass" event="ondblclick"/>
+                            </apex:outputfield>
+                            <apex:inputfield id="emailFieldEdit" value="{!con.Email}" rendered="{!AND(isInlineEditingDisabled,isEdit, con.id == selectedContactId)}"/> 
+                        </apex:column>  
+                        <apex:column id="phoneColumn" style="width: 200px;">
+                            <apex:facet name="header"><div class="requiredInput"><div class="requiredBlock"></div>{!$Label.Phone}</div></apex:facet>
+                            <apex:outputfield id="phoneId" value="{!con.Phone}" rendered="{!OR(!isInlineEditingDisabled, con.id != selectedContactId)}">  
+                                <apex:inlineeditsupport changedstyleclass="myBoldClass" event="ondblclick" />
+                            </apex:outputfield>
+                            <apex:inputfield id="phoneIdEdit" value="{!con.Phone}" rendered="{!AND(isInlineEditingDisabled,isEdit, con.id == selectedContactId)}"/>  
+                       </apex:column>        
+                        <apex:column style="width: 160px;" headerValue="{!$Label.Reference_Program_Member}">
+                            <apex:image url="{!$Resource.refedge__GreenCheck}" rendered="{!contactMap[con.Id].Is_Referenceable__c}" height="12px" width="12px"/>
+                        </apex:column>
+                        <apex:column value="{!contactMap[con.Id].RUL_Last_Activity_Date__c}" headerValue="{!$Label.T_Last_Used}" style="width: 90px;"/>
+                        <apex:column value="{!contactMap[con.Id].Referenceability_Status__c}" style="width: 100px;"/>
+                    </apex:pageBlockTable>
+                    </div>
+                    </apex:outputPanel>
+                    <apex:pageBlockSectionItem id="approvalNotesId">
+                        <apex:outputLabel value="{!$Label.Approval_Decline_Notes}" ></apex:outputLabel> 
+                        <apex:outputPanel styleClass="requiredInput" layout="block" >
+                        <div class="requiredBlock"></div>
+                            <apex:inputTextarea value="{!refReqAccount.refedge__Approve_Deny_Notes__c}" cols="50" rows="5" id="approvalNotesTextareaId"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <!-- <apex:outputPanel rendered="{!inactiveContacts.size > 0}">
+                        <h3>{!$Label.Inactive_Contacts}</h3>
+                    </apex:outputPanel>
+                    <apex:pageBlockTable value="{!inactiveContacts}" var="inactivecon" id="pbtContactInact" rendered="{!inactiveContacts.size > 0}">
+                        <apex:outputPanel >
+                            <h3>{!$Label.Inactive_Contacts}</h3>
+                        </apex:outputPanel>
+                        <apex:column id="buttonClick" headerValue="{!$Label.Activate_Contact}"  style="width: 100px;">
+                            <apex:commandButton value="{!$Label.Activate}" action="{!actvateContact}" reRender="reqResponseId">
+                                <apex:param name="conId" value="{!inactivecon.Id}" assignTo="{!activeContactId}" />
+                            </apex:commandButton>
+                        </apex:column>
+                        
+                        <apex:column headerValue="{!$Label.Name}" style="width: 250px;">
+                            <apex:outputLink value="/{!inactivecon.Id}">{!inactivecon.Name}</apex:outputLink>
+                        </apex:column>
+                        
+                        <apex:column value="{!inactivecon.Title}" style="width: 200px;"/>                     
+                        <apex:column value="{!inactivecon.Email}" style="width: 300px;"/> 
+                        <apex:column value="{!inactivecon.Phone}" style="width: 200px;"/>
+                        <apex:column value="{!inactiveContactMap[inactivecon.Id].Is_Referenceable__c}" style="width: 160px;"/>
+                        <apex:column value="{!inactiveContactMap[inactivecon.Id].RUL_Last_Activity_Date__c}" headerValue="{!$Label.T_Last_Used}" style="width: 90px;"/>
+                        <apex:column value="{!inactiveContactMap[inactivecon.Id].Referenceability_Status__c}"  style="width: 100px;"/>
+                    </apex:pageBlockTable>
+                     -->
+                    
+                </apex:pageBlockSection>
+                
+<!--                 <apex:pageBlockButtons location="top" id="pbbId1"> -->
+<!--                     <apex:commandButton value="{!$Label.Approve}" onclick="approved();return false;"/> -->
+<!--                     <apex:commandButton value="{!$Label.Decline}" onclick="declined();return false;"/> -->
+<!--                     <apex:commandButton value="{!$Label.Cancel}" action="{!returnHomePage}"/> -->
+<!--                 </apex:pageBlockButtons> -->
+            </apex:pageBlock>
+        </apex:outputPanel>
+        
+        
+        <apex:outputPanel rendered="{!isSF1}" layout="block" >
+            <apex:outputPanel rendered="{!AND(NOT(isProcessed), NOT(isRecordDeleted),showPage,NOT(chkManagedRequest),NOT(refReqAccount.refedge__Account_Request_Status__c = 'Unavailable'))}" id="sf1Panel">
+                 <apex:actionFunction name="SF1ApproveRequest" action="{!approve}" rerender="sf1Panel,pgmsgId,sf1Script" onComplete="redirectToFeedPage();">
+                    <apex:param name="contactId" assignTo="{!selectedContactId}" value=""/>
+                    <apex:param name="email" assignTo="{!ContactEmail}" value=""/>
+                    <apex:param name="phone" assignTo="{!ContactPhone}" value=""/>
+                </apex:actionFunction> 
+                <apex:actionFunction name="makingContactProgramMember" action="{!actvateContact}" rerender="sf1Script,pgmsgId" > 
+                    <apex:param name="conId" value="" assignTo="{!activeContactId}" />
+                </apex:actionFunction>
+                <apex:actionFunction name="redirectToEditContactPage" action="{!redirectToEditContactPage}"/>
+                <apex:actionFunction name="editContactInfo" action="{!editContactInfo}" rerender="sf1Panel,pgmsgId,sf1Script" oncomplete="redirectToEditContactPage();return false">
+                    <apex:param name="contactId" assignTo="{!editContactInfoId}" value=""/>
+                </apex:actionFunction>
+                <apex:actionFunction name="SF1declineRequest" action="{!decline}" reRender="sf1Panel,pgmsgId,sf1Script" onComplete="redirectToFeedPage();"/>
+                <div class="center">
+                    <div class="container">
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <button class="sf1Button" title="Edit" onclick="checkForApprovedDecline();" accesskey="" type="button" >
+                                        <span class="label" style="color: #44596c;" dir="ltr" >{!$Label.Submit}</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="child1">
+                            <div class="labelCol1 ">
+                                <span class="osOutputLabel">{!$Label.Account}</span>
+                            </div>
+                            <div class="dataCol ">
+                                <span class="osOutputLabel">{!refReqAccount.Account__r.Name}</span>
+                            </div>
+                        </div>
+                        <div class="child1">
+                            <div class="labelCol1 ">
+                                <span class="osOutputLabel">{!$Label.Reference_Type}</span>
+                            </div>
+                            <div class="dataCol ">
+                                <span class="osOutputLabel">{!refReqAccount.Reference_Type_Needed__r.Name}</span>
+                            </div>
+                        </div>
+                        <div class="child1" style="text-align:center;">
+                            <div class="labelCol1 sf1OutputLabel" style="width:50%;">
+                                <span class="osOutputLabel">{!$Label.Approve}<input type="radio" checked="checked" name="radioButton" value="{!$Label.Approve}"/></span>
+                            </div>
+                            <div class="labelCol1 sf1OutputLabel" style="width:50%;">
+                                <span class="osOutputLabel">{!$Label.Decline}<input type="radio"  name="radioButton" value="{!$Label.Decline}"/></span>
+                            </div>
+                        </div>
+                        <div class="child1" >
+                            <div class="labelColLarge sf1OutputLabel">
+                                <span class="osOutputLabel">{!$Label.NNotestes}<span class="requiredField">*</span></span>
+                            </div>
+                            <div class="dataCol">
+                                <apex:inputtextArea styleClass="sf1textarea" Title="{!$Label.Notes}" value="{!refReqAccount.refedge__Approve_Deny_Notes__c}" id="reqNotesId"/>
+                            </div>
+                        </div>
+                        <div class="child1">
+                            <div class="dataCol ">
+                                <span class="osOutputLabel">{!$Label.select_appropriate_contact}</span>
+                            </div>
+                        </div>
+                        <div class="child1">
+                            <apex:outputPanel styleclass="child2" layout="block" style="padding:0px;border-bottom:0px;" rendered="{!contacts.size > 0}">
+                                <div class="labelCol1 sf1OutputLabel" style="font-weight: bold;padding:10px;">
+                                    <span class="osOutputLabel">{!$Label.Active_Program_Members}</span>
+                                </div>
+                                
+                                <div class="labelCol1" style="padding-bottom: 0px;">
+                                    <apex:repeat value="{!contacts}"   var="con" id="pbtContact" rendered="{!contacts.size > 0}">
+                                        <div class="labelCol1" style="border-bottom: 1px solid #bbc0c4;border-radius: 10px;padding-top: 10px;">
+                                            <div class="labelCol1" style="width:10%;text-align: center;">
+                                                <input type="radio" name="radioButton1" value="{!con.Id}"/>
+                                            </div>
+                                            <apex:inputHidden value="{!con.Id}" id="hiddenContactId"/>
+                                            <div class="labelCol1" style="width:90%;" onclick="PORShowLoading();editContactInfo('{!JSENCODE(con.Id)}');return false;">
+                                                <div class="dataCol sf1OutputLabel">
+                                                    <span class="osOutputLabel" style="color: #015BA7">{!con.Name}</span>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel" style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Title}:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="title" value="{!con.Title}"/></div>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel" style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Email}<span class="requiredField">*</span>:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="email" value="{!con.email}"/></div>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel"  style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Phone}<span class="requiredField">*</span>:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="phone" value="{!con.Phone}"/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>  
+                                </div>
+                            
+                            </apex:outputPanel>
+                            <apex:outputPanel styleclass="child2" layout="block" style="padding: 0px;border-bottom:0px;"  rendered="{!inactiveContacts.size > 0 }">
+                                <div class="labelCol1 sf1OutputLabel" style="font-weight: bold;padding: 10px;">
+                                    <span class="osOutputLabel">{!$Label.Inactive_Program_Members}</span>
+                                </div>
+                                <div class="labelCol1" style="padding-bottom: 0px;">
+                                    <apex:repeat value="{!inactiveContacts}"   var="con" id="pbtInContact" rendered="{!inactiveContacts.size > 0}">
+                                        <div class="labelCol1" style="border-bottom: 1px solid #bbc0c4;border-radius: 10px;padding-top: 10px;">
+                                            <apex:inputHidden value="{!con.Id}" id="hiddenContactId"/>
+                                            <div class="labelCol1" style="width:90%;float:right;">
+                                                <div class="dataCol sf1OutputLabel">
+                                                    <span class="osOutputLabel" style="color: #696e71;">{!con.Name}</span>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel" style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Title}:</div>
+                                                    <div class="labelCol1 sf1OutputLabel " style="width:50%;">{!con.Title}</div>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel" style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Email}<span class="requiredField">*</span>:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="email" value="{!con.email}"/></div>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel"  style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Phone}<span class="requiredField">*</span>:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="phone" value="{!con.Phone}"/></div>
+                                                </div>
+                                            </div>
+                                            <div class="labelCol1" style="padding: 10px;">
+                                                <a onclick="PORShowLoading();makingContactProgramMember('{!JSENCODE(con.Id)}');return false;" ><span class="osOutputLabel">{!$Label.Activate}</span></a>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel styleclass="child2" layout="block" style="padding: 0px;border-bottom:0px;" rendered="{!nonProgramMembers.size > 0 }">
+                                <div class="labelCol1 sf1OutputLabel"  style="font-weight: bold;padding: 10px;">
+                                    <span class="osOutputLabel">{!$Label.Non_Program_Members}</span>
+                                </div>
+                                <div class="labelCol1" style="padding-bottom: 0px;">
+                                    <apex:repeat value="{!nonProgramMembers}"   var="con" id="pbtNonContact" rendered="{!nonProgramMembers.size > 0}">
+                                        <div class="labelCol1" style="border-bottom: 1px solid #bbc0c4;border-radius: 10px;padding-top: 10px;">
+                                            <apex:inputHidden value="{!con.Id}" id="hiddenContactId"/>
+                                            <div class="labelCol1 " style="width:90%;float:right;">
+                                                <div class="dataCol sf1OutputLabel">
+                                                    <span class="osOutputLabel" style="color: #696e71;">{!con.Name}</span>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel" style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Title}:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!con.Title}</div>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel"  style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Email}<span class="requiredField">*</span>:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="email" value="{!con.email}"/></div>
+                                                </div>
+                                                <div class="labelCol1 sf1OutputLabel" style="padding-bottom:0px;">
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;">{!$Label.Phone}<span class="requiredField">*</span>:</div>
+                                                    <div class="labelCol1 sf1OutputLabel" style="width:50%;"><apex:outputField id="phone" value="{!con.Phone}"/></div>
+                                                </div>
+                                            </div>
+                                            <div class="labelCol1 sf1OutputLabel" style="padding: 10px;">
+                                                <a onclick="PORShowLoading();makingContactProgramMember('{!JSENCODE(con.Id)}');return false;" ><span class="osOutputLabel">{!$Label.Activate}</span></a>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                            </apex:outputPanel>                         
+                        </div>
+                        
+                    </div>
+                </div>
+            </apex:outputPanel>   
+        </apex:outputPanel>
+            
+    </apex:form>
+    
+    <script>
+        jQuery('a').each( function() { 
+            jQuery(this).attr( 'target', '_blank' );
+        });
+       
+    </script>
+    
+</apex:page>

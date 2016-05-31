@@ -1,0 +1,58 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Reference_Interview__c" extensions="refedge.ReferenceInterviewEditExtension" sidebar="false" > 
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <c:POR_ModalLoader />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader title="{!$Label.Reference_Interview_Edit}" subtitle="{!$Label.New_Reference_Interview}"/>
+        <apex:pageBlock id="pbId" rendered="{!AND(showPage,NOT(refInterviewExists))}" title="{!$Label.Reference_Interview_Edit}" mode="edit">
+            <apex:pageBlockSection title="{!$Label.Information}" id="pbsId" columns="1" >
+                <apex:inputField value="{!refInterview.refedge__Speaker_info__c}"/>
+                <apex:inputField value="{!refInterview.refedge__Org_description__c}"/>
+                <apex:inputField value="{!refInterview.refedge__Org_website__c}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Upload_Photograph}"/>
+                    <apex:inputField value="{!refInterview.refedge__Photograph__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="margin-right: 0px;" value="{!$Label.Upload_transcript}" />
+                    <apex:inputFile value="{!transcript}"  filename="{!transcriptName}" id="file" contentType="{!transcriptContentType}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >
+                <apex:commandbutton value="{!$Label.Save}" action="{!save}"/>
+                <apex:commandbutton value="{!$Label.Cancel}" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:outputPanel rendered="{!!showPage}">
+             <apex:pageMessage summary="{!$Label.Reference_Content_Type_Error}" severity="Info" strength="3" />
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!refInterviewExists}">
+             <apex:pageMessage summary="{!$Label.Reference_Interview_Already_Exist}" severity="Info" strength="3" />
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

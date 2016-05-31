@@ -1,0 +1,29 @@
+<apex:page controller="RequalificationController" title="Requalification Home">
+
+    <style type="text/css">
+        .col2 { margin-right:15px; }
+        .btn { margin-left:5px; margin-right:15px; }
+        .btnDisabled { margin-left:5px; margin-right:15px; }
+    </style>
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType">Requalification<span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> Home</h2>
+            </div>
+        </div>
+    </div>
+
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:outputText value="{!$Label.RequalificationThanks_Thank_You}"/>
+                <br />
+                <apex:outputText value="{!accountContactName}"/>
+                <apex:outputText value="{!accountContactEmail}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

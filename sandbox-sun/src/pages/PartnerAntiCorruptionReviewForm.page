@@ -1,0 +1,287 @@
+<apex:page standardController="Anti_corruption__c" cache="true" expires="1" extensions="PartnerAntiCorruptionFormControllerExt">
+    <apex:form >
+        <style type="text/css">
+            .redFlagForm .bPageBlock .detailList .labelCol {
+                width: 60%;
+                font-weight: normal;
+                vertical-align: middle;
+            }
+            .redFlagForm .bPageBlock .detailList .data2Col {
+                width: 40%;
+            }
+        </style>
+
+        <!-- LEGAL TYPE 1 -->
+
+        <apex:pageBlock title="Legal Type 1 Resolution" rendered="{!IsLegalType1}">
+            <apex:pageBlockSection columns="2" collapsible="false">
+                <apex:commandButton id="level1Approve" action="{!approve}" value="{!$Label.FCPA_Approve}"/>
+                <apex:commandButton id="level1Reject" action="{!reject}" value="{!$Label.FCPA_Reject}"/>
+                <apex:outputLabel >{!$Label.Approval_Description_Legal_Type_1}</apex:outputLabel>
+                <apex:outputLabel >{!$Label.Rejection_description_Legal_Type_1}</apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" collapsible="false">
+                <apex:commandButton id="level1Escalate" action="{!escalateToType2}" value="{!$Label.FCPA_Escalate_To_Type_2}"/>
+                <apex:commandButton id="level1EscalateTo3" action="{!escalateToType3}" value="{!$Label.FCPA_Escalate_To_Type_3}"/>
+                <apex:outputLabel >{!$Label.Escalate_to_Type_2_Legal_Type_1}</apex:outputLabel>
+                <apex:outputLabel >{!$Label.Escalate_to_Type_3_Legal_Type_1}</apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageMessages escape="false"/>
+        </apex:pageBlock>
+        <apex:pageBlock title="Anti-Corruption Review Detail" mode="mainDetail" rendered="{!IsLegalType1}" >
+            <apex:pageBlockSection columns="2" collapsible="false">
+                <!--
+                <apex:inputField id="level1RejectionReason" value="{!AC.Rejection_Reason__c}"/>
+                -->
+                <apex:outputField id="Name" value="{!AC.Name}"/>
+                <apex:outputField id="level1Origin" value="{!AC.Origin__c}"/>
+                <apex:outputField id="level1EverConvicted" value="{!AC.Ever_Convicted__c}"/>
+                <apex:outputField id="level1TIIndexCountries" value="{!AC.TI_Indexed_Countries__c}"/>
+                <apex:outputField id="level1GovtPosition" value="{!AC.Government_Position__c}"/>
+                <apex:outputField id="level1DirectPurchaseAgreement" value="{!AC.Direct_Purchasing_Agreement__c}"/>
+                <apex:outputField id="level1Lead" value="{!AC.Lead__c}" rendered="{!AC.Lead__c != null}"/>
+                <apex:outputField id="level1OnbLead" value="{!AC.Partner_Onboarding__c}" rendered="{!AC.Partner_Onboarding__c != null}"/>
+                <apex:outputField id="level1AccountName" value="{!AC.Account_Name__c}"/>
+                <apex:outputField id="level1PartnerAccount" value="{!AC.Partner_Account__c}"/>
+                <apex:outputField id="level1PartnerStatus" value="{!AC.Partner_Status__c}"/>
+                <apex:outputField id="level1UnderlyingFacts" value="{!AC.Underlying_Facts__c}"/>
+                <apex:outputField id="level1InternalReview" value="{!AC.Internal_Review__c}"/>
+                <apex:outputField id="CreatedDate" value="{!AC.CreatedDate}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Assigned Approver"/>
+                    <apex:outputText value="{!currentApproverName}"/>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+
+        <!-- END LEGAL TYPE 1 -->
+        <!-- CHANNEL TYPE 2 -->
+
+
+        <apex:pageBlock title="{!headerToggle}" rendered="{!IsChanOpsType2}">
+            <apex:pageBlockSection columns="1" collapsible="false">
+                {!$Label.Approval_Description_Chan_Ops_Type_2}
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="false" rendered="{!NOT(AC.Screenshot_Attached__c)}">
+                <apex:commandButton id="level2AttachScreenshot" action="{!attachScreenshot}" value="{!$Label.FCPA_Attach_Screenshot}"/>
+                <!-- <apex:outputLabel >{!$Label.Attach_Screenshot_Information_Channel_Ops_Type_2}</apex:outputLabel> -->
+                <apex:outputLabel value="{!SUBSTITUTE($Label.Attach_Screenshot_Information_Channel_Ops_Type_2,'PotentialPartnerName', AC.Account_Name__c)}" escape="false"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" collapsible="false" rendered="{!AC.Screenshot_Attached__c && NOT(AC.RedFlagQuestionnaireComplete__c) && ISNULL(AC.Screenshot_Confirmed_By__c)}">
+                <apex:commandButton id="level2SSAgree" action="{!screenshotAgree}" value="Search was Clear"/>
+                <apex:commandButton id="level2SSDisagree" action="{!screenshotDisagree}" value="{!$Label.FCPA_Concerns_Found_in_Search}"/>
+                <apex:outputLabel >{!$Label.Search_Was_Clear_Description_Chan_Ops_Type_2}</apex:outputLabel>
+                <apex:outputLabel >{!$Label.Concerns_Found_in_Search_Chan_Ops_Type_2}</apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" collapsible="false" rendered="{!AC.Screenshot_Attached__c && NOT(AC.RedFlagQuestionnaireComplete__c) && NOT(ISNULL(AC.Screenshot_Confirmed_By__c))}">
+                <apex:commandButton id="level2SaveLocal" action="{!saveLocal}" value="{!$Label.FCPA_Save_and_Continue}"/>
+                <apex:commandButton rendered="{! NOT(AC.Red_Flag_Skip__c) }" id="level2RedFlagSubmit" action="{!submitRedFlagForm}" value="{!$Label.FCPA_Submit_Completed_Red_Flag_Form}"/>
+                <apex:commandButton rendered="{! AC.Red_Flag_Skip__c }" id="level2RedFlagAccept" action="{!submitRedFlagForm}" value="{!$Label.FCPA_Acknowledge_Red_Flag_Form_Data}"/>
+                <apex:outputLabel >{!$Label.AC_Click_Save_and_Continue}</apex:outputLabel>
+                <apex:outputLabel rendered="{! NOT(AC.Red_Flag_Skip__c) }">{!$Label.Submit_Completed_Red_Flag_Form_Description_Chan_Ops_Type_2}</apex:outputLabel>
+                <apex:outputLabel rendered="{! AC.Red_Flag_Skip__c }">{!$Label.Acknowledge_Red_Flag_Form_Data_Description_Chan_Ops_Type_2}</apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageMessages escape="false"/>
+        </apex:pageBlock>
+        <apex:pageBlock title="Anti-Corruption Review Detail" mode="mainDetail" rendered="{!IsChanOpsType2}">
+            <apex:pageBlockSection columns="2" collapsible="false">
+                <!--
+                <apex:inputField id="level2Rejectionreason" value="{!AC.Rejection_Reason__c}"/>
+                -->
+                <apex:pageBlockSectionItem rendered="{!NOT(AC.Screenshot_Attached__c)}">
+                    <apex:outputLabel value="{!$Label.FCPA_Screenshot_Label}"/>
+                    <apex:inputFile id="level2Screenshot" contentType="{!ssContentType}" fileName="{!ssFileName}" value="{!ssFile}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!AC.Screenshot_Attached__c}">
+                    <apex:outputLabel value="{!$Label.FCPA_Screenshot_Label}"/>
+                    <a id="level2ScreenshotLink" href="{!URLFOR($Action.Attachment.Download, attachmentId)}" target="_blank">View</a>
+                </apex:pageBlockSectionItem>
+
+                <apex:outputField id="Name" value="{!AC.Name}"/>
+                <apex:outputField id="level2Origin" value="{!AC.Origin__c}"/>
+                <apex:outputField id="level2EverConvicted" value="{!AC.Ever_Convicted__c}"/>
+                <apex:outputField id="level2TIIndexCountries" value="{!AC.TI_Indexed_Countries__c}"/>
+                <apex:outputField id="level2GovtPosition" value="{!AC.Government_Position__c}"/>
+                <apex:outputField id="level2DirectPA" value="{!AC.Direct_Purchasing_Agreement__c}"/>
+                <apex:outputField id="level2Lead" value="{!AC.Lead__c}" rendered="{!AC.Lead__c != null}"/>
+                <apex:outputField id="level2OnbLead" value="{!AC.Partner_Onboarding__c}" rendered="{!AC.Partner_Onboarding__c != null}"/>
+                <apex:outputField id="level2AccountName" value="{!AC.Account_Name__c}"/>
+                <apex:outputField id="level2PartnerAccount" value="{!AC.Partner_Account__c}"/>
+                <apex:outputField id="level2PartnerStatus" value="{!AC.Partner_Status__c}"/>
+                <apex:outputField id="level2UnderlyingFacts" value="{!AC.Underlying_Facts__c}"/>
+                <apex:outputField id="level2InternalReview" value="{!AC.Internal_Review__c}"/>
+				<apex:outputField id="CreatedDate" value="{!AC.CreatedDate}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Assigned Approver"/>
+                    <apex:outputText value="{!currentApproverName}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+        <div class="redFlagForm">
+            <apex:pageBlock title="{!$Label.FCPA_Red_Flag_Form}" mode="mainDetail" rendered="{! NOT(AC.Red_Flag_Skip__c) && IsChanOpsType2 && NOT(ISNULL(AC.Screenshot_Confirmed_By__c))}">
+                <apex:pageBlockSection columns="1" collapsible="false">
+                    <apex:outputText value="{!$Label.Red_Flag_Skip_Chan_Ops_Type_2}" escape="false"/>
+                </apex:pageBlockSection>
+                <br/>
+                <apex:pageBlockSection columns="1" collapsible="false" >
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.Recommended_by_government_official__c.InlineHelpText}" id="level2RecommendedByGovtOfficial" value="{!RFFAC.Recommended_by_government_official__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.Do_you_have_any_reason_to_believe_that_t__c.InlineHelpText}" id="level2ReasonToBelieve" value="{!RFFAC.Do_you_have_any_reason_to_believe_that_t__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.Required_Certification_Hesitation__c.InlineHelpText}" id="level2CertHesitation" value="{!RFFAC.Required_Certification_Hesitation__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.Unusual_Payment_Terms__c.InlineHelpText}" id="level2UnusualTerms" value="{!RFFAC.Unusual_Payment_Terms__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.Requested_Secret_Relationship__c.InlineHelpText}" id="level2RequestedSecretRelationship" value="{!RFFAC.Requested_Secret_Relationship__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.UnethicalBusiness__c.InlineHelpText}" id="level2UnethicalBusiness" value="{!RFFAC.UnethicalBusiness__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.UnusualFinancialTerms__c.InlineHelpText}" id="level2UnusualFinancialTerms" value="{!RFFAC.UnusualFinancialTerms__c}"/>
+                    <apex:inputField label="{!$ObjectType.Anti_corruption__c.Fields.QuestionnaireCompletionDate_Time__c.InlineHelpText}" id="level2QuestionaireCompletion" value="{!RFFAC.QuestionnaireCompletionDate_Time__c}"/>
+                    <apex:inputText label="{!$Label.FCPA_Answers_Provided_By}" id="level2AnswersProvidedBySearch" value="{!nameFilter}" title="Filter user by name" >
+                        <apex:actionSupport event="onkeyup" rerender="level2SearchResults" />
+                    </apex:inputText>
+                </apex:pageBlockSection>
+                <apex:outputPanel id="level2SearchResults" >
+                    <apex:pageBlockSection columns="1" collapsible="false" >
+                        <apex:selectList styleClass="{!errorToggle}" id="level2AnswersProvidedBySearchResults" value="{!selectedUser}" label=" " title="RedFlagAnsweredBySearch" multiselect="false" size="1">
+                            <apex:selectOptions value="{!userList}" />
+                        </apex:selectList>
+                        <apex:outputText rendered="{!LEN(errorToggle) > 1}" value="{!$Label.FCPA_Questions_Error_Message}" label=" " escape="false"/>
+                        <apex:inputHidden id="level2AnswersProvidedByHidden" value="{!RFFAC.RedFlagAnswersProvidedBy__c}"/>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:pageBlock>
+            <apex:pageBlock title="{!$Label.FCPA_Red_Flag_Form}" mode="mainDetail" rendered="{! AC.Red_Flag_Skip__c && IsChanOpsType2 && NOT(ISNULL(AC.Screenshot_Confirmed_By__c))}">
+                <apex:pageBlockSection columns="1" collapsible="false">
+                    {!$Label.Red_Flag_Form_Skipped_Notice}
+                </apex:pageBlockSection>
+                <br/>
+                <apex:pageBlockSection columns="1" collapsible="false">
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Recommended_by_government_official__c.InlineHelpText}" id="level2RecommendedByGovtOfficial" value="{!RFFAC.Recommended_by_government_official__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Do_you_have_any_reason_to_believe_that_t__c.InlineHelpText}" id="level2ReasonToBelieve" value="{!RFFAC.Do_you_have_any_reason_to_believe_that_t__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Required_Certification_Hesitation__c.InlineHelpText}" id="level2CertHesitation" value="{!RFFAC.Required_Certification_Hesitation__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Unusual_Payment_Terms__c.InlineHelpText}" id="level2UnusualTerms" value="{!RFFAC.Unusual_Payment_Terms__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Requested_Secret_Relationship__c.InlineHelpText}" id="level2RequestedSecretRelationship" value="{!RFFAC.Requested_Secret_Relationship__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.UnethicalBusiness__c.InlineHelpText}" id="level2UnethicalBusiness" value="{!RFFAC.UnethicalBusiness__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.UnusualFinancialTerms__c.InlineHelpText}" id="level2UnusualFinancialTerms" value="{!RFFAC.UnusualFinancialTerms__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.QuestionnaireCompletionDate_Time__c.InlineHelpText}" id="level2QuestionaireCompletion" value="{!RFFAC.QuestionnaireCompletionDate_Time__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.RedFlagAnswersProvidedBy__c.InlineHelpText}" id="level2AnswersProvidedBy" value="{!RFFAC.RedFlagAnswersProvidedBy__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </div>
+
+
+        <!-- END CHANNEL TYPE 2 -->
+        <!-- LEGAL TYPE 2 BUTTONS -->
+
+
+        <apex:pageBlock title="{!$Label.FCPA_Legal_Type_2_Resolution}" rendered="{!IsLegalType2}">
+            <apex:pageBlockSection columns="1" collapsible="false">
+                {!$Label.Legal_Type_2_Description}
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="3" collapsible="false">
+                <apex:commandButton id="level2Approve" action="{!approve}" value="{!$Label.FCPA_Approve}"/>
+                <apex:commandButton id="level2Reject" action="{!reject}" value="{!$Label.FCPA_Reject}"/>
+                <apex:commandButton id="level2EscalateTo3" action="{!escalateToType3}" rendered="{!IsLegalType2}" value="{!$Label.FCPA_Escalate_To_Type_3}"/>
+                <apex:outputLabel >{!$Label.Level_2_Approve_Description}</apex:outputLabel>
+                <apex:outputLabel >{!$Label.Legal_Type_2_Reject_Description}</apex:outputLabel>
+                <apex:outputLabel rendered="{!IsLegalType2}">{!$Label.Escalate_to_Type_3_Legal_Type_2}</apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageMessages escape="false"/>
+        </apex:pageBlock>
+
+        <!-- END LEGAL TYPE 2 BUTTONS -->
+        <!-- LEGAL TYPE 3 BUTTONS -->
+
+        <apex:pageBlock title="{!$Label.FCPA_Legal_Type_3_Resolution}" rendered="{!IsLegalType3}">
+            <apex:pageBlockSection columns="1" collapsible="false">
+                {!$Label.Legal_Type_3_Description}
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2" collapsible="false">
+                <apex:commandButton id="level3Approve" action="{!approve}" value="{!$Label.FCPA_Approve}"/>
+                <apex:commandButton id="level3Reject" action="{!reject}" value="{!$Label.FCPA_Reject}"/>
+                <apex:outputLabel >{!$Label.Legal_Type_3_Approval_Description}</apex:outputLabel>
+                <apex:outputLabel >{!$Label.Legal_Type_3_Rejection_Description}</apex:outputLabel>
+            </apex:pageBlockSection>
+            <apex:pageMessages escape="false"/>
+        </apex:pageBlock>
+        <apex:pageBlock title="{!$Label.Anti_Corruption_Review_Detail}" mode="mainDetail" rendered="{!IsLegalType2 || IsLegalType3}">
+            <apex:pageBlockSection columns="2" collapsible="false">
+                <!--
+                <apex:inputField id="level2and3RejectionReason" value="{!AC.Rejection_Reason__c}"/>
+                -->
+                <apex:pageBlockSectionItem rendered="{!AC.Screenshot_Attached__c}">
+                    <apex:outputLabel value="{!$Label.FCPA_Screenshot_Label}"/>
+                    <a id="level2and3ScreenshotLink" href="{!URLFOR($Action.Attachment.Download, attachmentId)}" target="_blank">View</a>
+                </apex:pageBlockSectionItem>
+ 				<apex:outputField id="Name" value="{!AC.Name}"/>
+                <apex:outputField id="level2and3Origin" value="{!AC.Origin__c}"/>
+                <apex:outputField id="level2and3EverConvicted" value="{!AC.Ever_Convicted__c}"/>
+                <apex:outputField id="level2and3TIIndexCountries" value="{!AC.TI_Indexed_Countries__c}"/>
+                <apex:outputField id="level2and3GovtPosition" value="{!AC.Government_Position__c}"/>
+                <apex:outputField id="level2and3DirectPA" value="{!AC.Direct_Purchasing_Agreement__c}"/>
+                <apex:outputField id="level2and3Lead" value="{!AC.Lead__c}" rendered="{!AC.Lead__c != null}"/>
+                <apex:outputField id="level2and3OnbLead" value="{!AC.Partner_Onboarding__c}" rendered="{!AC.Partner_Onboarding__c != null}"/>
+         		<apex:outputField id="level2and3AccountName" value="{!AC.Account_Name__c}"/>
+                <apex:outputField id="level2and3PartnerAccount" value="{!AC.Partner_Account__c}"/>
+                <apex:outputField id="level2and3PartnerStatus" value="{!AC.Partner_Status__c}"/>
+                <apex:outputField id="level2and3UnderlyingFacts" value="{!AC.Underlying_Facts__c}"/>
+                <apex:outputField id="level2and3InternalReview" value="{!AC.Internal_Review__c}"/>
+				<apex:outputField id="CreatedDate" value="{!AC.CreatedDate}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Assigned Approver"/>
+                    <apex:outputText value="{!currentApproverName}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+        <!-- END LEGAL TYPE 3 BUTTONS -->
+        <!-- LEGAL TYPE 2 & 3 -->
+
+
+        <div class="redFlagForm">
+            <apex:pageBlock title="{!$Label.FCPA_Red_Flag_Form}" mode="mainDetail" rendered="{!IsLegalType2 || IsLegalType3}">
+                <apex:pageBlockSection columns="1" collapsible="false">
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Recommended_by_government_official__c.InlineHelpText}" id="level2and3RecommendedByGovtOfficial" value="{!RFFAC.Recommended_by_government_official__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Do_you_have_any_reason_to_believe_that_t__c.InlineHelpText}" id="level2and3ReasonToBelieve" value="{!RFFAC.Do_you_have_any_reason_to_believe_that_t__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Required_Certification_Hesitation__c.InlineHelpText}" id="level2and3RequiredCertHesitation" value="{!RFFAC.Required_Certification_Hesitation__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Unusual_Payment_Terms__c.InlineHelpText}" id="level2and3UnusualTerms" value="{!RFFAC.Unusual_Payment_Terms__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.Requested_Secret_Relationship__c.InlineHelpText}" id="level2and3RequestedSecretRelationship" value="{!RFFAC.Requested_Secret_Relationship__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.UnethicalBusiness__c.InlineHelpText}" id="level2and3UnethicalBusiness" value="{!RFFAC.UnethicalBusiness__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.UnusualFinancialTerms__c.InlineHelpText}" id="level2and3UnusualFinancialTerms" value="{!RFFAC.UnusualFinancialTerms__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.QuestionnaireCompletionDate_Time__c.InlineHelpText}" id="level2and3QuestionaireCompletion" value="{!RFFAC.QuestionnaireCompletionDate_Time__c}"/>
+                    <apex:outputField label="{!$ObjectType.Anti_corruption__c.Fields.RedFlagAnswersProvidedBy__c.InlineHelpText}" id="level2and3AnswersProvidedBy" value="{!RFFAC.RedFlagAnswersProvidedBy__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </div>
+        <apex:pageBlock title="{!$Label.FCPA_Status_overview}" rendered="{!NOT(isDone)}">
+            <apex:pageBlockSection columns="2" collapsible="true">
+
+                <apex:pageBlockSection columns="1" collapsible="true">
+                    <apex:outputField id="statusLightGovtPos" value="{!AC.GovernmentPosition__c}"/>
+                    <apex:outputField id="statusLightSSAgree" rendered="{!NOT(ISNULL(AC.Screenshot_Confirmed_By__c))}" value="{!AC.ScreenshotIAgree__c}"/>
+                    <apex:outputField id="statusLightEverConvicted" value="{!AC.EverConvicted__c}"/>
+                    <apex:outputField id="statusLightRFGreen" rendered="{!AC.RedFlagQuestionnaireComplete__c}" value="{!AC.RedFlagQuestionnaireClear__c}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1" collapsible="true">
+                    <apex:outputField id="statusLightTIIndex" value="{!AC.TIIndex__c}"/>
+                    <apex:outputField id="statusLightDPA" value="{!AC.DirectPurchasingAgreement__c}"/>
+                    <apex:outputField id="statusLightRedFlagAttached" rendered="{!AC.RedFlagQuestionnaireComplete__c || IsLegalType2 || IsChanOpsType2}" value="{!AC.RedFlagQuestionnaireAttached__c}"/>
+                    <apex:outputField id="statusLightSSAttached" rendered="{!AC.Screenshot_Attached__c || IsLegalType2 || IsChanOpsType2}" value="{!AC.ScreenshotAttached__c}"/>
+                </apex:pageBlockSection>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+        <!-- END LEGAL TYPE 2 & 3 -->
+        <!-- ARCHIVED -->
+
+        <apex:detail rendered="{!isDone}" relatedList="false"/>
+
+        <!-- END ARCHIVED -->
+
+    </apex:form>
+    <apex:relatedList id="attachmentList" list="NotesAndAttachments"/>
+    <apex:relatedList id="taskList" list="OpenActivities"/>
+    <apex:relatedList id="oldTaskList" list="ActivityHistories"/>
+   <!-- <apex:relatedList list="ProcessSteps" ></apex:relatedList> -->
+</apex:page>

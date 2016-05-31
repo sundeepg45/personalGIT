@@ -1,0 +1,434 @@
+<apex:page id="pageId" extensions="refedge.RefRequestProjectController" StandardController="refedge__Reference_Request__c" sidebar="false" tabStyle="refedge__Reference_Request__c">
+    <!-- Message -->
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:pageMessages id="msgId"/>
+    <!-- Add JavaScript & Jquery-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <!-- Add CSS-->
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <Script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        var noOfMembers = {!matchedMembers};
+        function showPostCommunityPopup(){
+            if(noOfMembers > 0){
+               document.getElementById('pageId:frmId:referenceType').innerHTML = '{!JSENCODE(communityReferencTypeName)}';
+               document.getElementById('pageId:frmId:selectDeadlineId').value = '{!JSENCODE(communityDeadline)}';
+               jQuery("#dialogBoxDiv6").dialog({
+                    width: '400px',
+                    modal: true,
+                    resizable: false,
+                    draggable: false,
+                    buttons: [{
+                        text: "{!$Label.Post}",
+                        "class": "dialogButtonClass",
+                        click: function() {
+                            var withDetails = document.getElementById('pageId:frmId:with').value;
+                            var deadlineDetails = document.getElementById('pageId:frmId:selectDeadlineId').value;   
+                            var textArea = document.getElementById('pageId:frmId:details').value;
+                            var mydate = new Date(deadlineDetails);
+                            var todayDate = new Date();
+                            todayDate.setHours(0, 0, 0, 0);
+                            var hasError = false;
+                            if(withDetails == '' || deadlineDetails == '' || textArea == ''){
+                                hasError = true;
+                                alert('{!$Label.Community_Required_Information}');
+                            }
+                            
+                            if(deadlineDetails !='' && mydate < todayDate){
+                                hasError = true;
+                                alert('{!$Label.ReferenceUse_invalid_past_Deadline_date}');
+                            }
+                            if(!hasError){
+                                var emailBody = document.getElementById('pageId:frmId:emailBody').value;
+                                if(emailBody != '' && emailBody != null)
+                                    emailBody = emailBody.replace('!Community_Invite__c.Referenceability_Type_f__c','{!JSENCODE(communityReferencTypeName)}').replace('!Community_Invite__c.Community_Participate_With__c',withDetails).replace('!Community_Invite__c.Community_Participate_Deadline__c',deadlineDetails).replace('!Community_Invite__c.Community_Participate_Details__c' ,textArea);
+                                document.getElementById('pageId:frmId:emailBody').innerHTML = emailBody;
+                                jQuery( this ).dialog( "close" ); 
+                                jQuery("#dialogBoxDiv").dialog({
+                                    height    : 150,
+                                    width     : 415,
+                                    modal     : true,
+                                    resizable : false,  
+                                    buttons: [{
+                                        text: "{!$Label.Send}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            var communitySubject = document.getElementById('pageId:frmId:CommunitySubject').value;
+                                            jQuery( this ).dialog( "close" ); 
+                                            PORShowLoading();
+                                            communityInviteRecordCreation(true,false,'New Reference Opportunity Available',withDetails,deadlineDetails,textArea,'');
+                                            return false;
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.Edit_then_Send}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                            jQuery("#dialogBoxDiv8").dialog({
+                                                height    : 420,
+                                                width     : 600,
+                                                modal     : true,
+                                                resizable : false,  
+                                                buttons: [{
+                                                    text: "{!$Label.Done}",
+                                                    "class": "dialogButtonClass",
+                                                    click: function() {
+                                                        var communitySubject = document.getElementById('pageId:frmId:CommunitySubject').value;
+                                                        var editBody = document.getElementById('pageId:frmId:emailBody').value;
+                                                        jQuery( this ).dialog( "close" ); 
+                                                        PORShowLoading();
+                                                        communityInviteRecordCreation(true,true,communitySubject,withDetails,deadlineDetails,textArea, editBody);
+                                                        return false;
+                                                    }
+                                                },
+                                                {
+                                                    text: "{!$Label.Cancel}",
+                                                    "class": "dialogButtonClass",
+                                                    click: function() {
+                                                        jQuery( this ).dialog( "close" ); 
+                                                        //cancelUpdateOperation();
+                                                        return false;
+                                                    }
+                                                }]               
+                                            });
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.Do_Not_Send}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                            PORShowLoading();
+                                            communityInviteRecordCreation(false,false,'',withDetails,deadlineDetails,textArea,'');
+                                            return false;
+                                        }
+                                    },
+                                    {
+                                        text: "{!$Label.Cancel}",
+                                        "class": "dialogButtonClass",
+                                        click: function() {
+                                            jQuery( this ).dialog( "close" ); 
+                                            //cancelUpdateOperation();
+                                            return false;
+                                        }
+                                    }]               
+                                });
+                            }
+                            
+                        }
+                    },
+                    {
+                        text: "{!$Label.Cancel}",
+                        "class": "dialogButtonClass",
+                        click: function() {
+                            jQuery( this ).dialog( "close" ); 
+                            return false;
+                        },
+                    }]
+                });
+                var el = document.getElementsByClassName('selectDeadlineC');
+                jQuery(el[0]).click(function(e) {
+                    DatePicker.pickDate(true, jQuery(this).attr("id"), false);
+                    jQuery('.datePicker').removeAttr('style');
+                    var l = Math.ceil((jQuery(this).offset()).left) - 10;
+                    var r = Math.ceil((jQuery(this).offset()).top) - 90;
+                    jQuery('.datePicker').css('display','block').css('left',l+'px').css('top',r+'px');
+                    e.stopPropagation();
+                });
+            }
+            else {
+                alert('{!$Label.Community_Members_is_0}');
+            }
+        }
+        function setHelpText(Id){
+            var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+            var isIE7 = (navigator.appVersion.indexOf('MSIE 7.')==-1) ? false : true;
+            var helpImg = document.getElementById(Id);
+            if(isIE7)
+            helpImg.style.marginRight = "6px";
+            else if(isIE)
+            helpImg.style.marginRight = "0px";
+            else
+            helpImg.style.marginRight = "0px";  
+        }
+    </Script>
+    <style>
+        a.boxclose{
+            float:right;
+            margin-top:-40px;
+            cursor:pointer;
+            color: #fff;
+            border: 1px solid #AEAEAE;
+            border-radius: 30px;
+            background: #605F61;
+            font-size: 31px;
+            font-weight: bold;
+            display: inline-block;
+            line-height: 0px;
+            padding: 11px 3px;       
+        }
+        
+        .boxclose:before {
+            content: "?";
+        }
+        .showButton {
+            display : inline;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-top-colors: none;
+            
+            background: url("/img/alohaSkin/btn_sprite.png") repeat-x scroll right top #E8E8E9;
+            border-color: #B5B5B5 #B5B5B5 #7F7F7F;
+            border-image: none;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            color: #333333;
+            font-size: 0.9em;
+            font-weight: bold;
+            font-family: Arial,Helvetica,sans-serif;
+            margin: 1px;
+            padding: 2px 3px !important; 
+        }
+        .hideButton {
+            display : none;
+        }
+        .datePicker{z-index : 9999;} 
+        
+        
+        .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+            color:black;
+        }
+        .requiredInput{
+            position: relative;
+            height: 100%;
+        }
+        .requiredBlock{
+            background-color: #c00;
+            position: absolute;
+            left: -4px;
+            width: 3px;
+            top: 1px;
+            bottom: 1px;
+        }
+        .ui-state-hover,.ui-widget-content ui-state-hover{
+            background:#e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            border : 1px solid lightgray !important;
+        }
+        .ui-state-focus,.ui-widget-content .ui-state-focus{
+            background:#e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            border : 1px solid lightgray !important;
+        }
+        .ui-widget{
+            font-family: Arial,Helvetica,sans-serif !important;
+        }
+        input[type="checkbox"] {
+            background-color:white;
+            size:5em;
+        }
+        .dateFormat {
+            display : none !important;
+        }
+        .helpText {
+            text-decoration: none;
+            position: absolute;
+            display: none;
+            opacity: 0;
+            width: 15em;
+            z-index: 100000001;
+            background-color: #fefdb9;
+            padding: 2px 5px;
+            border: 1px solid orange;
+            text-align: left;
+            white-space: normal;
+            font-weight: normal;
+            color: #000;
+        }
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style>
+    <apex:form id="frmId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+         <apex:actionFunction name="communityInviteRecordCreation" action="{!communityInviteRecordCreation}" rerender="blocksectionId,requestPanel,sectionId,msgId,Notes_ListId,communityListId,frmId" onComplete="PORHideLoading();return false;">
+             <apex:param name="isSend" assignTo="{!isSend}" value=""/>
+             <apex:param name="EditThenSend" assignTo="{!EditThenSend}" value=""/>
+             <apex:param name="CommunityMailSubject" assignTo="{!communitysubjectValue}" value=""/>
+             <apex:param name="CommunityMailWith" assignTo="{!communitywithValue}" value=""/>
+             <apex:param name="CommunityMailDeadline" assignTo="{!communitydeadlineValue}" value=""/>
+             <apex:param name="CommunityMailDetails" assignTo="{!communitydetailsValue}" value=""/>
+             <apex:param name="CommunityMailBody" assignTo="{!editedBody}" value=""/>
+         </apex:actionFunction>
+         <apex:actionFunction name="getMatchingCommunityContacts" action="{!getMatchingCommunityContacts}" reRender="sectionId" onComplete="PORHideLoading();"/>
+        <apex:pageBlock id="pgBlckId" title="{!$Label.Post_to_Community}">
+            <apex:pageblockSection columns="1">
+                {!$Label.PostToCommunity_Detail}
+            </apex:pageblockSection>
+            <apex:pageBlockSection id="sectionId" columns="1" title="{!$Label.Matching_Members}">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Request_Type}"/>
+                    <apex:outputLabel value="{!communityReferencTypeName}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Matching_Criteria}"/>
+                    <apex:outputLabel value="{!matchedMembers}"/>
+                </apex:pageBlockSectionItem>
+                <script>
+                    noOfMembers = {!matchedMembers};
+                </script>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="refSectionId" columns="1" title="{!$Label.Referenceability_Info}">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Referenceability_Type}"/>
+                    <apex:outputLabel value="{!communityReferencTypeName}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Include}"/>
+                    <apex:inputCheckbox value="{!includeReferenceability}" onchange="PORShowLoading();getMatchingCommunityContacts();"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="attSectionId" columns="1" title="{!$Label.Attribute_Info}">
+                <apex:pageBlockSectionItem rendered="{!refUseAttr.AttributeLabels.size > 0}">
+                    <apex:outputLabel >&nbsp;</apex:outputLabel>
+                    <apex:commandLink style="color:#1797C0"  immediate="true" action="{!selectProjUseAttr}" value="{!$Label.Select_And_Edit}" id="theCommandLink"/>
+                </apex:pageBlockSectionItem>
+                <apex:repeat value="{!refUseAttr.AttributeLabels}" var="label">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >
+                             {!label.Name} <apex:outputText style="color : #CC0000;" value="{!IF(refUseAttr.mapRequiredLabel[label.Id],' | ','')}"/> 
+                        </apex:outputLabel>
+                        <apex:outputPanel >
+                            <apex:variable value="0" var="rowOrder"/>
+                            <apex:repeat value="{!refUseAttr.mapAttributesLabels[label]}" var="attr">
+                            <apex:outputText rendered="{!VALUE(rowOrder) > 0}">, </apex:outputText> {!attr.attributeLabel.Attribute__r.Name} 
+                            <apex:variable value="{!VALUE(rowOrder)+1}" var="rowOrder"/>
+                            </apex:repeat>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:repeat>
+                <apex:outputLabel rendered="{!refUseAttr.AttributeLabels.size == 0}" value="{!$Label.No_Data_Found}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Post}" onclick="showPostCommunityPopup();return false;"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!backToSearch}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:outputPanel id="communityDiv">
+            <div id="dialogBoxDiv6" title="{!$Label.Post_to_Community}" style="display:none;height: 50px; !important;">
+                  <table>
+                    <tr>
+                        <td style="text-align:right;">
+                            <apex:outputLabel value="{!$Label.Type}" style="margin-right:24px;"/>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId" styleClass="requiredInput" style="margin-left: 8px;" layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:outputText id="referenceType" value=""/>
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;">
+                            <span class="helpButton" id="helpImg2-_help"> 
+                            <apex:outputLabel value="{!$Label.With}"/>
+                            <img id="helpImg2" class="helpOrb" src="/s.gif" style="margin-top: 5px;"/> 
+                            <script>
+                                sfdcPage.setHelp('helpImg2', '{!$Label.PostWithHelpText}');
+                                setHelpText('helpImg2');                      
+                            </script> 
+                            </span>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId1" styleClass="requiredInput" style="margin-left: 8px;"  layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:inputText value="{!referencePostedWith}" id="with"/>
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;">
+                            <span class="helpButton" id="helpImg3-_help"> 
+                            <apex:outputLabel value="{!$Label.Community_Deadline}"/>
+                            <img id="helpImg3" class="helpOrb" src="/s.gif" style="margin-top: 5px;"/> 
+                            <script>
+                                sfdcPage.setHelp('helpImg3', '{!$Label.CommunityDeadlineHelpText}');
+                                setHelpText('helpImg3');                          
+                            </script> 
+                            </span>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId2" styleClass="requiredInput" style="margin-left: 8px;"  layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:inputText title="{!$Label.Community_Deadline}" value="{!communityDeadline}" id="selectDeadlineId" styleClass="selectDeadlineC"/>   
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;">
+                            <span class="helpButton" id="helpImg4-_help"> 
+                                <apex:outputLabel value="{!$Label.Details}"/>
+                                <img id="helpImg4" class="helpOrb" src="/s.gif" style="margin-top: 5px;"/> 
+                                <script>
+                                    sfdcPage.setHelp('helpImg4', '{!$Label.PostDetailsHelpText}');
+                                    setHelpText('helpImg4');                           
+                                </script> 
+                            </span>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId3" styleClass="requiredInput" style="margin-left: 8px;"  layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:inputTextArea value="{!communityDetails}" id="details" />   
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </apex:outputPanel>
+        <div id="dialogBoxDiv" title="{!$Label.Send_notification}" style="display:none;height: 60px; !important;">
+            {!$Label.Options_to_notify_community}
+        </div>
+        <div id="dialogBoxDiv8" title="{!$Label.E_mail_Preview}" style="display:none;">
+            <div>
+                <table style="width:70%; margin-left:50px;">
+                    <tr>
+                        <td>
+                            <apex:outputText value="Subject"/>
+                        </td>
+                        <td>
+                            <div style="background-color:white;border:1px solid #cfd0d2;padding: 7px 0 3px 10px;">
+                                <apex:inputText id="CommunitySubject" value="{!communitysubjectValue}" style="border: 0;width:100%;"/><br/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <apex:inputTextArea rows="20" cols="50" id="emailBody"  value="{!editThenSendEmailBody}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </apex:form>
+    
+    
+</apex:page>

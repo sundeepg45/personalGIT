@@ -1,0 +1,101 @@
+<apex:page controller="PPAdminOverrideController" cache="true" expires="1" action="{!checkContactSet}">
+
+    <apex:form >
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Partner Points Score Card Reconciliation<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Step 3: Add Missing Points</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+		
+        <apex:pageMessages />
+		<div><apex:commandLink action="{!selectContact}" id="backToContactDetails" value="< Cancel"/></div>
+		<br/>
+		<div class="bRelatedList">
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody">
+					<div>Select a Point Category:</div>
+					<br/>
+					<table class="list" border="0" cellspacing="0" cellpadding="0">
+					    <tr class="headerRow"> 
+							<th>Name</th>
+					    </tr>
+					    <apex:repeat var="name" value="{!PointsCategories}">
+					    <tr>
+					    	<td>
+								<apex:commandLink action="{!selectSubSystem}" value="{! name }">
+									<apex:param name="system" value="{! name }"/>
+								</apex:commandLink>
+							</td>
+					    </tr>
+						</apex:repeat>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<br/>
+		<br/>
+		
+		<apex:outputText rendered="{! not(isnull(currentPlugin))}">
+			<div>
+				Selected Point Category: <strong>{! currentPlugin.Name }</strong>
+			</div>
+			<div class="filterOverview">
+				<label for="SearchString">Item Name:</label><apex:inputText value="{!itemSearchValue}" id="searchString"/><apex:commandButton id="searchButton" value="Search" action="{!doItemSearch}"/>
+			</div>
+	
+			<br/>
+	
+			<apex:outputText rendered="{! not(isnull(itemSearchResults))}">
+				<div class="bRelatedList">
+					<div class="bPageBlock secondaryPalette">
+						<div class="pbBody">
+							<div>Search results for "<b>{!itemSearchValue}</b>" matching from the "<b>{!currentPlugin.Name}</b>" plugin</div>
+							<br/>
+							<table class="list" border="0" cellspacing="0" cellpadding="0">
+								<tr class="headerRow"> 
+								    <th>Item Name</th>
+								    <th>Sub-Category</th>
+								    <th>Region</th>
+								    <th>Language</th>
+								    <th># of Points</th>
+								    <th>Actions</th>
+								</tr>
+							    <apex:outputText rendered="{!itemSearchResults.size == 0}">
+							    <tr>
+							    	<td colspan="6">
+										No Results Found.
+									</td>
+							    </tr>
+								</apex:outputText>
+								<apex:repeat var="item" value="{!itemSearchResults}">
+								<tr id="{!item.pointCatalogId}">
+								    <td>{!item.description}</td>
+								    <td>{!item.subcategory}</td>
+								    <td>{!item.region}</td>
+								    <td>{!item.language}</td>
+								    <td><div id="ContentPoints">{!ROUND(item.pointValue,0)}</div></td>
+								    <td id="add{!item.pointCatalogId}">
+								    	<apex:outputText rendered="{!NOT(item.used)}">
+									    	<apex:commandLink id="addItem" action="{!addItem}" value="Add">
+									    		<apex:param name="itemId" value="{!item.pointCatalogId}"/>
+									    	</apex:commandLink>
+								    	</apex:outputText>
+								    	<apex:outputText rendered="{!item.used}">
+								    		Already Added
+								    	</apex:outputText>
+								    </td>
+								</tr>
+								</apex:repeat>
+							</table>
+						</div>
+					</div>
+				</div>
+			</apex:outputText>
+		</apex:outputText>
+    </apex:form>
+</apex:page>

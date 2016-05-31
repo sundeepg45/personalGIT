@@ -1,0 +1,75 @@
+<apex:component controller="EnhancedRelatedListController" >
+	<apex:attribute name="sequenceNumber" description="Change this value to force a refresh" type="Integer" default="0" assignTo="{!sequence}" />
+	<apex:attribute name="var" description="The variable to represent the record being displayed" type="String" />
+	<apex:attribute name="labelVar" description="The variable to represent the column label" type="String" />
+	<apex:attribute name="title" description="Section title" type="String" required="false" />
+	<apex:attribute name="collapsible" description="Collapsible" type="Boolean" default="false" required="false" />
+	<apex:attribute name="object" description="Name of the object to display" type="String" required="true" assignTo="{!queryObject}" />
+	<apex:attribute name="fields" description="Comma separated list of fields to display." type="String" required="true" assignTo="{!queryFields}" />
+	<apex:attribute name="sortFields" description="Comma separated list of fields name to use for sorting a column.  Use a blank fieldname to parse based on fields an order." type="String" required="false" assignTo="{!sortFieldsString}" />
+	<apex:attribute name="noSort" description="If true, disables all column sorting." type="Boolean" required="false" assignTo="{!noSort}" default="false" />
+	<apex:attribute name="labels" description="Comma separated list of fields labels to dispay.  If not provided it will be determined." type="String" required="false" assignTo="{!fieldLabelListString}" />
+	<apex:attribute name="conditions" description="Query conditions that will be used for this component." type="String" required="false" assignTo="{!queryConditions}" />
+	<apex:attribute name="order" description="Query order by option." type="String" required="false" assignTo="{!queryOrderBy}" />
+	<apex:attribute name="limit" description="Query limit" type="Integer" required="false" assignTo="{!queryLimit}" default="1000" />
+	<apex:attribute name="recordsPerPage" description="How many records to display per page" type="Integer" required="false" assignTo="{!pageSize}" />
+	<apex:attribute name="actionField" description="Field to link to an action" type="String" required="false" />
+	<apex:attribute name="actionFunctions" description="Function(s) that will be called when clicking on the action field" type="String" required="false"/>
+	<apex:attribute name="actionLabels" description="Label(s) that will be shown for the action functions" type="String" required="false"/>
+	<apex:attribute name="style" description="CSS style for the div block" type="String" default=""/>
+	<apex:attribute name="styleClass" description="CSS class for the div block." type="String" default=""/>
+	<apex:attribute name="panelStyle" description="CSS style for the panel block" type="String" default="max-height:28ex;overflow-y:auto;overflow-x:hidden;"/>
+	<apex:attribute name="panelClass" description="CSS class for the panel block." type="String" default=""/>
+	<apex:attribute name="tableStyle" description="CSS style for the table block." type="String" default="border:0px;padding:0px;border-spacing:0px;"/>
+	<apex:attribute name="tableClass" description="CSS class for the table block." type="String" default="list"/>
+	<apex:attribute name="theadStyle" description="CSS style for the thead block." type="String" default=""/>
+	<apex:attribute name="theadClass" description="CSS class for the thead block." type="String" default=""/>
+	<apex:attribute name="theadRowStyle" description="CSS style for the thead.tr block." type="String" default="position:relative"/>
+	<apex:attribute name="theadRowClass" description="CSS class for the thead.tr block." type="String" default="headerRow"/>
+	<apex:attribute name="theadCellStyle" description="CSS style for the thead.tr.th block." type="String" default=""/>
+	<apex:attribute name="theadCellClass" description="CSS class for the thead.tr.th block." type="String" default="zen-deemphasize headerCell"/>
+	<apex:attribute name="tbodyStyle" description="CSS style for the tbody block." type="String" default=""/>
+	<apex:attribute name="tbodyClass" description="CSS class for the tbody block." type="String" default=""/>
+	<apex:attribute name="tbodyRowStyle" description="CSS style for the tbody tr block." type="String" default=""/>
+	<apex:attribute name="tbodyRowClass" description="CSS class for the tbody tr block." type="String" default="dataRow"/>
+	<apex:attribute name="tbodyCellStyle" description="CSS style for the tbody tr.th block." type="String" default=""/>
+	<apex:attribute name="tbodyCellClass" description="CSS class for the tbody tr.th block." type="String" default="dataCell"/>
+	<apex:pageBlock title="{!title}" mode="detail">
+		<c:QueriedList var="varValue"
+			labelVar="labelValue"
+			object="{!object}"
+			fields="{!fields}"
+			sortFields="{!sortFields}"
+			noSort="{!noSort}"
+			labels="{!labels}"
+			conditions="{!conditions}"
+			order="{!order}"
+			limit="{!limit}"
+			recordsPerPage="{!recordsPerPage}"
+			actionField="{!actionField}"
+			actionFunction="{!actionFunctions}"
+			style="{!style}"
+			styleClass="{!styleClass}"
+			panelStyle="{!panelStyle}"
+			panelClass="{!panelClass}"
+			tableStyle="{!tableStyle}"
+			tableClass="{!tableClass}"
+			theadStyle="{!theadStyle}"
+			theadClass="{!theadClass}"
+			theadRowStyle="{!theadRowStyle}"
+			theadRowClass="{!theadRowClass}"
+			theadCellStyle="{!theadCellStyle}"
+			theadCellClass="{!theadCellClass}"
+			tbodyStyle="{!tbodyStyle}"
+			tbodyClass="{!tbodyClass}"
+			tbodyRowStyle="{!tbodyRowStyle}"
+			tbodyRowClass="{!tbodyRowClass}"
+			tbodyCellStyle="{!tbodyCellStyle}"
+			tbodyCellClass="{!tbodyCellClass}">
+			<apex:componentBody >
+				<apex:variable var="{!var}" value="{!varValue}"/>
+				<apex:variable var="{!labelVar}" value="{!labelValue}"/>
+			</apex:componentBody>
+		</c:QueriedList>
+	</apex:pageBlock>
+</apex:component>

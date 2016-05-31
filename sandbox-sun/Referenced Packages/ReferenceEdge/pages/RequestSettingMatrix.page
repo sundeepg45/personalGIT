@@ -1,0 +1,183 @@
+<apex:page controller="refedge.RequestSettingMatrixController" sideBar="false" id="pageId" tabStyle="refedge__Custom_Settings__c">
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <style>
+        .freezeColumn {
+            overflow-x:scroll;  
+            margin-left:160px;
+        }
+        
+        .Col1 {
+            position:absolute; 
+            width:160px; 
+            left:16px;
+            top:auto;
+            border : 0 px solid gray !important;
+            height:15px;
+        }
+        .headCol1 {
+            position:absolute; 
+            width:160px; 
+            left:16px;
+            top:102px;
+            height:15px;
+        }
+        .headCol2{
+            position:absolute; 
+            width:160px; 
+            left:16px;
+            top:auto;
+            height:15px;
+        }
+        .headCol3{
+            height:15px;
+        }
+    </style>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            if(({!IsPageAccessible} || {!IsPageAccessible} == true) && ({!isFullLicenseAccessible} || {!isFullLicenseAccessible} == true)){
+            	deleteMapping(); 
+            }
+            else{
+            	PORHideLoading();
+            } 
+        });
+    </script>
+    <apex:pageMessages id="pgmsgId" />
+   
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction action="{!deleteMappings}" name="deleteMapping" rerender="pgmsgId"  oncomplete="PORHideLoading();"/>
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink rendered="{!!isEdit}" style="color:#5C95C4;" action="{!backToCustomSetting}" value="{!$Label.Back_to_the_Custom_Setting_Page}"/><br/>
+        </div>
+        <apex:pageBlock rendered="{!AND(referenceTypes.size == 0,isContentSetting == 'false')}">
+            <apex:pageMessage summary="{!$Label.Referenceability_message}" strength="3" severity="Info"/>
+        </apex:pageBlock>
+        <apex:pageBlock id="blockId" rendered="{!AND(referenceTypes.size > 0,recordsPresent)}" >
+            <div id="divMain" style="overflow:auto" class="freezeColumn">
+                <table cellpadding="1" class="list" cellspacing="1" width="100%" border="1" style="border-collapse:collapse; border-spacing:1px">
+                    <!-- For reference fields -->
+                    <tr class="headerRow">
+                        <th class="headCol1"> {!$Label.Field_Label} </th>
+                        <apex:repeat value="{!referenceTypes}" var="refType">
+                            <th class="headCol3">
+                                <div style="text-align:center;min-width:250px;">{!refType.Name}</div><br/>
+                                <div style="float:left;padding-left:25px;padding-right:25px;">{!$Label.Visible}</div> 
+                                <div style="float:right;padding-left:25px;padding-right:25px;">{!$Label.Required}</div>
+                            </th>
+                        </apex:repeat>
+                    </tr>     
+                    <apex:repeat value="{!fieldMap}" var="fieldAPIName">
+                        <tr>
+                            <td class="Col1"> {!fieldMap[fieldAPIName].Name} </td>
+                            <apex:repeat value="{!referenceTypes}" var="refType">
+                                <td class="headCol3">
+                                    <div id="checkBoxDiv1" style="float:left;padding-left:25px;">
+                                        <apex:outputField value="{!matrixMap[fieldAPIName+''+refType.Id].Visible__c}" rendered="{!!isEdit}"/>
+                                        <apex:inputField id="VisibleId" value="{!matrixMap[fieldAPIName+''+refType.Id].Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/>
+                                    </div>
+                                    <div id="checkBoxDiv2"  style="float:right;padding-right:25px;">
+                                        <apex:outputField value="{!matrixMap[fieldAPIName+''+refType.Id].Required__c}" rendered="{!!isEdit}"/>
+                                        <apex:inputField id="RequiredId" value="{!matrixMap[fieldAPIName+''+refType.Id].Required__c}" onclick="checkForDependencyOfRequired(this.id);" rendered="{!isEdit}"/>  
+                                    </div>
+                                </td>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat>      
+                    <!-- For Attributes of Reference Fields -->
+                    <tr class="headerRow">
+                        <th class="headCol2"> {!$Label.Attribute_Label}</th>
+                        <apex:repeat value="{!referenceTypes}" var="refType">
+                            <th class="headCol3"><div style="text-align:center;min-width:250px;visibility:hidden;">{!refType.Name}</div></th>
+                        </apex:repeat>
+                    </tr> 
+                    <apex:repeat value="{!labelList}" var="label">
+                        <tr>
+                            <td class="Col1"> {!label.label__r.name}</td>
+                            <apex:repeat value="{!referenceTypes}" var="refType">
+                                <td class="headCol3">
+                                    <div id="checkBoxDiv1" style="float:left;padding-left:25px;">
+                                        <apex:outputField value="{!matrixMap[label.label__r.Id+''+refType.Id].Visible__c}" rendered="{!!isEdit}"/>
+                                        <apex:inputField id="VisibleId" value="{!matrixMap[label.label__r.Id+''+refType.Id].Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/>
+                                    </div>
+                                    <div id="checkBoxDiv2"  style="float:right;padding-right:25px;">
+                                        <apex:outputField value="{!matrixMap[label.label__r.Id+''+refType.Id].Required__c}" rendered="{!!isEdit}"/>
+                                        <apex:inputField id="RequiredId" value="{!matrixMap[label.label__r.Id+''+refType.Id].Required__c}" onclick="checkForDependencyOfRequired(this.id);" rendered="{!isEdit}"/>  
+                                    </div> 
+                                </td>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat> 
+                    <tr class="headerRow">
+                        <th class="headCol2">{!$Label.Notes}</th>
+                        <apex:repeat value="{!referenceTypes}" var="refType">
+                            <th class="headCol3"><div style="text-align:center;min-width:250px;visibility:hidden;">{!refType.Name}</div></th>
+                        </apex:repeat>
+                    </tr> 
+                    <apex:repeat value="{!dummyList}" var="label">
+                        <tr>
+                            <td class="Col1"> {!label}</td>
+                            <apex:repeat value="{!referenceTypes}" var="refType">
+                                <td class="headCol3">
+                                    <div id="textDiv" style="float:left;padding-left:20px;width:90%;min-height:20px;">
+                                        <apex:outputField value="{!refType.refedge__Note__c}" rendered="{!!isEdit}"/>
+                                        <apex:inputTextarea style="width:100%;" id="NoteId" value="{!refTypeWrapperList[refType.Id]}" rendered="{!isEdit}"/>
+                                    </div>
+                                </td>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat>   
+                </table>
+            </div>
+            <div id="generalNoteId" style="padding-top:25px;">
+                <apex:pageBlockSection id="sectionId"  rendered="{!isContentSetting == 'false'}">
+                    <apex:outputField value="{!customSetting.refedge__General_Notes__c}"  rendered="{!!isEdit}"/>
+                    <apex:inputField id="GenNoteId" value="{!customSetting.refedge__General_Notes__c}" style="width: 500px;"  rendered="{!isEdit}"/>
+                </apex:pageBlockSection>
+            </div>
+            
+            <apex:pageBlockButtons id="buttons">
+                <apex:commandButton value="{!$Label.Manage_Custom_Fields}" action="{!redirectFieldPage}" rendered="{!isContentSetting == 'false'}"/>
+                <apex:commandButton value="{!$Label.Save}" action="{!saveMatrix}" rendered="{!isEdit}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="formId,pgmsgId"/>
+                <apex:commandButton value="{!$Label.Edit}" action="{!editMatrix}" rendered="{!!isEdit}"  onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="formId"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancelMatrix}" rendered="{!isEdit}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="formId"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+         <apex:outputPanel style="float:left;width:100%;" rendered="{!!recordsPresent}">
+            <apex:pageMessage summary="{!$Label.Add_fields_to_ref_req_add_info_Message}" severity="Info" strength="3" />
+        </apex:outputPanel>
+        <script>
+        
+        document.getElementById('divMain').style.width = window.screen.width - 190 +'px';
+        
+        
+        
+        function checkForDependencyOfRequired(requiredObj){
+           
+            if(document.getElementById(requiredObj).checked){
+                
+               
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.childNodes[0].firstChild;
+                 if(parentId==null)
+                     parentId=document.getElementById(requiredObj).parentNode.parentNode.childNodes[1].firstChild;
+                
+                parentId.checked=true;
+            }
+            
+         }
+        function checkForDependencyOfVisible(requiredObj){
+        
+            if(!document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.children[1].firstChild;
+                
+                parentId.checked=false;
+            }
+        }
+        
+        
+        
+    </script>
+    </apex:form>
+</apex:page>

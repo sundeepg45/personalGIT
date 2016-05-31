@@ -1,0 +1,6 @@
+<table height="400" width="550" cellpadding="5" border="0" cellspacing="5" >
+<tr height="400" valign="top" >
+<td style=" color:#000000; font-size:12pt; background-color:#FFFFFF; font-family:arial; bLabel:main; bEditID:r3st1;" tEditID="c1r1" locked="0" aEditID="c1r1" >
+<![CDATA[<font face="arial" style="color: rgb(0, 0, 0); font-family: arial;" size="2"><font>Thanks for nominating&nbsp;</font><font>{!Nomination__c.Contact__c}&nbsp;</font><font>&nbsp;to the Reference Program.</font></font><div style="color: rgb(0, 0, 0); font-family: arial;"><font face="arial" size="2">Unfortunately at this time we’re unable to add them to the program.</font></div><div style="color: rgb(0, 0, 0); font-family: arial;"><font face="arial" size="2"><br></font></div><div><font face="arial" size="2">{!Nomination__c.Note__c}</font></div>]]></td>
+</tr>
+</table>

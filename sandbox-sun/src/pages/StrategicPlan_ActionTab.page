@@ -1,0 +1,200 @@
+<apex:page controller="TabUIController" extensions="StrategicPlan_ActionControllerExtn" showChat="false" showHeader="false" sidebar="false">
+    <apex:form >
+        <apex:commandButton action="{!displayId}" style="display:none" immediate="true" value="displayId" id="displayId"/>
+        <!-- apex:actionFunction action="{!displayId}" name="displayActions2" status="loadingDetails" rerender="action" oncomplete="document.getElementById('action').style.display='block';" -->
+        <apex:actionFunction action="{!displayId}" name="displayActions2" status="loadingDetails" rerender="action" oncomplete="document.getElementById('{!$Component.displayId}').click();">
+            <apex:param name="solutionId" assignTo="{!activeId}" value="" />
+        </apex:actionFunction>
+        <script type="text/javascript">
+            function displayActions(actionId) {
+                var element = document.getElementById('action');
+                var inputs = element.getElementsByTagName('textarea');
+                if(inputs && inputs.length != 0) {
+                    alert('{JSENCODE($!Label.StrategicPlan_EditInProgress)}');
+                }
+                else {
+                    element.style.display='none';
+                    displayActions2(actionId);
+                }
+            }
+        </script>
+        <c:QueriedList sequenceNumber="{!sequenceNumber}"
+            object="StrategicPlan_Action__c"
+            fields="Name,ActionSubject__c,AssignedTo__c,Status__c,Start__c,End__c,RelatedTo__c"
+            sortFields="Name,ActionSubject__c,AssignedTo__r.Name,Status__c,Start__c,End__c,RelatedTo_Number__c"
+            labels=",,,,,,"
+            conditions="StrategicPlan__c='{!strategicPlanId}'"
+            order="Name,ActionSubject__c,RelatedTo_Number__c"
+            recordsPerPage="50"
+            actionFunction="displayActions"
+            panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;"
+            rendered="{!NOT(ISBLANK(strategicPlanId))}" />
+        <apex:actionStatus startText="{!$Label.StrategicPlan_LoadingDetails}" id="loadingDetails"/>
+    </apex:form>
+    <div id="action">
+        <apex:outputPanel id="action">
+            <apex:form id="form">
+                <apex:inputHidden value="{!Task.RecordTypeId}" />
+                <apex:sectionHeader title="{!$ObjectType.StrategicPlan_Action__c.Label}" subtitle="{!IF(ISBLANK(id),'New Action',Action.Name)}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}"/>
+                <apex:pageBlock title="{!$Label.StrategicPlan_ActionDetail}" mode="{!IF(mode='view','inlineEdit','edit')}" >
+                    <apex:pageMessages id="pageMessages"/>
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!newRecord}" id="newButton" value="{!$Label.StrategicPlan_NewAction}" rendered="{!AND(mode='view',isCreateable)}" />
+                        <apex:commandButton action="{!editRecord}" id="editButton" value="{!$Label.Edit}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isUpdateable)}" />
+                        <apex:commandButton action="{!deleteRecord}" id="deleteButton" value="{!$Label.Delete}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isDeletable)}" />
+                        <!-- apex:commandButton action="{x!cloneRecord}" id="cloneButton" value="{!$Label.Clone}" rendered="{x!AND(mode='view',NOT(ISBLANK(id)),isCreateable)}" / -->
+                        <apex:commandButton action="{!saveAction}" id="saveButton" value="{!$Label.Save}" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(AND(mode='new',isCreateable),AND(NOT(ISBLANK(id)),isUpdateable))}" />
+                        <apex:commandButton action="{!cancelRecord}" id="cancelButton" value="{!$Label.cancel}" immediate="true" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}"/>
+                    </apex:pageBlockButtons>
+                    <apex:outputPanel layout="none" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}">
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.StrategicPlan_Action__c.Fields.Status__c.inlineHelpText}">
+                                <apex:outputText value="{!$ObjectType.StrategicPlan_Action__c.Fields.Status__c.Label}" />
+                                <apex:outputPanel >
+                                    <apex:outputField value="{!Task.Status}" id="statusOutput" rendered="{!mode='view'}"/>
+                                    <apex:inputField value="{!Task.Status}" required="true" id="statusInput" rendered="{!mode!='view'}"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$Label.StrategicPlan_ActionRelatedToHelp}" rendered="{!OR(ISBLANK(Action.Subject__c),ISBLANK(Id))}">
+                                <apex:outputLabel value="{!$Label.StrategicPlan_ActionRelatedTo}" for="relatedTo"/>
+                                <apex:outputPanel layout="inline" id="relatedTo">
+                                    <apex:inputField value="{!Action.Subject__c}" required="true" id="subjectInput" onchange="return changeSubject(this);"/>
+                                    <apex:outputPanel layout="inline" style="display:none">
+                                        <apex:inputField value="{!Action.StrategicPlan__c}" id="strategicPlanInput"/>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="inline" id="strategicPlanOutput2" style="display:{!IF((Action.Subject__c='Strategic Plan'),'inline','none')};">
+                                        <apex:outputField value="{!Action.StrategicPlan__c}" id="strategicPlanOutput3">
+                                            <apex:inlineEditSupport disabled="true"/>
+                                        </apex:outputField>
+                                        <apex:outputText value=" ({!Action.StrategicPlan__r.PlanNumber__c})" id="planNumberOutput3" rendered="{!NOT(ISBLANK(Action.StrategicPlan__r.PlanNumber__c))}" />
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="inline" id="strategyInput2" style="display:{!IF((Action.Subject__c='Strategic Plan Strategy'),'inline','none')};">
+                                        <apex:inputField value="{!Action.Strategy__c}" id="strategyInput" />
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="inline" id="solutionInput2"                                   style="display:{!IF((Action.Subject__c='Strategic Plan Solution'),'inline','none')};" >
+                                        <apex:inputField value="{!Action.Solution__c}" id="solutionInput" />
+                                    </apex:outputPanel>
+                                    <script type="text/javascript">
+                                        function changeSubject(el) {
+                                            var c1=document.getElementById('{!$Component.strategicPlanOutput2}');
+                                            var c2=document.getElementById('{!$Component.strategyInput2}');
+                                            var c3=document.getElementById('{!$Component.solutionInput2}');
+                                            c1.style.display = 'none';
+                                            c2.style.display = 'none';
+                                            c3.style.display = 'none';
+                                            if(el.value == 'Strategic Plan') {
+                                                c1.style.display = 'inline';
+                                            }
+                                            else if(el.value == 'Strategic Plan Strategy') {
+                                                c2.style.display = 'inline';
+                                            }
+                                            else if(el.value == 'Strategic Plan Solution') {
+                                                c3.style.display = 'inline';
+                                            }
+                                            return true;
+                                        }
+                                    </script>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$Label.StrategicPlan_ActionRelatedToHelp}" rendered="{!NOT(OR(ISBLANK(Action.Subject__c),ISBLANK(Id)))}">
+                                <apex:outputPanel >
+                                    <apex:outputLabel value="{!$ObjectType.StrategicPlan_Action__c.Fields.StrategicPlan__c.Label}" for="relatedToOutput" rendered="{!(Action.Subject__c='Strategic Plan')}"/>
+                                    <apex:outputLabel value="{!$ObjectType.StrategicPlan_Action__c.Fields.Strategy__c.Label}" for="relatedToOutput" rendered="{!(Action.Subject__c='Strategic Plan Strategy')}"/>
+                                     <apex:outputLabel value="{!$ObjectType.StrategicPlan_Action__c.Fields.Solution__c.Label}" for="relatedToOutput" rendered="{!(Action.Subject__c='Strategic Plan Solution')}"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel layout="inline" id="relatedToOutput">
+                                    <apex:outputPanel layout="none" rendered="{!(Action.Subject__c='Strategic Plan')}">
+                                        <apex:outputField value="{!Action.StrategicPlan__c}" id="strategicPlanOutput">
+                                            <apex:inlineEditSupport disabled="true"/>
+                                        </apex:outputField>
+                                        <apex:outputText value=" ({!Action.StrategicPlan__r.PlanNumber__c})" id="planNumberOutput" rendered="{!NOT(ISBLANK(Action.StrategicPlan__r.PlanNumber__c))}" />
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none" rendered="{!(Action.Subject__c='Strategic Plan Strategy')}">
+                                        <apex:outputField value="{!Action.Strategy__c}" id="stategyOutput">
+                                            <apex:inlineEditSupport disabled="true"/>
+                                        </apex:outputField>
+                                        <apex:outputText value=" ({!Action.Strategy__r.StrategyNumber__c})" id="strategyNumberOutput" rendered="{!NOT(ISBLANK(Action.Strategy__r.StrategyNumber__c))}" />
+                                    </apex:outputPanel>
+                                    <apex:outputPanel layout="none" rendered="{!(Action.Subject__c='Strategic Plan Solution')}">
+                                        <apex:outputField value="{!Action.Solution__c}" id="solutionOutput" rendered="{!AND((Action.Subject__c='Strategic Plan Solution'),NOT(ISBLANK(Id)))}">
+                                            <apex:inlineEditSupport disabled="true"/>
+                                        </apex:outputField>
+                                        <apex:outputText value=" ({!Action.Solution__r.SolutionNumber__c})" id="solutionNumberOutput" rendered="{!NOT(ISBLANK(Action.Solution__r.SolutionNumber__c))}" />
+                                    </apex:outputPanel>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.StrategicPlan_Action__c.Fields.ActionSubject__c.inlineHelpText}">
+                                <apex:outputText value="{!$ObjectType.StrategicPlan_Action__c.Fields.ActionSubject__c.Label}"/>
+                                <apex:outputPanel >
+                                    <apex:outputField value="{!Task.ActionSubject__c}" id="actionSubjectOutput" rendered="{!mode='view'}"/>
+                                    <apex:inputField value="{!Task.ActionSubject__c}" required="true" id="actionSubjectInput" style="width:100%" rendered="{!mode!='view'}"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$Label.StrategicPlan_ActionNumberHelp}">
+                                <apex:outputText value="{!$ObjectType.StrategicPlan_Action__c.Fields.Name.Label}"/>
+                                <apex:outputField value="{!Action.Name}" id="nameOutput">
+                                    <apex:inlineEditSupport disabled="true"/>
+                                </apex:outputField>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.StrategicPlan_Action__c.Fields.Start__c.inlineHelpText}">
+                                <apex:outputText value="{!$ObjectType.StrategicPlan_Action__c.Fields.Start__c.Label}"/>
+                                <apex:outputPanel >
+                                    <apex:outputField value="{!Task.Start__c}" rendered="{!mode='view'}" id="startOutput"/>
+                                    <apex:inputField value="{!Task.Start__c}" rendered="{!mode!='view'}" id="startInput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.StrategicPlan_Action__c.Fields.End__c.inlineHelpText}">
+                                <apex:outputText value="{!$ObjectType.StrategicPlan_Action__c.Fields.End__c.Label}"/>
+                                <apex:outputPanel >                         
+                                    <apex:outputField value="{!Task.End__c}" rendered="{!mode='view'}" id="endOutput"/>
+                                    <apex:inputField value="{!Task.End__c}" rendered="{!mode!='view'}" id="endInput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.StrategicPlan_Action__c.Fields.AssignedTo__c.inlineHelpText}">
+                                <apex:outputText value="{!$ObjectType.StrategicPlan_Action__c.Fields.AssignedTo__c.Label}"/>
+                                <apex:outputPanel >                         
+                                    <apex:outputField value="{!Action.AssignedTo__c}" rendered="{!mode='view'}" id="assignToOutput"/>
+                                    <apex:inputField value="{!Action.AssignedTo__c}" required="true" rendered="{!mode!='view'}" id="assignToInput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$Label.StrategicPlan_ActionReminderHelp}">
+                                <apex:outputText value="{!$ObjectType.Task.Fields.ReminderDateTime.Label}"/>
+                                <apex:outputPanel >                         
+                                    <apex:outputField value="{!Task.ReminderDateTime}" rendered="{!mode='view'}" id="reminderOutput"/>
+                                    <apex:inputField value="{!Task.ReminderDateTime}" rendered="{!mode!='view'}" id="reminderInput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:pageBlockSectionItem helpText="{!$Label.StrategicPlan_ActionCommentsHelp}">
+                                <apex:outputText value="{!$Label.StrategicPlan_ActionCommentsLabel}"/>
+                                <apex:outputPanel >                             
+                                    <apex:outputField value="{!Task.Description}" rendered="{!mode='view'}" id="descriptionOutput"/>
+                                    <apex:inputField value="{!Task.Description}" rendered="{!mode!='view'}" id="descriptionInput" style="width:100%"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(Task.CreatedById))}">
+                                <apex:outputLabel value="{!$Label.CreatedBy}" for="createdBy"/>
+                                <apex:outputPanel layout="inline" id="createdBy">
+                                    <apex:outputField value="{!Task.CreatedById}" id="createdByOutput" />
+                                    <apex:outputText value=", {!Task.CreatedDate}" id="createdDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(Task.LastModifiedById))}">
+                                <apex:outputLabel value="{!$Label.LastModifiedBy}" for="lastModifiedBy"/>
+                                <apex:outputPanel layout="inline" id="lastModifiedBy">
+                                    <apex:outputField value="{!Task.LastModifiedById}" id="modifiedByOutput" />
+                                    <apex:outputText value=", {!Task.LastModifiedDate}" id="modifiedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                </apex:pageBlock>
+            </apex:form>
+        </apex:outputPanel>
+    </div>
+</apex:page>

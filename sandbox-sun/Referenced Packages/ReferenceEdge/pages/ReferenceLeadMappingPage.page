@@ -1,0 +1,251 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.ReferenceLeadMappingController" id="pageId" sidebar="false"> 
+    <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .bPageBlock .list {
+            width: 25%;
+        }
+    </style>
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <style type="text/css">
+        table.gridtable {
+            font-family: verdana,arial,sans-serif;
+            font-size:11px;
+            color:#333333;
+            border-collapse: collapse;
+            border: 2px solid #CFCCCC;
+            width: 100%;
+        }
+        table.gridtable th {
+            padding: 8px;
+            background-color: #dedede; 
+        }
+        table.gridtable td {
+            padding: 8px;
+            border-left: 2px solid #CFCCCC;
+            border-right: 2px solid #CFCCCC;
+            background-color: #ffffff;
+        }
+        .col1 {
+            width: 50%;
+        }
+        .col2 {
+            width: 21%;
+            text-align:center;
+        }
+        .col0 {
+            width: 8%;
+            text-align:center;
+        }
+    </style>
+    <!-- Java Script -->
+    <script type="text/javascript"> 
+        function checkForDependencyOfRequired(requiredObj){
+            if(document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.children[2].children[0];
+                parentId.checked=true;
+            }
+        }
+        function checkForDependencyOfVisible(requiredObj){
+            if(!document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.children[3].children[0];
+                parentId.checked=false;
+            }
+        }
+        function checkForDependencyOfVisibleOnSection(labelSize, fieldSize, refSize){
+            var sectionflag = false;
+            var childFlag = false;
+            var loopSize = 0;
+            var count = 0;
+            var msg = '{!$Label.Fill_name_of_section}';
+            var msg2 = '{!$Label.Select_one_entity}';
+            if(labelSize != ''){
+                for(var i = 1; i <7; i++) {
+                    var id = 'row'+ i;
+                    //alert(id);
+                    if(document.getElementById(id).children[2].children[0].checked){
+                        if(document.getElementById(id).children[1].children[0].value == ''){
+                            alert(msg.replace('@@@',i));
+                            sectionflag = true;
+                            break;
+                        }
+                        if( i == 3) {
+                            loopSize = labelSize;
+                            count = 1;
+                        }
+                        else if( i == 4) {
+                            loopSize = fieldSize;
+                            count = 2;
+                        }
+                        else if( i == 5) {
+                            loopSize = refSize;
+                            count = 3;
+                        }
+                        if(loopSize > 0) {
+                            childFlag = false;
+                            for(var j = 0; j <loopSize; j++){
+                                var childId = 'pageId:frmId:pbId:loopId'+count+':'+j+':checkBoxVP'+count;
+                                if(document.getElementById(childId).checked){
+                                    childFlag = true;
+                                    break;
+                                }
+                            }
+                            if(!childFlag) {
+                                alert(msg2.replace('@@@',i));
+                                sectionflag = true;
+                                break;  
+                            }
+                            loopSize = 0;
+                        }
+                    }
+                }
+            }
+            if(!sectionflag){
+                saveSettings();
+            }else
+                return false;
+        }
+    </script>
+       
+    <!-- Form -->
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="saveSettings" action="{!saveReferenceLeadSettings}" reRender="pgmsgId, pbId"/>
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_the_Custom_Setting_Page}" action="{!returnCustomSettings}"/><br/>
+        </div>
+        <apex:pageBlock id="pbId" title="{!$Label.ReferenceLead_Settings}" >
+            <apex:pageBlockButtons id="pbbId">
+                <apex:commandButton value="{!$Label.Manage_Custom_Fields}" action="{!redirectFieldPage}"/>
+                <apex:commandButton value="{!$Label.Edit}" rendered="{!NOT(isEdit)}" action="{!editNominationSettings}" reRender="pgmsgId, pbId" />
+                <apex:commandButton value="{!$Label.Save}" onclick="checkForDependencyOfVisibleOnSection('{!filterMappingRecords.size}', '{!referenceLeadFieldList.size}', '{!refTypeMappingRecords.size}');return false;" rendered="{!isEdit}" />
+                <apex:commandButton value="{!$Label.Cancel}" rendered="{!isEdit}" action="{!cancelNominationSettings}" reRender="pgmsgId, pbId"/>
+            </apex:pageBlockButtons>
+            <apex:outputpanel id="tableId">
+                <table class="gridtable">
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!$Label.Section_Order}</th>
+                        <td class="col1"></td>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!$Label.Visible}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!$Label.Required}</th>
+                    </tr>
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col1" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!HeaderListMap[HeaderList[0]]}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col2"></th>
+                    </tr>
+                    <tr id="row1">
+                        <td class="col0"><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[0]].Order__c}"/></td>
+                        <td class="col1"><apex:inputField style="width:80%;" value="{!referenceLeadHeaderMap[HeaderList[0]].Field_API_Name__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[0]].Field_API_Name__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField value="{!referenceLeadHeaderMap[HeaderList[0]].Visible__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[0]].Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <th class="col2"></th>
+                    </tr>
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col1" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!HeaderListMap[HeaderList[1]]}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col2"></th>
+                    </tr>
+                    <tr id="row2">
+                        <td class="col0"><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[1]].Order__c}"/></td>
+                        <td class="col1"><apex:inputField style="width:80%;" value="{!referenceLeadHeaderMap[HeaderList[1]].Field_API_Name__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[1]].Field_API_Name__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField value="{!referenceLeadHeaderMap[HeaderList[1]].Visible__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[1]].Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <th class="col2"></th>
+                    </tr>
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col1" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!HeaderListMap[HeaderList[2]]}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col2"></th>
+                    </tr>
+                    <tr id="row3">
+                        <td class="col0"><apex:inputField style="width:50%;" value="{!referenceLeadHeaderMap[HeaderList[2]].Order__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[2]].Order__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col1"><apex:inputField style="width:80%;" value="{!referenceLeadHeaderMap[HeaderList[2]].Field_API_Name__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[2]].Field_API_Name__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField value="{!referenceLeadHeaderMap[HeaderList[2]].Visible__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[2]].Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <th class="col2" style="border-bottom: 2px solid #CFCCCC;"></th>
+                    </tr>
+                    <apex:repeat id="loopId1" value="{!filterMappingRecords}" var="label">
+                        <tr>
+                            <td class="col0"></td>
+                            <td class="col1" style="text-align:right;"><apex:outputField value="{!label.Name}" /></td>
+                            <td class="col2"><apex:inputField id="checkBoxVP1" value="{!label.refedge__Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/><apex:outputField value="{!label.refedge__Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                            <td class="col2"><apex:inputField id="checkBoxRP1" value="{!label.refedge__Required__c}" onclick="checkForDependencyOfRequired(this.id);" rendered="{!isEdit}"/><apex:outputField value="{!label.refedge__Required__c}" rendered="{!NOT(isEdit)}"/></td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col1" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!HeaderListMap[HeaderList[3]]}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;"></th>
+                    </tr>
+                    <tr id="row4">
+                        <td class="col0"><apex:inputField style="width:50%;" value="{!referenceLeadHeaderMap[HeaderList[3]].Order__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[3]].Order__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col1"><apex:inputField style="width:80%;" value="{!referenceLeadHeaderMap[HeaderList[3]].Field_API_Name__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[3]].Field_API_Name__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField value="{!referenceLeadHeaderMap[HeaderList[3]].Visible__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[3]].Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <th class="col2" style="border-bottom: 2px solid #CFCCCC;"></th>
+                    </tr>
+                    <apex:repeat id="loopId2" value="{!referenceLeadFieldList}" var="field">
+                        <tr>
+                            <td class="col0"></td>
+                            <td class="col1" style="text-align:right;"><apex:outputlabel value="{!field.Name}" /></td>
+                            <td class="col2"><apex:inputField id="checkBoxVP2" value="{!field.refedge__Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/><apex:outputField value="{!field.refedge__Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                            <td class="col2"><apex:inputField id="checkBoxRP2" value="{!field.refedge__Required__c}" onclick="checkForDependencyOfRequired(this.id);" rendered="{!isEdit}"/><apex:outputField value="{!field.refedge__Required__c}" rendered="{!NOT(isEdit)}"/></td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col1" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!HeaderListMap[HeaderList[4]]}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;"></th>
+                    </tr>
+                    <tr id="row5">
+                        <td class="col0"><apex:inputField style="width:50%;" value="{!referenceLeadHeaderMap[HeaderList[4]].Order__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[4]].Order__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col1"><apex:inputField style="width:80%;" value="{!referenceLeadHeaderMap[HeaderList[4]].Field_API_Name__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[4]].Field_API_Name__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField value="{!referenceLeadHeaderMap[HeaderList[4]].Visible__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[4]].Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <th class="col2"></th>
+                    </tr>
+                    <apex:repeat id="loopId3" value="{!refTypeMappingRecords}" var="ref">
+                        <tr>
+                            <td class="col0"></td>
+                            <td class="col1" style="text-align:right;"><apex:outputField value="{!ref.Name}" /></td>
+                            <td class="col2"><apex:inputField id="checkBoxVP3" value="{!ref.refedge__Visible__c}" rendered="{!isEdit}"/><apex:outputField value="{!ref.refedge__Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                            <th class="col2"></th>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <th class="col0" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col1" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;">{!HeaderListMap[HeaderList[5]]}</th>
+                        <th class="col2" style="border-top: 2px solid #CFCCCC;border-bottom: 2px solid #CFCCCC;"></th>
+                        <th class="col2" style="border-bottom: 2px solid #CFCCCC;"></th>
+                    </tr>
+                    <tr id="row6">
+                        <td class="col0"><apex:inputField style="width:50%;" value="{!referenceLeadHeaderMap[HeaderList[5]].Order__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[5]].Order__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col1"><apex:inputField style="width:80%;" value="{!referenceLeadHeaderMap[HeaderList[5]].Field_API_Name__c}" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[5]].Field_API_Name__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField id="checkBoxVP3" value="{!referenceLeadHeaderMap[HeaderList[5]].Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[5]].Visible__c}" rendered="{!NOT(isEdit)}"/></td>
+                        <td class="col2"><apex:inputField id="checkBoxRP3" value="{!referenceLeadHeaderMap[HeaderList[5]].Required__c}" onclick="checkForDependencyOfRequired(this.id);" rendered="{!isEdit}"/><apex:outputField value="{!referenceLeadHeaderMap[HeaderList[5]].Required__c}" rendered="{!NOT(isEdit)}"/></td>
+                    </tr>
+                </table>
+            </apex:outputpanel>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

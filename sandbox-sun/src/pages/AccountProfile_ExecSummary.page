@@ -1,0 +1,217 @@
+<apex:page controller="AccountProfileExecSummaryController"
+        tabStyle="Account_Profile__c"
+        showHeader="false"
+        sidebar="false"
+        readonly="false"
+        renderas="{!IF($CurrentPage.parameters.renderas='pdf','pdf','html')}"
+        standardStylesheets="true"
+        id="AccountProfile_ExecSummary">
+    <apex:variable var="IsRenderAsPDF" value="{!$CurrentPage.parameters.renderas='pdf'}"/>            
+    <apex:outputPanel layout="none" rendered="{!IsRenderAsPDF}">
+        <!-- When renderas="pdf" the standardStylesheets attribute is ignored, we we have to manually load style sheets. -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/zen-componentsCompatible.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/zen-componentsCompatible.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/elements.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/elements.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/common.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/common.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dStandard.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dStandard.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom0.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom0.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom1.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom1.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom2.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom2.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/extended.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/extended.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/setup.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/setup.css -->
+    </apex:outputPanel>
+    <apex:stylesheet value="{!$Resource.AccountProfileStyle}"/>
+    <apex:stylesheet value="{!$Resource.PrintableStylesheet}"/>           
+    <apex:outputPanel styleClass="hideforprint" style="padding:5px 5px 5px 5px;margin:5px 5px 5px 5px;" layout="block">
+        <apex:outputLink value="/apex/AccountProfile_View?id={!accountProfile.Id}&print=1">
+            {!$Label.AccountProfile_FullView}
+        </apex:outputLink>
+        <apex:outputText value=" | " styleClass="pipe"/>
+        <apex:outputLink value="/apex/AccountProfile_View?id={!accountProfile.Id}&print=1&view=infrastructure">
+            {!$Label.AccountProfile_InfrastructureView}
+        </apex:outputLink>
+        <apex:outputText value=" | " styleClass="pipe"/>
+        <apex:outputLink value="/apex/AccountProfile_View?id={!accountProfile.Id}&print=1&view=top">
+            {!$Label.AccountProfile_TopView}
+        </apex:outputLink>
+        <apex:outputText value=" | " styleClass="pipe"/>
+        <apex:outputPanel layout="none">
+            {!$Label.AccountProfile_ExecutiveSummary}
+        </apex:outputPanel>         
+    </apex:outputPanel>
+    <apex:outputPanel style="padding:5px 5px 5px 5px;margin:5px 5px 5px 5px;z-index:2;position:absolute;right:0px;top 0px;background-color:#ffffff;opacity=1.0;" styleClass="print hideforprint" layout="block">
+        <div class="printHeader" style="padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;" id="printHeader">
+            <div class="printControls" style="padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;">
+                <ul rip-style-borderwidth-backup="" rip-style-borderstyle-backup="" class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;" rip-style-bordercolor-backup="">
+                    <apex:outputLink value="javascript:window.close();">
+                        <li>{!$Label.AccountProfile_CloseWindow}</li>
+                    </apex:outputLink>
+                    <apex:outputLink value="javascript:window.print();">
+                        <li>{!$Label.AccountProfile_PrintThisPage}</li>
+                    </apex:outputLink>
+                    <apex:outputLink value="/apex/AccountProfile_ExecSummary?id={!accountProfile.Id}&renderas=pdf">
+                        <li>{!$Label.AccountProfile_Download}</li>
+                    </apex:outputLink>
+                </ul>
+            </div>
+        </div>
+    </apex:outputPanel>
+    <apex:sectionHeader title="{!$Label.AccountProfile_ExecutiveSummaryPrepared} {!NOW()}" subtitle="{!account.Name}"/>
+    <br/>
+    <apex:outputText style="font-size: 1.6em" value="{!$Label.AccountProfile_CustomerOverview}"/>
+    <apex:pageBlock mode="maindetail">
+        <apex:pageBlockSection title="{!$Label.AccountProfile_AccountDetails}" columns="2" collapsible="false">
+            <apex:outputField value="{!account.Name}"/>
+            <apex:outputField label="{!$ObjectType.StrategicPlan__c.Fields.AccountType__c.Label}" value="{!account.RecordType.Name}"/>
+            <apex:outputField value="{!account.AccountClassification__c}"/>
+            <apex:outputField label="{!$ObjectType.StrategicPlan__c.Fields.ParentAccount__c.Label}" value="{!account.Parent.Name}"/>
+            <apex:outputField value="{!account.Industry}"/>
+            <apex:outputField value="{!account.AnnualRevenue}"/>
+            <apex:outputField value="{!account.NumberOfEmployees}"/>
+			<apex:outputField label="{!$ObjectType.Account_Profile__c.Fields.AnnualITBudget__c.Label}" value="{!account.IT_Budget__c}"/>
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.StrategicPlan__c.Fields.AccountBillingAddress__c.Label}"/>
+                <apex:outputPanel >
+                    <apex:outputText value="{!account.BillingStreet}" rendered="{!(account.BillingStreet != null)}"/>
+                    <apex:outputText rendered="{!(account.BillingStreet != null)}"><br/></apex:outputText>
+                    <apex:outputText value="{!account.BillingCity}, " rendered="{!(account.BillingCity != null)}"/>
+                    <apex:outputText value="{!account.BillingState} " rendered="{!(account.BillingState != null)}"/>
+                    <apex:outputText value="{!account.BillingPostalCode}" rendered="{!(account.BillingPostalCode != null)}"/>
+                    <apex:outputText rendered="{!OR(account.BillingCity != null,account.BillingState != null,account.BillingPostalCode != null)}"><br/></apex:outputText>
+                    <apex:outputText value="{!account.BillingCountry}" rendered="{!(account.BillingCountry != null)}"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>            
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_CompanyOverview}" columns="1" collapsible="false">
+            <apex:outputField value="{!accountProfile.Industry_Position_Market_Share_History__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_AccountObjectives}" columns="1" collapsible="false">
+            <apex:outputField value="{!accountProfile.Corporate_Objectives__c}"/>
+            <apex:outputField value="{!accountProfile.Account_end_users__c}"/>
+            <apex:outputField value="{!accountProfile.Account_s_Biggest_Competitor_s__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_RedHatSalesInput}" columns="1" collapsible="false">
+            <apex:outputField value="{!accountProfile.Corporate_Strategy_Current_Initiatives__c}"/>
+            <apex:outputField value="{!accountProfile.Critical_Success_Factors__c}"/>
+            <apex:outputField value="{!accountProfile.Pain_Point_1__c}"/>
+            <apex:outputField value="{!accountProfile.Pain_Point_2__c}"/>
+            <apex:outputField value="{!accountProfile.Pain_Point_3__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_PowerMap}" columns="1" collapsible="false">
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:pageBlockTable value="{!accountProfile.Account_Profile_Power_Maps__r}" var="powerMapEntry" rendered="{!(accountProfile.Account_Profile_Power_Maps__r.size > 0)}">
+                        <apex:column headerValue="{!$ObjectType.Account_Profile_Power_Map__c.Fields.CustomerKeyContact__c.Label}" value="{!powerMapEntry.CustomerKeyContact__r.Name}"/>
+                        <apex:column value="{!powerMapEntry.Title__c}"/>
+                        <apex:column value="{!powerMapEntry.Reports_To__c}"/>
+                        <apex:column headerValue="{!$Label.AccountProfile_PointPerson}" value="{!powerMapEntry.Point_Person_on_Red_Hat_Account_Team__c}"/>
+                        <apex:column value="{!powerMapEntry.Business_Agenda__c}"/>
+                        <apex:column value="{!powerMapEntry.Personal_Agenda__c}"/>
+                        <apex:column value="{!powerMapEntry.Your_Relationship__c}"/>
+                    </apex:pageBlockTable>
+                    <apex:outputText rendered="{!(accountProfile.Account_Profile_Power_Maps__r.size = 0)}" value="{!$Label.No_records_to_display}" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>  
+    </apex:pageBlock>
+    <br/>
+    <apex:outputText style="font-size: 1.6em" value="{!$Label.AccountProfile_CustomerEnvironment}"/>
+    <apex:pageBlock mode="maindetail">
+        <apex:pageBlockSection title="{!$Label.AccountProfile_PreferredRedHatPartners}" columns="1" collapsible="false">
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >            
+                    <apex:pageBlockTable value="{!accountProfile.Account_Profile_Partner_Statuses__r}" var="preferredPartner" rendered="{!(accountProfile.Account_Profile_Partner_Statuses__r.size > 0)}">
+                        <apex:column headerValue="Partner" value="{!preferredPartner.PartnerStatus__r.Partner__r.Name}"/>
+                        <apex:column value="{!preferredPartner.PartnerStatus__r.PartnerTier__c}"/>
+                        <apex:column value="{!preferredPartner.PartnerStatus__r.PartnerType__c}"/>
+                    </apex:pageBlockTable>
+                    <apex:outputText rendered="{!(accountProfile.Account_Profile_Partner_Statuses__r.size = 0)}" value="{!$Label.No_records_to_display}" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>                    
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_OtherPartnersandAlliances}" columns="1" collapsible="false">
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >              
+                    <apex:pageBlockTable value="{!accountProfile.Account_Profile_Other_Partners__r}" var="otherPartner" rendered="{!(accountProfile.Account_Profile_Other_Partners__r.size > 0)}">
+                        <apex:column value="{!otherPartner.Name}"/>
+                        <apex:column value="{!otherPartner.Partner_Type__c}"/>
+                    </apex:pageBlockTable>
+                    <apex:outputText rendered="{!(accountProfile.Account_Profile_Other_Partners__r.size = 0)}" value="{!$Label.No_records_to_display}" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>                      
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_Competitors}" columns="1" collapsible="false">
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >             
+                    <apex:pageBlockTable value="{!accountProfile.Competitor__r}" var="competitor" rendered="{!(accountProfile.Competitor__r.size > 0)}">
+                        <apex:column value="{!competitor.Competitor__c}"/>
+                    </apex:pageBlockTable>
+                    <apex:outputText rendered="{!(accountProfile.Competitor__r.size = 0)}" value="{!$Label.No_records_to_display}" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$Label.AccountProfile_SWOT_Analysis}" columns="1" collapsible="false">
+            <c:AccountProfileSWOT profileId="{!accountProfile.Id}" showTableHeader="true" renderAsPDF="{!IsRenderAsPDF}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="{!$ObjectType.Opportunity.LabelPlural}" columns="1" collapsible="false">
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:pageBlockTable value="{!opportunities}" var="opportunity" rendered="{!(opportunities.size > 0)}">
+                        <apex:column headerValue="{!$ObjectType.Opportunity.Label}" value="{!opportunity.Name}"/>
+                        <apex:column headerValue="{!$ObjectType.Account.Label}" value="{!opportunity.Account.Name}"/>
+                        <apex:column value="{!opportunity.StageName}"/>
+                        <apex:column value="{!opportunity.Amount}"/>
+                        <apex:column value="{!opportunity.CloseDate}"/>
+                        <apex:column headerValue="{!$ObjectType.StrategicPlan_Solution__c.LabelPlural}">
+                            <apex:repeat rows="1" value="{!opportunity.StrategicPlan_SolutionOpportuniti__r}" var="solution">
+                                <apex:outputText value="{!solution.StrategicPlan_Solution__r.Name}"/>
+                            </apex:repeat>                    
+                            <apex:repeat first="1" value="{!opportunity.StrategicPlan_SolutionOpportuniti__r}" var="solution">
+                                <apex:outputText ><br/></apex:outputText>
+                                <apex:outputText value="{!solution.StrategicPlan_Solution__r.Name}  "/>
+                            </apex:repeat>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                    <apex:outputText rendered="{!(opportunities.size = 0)}" value="{!$Label.No_records_to_display}" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>                    
+        </apex:pageBlockSection>       
+    </apex:pageBlock>
+    <br/>
+    <apex:outputText style="font-size: 1.6em" value="{!$Label.AccountProfile_RedHatStrategy}"/>
+    <apex:pageBlock mode="maindetail">
+        <apex:pageBlockSection title="{!$ObjectType.StrategicPlan_Strategy__c.LabelPlural}" columns="1" collapsible="false">
+            <apex:outputPanel >
+                <apex:pageBlockTable value="{!strategies}" var="strategy" rendered="{!(strategies.size > 0)}">
+                    <apex:column value="{!strategy.Name}"/>
+                    <apex:column value="{!strategy.PainPointDescription__c}"/>
+                    <apex:column headerValue="{!$ObjectType.StrategicPlan_Solution__c.LabelPlural}">
+                        <apex:pageBlockTable value="{!strategy.Solutions__r}" var="solution">
+                            <apex:column value="{!solution.Name}"/>
+                            <apex:column value="{!solution.SolutionDescription__c}"/>
+                        </apex:pageBlockTable>
+                    </apex:column>
+                </apex:pageBlockTable>
+                <apex:outputText rendered="{!(strategies.size = 0)}" value="{!$Label.No_records_to_display}" />
+            </apex:outputPanel>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <br/>
+    <apex:outputText style="font-size: 1.6em" value="{!$Label.AccountProfile_AccountTeamMembers}"/>
+    <apex:pageBlock mode="maindetail">
+        <apex:pageBlockSection title="" columns="2" collapsible="false">
+            <apex:outputPanel >
+                <apex:pageBlockTable value="{!account.AccountTeamMembers}" first="0" rows="{!ceiling(account.AccountTeamMembers.size/2)}" var="teamMember" rendered="{!(account.AccountTeamMembers.size > 0)}">
+                    <apex:column value="{!teamMember.User.Name}"/>
+                    <apex:column value="{!teamMember.TeamMemberRole}"/>
+                </apex:pageBlockTable>
+                <apex:outputText rendered="{!(account.AccountTeamMembers.size = 0)}" value="{!$Label.No_records_to_display}" />
+            </apex:outputPanel>
+            <apex:outputPanel >
+                <apex:pageBlockTable value="{!account.AccountTeamMembers}" first="{!ceiling(account.AccountTeamMembers.size/2)}" var="teamMember" rendered="{!(account.AccountTeamMembers.size > 1)}">
+                    <apex:column value="{!teamMember.User.Name}"/>
+                    <apex:column value="{!teamMember.TeamMemberRole}"/>
+                </apex:pageBlockTable>
+            </apex:outputPanel>            
+        </apex:pageBlockSection>    
+    </apex:pageBlock>
+</apex:page>

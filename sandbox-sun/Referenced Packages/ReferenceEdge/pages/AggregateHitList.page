@@ -1,0 +1,203 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pgId" controller="refedge.AggregateHitListController" sidebar="false" tabStyle="Aggregate_Hit_List__tab">
+    <c:POR_ModalLoader id="PORLoader"/>
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+         .paginatorWrap{
+            background: url("/img/alohaSkin/listFooter.png") repeat-x scroll 0 0 #F2F2F2;
+            border: 1px solid #EAEAEA;
+            background-color: #F3F3F3;
+            border-top: 1px solid #FFFFFF;
+            padding: 5px;
+        }
+         .showButton {
+            display : inline;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-top-colors: none;
+            background: url("/img/alohaSkin/btn_sprite.png") repeat-x scroll right top #E8E8E9;
+            border-color: #B5B5B5 #B5B5B5 #7F7F7F;
+            border-image: none;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            color: #333333;
+            font-size: 0.9em;
+            font-weight: bold;
+            font-family: Arial,Helvetica,sans-serif;
+            margin: 1px;
+            padding: 2px 3px;
+            
+        }
+        .defaultAsteikClass{
+        
+        }
+        .valueChangedClass{
+            
+        }
+        .hideButton {
+            display : none;
+        }
+    </style>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            if(document.getElementById('pgId_frmId_pbId_tableId_0_astField_ileinner') != null){
+                PORHideLoading();
+            }
+            else{
+                if(({!IsPageAccessible} || {!IsPageAccessible} == true) && ({!isFullLicenseAccessible} || {!isFullLicenseAccessible} == true)){
+                	updateInlineEditingValue(true);
+                }
+                else{
+                	PORHideLoading();
+                }
+            }
+        });
+        var hitIds='';
+        var lastClickedObj = '';
+        var hitRecordId = '';
+        function saveRecord(listSize){
+            var astValue=false;
+                if(hitRecordId != ''){
+                    var newId = lastClickedObj.id;
+                    var find = ':';
+                    var re = new RegExp(find, 'g');
+                    var newId1 = newId.replace(re, '_');
+                    newId1 = newId1.replace('asterikPanel','astField');
+                    astValue = document.getElementById(newId1).checked;
+                }
+                PORShowLoading();
+                saveTheRecord(hitRecordId,astValue);
+        }
+        
+        function updateHitRecord(hitRecord,clickedElement){
+            lastClickedObj = clickedElement;
+            hitRecordId = hitRecord;
+        }
+    </script>
+     
+    <apex:form id="frmId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction name="updateInlineEditingValue" rerender="frmId" onComplete="PORHideLoading();">
+            <apex:param name="isInlineEditingDisabled" assignTo="{!isInlineEditingDisabled}" value=""/>
+        </apex:actionFunction>
+        <apex:pageBlock id="pbId" title="{!$Label.T_Aggregate_Hit_List}">
+            <apex:pageBlockButtons id="btnIds">
+                <apex:commandButton style="width:50px;" value="{!$Label.Edit}" action="{!editRow}" id="editButton" rendered="{!AND(!isEdit,isInlineEditingDisabled)}" reRender="pbId" onclick="PORShowLoading();" oncomplete="PORHideLoading();document.getElementById('pgId:frmId:pbId:btnIds:saveButton').className = 'showButton';document.getElementById('pgId:frmId:pbId:btnIds:cancelButton').className = 'showButton';"/>
+                <apex:commandButton style="width:50px;" styleClass="hideButton" value="{!$Label.Save}" id="saveButton" onclick="saveRecord({!hitListRecords.size});return false;"  reRender="pbId,pgmsgId" />
+                <apex:commandButton style="width:50px;" styleClass="hideButton" value="{!$Label.Cancel}" oncomplete="PORHideLoading();" onclick="PORShowLoading();" id="cancelButton" action="{!queryHitRecords}" rerender="pbId"/>
+            </apex:pageBlockButtons>
+            <apex:actionFunction action="{!saveTheRecord}" name="saveTheRecord" onComplete="PORHideLoading();" rerender="frmId">
+                <apex:param name="hitRecord" assignTo="{!UpdateHitRecordId}" value=""/>
+                <apex:param name="astValue" assignTo="{!asterikValue}" value=""/>
+            </apex:actionFunction>
+            <apex:pageBlockTable value="{!hitListRecords}" id="tableId" var="hitRecord" rendered="{!hitListRecords.size > 0}">
+                <apex:column headerValue="{!$Label.Action}">
+                    <apex:commandLink value="{!$Label.Action}" action="{!delHitRecord}" rerender="frmId,tableId" onclick="PORShowLoading();" oncomplete="PORHideLoading();">
+                        <apex:param value="{!hitRecord.Id}" assignTo="{!hitRecordId}" name="hitRecord"/>
+                    </apex:commandLink> |
+                    <apex:commandLink value="{!$Label.Assign}" onclick="window.open('{!$Page.refedge__AssignAction}?Id={!URLENCODE(hitRecord.Id)}&retPage={!$Page.refedge__AggregateHitList}','_self');return false;" rendered="{!!hitRecord.refedge__Released__c}"/> 
+                    <apex:outputLabel value="{!$Label.Assign}" rendered="{!hitRecord.refedge__Released__c}"/>|
+                    <apex:commandLink value=" {!$Label.Reminder}" onclick="window.open('{!$Page.refedge__ReminderAction}?Id={!URLENCODE(hitRecord.Id)}&retPage={!$Page.refedge__AggregateHitList}','_self');return false;" rendered="{!!hitRecord.refedge__Released__c}"/> 
+                    <apex:outputLabel value="{!$Label.Reminder}" rendered="{!hitRecord.refedge__Released__c}"/>|
+                    <apex:commandLink value=" {!$Label.Release}" onclick="window.open('{!$Page.refedge__HitListReleaseAction}?Id={!URLENCODE(hitRecord.Id)}&retPage={!$Page.refedge__AggregateHitList}','_self');return false;" rendered="{!!hitRecord.refedge__Released__c}"/>
+                    <apex:outputLabel value=" {!$Label.Release}" rendered="{!hitRecord.refedge__Released__c}"/>
+                </apex:column>
+                
+                <apex:column headerValue="{!$Label.Dispostion}" >
+                    <apex:outPutField value="{!hitRecord.refedge__Disposition__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Released}" >
+                    <apex:outPutField value="{!hitRecord.refedge__Released__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Account}">
+                    <apex:outPutField value="{!hitRecord.refedge__Account__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Contact}">
+                    <apex:outPutField value="{!hitRecord.refedge__Contact__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Phone}">
+                    <apex:outPutField value="{!hitRecord.refedge__Phone__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Email}">
+                    <apex:outPutField value="{!hitRecord.refedge__Email__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Type}">
+                    <apex:outPutField value="{!hitRecord.refedge__Referenceability_Type__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Request}">
+                    <apex:outputField value="{!hitRecord.refedge__Reference_Request__c}" />
+                </apex:column>
+                <apex:column headerValue="{!$Label.Deadline}">
+                    <apex:outputField value="{!hitRecord.refedge__Deadline__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Opportunity}">
+                    <apex:outputField value="{!hitRecord.refedge__Opportunity__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.T_Last_Used}">
+                    <apex:outputField value="{!hitRecord.LastActivityDate}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.Note}">
+                    <apex:outputField value="{!hitRecord.refedge__Note__c}"/>
+                </apex:column>
+                <apex:column id="asterikId" headerValue="*">
+                    <apex:outputPanel id="asterikPanel" onClick="updateHitRecord('{!JSENCODE(hitRecord.Id)}',this);return false;">
+                        <apex:outputField id="astField" styleClass="defaultAsteikClass" value="{!hitRecord.refedge__Field1__c}" rendered="{!!isEdit}">
+                             <apex:InlineEditSupport id="inlineClass" changedStyleClass="valueChangedClass" showOnEdit="saveButton,cancelButton" event="ondblclick"/>
+                        </apex:outputField>
+                    </apex:outputPanel>
+                    <apex:inputField id="astFieldEdit" value="{!hitRecord.refedge__Field1__c}" rendered="{!isEdit}"/>
+                    <apex:inputHidden value="{!hitRecord.Id}" id="hiddenId"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:outputPanel layout="block" styleClass="paginatorWrap" rendered="{!hitListRecords.size > 0}">
+                <div class="paginator" id="pager">
+                    <span class="left">
+                        {!(setCon.pageNumber * size)+1-size}-{!IF((setCon.pageNumber * size) > noOfRecords, noOfRecords,(setCon.pageNumber * size))} of {!noOfRecords}
+                    </span>
+                    <span class="prevNextLinks">            
+                        <span class="prevNext">
+                            <apex:commandLink action="{!setCon.Previous}" onClick="PORShowLoading();" onComplete="PORHideLoading();" rendered="{!setCon.hasPrevious}"  reRender="pbId">
+                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!setCon.hasPrevious}" width="5px" height="8px"/>&nbsp;{!$Label.Previous_Page}
+                            </apex:commandLink>
+                        </span>
+                        <span class="prevNext">
+                            <apex:commandLink action="{!setCon.Next}" rendered="{!setCon.hasNext}" onClick="PORShowLoading();" onComplete="PORHideLoading();" reRender="pbId">{!$Label.Next_Page}&nbsp; 
+                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!setCon.hasNext}" width="5px" height="8px"/>       
+                            </apex:commandLink>
+                        </span>
+                    </span>
+                    <span class="right">
+                        {!$Label.Page}&nbsp; 
+                        <apex:outputText id="input" value="{!setCon.PageNumber}" styleClass="pageInput"/> of {!totalPage}
+                    </span>       
+                </div>
+        </apex:outputPanel>
+        
+        <apex:pageMessage summary="{!$Label.No_Records_Found}" severity="Warning" strength="3" rendered="{!hitListRecords.size = 0}"/>
+        
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

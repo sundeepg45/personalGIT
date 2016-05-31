@@ -1,0 +1,130 @@
+<apex:page sidebar="false" controller="PartnerGateway">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Join</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body id="join">
+
+  <div class="red-hat-content">
+
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+            </div><!-- /.col-xs-5 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+
+    <div class="join-content-wrap user-signup">
+      <div class="container">
+        <div class="row">
+          <div class="content-wrapper">
+            <apex:form >
+              <div class="row">
+                <div class="col-xs-12">
+                  <h1 class="request-problem"><span class="fa fa-exclamation-circle"></span>{!$Label.ONB_further_action_required}</h1>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+
+                  <apex:outputPanel id="CaseStatus">
+
+                    <p><apex:outputLabel value="{!$Label.Onboarding_DisplayCaseStatus_Case_Exists}"/></p>
+
+                    <h2>{!$Label.ONB_case_details}</h2>
+                    <table>
+                        <!--
+                      <tr>
+                        <td class="table-title">Request Date: </td>
+                        <td><apex:outputText value="{!existingCase.CreatedDate}" /></td>
+                      </tr>
+                        -->
+                      <tr>
+                        <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Issue_Type}"/>:</td>
+                        <td><apex:outputText value="{!existingCase.Issue_Type__c}"/></td>
+                      </tr>
+                      <tr>
+                         <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Number}"/>:</td>
+                         <td><apex:outputText value="{!existingCase.CaseNumber}"/></td>
+                      </tr>
+                      <tr>
+                         <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Status}"/>:</td>
+                         <td><apex:outputText value="{!existingCase.Status}" /></td>
+                      </tr>
+                       <tr>
+                         <td class="table-title"><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Case_Email}"/>:</td>
+                         <td><apex:outputLink value="mailto:{!existingCaseEmail}?Subject=Case%20{!existingCase.CaseNumber}" ><apex:outputText value="{!$Label.Onboarding_DisplayCaseStatus_Contact_Case_Owner}" /></apex:outputLink></td>
+                      </tr>
+                    </table>
+
+                    </apex:outputPanel>
+
+
+                  </div><!-- /.col-xs-12 -->
+                </div><!-- /.row -->
+
+
+                <!--  END PAGE CONTENT  -->
+
+
+
+            </apex:form>
+          </div><!-- /.content-wrapper -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.join-content-wrap /.user-signup -->
+
+     <c:Onboarding_Footer />
+
+  </div> <!--  red-hat-content -->
+
+  </body>
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+  </style>
+</apex:page>

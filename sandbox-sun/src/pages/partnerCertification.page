@@ -1,0 +1,104 @@
+<apex:page controller="PartnerTrainingController"   tabStyle="PartnerTraining__c" >
+<apex:stylesheet value="{!$Resource.Partner_Product_Style_Sheet}" />
+ <STYLE TYPE="text/css" >
+
+        .bPageBlock .pbBody {
+           background-color:#FFFFFF;
+           margin:0;
+        }
+
+        .bPageBlock .pbBottomButtons {
+          background-color:#FFFFFF;
+           margin:0;
+        }
+
+        .bPageBlock, .individualPalette .bPageBlock {
+            background-color:#FFFFFF;
+            border-color:#000099 #8B9CD3 #8B9CD3;
+            border-style:none;
+            border-width:0;
+        }
+        .bPageBlock .detailList tr td, .bPageBlock .detailList tr th {
+              border-bottom-color:#FFFFFF;
+        }
+    </STYLE>
+    <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"/>
+<script type="text/javascript">
+    $.noConflict();
+ </script>
+<apex:SectionHeader title="{!$Label.Partner_Certification_Title}" />
+    <apex:form >
+        <apex:pageMessages />
+        <apex:pageBlock >
+            <apex:pageBlockButtons location="bottom" >
+                <apex:commandButton id="btnSave" rendered="{!NOT(partnerTraining.LMSCreated__c)}" action="{!saveCertification}" value="{!$Label.Partner_Certification_Save}"/>
+                <apex:commandButton id="btnCancel" action="{!cancel}" value="{!$Label.Partner_Certification_Cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="1" >
+               <apex:pageBlockSectionItem rendered="{!standardUser}">
+                    <apex:outputLabel value="{!$Label.Partner_Certification_Partner}" />
+                    <apex:outputPanel layout="none">
+                         <apex:actionRegion >
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                            <apex:inputField id="txtPartner" value="{!partnerTraining.Partner__c}" />
+                            <apex:actionSupport event="onchange" rerender="populatecontacts"/>
+                        </div>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Partner_Certification_Certifying_Entity}" />
+                    <apex:outputPanel layout="none" >
+	                    <input name="accountId" type="hidden" value="{!$CurrentPage.parameters.accountId}"/>
+                        <apex:actionRegion >
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                            <apex:selectList id="cboTrainingType" value="{!partnerTraining.TrainingType__c}"
+                                size="1" multiselect="false" >
+                                <apex:selectOptions value="{!certifyingEntityList}"/>
+                                <apex:actionSupport event="onchange" rerender="certifications"/>
+                            </apex:selectList>
+                        </div>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+           </apex:pageBlockSection>
+          <apex:pageBlockSection columns="1" id="certifications">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Partner_Certification_Name}" />
+                    <apex:outputPanel layout="none">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                            <apex:selectList id="cboCertification" value="{!partnerTraining.Certification__c}"
+                                size="1" multiselect="false" >
+                                <apex:selectOptions value="{!certificationList}"/>
+                            </apex:selectList>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Partner_Certification_Number}" />
+                    <apex:outputPanel layout="none">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                            <apex:inputField id="txtCertNumber" value="{!partnerTraining.CertificateNumber__c}" />
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Partner_Certification_Date_Achieved}" />
+                    <apex:outputPanel layout="none">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                        <apex:inputField id="txtDateAchieved" value="{!partnerTraining.Date_Achieved__c}" />
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$Label.Partner_Certification_Certificate_Holder}" />
+                    <apex:selectList id="cboCertContact" value="{!partnerTraining.Contact__c}"
+                        size="1" multiselect="false" >
+                        <apex:selectOptions value="{!contacts}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+           </apex:pageBlockSection>
+        </apex:pageBlock>
+      </apex:form>
+</apex:page>

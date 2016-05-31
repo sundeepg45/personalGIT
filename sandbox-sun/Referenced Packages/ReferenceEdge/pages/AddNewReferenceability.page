@@ -1,0 +1,478 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pgId" standardController="refedge__Referenceability__c" extensions="refedge.AddNewReferenceabilityController" sidebar="false">
+     <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <!-- Form -->
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <style>
+            .pbSubheader
+            {
+                background-image : none !important;
+                color : white !important;
+            }
+            jQuery(".ui-icon ui-icon-closethick").removeAttr();
+            .ui-widget-content{
+                border : none !important;
+            }
+            .ui-widget-header{
+                background : none !important;
+                border : none !important;
+                color : black !important;
+            } 
+            .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+        </style>
+        
+        <apex:outputPanel id="msgPanel">
+            <script>
+                PORShowLoading();
+                jQuery(document).ready(function() {
+                    PORHideLoading();
+                });
+                var referenceStatus=false;
+                var ContactSelected;
+                var referenceStatus =  {!isContactReferenceableStatus};
+                function showPopup(isOnlySave){
+                    if({!isContactSelected} && !{!isContactCandidate} && !{!isContactReferenceableStatus}){
+                        jQuery( "#dialogBoxDivCon" ).dialog({
+                            width: '400px',
+                            modal: true,
+                            resizable: false,
+                            draggable: false,
+                            buttons: [{
+                                text: "{!$Label.Candidate}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                    if(!{!isAccountCandidate} && !{!isAccountReferenceableStatus}){
+                                        jQuery( "#dialogBoxDivAcc4" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveJs(false,true,false,true,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveJs(false,false,false,true,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                   jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]      
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveJs(false,false,false,true,isOnlySave);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Member}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    if(!{!isAccountCandidate} && !{!isAccountReferenceableStatus}){
+                                        jQuery( "#dialogBoxDivAcc3" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveJs(true,false,true,false,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveJs(false,false,true,false,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                   jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]      
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveJs(false,false,true,false,isOnlySave);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                }
+                            }]
+                        });
+                        jQuery(".ui-dialog-titlebar").hide();
+                        jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                        return false;
+                    }
+                    else if({!isContactSelected} && {!isContactCandidate} && !{!isContactReferenceableStatus}){
+                        jQuery( "#dialogBoxDivCon2" ).dialog({
+                            width: '400px',
+                            modal: true,
+                            resizable: false,
+                            draggable: false,
+                            buttons: [{
+                                text: "{!$Label.Candidate}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                    if(!{!isAccountCandidate} && !{!isAccountReferenceableStatus}){
+                                        jQuery( "#dialogBoxDivAcc4" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveJs(false,true,false,true,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveJs(false,false,false,true,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                   jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]      
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveJs(false,false,false,true,isOnlySave);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Member}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" );
+                                    if(!{!isAccountCandidate} && !{!isAccountReferenceableStatus}){
+                                        jQuery( "#dialogBoxDivAcc3" ).dialog({
+                                            width: '400px',
+                                            modal: true,
+                                            resizable: false,
+                                            draggable: false,
+                                            buttons: [{
+                                                text: "{!$Label.Yes}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" );
+                                                    PORShowLoading();
+                                                    saveJs(true,false,true,false,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.No}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    PORShowLoading();
+                                                    saveJs(false,false,true,false,isOnlySave);
+                                                }
+                                            },
+                                            {
+                                                text: "{!$Label.Cancel}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                   jQuery( this ).dialog( "close" ); 
+                                                }
+                                            }]
+                                        });
+                                        return false;
+                                    }
+                                    else {
+                                        PORShowLoading();
+                                        saveJs(false,false,true,false,isOnlySave);
+                                    }
+                                }
+                            },
+                            {
+                                text: "{!$Label.Cancel}",
+                                "class": "dialogButtonClass",
+                                click: function() {
+                                    jQuery( this ).dialog( "close" ); 
+                                }
+                            }]
+                        });
+                        jQuery(".ui-dialog-titlebar").hide();
+                        jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                        return false;
+                    }
+                    else {
+                        if(!{!isAccountCandidate} && !{!isAccountReferenceableStatus}){
+                            jQuery( "#dialogBoxDivAcc2" ).dialog({
+                                width: '400px',
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                buttons: [{
+                                    text: "{!$Label.Candidate}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        PORShowLoading();
+                                        saveJs(false,true,false,false,isOnlySave);
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Member}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        PORShowLoading();
+                                        saveJs(true,false,false,false,isOnlySave);
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Cancel}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        
+                                        if(!{!(isContactsRendered)}){
+                                            PORShowLoading();
+                                            saveJs(false,false,false,false,isOnlySave);
+                                        }
+                                    }
+                                }]
+                            });
+                            jQuery(".ui-dialog-titlebar").hide();
+                            jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                            return false;
+                        }
+                        else if({!isAccountCandidate} && !{!isAccountReferenceableStatus}){
+                            jQuery( "#dialogBoxDivAcc" ).dialog({
+                                width: '400px',
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                buttons: [{
+                                    text: "{!$Label.Candidate}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        PORShowLoading();
+                                        saveJs(false,true,false,false,isOnlySave);
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Member}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        PORShowLoading();
+                                        saveJs(true,false,false,false,isOnlySave);
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Cancel}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        
+                                        if(!{!(isContactsRendered)}){
+                                            PORShowLoading();
+                                            saveJs(false,false,false,false,isOnlySave);
+                                        }
+                                    }
+                                }]
+                            });
+                            jQuery(".ui-dialog-titlebar").hide();
+                            jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                            return false;
+                        }
+                        else {
+                            PORShowLoading();
+                            saveJs(true,false,false,false,isOnlySave);
+                        }
+                        return false;
+                    }
+                    return false;
+                }
+                function redirectToPage(){
+                    PORHideLoading();
+                    if(!{!hasError}){
+                        redirectToPage1();
+                    }
+                }
+            </script>
+        </apex:outputPanel>
+        
+        <apex:actionFunction name="findReferenceStatus" oncomplete="PORHideLoading();"  immediate="true" action="{!getReferenceStatus}" rerender="pgmsgId,butonPanel,msgPanel">
+            <apex:param assignTo="{!selectedContact}" value="" name="paramName"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="saveJs" oncomplete="redirectToPage();"  action="{!save}" reRender="pgmsgId,pbId,msgPanel">
+            <apex:param assignTo="{!makeAccountMember}" value="" name="paramName"/>
+            <apex:param assignTo="{!makeAccountCandidate}" value="" name="paramName1"/>
+            <apex:param assignTo="{!makeContactMember}" value="" name="paramName2"/>
+            <apex:param assignTo="{!makeContactCandidate}" value="" name="paramName3"/>
+            <apex:param assignTo="{!isOnlySave}" value="" name="paramName2"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="deleteRef" immediate="true" action="{!deleteReferenceability}" rerender="pbId1" oncomplete="PORHideLoading();">
+            <apex:param assignTo="{!selectedReferenceability}" value="" name="selectedReferenceability"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="redirectToPage1" action="{!redirectToPage}"/>
+        <apex:sectionHeader title="{!$Label.Referencibility_Edit}" subtitle="{!$Label.New_Referenceability}"/>
+        <apex:actionRegion >
+            <apex:outputPanel id="pbId1">
+                <apex:pageBlock rendered="{!OR(showReferenceabilityForContact,showReferenceabilityForAccount)}">
+                    <apex:pageBlockButtons location="top">
+                        <apex:outputPanel id="butonPanel">
+                            <apex:commandButton value="{!$Label.Done}" immediate="true" action="{!redirectToPage}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockButtons>
+                    <apex:pageBlockSection rendered="{!referenceabilityPresent.size >0}" title="{!$Label.Existing_Referenceability}" columns="1">
+                         <apex:pageBlockTable value="{!referenceabilityPresent}" var="ref">
+                            <apex:column headerValue="{!$Label.Action}">
+                                <apex:commandLink value="{!$Label.Delete}" onclick="deleteRef('{!ref.Id}');PORShowLoading();return false;"  >
+                                </apex:commandLink>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Referenceability}">
+                                <apex:outputLabel value="{!ref.Referenceability_Type__r.Name}"></apex:outputLabel>
+                            </apex:column>
+                         </apex:pageBlockTable>
+                    </apex:pageBlockSection>
+                    <apex:outputLabel value="{!$Label.No_Associated_Referenceability_found}" rendered="{!referenceabilityPresent.size == 0}"/>  
+                </apex:pageBlock>
+            </apex:outputPanel>
+        </apex:actionRegion>
+        <apex:pageBlock id="pbId" title="{!$Label.Referencibility_Edit}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:outputPanel id="butonPanel">
+                    <apex:commandButton value="{!$Label.Save}" onclick="showPopup(true); return false;" />
+                    <apex:commandButton value="{!$Label.Cancel}" immediate="true" action="{!cancel}"/>
+                    <apex:commandButton value="{!$Label.Save_and_New}" rendered="{!NOT(OR(showReferenceabilityForContact,showReferenceabilityForAccount))}" onclick="showPopup(false); return false;"/>
+                </apex:outputPanel>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection id="pbsId" columns="1" title="{!$Label.Information}">
+                <apex:outputField value="{!refer.refedge__Account__c}" />
+                <apex:pageBlockSectionItem id="pbsiId" rendered="{!(isContactsRendered)}">
+                    <apex:outputLabel value="{!$Label.Contact}" />
+                    <apex:selectList id="contactId" title="{!$Label.Contact}" onchange="PORShowLoading();findReferenceStatus(this.value);" size="1" value="{!refer.refedge__Contact__c}">
+                           <apex:selectOptions value="{!contacts}"  id="selectContacts"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:outputField rendered="{!NOT(isContactsRendered)}" value="{!refer.refedge__Contact__c}" />
+                <apex:pageBlockSectionItem id="refType">
+                    <apex:outputLabel value="{!$Label.Referenceability_Type}"/>
+                        <apex:outputPanel styleClass="requiredInput" layout="block" >
+                        <div class="requiredBlock"></div>
+                        <c:POR_MultiSelectPicklist leftLabel="{!$Label.Available_Reference_Types}" leftSelOptions="{!referenceabilityTypes}" rightLabel="{!$Label.Selected_Reference_Types}" rightSelOptions="{!selectedFields}" size="20" width="200px">
+                        </c:POR_MultiSelectPicklist>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:inputField id="statusId" required="true" value="{!refer.refedge__Status__c}" rendered="{!NOT(OR(showReferenceabilityForContact, showReferenceabilityForAccount))}"/> 
+                <apex:inputField id="commentId" value="{!refer.refedge__Comment__c}" />
+                <apex:inputField id="verifiedDate" required="true" value="{!refer.refedge__Verified__c}" rendered="{!NOT(OR(showReferenceabilityForContact, showReferenceabilityForAccount))}"/>
+            </apex:pageBlockSection>
+        </apex:pageblock>
+        <div id="dialogBoxDivCon" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Contact_Member_Candidate_Message}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivCon2" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Change_Contact_Candidate_to_Member}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAcc" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Change_Account_Candidate_to_Member}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAcc2" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Account_Member_Candidate_Message}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAcc3" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Account_Member_Message}" escape="false"/>
+        </div>
+        <div id="dialogBoxDivAcc4" style="display:none;height: 60px; !important;">
+            <apex:outPutText value="{!$Label.Account_Candidate_Message}" escape="false"/>
+        </div>
+    </apex:form>
+</apex:page>

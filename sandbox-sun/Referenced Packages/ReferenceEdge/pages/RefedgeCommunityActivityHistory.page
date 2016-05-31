@@ -1,0 +1,91 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.RefedgeCommunityActivityHistory" sidebar="false">
+    <c:RefedgeCommunityHeader pageHeader="{!$Label.Reference_Activities}"/>
+    <apex:pagemessages id="pgMsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isCommunityLicenseAccessible,NOT(IsPageAccessible),isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Contact_must_reference_program_member}" strength="3" severity="Info" rendered="{!AND(IsPageAccessible,NOT(isRefedgeProgramMember))}" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        .bodyclass{
+            background:lightblue;
+        }
+        
+        .container{
+            margin-left: 10%;
+            margin-right: 10%;
+            border-radius: 5px;
+            margin-top: 1%;
+            padding: 2%;
+            background:white;
+            width: 60%;
+        }
+        
+        
+        .innertextstyle{
+            color:#5C5B5B;
+            font-size: large;
+            padding-bottom: 10px;
+        }
+        .col {
+            color: #5C5B5B;
+            font-size: 14px;
+        }
+    </style>
+    <body class="bodyclass">
+        <apex:outputPanel rendered="{!AND(IsPageAccessible, isRefedgeProgramMember, isCommunityLicenseAccessible)}">
+            <div class="container">
+                <apex:outputPanel layout="block" styleClass="innertextstyle">{!$Label.Rewards}</apex:outputPanel>
+                <div style="width:5%;float:left;color: #5C5B5B;font-size: 14px;">{!lifetimePoints}</div><div style="width:80%;float:left;color: #5C5B5B;font-size: 14px;">{!$Label.Your_Lifetime_points}</div> <br/><br/>
+                <div style="width:5%;float:left;color: #5C5B5B;font-size: 14px;">{!avaliablePoints}</div><div style="width:80%;float:left;color: #5C5B5B;font-size: 14px;">{!$Label.Current_Available_Points}</div> <br/><br/>
+                
+                <br/>
+                <div style="height: 1px;background-color: #D0D0CE;"></div>
+                <br/>
+                
+                <apex:outputPanel layout="block" styleClass="innertextstyle" rendered="{!listContactReq.size > 0}">{!$Label.Your_Activities}</apex:outputPanel>
+                <apex:dataTable id="dataTableId" value="{!listContactReq}" var="cr" width="90%" cellpadding="2" rendered="{!listContactReq.size > 0}" >
+                    <apex:column id="col1" headerValue="{!$Label.Date}" headerClass="col" styleClass="col">
+                        <apex:outputField value="{!cr.Reference_Request_Account__r.refedge__Activity_Date__c}" rendered="{!cr.Reference_Request_Account__r.refedge__Activity_Date__c != null}"/>
+                        <apex:outputText value="n/a" rendered="{!cr.Reference_Request_Account__r.refedge__Activity_Date__c == null}"/> 
+                    </apex:column>
+                    <apex:column id="col2" headerValue="{!$Label.Type}" headerClass="col" styleClass="col">
+                        <apex:outputField value="{!cr.Referenceability_Type__r.Name}" rendered="{!cr.Referenceability_Type__r.Name != null}"/>
+                        <apex:outputText value="n/a" rendered="{!cr.Referenceability_Type__r.Name == null}"/> 
+                    </apex:column>
+                    <apex:column id="col3" headerValue="{!$Label.Prospective_Customer}" headerClass="col" styleClass="col">
+                        <apex:outputField value="{!mapRefRequest[cr.Reference_Request_Account__r.refedge__Reference_Request__c].Account_Name_f__c}" rendered="{!mapRefRequest[cr.Reference_Request_Account__r.refedge__Reference_Request__c].Account_Name_f__c != null}"/>
+                        <apex:outputText value="n/a" rendered="{!mapRefRequest[cr.Reference_Request_Account__r.refedge__Reference_Request__c].Account_Name_f__c == null}"/> 
+                    </apex:column>
+                    <apex:column id="col4" headerValue="{!$Label.Outcome}" headerClass="col" styleClass="col">
+                        <apex:outputField value="{!mapRefRequest[cr.Reference_Request_Account__r.refedge__Reference_Request__c].Opportunity_Stage_f__c}" rendered="{!mapRefRequest[cr.Reference_Request_Account__r.refedge__Reference_Request__c].Opportunity_Stage_f__c != null}"/>
+                        <apex:outputText value="n/a" rendered="{!mapRefRequest[cr.Reference_Request_Account__r.refedge__Reference_Request__c].Opportunity_Stage_f__c == null}"/> 
+                    </apex:column>
+                    <apex:column id="col5" headerValue="{!$Label.Points}" headerClass="col" styleClass="col">
+                        <apex:outputField value="{!cr.Referenceability_Type__r.refedge__Reward_points__c}" rendered="{!cr.Referenceability_Type__r.refedge__Reward_points__c != null}"/>
+                        <apex:outputText value="n/a" rendered="{!cr.Referenceability_Type__r.refedge__Reward_points__c == null}"/> 
+                    </apex:column>
+                </apex:dataTable>
+            </div>
+        </apex:outputPanel>
+    </body>
+</apex:page>

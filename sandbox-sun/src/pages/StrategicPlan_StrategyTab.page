@@ -1,0 +1,172 @@
+<apex:page controller="TabUIController" extensions="StrategicPlan_StrategyControllerExtn" showChat="false" showHeader="false" sidebar="false" id="strategyTab">
+    <apex:form id="headerForm">
+        <apex:commandButton action="{!displayId}" style="display:none" immediate="true" value="displayId" id="displayId"/>
+        <!-- apex:actionFunction action="{!displayId}" name="displayStrategy2" status="loadingDetails" rerender="solution" oncomplete="document.getElementById('strategy').style.display='block';" -->
+        <apex:actionFunction action="{!displayId}" name="displayStrategy2" status="loadingDetails" rerender="solution" oncomplete="document.getElementById('{!$Component.displayId}').click();">
+            <apex:param name="strategyId" assignTo="{!Id}" value="" />
+            <apex:param name="activeTab" assignTo="{!activeTab}" value="StrategicPlan_Strategy__c" />
+        </apex:actionFunction>
+        <script type="text/javascript">
+            function displayStrategy(strategyId) {
+                var element = document.getElementById('strategy');
+                var inputs = element.getElementsByTagName('textarea');
+                if(inputs && inputs.length != 0) {
+                    alert('{JSENCODE($!Label.StrategicPlan_EditInProgress)}');
+                }
+                else {
+                    element.style.display="none";
+                    displayStrategy2(strategyId,'StrategicPlan_Strategy__c');
+                }
+            }
+        </script>
+        <c:QueriedList sequenceNumber="{!sequenceNumber}"
+            object="StrategicPlan_Strategy__c"
+            fields="StrategyNumber__c,Name,Status__c,GoalName__c,GoalType__c,PainPointName__c,InitiativeName__c"
+            sortFields="StrategyNumber__c,Name,Status__c,GoalName__c,GoalType__c,PainPointName__c,InitiativeName__c"
+            labels=",,,,{!$Label.StrategicPlan_GoalType},{!$Label.StrategicPlan_PainPoint},{!$Label.StrategicPlan_Initiative}"
+            conditions="StrategicPlan__c='{!strategicPlanId}'"
+            order="StrategyNumber__c"
+            recordsPerPage="50"
+            actionFunction="displayStrategy"
+            panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;"
+            rendered="{!NOT(ISBLANK(strategicPlanId))}" />
+        <apex:actionStatus startText="{!$Label.StrategicPlan_LoadingDetails}" id="loadingDetails"/>
+    </apex:form>
+    <div id="strategy">
+        <apex:outputPanel id="strategy">
+            <apex:form id="form">
+                <apex:sectionHeader title="{!$ObjectType.StrategicPlan_Strategy__c.Label}" subtitle="{!IF(ISBLANK(id),'New Strategy',Strategy.Name)}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}" id="strategyHeader" />
+                <apex:pageBlock title="{!$Label.StrategicPlan_StrategyDetail}" mode="{!IF(mode='view','inlineEdit','edit')}" >
+                    <apex:pageMessages id="pageMessages"/>
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!newRecord}" id="newButton" value="{!$Label.StrategicPlan_NewStrategy}" rendered="{!AND(mode='view',isCreateable)}" />
+                        <apex:commandButton action="{!editRecord}" id="editButton" value="{!$Label.Edit}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isUpdateable)}" />
+                        <apex:commandButton action="{!deleteRecord}" id="deleteButton" value="{!$Label.Delete}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isDeletable)}" />
+                        <apex:commandButton action="{!cloneRecord}" id="cloneButton" value="{!$Label.Clone}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isCreateable)}" />
+                        <apex:commandButton action="{!saveStrategy}" id="saveButton" value="{!$Label.Save}" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(AND(mode='new',isCreateable),AND(NOT(ISBLANK(id)),isUpdateable))}" />
+                        <apex:commandButton action="{!cancelRecord}" id="cancelButton" value="{!$Label.cancel}" immediate="true" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}"/>
+                    </apex:pageBlockButtons>
+                    <apex:outputPanel layout="none" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}" id="strategyDetails">
+                        <apex:pageBlockSection columns="1" collapsible="false" showHeader="true" title="{!$Label.StrategicPlan_RedHatDetails}">
+                            <apex:outputText value="{!$Label.StrategicPlan_StrategyDetailsInstructions}"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false" showHeader="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.Status__c}" rendered="{!mode='view'}" id="strategyStatusOutput"/>
+                            <apex:inputField value="{!Strategy.Status__c}" required="true" rendered="{!mode!='view'}" id="strategyStatusInput" style="width:100%" />
+                            <apex:pageBlockSectionItem />
+                            <apex:outputField value="{!Strategy.Name}" rendered="{!mode='view'}" id="strategyNameOutput"/>
+                            <apex:inputField value="{!Strategy.Name}" required="true" rendered="{!mode!='view'}" id="strategyNameInput" style="width:100%" />
+                            <apex:outputField value="{!Strategy.StrategyNumber__c}" id="strategyNumberOutput"/>
+                            <apex:outputField value="{!Strategy.ProjectedResources__c}" rendered="{!mode='view'}" id="strategyProjectedResourcesOutput"/>
+                            <apex:inputField value="{!Strategy.ProjectedResources__c}" required="true" rendered="{!mode!='view'}" id="strategyProjectedResourcesInput" style="width:100%" />
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false" showHeader="true" title="{!$Label.StrategicPlan_CustomerDetails}">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.GoalName__c}" rendered="{!mode='view'}" id="strategyGoalNameOutput"/>
+                            <apex:inputField value="{!Strategy.GoalName__c}" rendered="{!mode!='view'}" id="strategyGoalNameInput"/>
+                            <apex:outputField value="{!Strategy.GoalType__c}" rendered="{!mode='view'}" id="strategyGoalTypeOutput"/>
+                            <apex:inputField value="{!Strategy.GoalType__c}" rendered="{!mode!='view'}" id="strategyGoalTypeInput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.GoalDescription__c}" rendered="{!mode='view'}" id="strategyGoalDescriptionOutput"/>
+                            <apex:inputField value="{!Strategy.GoalDescription__c}" rendered="{!mode!='view'}" id="strategyGoalDescriptionInput"/>
+                            <apex:pageBlockSectionItem />
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.PainPointName__c}" rendered="{!mode='view'}" id="strategyPainPointNameOutput"/>
+                            <apex:inputField value="{!Strategy.PainPointName__c}" rendered="{!mode!='view'}" id="strategyPainPointNameInput"/>
+                            <apex:outputField value="{!Strategy.PainPointType__c}" rendered="{!mode='view'}" id="strategyPainPointTypeOutput"/>
+                            <apex:inputField value="{!Strategy.PainPointType__c}" rendered="{!mode!='view'}" id="strategyPainPointTypeInput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.PainPointDescription__c}" rendered="{!mode='view'}" id="strategyPainPointDescriptionOutput"/>
+                            <apex:inputField value="{!Strategy.PainPointDescription__c}" rendered="{!mode!='view'}" id="strategyPainPointDescriptionInput"/>
+                            <apex:pageBlockSectionItem />
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.InitiativeName__c}" rendered="{!mode='view'}" id="strategyInitiativeNameOutput"/>
+                            <apex:inputField value="{!Strategy.InitiativeName__c}" rendered="{!mode!='view'}" id="strategyInitiativeNameInput"/>
+                            <apex:outputField value="{!Strategy.InitiativeType__c}" rendered="{!mode='view'}" id="strategyInitiativeTypeOutput"/>
+                            <apex:inputField value="{!Strategy.InitiativeType__c}" rendered="{!mode!='view'}" id="strategyInitiativeTypeInput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.InitiativeDescription__c}" rendered="{!mode='view'}" id="strategyInitiativeDescriptionOutput"/>
+                            <apex:inputField value="{!Strategy.InitiativeDescription__c}" rendered="{!mode!='view'}" id="strategyInitiativeDescriptionInput"/>
+                            <apex:pageBlockSectionItem />
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.EventName__c}" rendered="{!mode='view'}" id="strategyEventNameOutput"/>
+                            <apex:inputField value="{!Strategy.EventName__c}" rendered="{!mode!='view'}" id="strategyEventNameInput"/>
+                            <apex:outputField value="{!Strategy.EventDate__c}" rendered="{!mode='view'}" id="strategyEventDateOutput"/>
+                            <apex:inputField value="{!Strategy.EventDate__c}" rendered="{!mode!='view'}" id="strategyEventDateInput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="newButton, editButton, deleteButton, cloneButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!Strategy.EventDescription__c}" rendered="{!mode='view'}" id="strategyEventDescriptionOutput"/>
+                            <apex:inputField value="{!Strategy.EventDescription__c}" rendered="{!mode!='view'}" id="strategyEventDescriptionInput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="2" collapsible="false" showHeader="true" title="{!$Label.StrategicPlan_SystemDetails}">
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="{!$Label.CreatedBy}" for="createdBy"/>
+                                <apex:outputPanel layout="inline" id="createdBy">
+                                    <apex:outputField value="{!Strategy.CreatedById}" id="strategyCreatedByOutput"/>
+                                    <apex:outputText value=" ({!Strategy.CreatedDate})" id="strategyCreatedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="{!$Label.LastModifiedBy}" for="lastModifiedBy"/>
+                                <apex:outputPanel layout="inline" id="lastModifiedBy">
+                                    <apex:outputField value="{!Strategy.LastModifiedById}" id="strategyModifiedByOutput"/>
+                                    <apex:outputText value=" ({!Strategy.LastModifiedDate})" id="strategyModifiedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                </apex:pageBlock>
+                <apex:pageBlock title="{!$ObjectType.StrategicPlan_Solution__c.LabelPlural}" mode="detail" id="solutions" rendered="{!NOT(ISBLANK(Id))}">
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!newSolution}" id="newSolution" value="{!$Label.StrategicPlan_NewSolution}" immediate="true" rendered="{!AND(mode='view',isCreateable)}" />
+                    </apex:pageBlockButtons>
+                    <c:QueriedList sequenceNumber="{!sequenceNumber}"
+                        object="StrategicPlan_Solution__c"
+                        fields="SolutionNumber__c,Name,BusinessUnit__c"
+                        sortFields="SolutionNumber__c,Name,"
+                        labels=",,"
+                        conditions="Strategy__c='{!Id}'"
+                        order="SolutionNumber__c"
+                        actionField="SolutionNumber__c"
+                        recordsPerPage="50"
+                        panelClass=""
+                        styleClass=""
+                        panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;"
+                        rendered="{!NOT(ISBLANK(Id))}" />
+                </apex:pageBlock>
+                <apex:pageBlock title="{!$ObjectType.StrategicPlan_Action__c.LabelPlural}" mode="detail" id="actions" rendered="{!NOT(ISBLANK(Id))}">
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!newAction}" id="newAction" value="{!$Label.StrategicPlan_NewAction}" immediate="true" rendered="{!AND(mode='view',isCreateable)}" />
+                    </apex:pageBlockButtons>
+                    <c:QueriedList sequenceNumber="{!sequenceNumber}"
+                        object="StrategicPlan_Action__c"
+                        fields="Name,ActionSubject__c,AssignedTo__c,Status__c,Start__c,End__c,RelatedTo__c"
+                        sortFields="Name,ActionSubject__c,AssignedTo__r.Name,Status__c,Start__c,End__c,RelatedTo_Number__c"
+                        labels=",,,,,,"
+                        conditions="Strategy__c='{!Id}' and Subject__c='Strategic Plan Strategy'"
+                        order="Name,ActionSubject__c,RelatedTo_Number__c"
+                        recordsPerPage="50"
+                        actionField="Name"
+                        panelClass=""
+                        styleClass=""
+                        panelStyle="max-height:28ex;overflow-y:auto;overflow-x:hidden;"
+                        rendered="{!NOT(ISBLANK(Id))}" />
+                </apex:pageBlock>
+            </apex:form>
+        </apex:outputPanel>
+    </div>
+</apex:page>

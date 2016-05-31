@@ -1,0 +1,74 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.FilterSettingController"  sideBar="false" id="pageId" tabStyle="refedge__Custom_Settings__c" >
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <script>
+        function checkForDependencyOfRequired(requiredObj){
+            if(document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.children[3].children[0];
+                parentId.checked=true;
+            }
+        }
+        function checkForDependencyOfVisible(requiredObj){
+            if(!document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.children[2].children[0];
+                parentId.checked=false;
+            }
+        }
+        function onstartOnly(){
+            
+        }
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_the_Custom_Setting_Page}" action="{!returnCustomSettings}"/><br/>
+        </div>
+        <apex:pageBlock id="pbId" title="{!$Label.Filter_Order}">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Edit}" rendered="{!NOT(isEdit)}" action="{!editSettings}" reRender="pgmsgId, pbId" />
+                <apex:commandButton value="{!$Label.Save}" rendered="{!isEdit}"  action="{!saveSettings}" reRender="pgmsgId, pbId"/>
+                <apex:commandButton value="{!$Label.Cancel}" rendered="{!isEdit}" action="{!returnSettings}" reRender="pgmsgId, pbId"/>
+            </apex:pageBlockButtons>
+            <apex:outputPanel id="inputBlk">
+                <apex:pageBlockSection id="sec1" columns="1">
+                    <apex:pageBlockTable id="pbTableId" value="{!filterList}" var="filter" style="width:60%;">
+                        <apex:column headerValue="{!$Label.Filter_Name}" value="{!filter.refedge__Label__c}"/>
+                        <apex:column headerValue="{!$Label.Order}"  style="width:160px;">
+                            <apex:inputField value="{!filter.refedge__Order__c}" rendered="{!isEdit}"/>
+                            <apex:outputField value="{!filter.refedge__Order__c}" rendered="{!!isEdit}"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="{!$Label.Basic_Search_View}"  style="width:160px;">
+                            <apex:inputField id="basicId" value="{!filter.refedge__Visible__c}" onclick="checkForDependencyOfRequired(this.id);"  rendered="{!isEdit}"/>
+                            <apex:outputField value="{!filter.refedge__Visible__c}" rendered="{!!isEdit}"/>
+                        </apex:column>
+                        
+                        <apex:column headerValue="{!$Label.Visible}"  style="width:160px;">
+                            <apex:inputField id="visibleId" value="{!filter.refedge__Filter_RefSearch_Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/>
+                            <apex:outputField value="{!filter.refedge__Filter_RefSearch_Visible__c}" rendered="{!!isEdit}"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

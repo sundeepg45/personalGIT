@@ -1,0 +1,39 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page standardController="refedge__Reference_Request__c" showheader="false" sidebar="false" id="pageId" extensions="refedge.AllAccReqofRefRequestController">
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:pageblock >
+            <apex:pageMessage severity="Info" strength="2" summary="{!$Label.No_Records_Found}" rendered="{!requestList.size <=0}"/>  
+            <apex:pageBlockTable value="{!requestList}" var="accreq" rendered="{!requestList.size > 0}">
+                <apex:column headerValue="{!$Label.Details}">
+                    <apex:commandLink value="{!accreq.Name}" onclick="window.open('/{!accreq.Id}');return false;"/>
+                </apex:column>
+                <apex:column value="{!accreq.refedge__Account__c}"/>
+                <apex:column value="{!accreq.refedge__Reference_Type_Needed__c}"/>
+                <apex:column value="{!accreq.refedge__Requester__c}"/>
+                <apex:column value="{!accreq.refedge__Deadline__c}"/>
+                <apex:column value="{!accreq.refedge__Managed_Request__c}"/>
+                <apex:column value="{!accreq.refedge__Approval_Status__c}"/>
+                <apex:column value="{!accreq.refedge__Account_Request_Status__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

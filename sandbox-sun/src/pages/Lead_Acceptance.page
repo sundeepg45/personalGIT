@@ -1,0 +1,15 @@
+<apex:page standardController="Lead" extensions="Lead_AcceptControllerExtension" action="{!acceptLead}" id="form">
+	<apex:outputText value="{!Lead.PenaltyBoxExpiration__c}" rendered="false"/>
+	<apex:outputText value="{!Lead.OwnerId}" rendered="false"/>
+	<apex:outputText value="{!Lead.Stage__c}" rendered="false"/>
+	<apex:outputText value="{!Lead.Route_Around__c}" rendered="false"/>
+	<apex:sectionHeader title="Lead Acceptance" subtitle="{!Lead.Name}" />
+	<apex:form id="form">
+		<apex:pageBlock title="Lead Acceptance" mode="View">
+			<apex:pageBlockButtons location="both">
+				<apex:commandButton value="Cancel" action="{!cancel}" />
+			</apex:pageBlockButtons>
+			<apex:pageMessages />
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

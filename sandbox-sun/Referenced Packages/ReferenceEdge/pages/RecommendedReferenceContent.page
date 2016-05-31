@@ -1,0 +1,107 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page standardController="Opportunity" extensions="refedge.RecommendedReferenceContent" id="pgId">
+    <apex:pageMessages id="pageMsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <script>
+        //Redirect Account search
+        function jsRedirectAccountRefSearch(){
+            if((typeof sforce != 'undefined')  && (sforce != null)){
+                sforce.one.navigateToURL('{!$Page.refedge__SF1_RfSearchPage}?opportunityId={!opp.Id}&forAccount=true&forContent=false&SF1=true')
+            }else{
+                window.open('{!$Page.refedge__RfSearchPage}?opportunityId={!opp.Id}&forAccount=true&forContent=false&PreFilter=true&SF1=false','_parent');
+            }
+        }
+        
+        //Redirect Content search
+        function jsRedirectContentRefSearch(){
+            if((typeof sforce != 'undefined')  && (sforce != null)){
+                sforce.one.navigateToURL('{!$Page.refedge__SF1_RfSearchPage}?opportunityId={!opp.Id}&forAccount=false&forContent=true&SF1=true')
+            }else{
+                window.open('{!$Page.refedge__RfSearchPage}?opportunityId={!opp.Id}&forAccount=false&forContent=true&PreFilter=true&SF1=false','_parent');
+            }
+        }
+        //Redirect to Ref search
+        function jsRedirectRefSearch(){
+            if((typeof sforce != 'undefined')  && (sforce != null)){
+                sforce.one.navigateToURL('{!$Page.refedge__SF1_RfSearchPage}?opportunityId={!opp.Id}&forAccount=false&forContent=false&SF1=true')
+            }else{
+                window.open('{!$Page.refedge__RfSearchPage}?opportunityId={!opp.Id}&forAccount=false&forContent=false&PreFilter=true&SF1=false','_parent');
+            }
+        }
+    </script> 
+    <style>
+        .bPageBlock{
+            background-color: #595959 !important;
+            border-color: #595959 !important;
+        }
+        .tertiaryPalette{
+            background-color: #595959 !important;
+        }
+        .pbSubsection{
+            width: 57% !important;
+            margin-left: 1% !important;
+        }
+        .pbSubheader h3{
+            color: rgb(146, 205, 220) !important;
+            font-size: 15px !important;
+        }
+        .labelCol{
+            color: white !important;
+            font-weight: normal !important;
+            font-size: 13px !important;
+        }
+        .pbBody a{
+            color: white !important;
+            font-weight: normal !important;
+            font-size: 13px !important;
+        }
+        th,td{
+            border-bottom : none !important;
+            font-size: 13px !important;
+        }
+        
+    </style>
+    <apex:form id="formId" style="background-color: #595959;" rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlock id="pbId" >
+            <apex:pageBlockSection id="pbsId" collapsible="false" title="{!IF(AND(NOT(showAccountLink),NOT(showContentLink)),$Label.Refedge_Opportunity_options_not_enabled,$Label.RecommendedResourcesHeader)}" rendered="{!OR(noOfContents > 0, noOfAccounts > 0)}">
+                    <apex:outputPanel id="pbsiOpId21" layout="block" style="color: white;font-size: 13px;float: left;" rendered="{!showContentLink}">
+                        <div style="cursor: pointer;float: left;" onclick="jsRedirectContentRefSearch();return false;">
+                            <apex:outputText value="{!$Label.Matching_Reference_Content}" />
+                        </div>
+                        <apex:commandLink value="{!IF(noOfContents > 2000,TEXT(2000)+'+',noOfContents)}" onclick="jsRedirectContentRefSearch();return false;" style="float: left;margin-left: 5px;border: 1px solid white;padding: 1px 3px 1px 3px;color: white;text-decoration: none !important;"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel id="pbsiOpId11" layout="block" style="color: white;font-size: 13px;float: left;" rendered="{!showAccountLink}">
+                        <div style="cursor: pointer;float: left;" onclick="jsRedirectAccountRefSearch();return false;" >
+                            <apex:outputText value="{!$Label.Matching_Reference_Accounts}" />
+                        </div>
+                        <apex:commandLink value="{!IF(noOfAccounts > 2000,TEXT(2000)+'+',noOfAccounts)}" onclick="jsRedirectAccountRefSearch();return false;" style="float: left;margin-left: 5px;border: 1px solid white;padding: 1px 3px 1px 3px;color: white;text-decoration: none !important;"/>
+                    </apex:outputPanel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection rendered="{!AND(noOfContents == 0, noOfAccounts == 0)}" columns="1">
+                <apex:outputPanel id="pbsiOpId" layout="block" style="color: white;font-size: 14px;">
+                    Sorry, there are no matching reference resources that fully match this Opportunity.<br/>
+                    Go to <apex:commandLink value="Ref Search" onclick="jsRedirectRefSearch();return false;" style="text-decoration: none !important;"/> and remove some criteria to expand search results.
+                    <apex:commandLink value=">>Ref Search" onclick="jsRedirectRefSearch();return false;" style="color: #0CA4DB !important;"/>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

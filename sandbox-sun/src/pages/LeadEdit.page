@@ -1,0 +1,2 @@
+<apex:page action="{!leadEdit}"
+	standardController="Lead" extensions="Lead_EditControllerExtension"/>

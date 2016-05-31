@@ -1,0 +1,99 @@
+<apex:page controller="RHContentListAdminController" action="{! initData }" cache="true" expires="1">
+    <apex:form >
+        <div class="bPageTitle">
+            <div class="ptBody secondaryPalette">
+                <div class="content">
+                    <h1 class="pageType">Red Hat Content<span class="titleSeparatingColon">:</span></h1>
+                    <h2 class="pageDescription">Administration</h2>
+                    <div class="blank">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+
+        <apex:pageMessages id="messages"/>
+        
+        <apex:pageBlock id="sitePageSection">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!findContent}" id="addNewDocument" value="Add Document to Section" rendered="{!NOT(ISNULL(comboNavObject.Page__c) || ISNULL(comboNavObject.Site__c) || ISNULL(comboNavObject.Section__c))}"/>
+                <apex:commandButton action="{!manageVideos}" id="manageVideos" value="Manage Videos"/>
+            </apex:pageBlockButtons>
+            <apex:outputText >
+                <div>
+                    Please select a Site:&nbsp;&nbsp;
+                    <apex:inputField id="cboSite" value="{!comboNavObject.Site__c}">
+                        <apex:actionSupport event="onchange" rerender="sitePageSection"/>
+                    </apex:inputField>                  
+                    <apex:outputText rendered="{!NOT(ISNULL(comboNavObject.Site__c))}">
+                        &nbsp;&nbsp;Page:&nbsp;&nbsp;
+                        <apex:inputField id="cboPage" value="{!comboNavObject.Page__c}">
+                            <apex:actionSupport event="onchange" rerender="sitePageSection"/>
+                        </apex:inputField>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISNULL(comboNavObject.Page__c) || ISNULL(comboNavObject.Site__c))}">
+                        &nbsp;&nbsp;and Section:&nbsp;&nbsp;
+                        <apex:inputField id="cboSection" value="{!comboNavObject.Section__c}">
+                            <apex:actionSupport event="onchange" rerender="sitePageSection"/>
+                        </apex:inputField>
+                    </apex:outputText>
+                </div>
+            </apex:outputText>
+            <apex:outputText rendered="{!contentList.size > 0}">
+                <div>&nbsp;</div>
+                <apex:pageBlockTable value="{!contentList}" var="contentItem">
+                    <apex:column headerValue="Document Title">
+                        <apex:outputText rendered="{!NOT(ISNULL(contentItem.content))}">
+                            <span id="editDocument{!contentItem.rhcontent.ContentDocumentId__c}">
+                            <apex:commandLink action="{!editDocument}" id="editDocument" value="{!contentItem.content.title}">
+                                <apex:param name="docId" value="{!contentItem.rhcontent.Id}"/>
+                            </apex:commandLink>
+                            </span>
+                        </apex:outputText>                  
+                        <apex:outputText rendered="{!ISNULL(contentItem.content)}"><font color="red">Content Not Accessible / Access Denied</font></apex:outputText>                    
+                    </apex:column> 
+                    <apex:column value="{!contentItem.rhcontent.Section__c}"/> 
+                    <apex:column value="{!contentItem.rhcontent.Sort_Order__c}"/>
+                    <apex:column value="{!contentItem.rhcontent.Audience__c}"/>
+                    <apex:column headerValue="Published?">
+                        <apex:outputField value="{!contentItem.rhcontent.IsPublished__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Featured?">
+                        <apex:outputField value="{!contentItem.rhcontent.IsFeatured__c}"/>
+                    </apex:column>
+                    <apex:column headerValue="Last Modified By" value="{!contentItem.rhcontent.LastModifiedBy.Name}"/> 
+                    <apex:column value="{!contentItem.rhcontent.LastModifiedDate}"/>
+                    <apex:column headerValue="Actions">
+                        <span id="{!contentItem.rhcontent.id}actions">
+                            <span id="selectSpan{!contentItem.rhcontent.ContentDocumentId__c}">
+                                <a href="/sfc/#version?selectedDocumentId={!contentItem.rhcontent.ContentDocumentId__c}" target="_blank">Target Document</a>
+                            </span>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <span id="removeSpan{!contentItem.rhcontent.ContentDocumentId__c}">
+                                <apex:commandLink action="{!removeDocument}" onclick="if (!confirm('Are you sure?')){ return false; }" id="removeDocument" value="Remove" title="Remove this document from this Microsite Location">
+                                    <apex:param name="docId" value="{!contentItem.rhcontent.Id}"/>
+                                </apex:commandLink>
+                            </span>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <span id="cloneSpan{!contentItem.rhcontent.ContentDocumentId__c}">
+                                <apex:commandLink action="{!cloneDocument}" id="cloneDocument" value="Clone To" title="Copy this document and it's settings to a differnt Microsite Location">
+                                    <apex:param name="docId" value="{!contentItem.rhcontent.Id}"/>
+                                </apex:commandLink>
+                            </span>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <span id="publishSpan{!contentItem.rhcontent.ContentDocumentId__c}">
+                                <apex:commandLink rendered="{!NOT(contentItem.rhcontent.IsPublished__c)}" action="{!publishDocument}" id="publishDocument" value="Publish" title="Show this document in this Microsite Location">
+                                    <apex:param name="docId" value="{!contentItem.rhcontent.Id}"/>
+                                </apex:commandLink>
+                            </span>
+                            <span id="unpublishSpan{!contentItem.rhcontent.ContentDocumentId__c}">
+                                <apex:commandLink rendered="{!contentItem.rhcontent.IsPublished__c}" action="{!unpublishDocument}" id="unpublishDocument" value="Unpublish" title="Hide this document from this Microsite Location">
+                                    <apex:param name="docId" value="{!contentItem.rhcontent.Id}"/>
+                                </apex:commandLink>
+                            </span>
+                        </span>
+                    </apex:column>                   
+                </apex:pageBlockTable> 
+            </apex:outputText>          
+        </apex:pageBlock>
+        
+    </apex:form>
+</apex:page>

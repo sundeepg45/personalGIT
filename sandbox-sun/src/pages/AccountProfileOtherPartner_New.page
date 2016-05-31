@@ -1,0 +1,20 @@
+<apex:page standardController="Account_Profile_Other_Partner__c" extensions="AccountProfileOtherPartner_ContExtn" tabStyle="Account_Profile__c" id="AccountProfileOtherPartner_New">
+	<apex:form id="form">
+		<apex:sectionHeader subtitle="{!$Label.AccountProfile_NewAccountProfileOtherPartner}" title="{!$Label.AccountProfile_AccountProfileOtherPartnerEdit}"/>
+		<apex:pageMessages id="pageMessages"/>
+    	<apex:pageBlock title="{!$Label.AccountProfile_AccountProfileOtherPartnerEdit}" mode="edit">
+    		<apex:pageBlockButtons >
+				<apex:commandbutton value="{!$Label.AccountProfile_Save}" action="{!saveAndReturn}"/>
+				<apex:commandbutton value="{!$Label.AccountProfile_SaveNew}" action="{!saveAndNew}"/>
+				<apex:commandbutton value="{!$Label.AccountProfile_Cancel}" immediate="true" action="{!cancelAndReturn}"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1" title="{!$Label.AccountProfile_Information}">
+				<apex:inputField value="{!Account_Profile_Other_Partner__c.Account_Profile__c}"/>
+				<apex:inputField required="true" value="{!Account_Profile_Other_Partner__c.Name}"/>
+				<apex:selectList id="partnerType" value="{!Account_Profile_Other_Partner__c.Partner_Type__c}" size="1" multiselect="false">
+					<apex:selectOptions value="{!partnerTypeList}"/>
+				</apex:selectList>			
+			</apex:pageBlockSection>
+    	</apex:pageBlock>
+	</apex:form>
+</apex:page>

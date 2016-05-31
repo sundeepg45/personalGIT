@@ -1,0 +1,4 @@
+<apex:page standardController="OpportunityLineItem" 
+	extensions="Opportunity_ProductPricingRedirect" 
+	action="{!managedProducts}">
+</apex:page>

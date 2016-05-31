@@ -1,0 +1,1365 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" StandardController="refedge__Reference_Request__c" sidebar="false" extensions="refedge.RefRequestProjectController" tabStyle="refedge__Reference_Request__c">
+  <!-- Message -->
+    <apex:pageMessages id="msgId"/>
+     <!-- Add JavaScript & Jquery-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <!-- Add CSS-->
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    
+   
+    <style>
+        a.boxclose{
+            float:right;
+            margin-top:-40px;
+            cursor:pointer;
+            color: #fff;
+            border: 1px solid #AEAEAE;
+            border-radius: 30px;
+            background: #605F61;
+            font-size: 31px;
+            font-weight: bold;
+            display: inline-block;
+            line-height: 0px;
+            padding: 11px 3px;       
+        }
+        
+        .boxclose:before {
+            content: "?";
+        }
+        .showButton {
+            display : inline;
+            -moz-border-bottom-colors: none;
+            -moz-border-left-colors: none;
+            -moz-border-right-colors: none;
+            -moz-border-top-colors: none;
+            
+            background: url("/img/alohaSkin/btn_sprite.png") repeat-x scroll right top #E8E8E9;
+            border-color: #B5B5B5 #B5B5B5 #7F7F7F;
+            border-image: none;
+            border-radius: 3px 3px 3px 3px;
+            border-style: solid;
+            border-width: 1px;
+            color: #333333;
+            font-size: 0.9em;
+            font-weight: bold;
+            font-family: Arial,Helvetica,sans-serif;
+            margin: 1px;
+            padding: 2px 3px !important; 
+        }
+        .hideButton {
+            display : none;
+        }
+        .datePicker{z-index : 9999;} 
+        
+        
+        .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+            color:black;
+        }
+        .requiredInput{
+            position: relative;
+            height: 100%;
+        }
+        .requiredBlock{
+            background-color: #c00;
+            position: absolute;
+            left: -4px;
+            width: 3px;
+            top: 1px;
+            bottom: 1px;
+        }
+        .ui-state-hover,.ui-widget-content ui-state-hover{
+            background:#e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            border : 1px solid lightgray !important;
+        }
+        .ui-state-focus,.ui-widget-content .ui-state-focus{
+            background:#e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            border : 1px solid lightgray !important;
+        }
+        .ui-widget{
+            font-family: Arial,Helvetica,sans-serif !important;
+        }
+        input[type="checkbox"] {
+            background-color:white;
+            size:5em;
+        }
+        .dateFormat {
+            display : none !important;
+        }
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            var count = 0;
+            <apex:repeat value="{!allAccountReq}" var="reqWrap">
+                if(!{!reqWrap.isUR} && document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelField_ileinner') != null && ("{!reqWrap.rra.refedge__Account_Request_Status__c}" == "" || ("{!reqWrap.rra.refedge__Account_Request_Status__c}" !="Unavailable" &&  "{!reqWrap.rra.refedge__Account_Request_Status__c}" != "Completed" && ("{!reqWrap.rra.refedge__Account_Request_Status__c}".indexOf("Give Up") == -1))) ){
+                    document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelField_ileinner').children[0].onmouseover="null";
+                    document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelField_ileinner').children[0].removeAttribute("href");
+                    document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelField_ileinner').children[0].style.textDecoration = 'none';
+                }
+                else if(!{!reqWrap.isUR} && ("{!reqWrap.rra.refedge__Account_Request_Status__c}" == "No Longer Needed"  || "{!reqWrap.rra.refedge__Account_Request_Status__c}" =="Completed" || "{!reqWrap.rra.refedge__Account_Request_Status__c}".indexOf("Give Up") != -1)  ){
+                    if(document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":typeAr") != null && document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":typeAr").children[0] != null){
+                        document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":typeAr").children[0].onmouseover="null";
+                        document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":typeAr").children[0].removeAttribute("href");
+                        document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":typeAr").children[0].style.textDecoration = 'none';
+                    }
+                }
+                else if({!reqWrap.isUR} && document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelFieldUnspecified_ileinner')!= null && "{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" != "No Longer Needed"){
+                    document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelFieldUnspecified_ileinner').children[0].onmouseover="null";      
+                    document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelFieldUnspecified_ileinner').children[0].removeAttribute("href"); 
+                    document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+count+'_typePanelFieldUnspecified_ileinner').children[0].style.textDecoration = 'none';  
+                }
+                else if({!reqWrap.isUR} && "{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" == "No Longer Needed"){
+                    if(document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":UrType") != null && document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+count+":UrType").children[0] != null){
+                        document.getElementById('pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+count+':UrType').children[0].onmouseover="null";
+                        document.getElementById('pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+count+':UrType').children[0].removeAttribute("href");
+                        document.getElementById('pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+count+':UrType').children[0].style.textDecoration = 'none';
+                    }
+                }   
+                ++count;
+            </apex:repeat>
+            count = 0;
+            if(document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_0_ArstatusField_ileinner') != null || document.getElementById('pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_0_UrstatusField_ileinner') != null || document.getElementById('pageId_frmId_pgBlckId_sectionId_subjectId_ileinner') != null){
+                checkRadio();
+                PORHideLoading();
+            }
+            else{
+                updateInlineEditingValue(true);
+            }
+        });
+        var newWin=null;
+        var showmessage=false;
+        var showProcessMessage=false;
+        var lastRecordId = '';
+        var lastClickedObj = '';
+        var lastClickedHitObj = '';
+        var isUrRequest = false;
+        function displayFields(isUr,rra,ur,urRefTtype,arRefType){
+            getTheFieldInfo(isUr,rra,ur,urRefTtype,arRefType);
+            return false;    
+        }
+        function openAddRequest(pageURL){
+            var url = '';
+            if('{!JSENCODE(refRequestObj.refedge__Project_Type__c)}' == 'Candidate')
+                url =  pageURL + '?id='+'{!URLENCODE(refRequestObj.Id)}'+'&candidateproject=true';
+            else
+                url =  pageURL + '?id='+'{!URLENCODE(refRequestObj.Id)}'+'&candidateproject=false';
+            newWin=window.open(url, 'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');  
+        }
+        
+        var previousRequestId = '';
+        function editRequestInfo(reqId,clickedObj,showMsg,isUr,processMessage){
+            showmessage = showMsg;
+            isUrRequest = isUr;
+            showProcessMessage =    processMessage;
+            document.getElementById('pageId:frmId:pgBlckId:blocksectionId:saveButton').className='showButton';
+            document.getElementById('pageId:frmId:pgBlckId:blocksectionId:cancelButton').className='showButton';
+            var singleChange = true;
+            var Id = '';
+            jQuery('.inlineEditUndo').each(function() {
+                if(jQuery(this).parent().parent().css('display') != 'none'){
+                    id = jQuery(this).parent().parent().attr('id');
+                    if(id.indexOf("specPbtRequest") > -1){
+                        singleChange = false;
+                    }
+                }
+            });
+            if(singleChange == false && previousRequestId != '' && previousRequestId != reqId){
+                jQuery( "#dialogBoxDivNew" ).dialog({
+                    width: '400px',
+                    modal: true,
+                    resizable: false,
+                    draggable: false,
+                    buttons: [{
+                        text: "{!$Label.Ok}",
+                        "class": "dialogButtonClass",
+                        click: function() {
+                            jQuery( this ).dialog( "close" );
+                            return false;
+                        }
+                    }]
+                });
+            }
+            else{
+                previousRequestId = reqId;
+                if(!showmessage){
+                    lastClickedObj = clickedObj;
+                    lastRecordId = reqId;
+                }
+                updateInfo(reqId);
+            }
+        }
+        var previousHitId = '';
+        function checkHitlistRecord(hitlistId,value){
+            
+            document.getElementById('pageId:frmId:pgBlckId:hitList:saveButton').className='showButton';
+            document.getElementById('pageId:frmId:pgBlckId:hitList:cancelButton').className='showButton';
+            var singleChange = true;
+            var Id = '';
+            jQuery('.inlineEditUndo').each(function() {
+                if(jQuery(this).parent().parent().css('display') != 'none'){
+                    id = jQuery(this).parent().parent().attr('id');
+                    if(id.indexOf("hitList") > -1){
+                        singleChange = false;
+                    }
+                }
+            });
+            if(singleChange == false && previousHitId != hitlistId){
+                alert('{!$Label.Only_one_hitlist_item_updated}');
+                return false;
+            }
+            else{
+                previousHitId = hitlistId;
+                lastClickedHitObj = value;
+
+            }
+        }
+        function cancelUpdate(){
+            previousRequestId = '';
+            PORShowLoading();
+            document.getElementById('pageId:frmId:pgBlckId:blocksectionId:saveButton').className='hideButton';
+            document.getElementById('pageId:frmId:pgBlckId:blocksectionId:cancelButton').className='hideButton';
+            cancelUpdateOperation();
+        }
+        function editRequestSubject(){
+            document.getElementById('pageId:frmId:pgBlckId:sectionId:reqsaveButton').className='showButton';
+            document.getElementById('pageId:frmId:pgBlckId:sectionId:reqcancelButton').className='showButton';
+        }
+      
+        function assignReqIdJS(reqId,isUnspRequest){
+
+            assignDetails(reqId,isUnspRequest);
+        }
+        function chkForRadioSelected(hitRecordId){
+            if(jQuery('input[type=radio]:checked').size() > 0){
+                jQuery( "#dialogBoxDiv5" ).dialog({
+                    width: '400px',
+                    modal: true,
+                    resizable: false,
+                    draggable: false,
+                    buttons: [{
+                        text: "{!$Label.Yes}",
+                        "class": "dialogButtonClass",
+                        click: function() {
+                            jQuery( this ).dialog( "close" );
+                            PORShowLoading();
+                            assignHitRecord(hitRecordId,true);
+                        }
+                    },
+                    {
+                        text: "{!$Label.No}",
+                        "class": "dialogButtonClass",
+                        click: function() {
+                            jQuery( this ).dialog( "close" ); 
+                            PORShowLoading();
+                            assignHitRecord(hitRecordId,false);
+                        }
+                    }]
+                });
+                jQuery(".ui-dialog-titlebar").hide();
+                jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+            }
+            else{
+               alert('{!$Label.Select_Item_Message}');
+            }
+        }
+        function chkForRadioSelectedCommunity(){
+            if(jQuery('input[type=radio]:checked').size() > 0){
+                PORShowLoading();
+                return true;
+            }
+            else{
+               alert('{!$Label.Select_Item_Message}');
+               return false;
+            }
+        }
+        function chkForRadioSelectedonSave(Id){
+            var dispositionStatus = '';
+            var fieldId = '';
+            if(lastClickedHitObj != ''){
+                var newId = lastClickedHitObj.id;
+                var find = ':';
+                var re = new RegExp(find, 'g');
+                var newId1 = newId.replace(re, '_');
+                if(newId1.search('dispositionPanel') != -1){
+                    var newId1 = newId1.replace('dispositionPanel','dispositionCol');
+                    var e = document.getElementById(newId1);
+                    if(e!=null){
+                        dispositionStatus = e.options[e.selectedIndex].value;
+                    }
+                }
+            }
+            if(isInlineEditingDisabled && Id != ''){
+                for(var chkCount = 0; chkCount < {!hitListRecords.size}; chkCount++){
+                    if(Id == document.getElementById('pageId:frmId:pgBlckId:hitList:hitlistTableId:'+ chkCount +':selecthitsingleHidden').value){
+                        dispositionStatus = document.getElementById('pageId:frmId:pgBlckId:hitList:hitlistTableId:'+ chkCount +':dispositionColEdit').value;
+                    }
+                }
+            }
+            if(dispositionStatus == 'Agreed'){
+                if(jQuery('input[type=radio]:checked').size() > 0){
+                    saveHitListJs(dispositionStatus,previousHitId);
+                }
+                else{
+                   alert('{!$Label.Select_Item_Message}');
+                   return false;
+                }
+            }
+            else{
+                saveHitListJs(dispositionStatus,previousHitId);
+            }
+        }
+        
+        function getReqInfoDetails(){
+            statusValue = '';
+            changedEntity = '';
+            if(lastClickedObj != ''){
+                var newId = lastClickedObj.id;
+                var find = ':';
+                var re = new RegExp(find, 'g');
+                var newId1 = newId.replace(re, '_');
+                if(newId1.search('statusPanel') != -1){
+                    if(isUrRequest)
+                        var newId1 = newId1.replace('statusPanel','UrstatusField');
+                    else
+                        var newId1 = newId1.replace('statusPanel','ArstatusField');
+                    var e = document.getElementById(newId1);
+                    if(e!=null){
+                        statusValue = e.options[e.selectedIndex].value;
+                        changedEntity = 'status';
+                    }
+                }
+                if(newId1.search('processPanel') != -1){
+                    var newId2 = newId1.replace('processPanel','ArProcess');
+                    var e = document.getElementById(newId2);
+                    if(e!=null){
+                        statusValue = e.options[e.selectedIndex].value;
+                        changedEntity = 'process';
+                    }   
+                }
+                if(newId1.search('deadlinePanel') != -1){
+                    if(isUrRequest)
+                        var newId1 = newId1.replace('deadlinePanel','UrDeadline');
+                    else
+                        var newId1 = newId1.replace('deadlinePanel','ArDeadline');
+                    statusValue = document.getElementById(newId1).value;
+                    changedEntity = 'deadLine';
+                }
+                
+                getAccReqDetails(lastRecordId,statusValue,changedEntity);
+            }
+            else{
+                lastRecordId = previousRequestId;
+                getAccReqDetails(lastRecordId,'','');
+            }
+        }
+        
+        function getReqInfoDetailsEdit(RecordId,isUr){
+            
+            isUrRequest = isUr;
+            lastRecordId = RecordId;
+            getAccReqDetails(lastRecordId,'','');
+        }
+        
+        function setSubject(){
+            var subjectValue = document.getElementById('pageId_frmId_pgBlckId_sectionId_subjectId').value;
+            saveRequestSubjectJs(subjectValue);
+        }
+        
+        var oldRequestId ='';
+        function checkRadio(){
+            var chkCount=0;
+            var isSizeOne = true;
+            if({!allAccountReq.size} > 1)
+                isSizeOne = false;
+            else
+                isSizeOne = true;
+            var checkedReqId = '';
+            var isReqUr = false;
+            jQuery('input:radio').each(function() {
+                if (jQuery(this).is(':disabled') == false) {
+                    var id = "pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+ chkCount +":radioPanelId";
+                    var ele = document.getElementById(id) ;
+                    if(jQuery(this).val() == oldRequestId || isSizeOne){
+                        jQuery(this).attr("checked", "checked");
+                        checkedReqId = document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+ chkCount +":selectsingleHidden").value;
+                        isReqUr = document.getElementById("pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+ chkCount +":isReqUR").value;
+                    }
+                }
+                chkCount = chkCount+1;
+            });
+            if(checkedReqId != '' && (oldRequestId == null || oldRequestId == ''))
+                assignDetails(checkedReqId,isReqUr);
+        }
+        function postToInfl(){
+            var chkCount=0;
+            var isContactPresent = false;
+            var ele = '';
+            jQuery('input[id=radioID]').each(function() {
+                if(jQuery(this).is(':checked')) {
+                    var id = "pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:"+ chkCount +":selectsingleHidden";
+                    ele = document.getElementById(id).value;
+                    if(document.getElementById('pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+ chkCount +':contact') != null){
+                        isContactPresent = true;
+                    }
+                }
+                chkCount = chkCount+1;
+            });
+            if(isContactPresent){
+                alert('No challenge is posted. Contact is present here.'); 
+                return false;
+            }
+            else if(jQuery('input[type=radio]:checked').size() > 0){
+                PORShowLoading();
+                postToInfluitive(ele);
+            }
+            else{
+               alert('{!$Label.Select_Item_Message}');
+            }
+        }
+    </script>
+    
+    <apex:outPutPanel id="SizePanel">
+        <script>
+            function updateMessage(){
+                var flag=false;
+                var writetoNote = false;
+                if({!manage2PeerError}){
+                    var errorMsg = '{!$Label.Managed_Request_Error}';
+                    errorMsg = errorMsg.replace('@@@', '{!errorAccountName}');
+                    alert(errorMsg);
+                    PORShowLoading();
+                    cancelUpdateOperation();
+                    return false;
+                }
+                else if({!showConfirmationSaveMessage}){
+                    
+                    jQuery( "#dialogBoxDiv2" ).dialog({
+                        width: '400px',
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        buttons: [{
+                            text: "{!$Label.Continue}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                                jQuery(".ui-dialog-title").text( '');
+                                jQuery( this ).dialog( "close" );
+                                previewEmailOncomplete(writetoNote);
+                                return false;
+                            }
+                        },
+                        {
+                            text: "{!$Label.Cancel}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                            jQuery(".ui-dialog-title").text( '');
+                                jQuery( this ).dialog( "close" ); 
+                                PORShowLoading();
+                                cancelUpdateOperation();
+                                return false;
+                            }
+                        }]
+                    });
+                    jQuery(".ui-dialog-title").text( '{!$Label.Change_Request_Title}');
+                }
+                else{
+                    writetoNote = document.getElementById('pageId:frmId:writetoNoteId').checked;
+                    
+                    if({!showPeer2ManagedMessage}){
+                         var r=confirm('{!$Label.Change_Request_Type_Message}')
+                         if (r==true){
+                              showProcessMessage = false;
+                              previewEmailOncomplete(writetoNote);
+                              return;
+                          }
+                          else {
+                               showProcessMessage = false;
+                               PORShowLoading();
+                               cancelUpdateOperation();
+                               return;
+                          }
+                    }
+                    else{
+                        previewEmailOncomplete(writetoNote);
+                        return false;
+                    }
+                }
+            }
+            
+            var size={!updateReqSetSize};
+            function previewEmailOncomplete(writetoNote){
+                var fieldId = '';
+                var noteId = '';
+                var typeId = '';
+                var deadlineId = '';
+                var isPreview = false;
+                var subject = '';
+                
+                for(var chkCount = 0; chkCount < {!allAccountReq.size}; chkCount++){
+                    if(lastRecordId == document.getElementById('pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+ chkCount +':selectsingleHidden').value){
+                        if(isInlineEditingDisabled){
+                            fieldId = 'pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+ chkCount +':';
+                        }
+                        else {
+                            fieldId = 'pageId_frmId_pgBlckId_blocksectionId_specPbtRequest_'+ chkCount +'_';
+                        }
+                        var ownerValue = '';
+                        var e ;
+                        var statusValue = '';
+                        if(isUrRequest){
+                            noteId = 'pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+ chkCount +':denyNotesUn';
+                            if(isInlineEditingDisabled){
+                                typeId = fieldId+'typePanelFieldUnspecified1';
+                                deadlineId = fieldId+'UrDeadline1';
+                                ownerValue = document.getElementById(fieldId+'ownerFieldUn1').value;
+                                statusValue = document.getElementById(fieldId+'UrstatusField1').value;
+                            }
+                            else{
+                                typeId = fieldId+'typePanelFieldUnspecified_ileinner';
+                                deadlineId = fieldId+'UrDeadline_ileinner';
+                                if(document.getElementById(fieldId+'ownerFieldUn_ileinner').children[0] != null){
+                                    ownerValue = document.getElementById(fieldId+'ownerFieldUn_ileinner').innerHTML ;
+                                    ownerValue = ownerValue.split('<')[0];
+                                }
+                                if(document.getElementById(fieldId+'UrstatusField') != null){
+                                    e = document.getElementById(fieldId+'UrstatusField');
+                                    statusValue = e.options[e.selectedIndex].value;
+                                }
+                                else{
+                                    statusValue = document.getElementById(fieldId+'UrstatusField_ileinner').innerHTML;
+                                }
+                            }
+                            if(ownerValue == ''){
+                                ownerValue = '{!JSENCODE(tempRRA.Project_Owner__r.Name)}';
+                            }
+                            if(ownerValue != '{!JSENCODE(tempRRA.Project_Owner__r.Name)}'){
+                                isPreview = true;
+                            }
+                            if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}'){
+                                if(statusValue == 'On Hold'){
+                                    isPreview = true;
+                                }
+                            }
+                        }
+                        else {
+                            noteId = 'pageId:frmId:pgBlckId:blocksectionId:specPbtRequest:'+ chkCount +':denyNotes';
+                            if(isInlineEditingDisabled){
+                                typeId = fieldId+'typePanelField1';
+                                deadlineId = fieldId+'ArDeadline1';
+                                ownerValue = document.getElementById(fieldId+'ownerField1').value;
+                                statusValue = document.getElementById(fieldId+'ArstatusField1').value;
+                            }
+                            else{
+                                typeId = fieldId+'typePanelField_ileinner';
+                                deadlineId = fieldId+'ArDeadline_ileinner';
+                                if(document.getElementById(fieldId+'ownerField_ileinner').children[0] != null){
+                                    ownerValue = document.getElementById(fieldId+'ownerField_ileinner').innerHTML ;
+                                    ownerValue = ownerValue.split('<')[0];
+
+                                }
+                                if(document.getElementById(fieldId+'ArstatusField') != null){
+                                    e = document.getElementById(fieldId+'ArstatusField');
+                                    statusValue = e.options[e.selectedIndex].value;
+                                }
+                                else{
+                                    statusValue = document.getElementById(fieldId+'ArstatusField_ileinner').innerHTML;
+                                }
+                            }
+                            if(ownerValue == ''){
+                                ownerValue = '{!JSENCODE(tempRRA.Project_Owner__r.Name)}';
+                            }
+                            if(ownerValue != '{!JSENCODE(tempRRA.Project_Owner__r.Name)}'){
+                                isPreview = true;
+                            }
+                            if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}'){
+                                if(statusValue != 'In Progress' && statusValue != 'Unavailable' && statusValue != 'No Longer Needed' && statusValue != '' && statusValue != 'Not Started' && statusValue != 'No Response'){
+                                    isPreview = true;
+                                }
+                            }
+                        }
+                        if(isPreview || isPreview == true){
+                            if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}' && ownerValue != '{!JSENCODE(tempRRA.Project_Owner__r.Name)}')
+                                document.getElementById('pageId:frmId:Subject').value = ownerValue+'{!OWNER_UPDATE_SUBJECT}';
+                            else if(statusValue != '{!JSENCODE(tempRRA.refedge__Account_Request_Status__c)}'){
+                                document.getElementById('pageId:frmId:Subject').value = '{!STATUS_UPDATE_SUBJECT}';
+                            }
+                            else if(ownerValue != '{!JSENCODE(tempRRA.Project_Owner__r.Name)}'){
+                                document.getElementById('pageId:frmId:Subject').value = ownerValue+'{!OWNER_UPDATE_SUBJECT}';
+                            }
+                            document.getElementById('pageId:frmId:account').innerHTML = '{!JSENCODE(tempRRA.Account__r.Name)}';
+                            if(isInlineEditingDisabled){
+                                document.getElementById('pageId:frmId:UseRequested').innerHTML = document.getElementById(typeId).value;
+                                document.getElementById('pageId:frmId:deadline').innerHTML = document.getElementById(deadlineId).value;
+                            }
+                            else{
+                                document.getElementById('pageId:frmId:UseRequested').innerHTML = document.getElementById(typeId).children[0].innerHTML;
+                                document.getElementById('pageId:frmId:deadline').innerHTML = document.getElementById(deadlineId).innerHTML;
+                            }
+                            document.getElementById('pageId:frmId:Status').innerHTML = statusValue;
+
+                            document.getElementById('pageId:frmId:notes').value = document.getElementById(noteId).value;
+                            
+                            jQuery("#dialogBoxDiv").dialog({
+                                height    : 150,
+                                width     : 415,
+                                modal     : true,
+                                resizable : false,  
+                                buttons: [{
+                                    text: "{!$Label.Send}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        previousRequestId = '';
+                                        updateInformation(true,lastRecordId,writetoNote,'');
+                                        return false;
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Edit_then_Send}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        jQuery("#dialogBoxDiv1").dialog({
+                                            height    : 420,
+                                            width     : 600,
+                                            modal     : true,
+                                            resizable : false,  
+                                            buttons: [{
+                                                text: "{!$Label.Done}",
+                                                "class": "dialogButtonClass",
+                                                click: function() {
+                                                    document.getElementById(noteId).value = document.getElementById('pageId:frmId:notes').value;
+                                                    jQuery( this ).dialog( "close" ); 
+                                                    writetoNote = document.getElementById('pageId:frmId:writetoNoteId').checked;
+                                                    subject = document.getElementById('pageId:frmId:Subject').value;
+                                                    PORShowLoading();
+                                                    previousRequestId = '';
+                                                    updateInformation(true,lastRecordId,writetoNote,subject);
+                                                    return false;
+                                                }
+                                            }]              
+                                        });
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.Do_Not_Send}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        previousRequestId = '';
+                                        updateInformation(false,lastRecordId,writetoNote,'');
+                                        return false;
+                                    },
+                                },
+                                {
+                                    text: "{!$Label.Cancel}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        PORShowLoading();
+                                        cancelUpdateOperation();
+                                        previousRequestId = '';
+                                        return false;
+                                    }
+                                }]              
+                            });
+                            break;
+                        }
+                        else{
+                            PORShowLoading();
+                            previousRequestId = '';
+                            updateInformation(true,lastRecordId,writetoNote,'');
+                            return false;
+                        }
+                    }
+                }
+                if(!isPreview || isPreview == false){
+                    PORShowLoading();
+                    previousRequestId = '';
+                    updateInformation(true,lastRecordId,writetoNote,'');
+                    return false;
+                }
+                
+            }
+            function confirmReleaseAll(){
+                var responce = confirm('{!$Label.ReleaseAllMessage}');
+                if(responce == true){
+                    releaseAllJs();
+                }
+                else{
+                    return false;
+                }
+            }
+            function showPostCommunityPopup(isHitList,hitListRecordId){
+                var isRequestAssociatedToCommunity = {!isRequestAssociatedToCommunity};
+                if(isHitList){
+                    isRequestAssociatedToCommunity = false;
+                }
+                if(jQuery('input[type=radio]:checked').size() > 0 && !isRequestAssociatedToCommunity){
+                    if(isHitList){
+                        setHitListId(hitListRecordId);
+                    }
+                    else{
+                        redirectPostCommunity();
+                    }
+                }
+                else if(isRequestAssociatedToCommunity){
+                    alert('{!$Label.The_Request_has_already_been_posted}');
+                }
+                else if(jQuery('input[type=radio]:checked').size() == 0){
+                    alert('{!$Label.Select_Item_Message}');
+                }
+            }
+        </script>
+    </apex:outPutPanel>
+    <apex:outputPanel id="chkRadio">
+        <script>
+            function getInfluitiveResponse(){
+                if({!isChallengeCreated}){
+                    alert('Challenge is created in Influitive Hub.');
+                }
+            }
+            function selectRadioButton(){
+                oldRequestId = '{!JSENCODE(selectedaccountReq)}';
+                checkRadio();
+            }
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="frmId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <script>
+            var isInlineEditingDisabled = {!isInlineEditingDisabled};
+        </script>
+        <apex:sectionHeader title="{!$ObjectType.refedge__Reference_Request__c.Label}" subtitle="{!refRequestObj.Name}"/>
+        <apex:commandLink value="{!$Label.Back_To_Ref_Workspace}" action="{!backToWorkspace}" rendered="{!isFromWorkspace}"/>
+        <apex:pageBlock id="pgBlckId" >
+            <apex:actionFunction name="updateInlineEditingValue" rerender="frmId" onComplete="checkRadio();PORHideLoading();">
+                <apex:param name="isInlineEditingDisabled" assignTo="{!isInlineEditingDisabled}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="redirectPostCommunity" action="{!redirectPostCommunity}"/>
+            <apex:actionFunction name="setHitListId" reRender="msgId" onComplete="redirectPostCommunity();">
+                <apex:param name="communityHitListRecordId" assignTo="{!communityHitListRecordId}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="getAccReqDetails" action="{!getSelectedAccReqDetails}" rerender="SizePanel,dialogBoxDiv1" oncomplete="updateMessage();return false;">
+                <apex:param name="reqId" assignTo="{!updateReqId}" value=""/>
+                <apex:param name="statusValue" assignTo="{!statusValue}" value=""/>
+                <apex:param name="changedEntity" assignTo="{!changeField}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction action="{!displayFieldInfo}" name="getTheFieldInfo" reRender="reqInfoSec,blckSection,msgId" onComplete="PORHideLoading();">
+                <apex:param name="IsUr" assignTo="{!isUr}" value=""/>
+                <apex:param name="RRA" assignTo="{!rrAcc}" value=""/>
+                <apex:param name="Ur" assignTo="{!Ureq}" value=""/>
+                <apex:param name="urRefTtype" assignTo="{!urRefName}" value=""/>
+                <apex:param name="arRefType" assignTo="{!arRefName}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="assignHitRecord" action="{!assignHitRecord}" oncomplete="PORHideLoading();" rerender="pgBlckId,msgId">
+                <apex:param name="hitId" assignTo="{!hitRecordId}" value=""/>
+                <apex:param name="isDispositionSet" assignTo="{!isDispositionSet}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="assignCommunityRecord" action="{!assignCommunityContactRecord}" oncomplete="PORHideLoading();" rerender="pgBlckId,msgId">
+                <apex:param name="hitId" assignTo="{!communityIdtoDelete}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="updateInformation" action="{!saveReqList}" rerender="blocksectionId,requestPanel,sectionId,msgId,Notes_ListId" onComplete="PORHideLoading();return false;">
+                <apex:param name="isSend" assignTo="{!isSend}" value=""/>
+                <apex:param name="reqId" assignTo="{!updateReqId}" value=""/>
+                <apex:param name="writetoNote" assignTo="{!writetoNote}" value=""/>
+                <apex:param name="subject" assignTo="{!subjectValue}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="cancelUpdateOperation" action="{!cancelUpdate}" oncomplete="PORHideLoading();" rerender="blocksectionId,requestPanel,sectionId,msgId,communityListId"/>
+            <apex:actionFunction action="{!setParam}" name="assignDetails" oncomplete="PORHideLoading();" rerender="sectionId,SizePanel,contactOpId,communityDiv">
+                <apex:param name="reqId" assignTo="{!hitRecordRequestId}" value=""/>
+                <apex:param name="isUr" assignTo="{!hitRecordIsUR}" value=""/>  
+            </apex:actionFunction>
+            <apex:actionFunction name="updateInfo" action="{!setParam}" rerender="sectionId,SizePanel" oncomplete="PORHideLoading();">
+                <apex:param name="reqId" assignTo="{!reqId}" value=""/>
+            </apex:actionFunction>
+            
+            <apex:actionFunction name="releaseAllJs" status="porStatus" action="{!releaseHitRecords}" rerender="hitListId"/>
+            <apex:actionFunction name="saveHitListJs" status="porStatus" action="{!updateHitRecords}" rerender="pgBlckId">
+                <apex:param name="status" assignTo="{!dispositionStatus}" value=""/>
+                <apex:param name="reqId" assignTo="{!hitRecordId}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="saveRequestSubjectJs" status="porStatus"  action="{!saveRequestEdit}" rerender="sectionId,reqButtonId">
+                <apex:param name="subject" assignTo="{!Subject}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="showContactBlock" action="{!displayContact}" oncomplete="selectRadioButton();PORHideLoading();return false;"   reRender="contactOpId,chkRadio">
+                <apex:param name="accountId" value="" assignTo="{!accountId}"/>
+                <apex:param name="req" value="" assignTo="{!selectedaccountReq}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="assignContact" action="{!assignContact}" reRender="requestPanel,contactOpId, pgmsgId,chkRadio" oncomplete="PORHideLoading();selectRadioButton();">
+                <apex:param name="selectedCon" value=""  assignTo="{!contactId}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="postToInfluitive" action="{!postToINFL}" reRender="requestPanel,contactOpId, pgmsgId,chkRadio" oncomplete="PORHideLoading();getInfluitiveResponse();">
+                <apex:param assignTo="{!selectRefType}" name="param" value=""/>
+            </apex:actionFunction>
+            <apex:outputPanel id="reqButtonId" >
+                <apex:commandButton onclick="PORShowLoading();" oncomplete="PORHideLoading();" rendered="{!AND(isInlineEditingDisabled,isEdit)}" action="{!saveRequestEdit}" rerender="sectionId,reqButtonId" style="margin-left:40%;width:50px;" value="{!$Label.Save}" id="reqsaveButton1"/>
+                <apex:commandButton onclick="PORShowLoading();" oncomplete="PORHideLoading();" rendered="{!AND(isInlineEditingDisabled,isEdit)}" action="{!cancelRequestEdit}" rerender="sectionId,reqButtonId" style="width:50px;" value="{!$Label.Cancel}" id="reqcancelButton1"/>
+                <apex:commandButton styleClass="hideButton" style="margin-left:40%;width:50px;" value="{!$Label.Save}" onclick="setSubject();return false;"  id="reqsaveButton"/>
+                <apex:commandButton styleClass="hideButton" style="width:50px;" value="{!$Label.Cancel}" action="{!cancelRequestEdit}"  id="reqcancelButton" rerender="sectionId,reqButtonId"/>   
+            </apex:outputPanel>
+            <apex:pageBlockSection id="sectionId" columns="2" title="{!$Label.Request_Project}">
+                <apex:outputField value="{!refRequestObj.Name}"/>
+                <apex:outputField value="{!refRequestObj.refedge__Opportunity__c}"/>
+                <apex:outputField value="{!refRequestObj.refedge__Requester__c}"/>
+                <apex:outputField value="{!refRequestObj.refedge__Project_Type__c}"/>
+                <apex:outputField rendered="{!!isInlineEditingDisabled}" id="subjectId" value="{!refRequestObj.refedge__Title__c}"><apex:InlineEditSupport changedStyleClass="myBoldClass" event="ondblclick" showOnEdit="reqsaveButton,reqcancelButton"/></apex:outputField>
+                <apex:pageBlockSectionItem rendered="{!AND(isInlineEditingDisabled,!isEdit)}">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Reference_Request__c.fields.refedge__Title__c.Label}" ></apex:outputLabel> 
+                    <apex:outputPanel >
+                        <apex:outputText value="{!refRequestObj.refedge__Title__c}"/>
+                        <apex:commandLink action="{!editRow}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="sectionId,reqButtonId">
+                            <apex:image url="{!$Resource.refedge__Edit}" height="12px" width="12px"/>
+                        </apex:commandLink>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:inputField id="subjectIdEdit" rendered="{!AND(isInlineEditingDisabled,isEdit)}" value="{!refRequestObj.refedge__Title__c}"/>
+                <apex:outputField value="{!refRequestObj.refedge__Case__c}"/>
+            </apex:pageblockSection> 
+            <apex:pageBlockSection title="{!$Label.Attribute_Info}" id="genInfoId" columns="1" rendered="{!refUseAttr.AttributeLabels.size > 0}">                 
+               
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >&nbsp;</apex:outputLabel>
+                    <apex:commandLink style="color:#1797C0"  immediate="true" action="{!selectProjUseAttr}" value="{!$Label.Select_And_Edit}" id="theCommandLink"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:repeat value="{!refUseAttr.AttributeLabels}" var="label">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >
+                             {!label.Name} <apex:outputText style="color : #CC0000;" value="{!IF(refUseAttr.mapRequiredLabel[label.Id],' | ','')}"/> 
+                        </apex:outputLabel>
+                        <apex:outputPanel >
+                            <apex:variable value="0" var="rowOrder"/>
+                            <apex:repeat value="{!refUseAttr.mapAttributesLabels[label]}" var="attr">
+                            <apex:outputText rendered="{!VALUE(rowOrder) > 0}">, </apex:outputText> {!attr.attributeLabel.Attribute__r.Name} 
+                            <apex:variable value="{!VALUE(rowOrder)+1}" var="rowOrder"/>
+                            </apex:repeat>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                </apex:repeat>
+               
+            </apex:pageBlockSection>
+            <apex:outputPanel id="opReqItemId">
+            <apex:pageBlockSection columns="1" title="{!$Label.Request_Items}" id="blocksectionId">
+                <apex:outputPanel id="opButtonId" style="margin-left: 40%;width:100%;float:left;">
+                    <apex:commandButton rendered="{!isInfluitiveEnabled}" styleClass="showButton" style="width:95px;padding: 4px 3px !important;" value="{!$Label.Post_to_Influitive}" onclick="postToInfl();return false;" rerender="SizePanel"/>
+                    <apex:commandButton styleClass="showButton" style="width:50px;padding: 4px 3px !important;" value="{!$Label.Add}" onclick="openAddRequest('{!$Page.refedge__addRequest}');return false;" rerender="SizePanel"/>
+                    <apex:commandButton styleClass="showButton" style="width:50px;padding: 4px 3px !important;" value="{!$Label.Match}" action="{!goToRefMatch}" />
+                    <apex:commandButton styleClass="showButton" style="padding: 4px 3px !important;" value="{!$Label.Post_to_Community}" rendered="{!isProCom}" onclick="showPostCommunityPopup(false,'');return false;" /> 
+                    <apex:commandButton rendered="{!!isInlineEditingDisabled}" styleClass="hideButton" style="width:50px;padding: 4px 3px !important;" value="{!$Label.Save}" id="saveButton" onclick="getReqInfoDetails();return false;"  rerender="msgId" />
+                    <apex:commandButton rendered="{!!isInlineEditingDisabled}" styleClass="hideButton" style="width:50px;padding: 4px 3px !important;" value="{!$Label.Cancel}"  id="cancelButton" onclick="cancelUpdate();return false;" />
+                </apex:outputPanel>
+                
+                <apex:outputPanel id="requestPanel">
+                    <apex:variable value="{!0}" var="index"/>   
+                    <apex:pageBlockTable value="{!allAccountReq}" var="reqWrap" id="specPbtRequest" >
+                            <apex:column id="headerFooterId" headerValue="{!$Label.Action}">
+                                <apex:outputPanel id="editLinkEnableOp" rendered="{!NOT(OR(reqWrap.processStatus == 'Peer2Peer', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed', reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'Account Specified'))}">
+                                    <apex:outputLink onclick="PORShowLoading();return displayFields('{!reqWrap.isUR}','{!JSENCODE(reqWrap.rra.Id)}','{!JSENCODE(reqWrap.unSpec.Id)}','{!JSENCODE(reqWrap.unSpec.refedge__Reference_Type_Needed__c)}','{!JSENCODE(reqWrap.rra.refedge__Reference_Type_Needed__c)}');" >{!$Label.Info}</apex:outputLink>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="editLinkDisableOp" rendered="{!OR(reqWrap.processStatus == 'Peer2Peer', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed', reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'Account Specified')}">
+                                    <a href="#" style="pointer-events: none; color : lightgray;">{!$Label.Info}</a>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="radioPanelId" rendered="{!NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}">
+                                    <input type="radio" id="radioID" name="radioName" value="{!reqWrap.id}"  onclick="PORShowLoading();assignDetails('{!JSENCODE(reqWrap.id)}',{!reqWrap.isUr});" />
+                                    <apex:inputhidden value="{!reqWrap.id}" id="selectsingleHidden"/>
+                                    <apex:inputhidden value="{!reqWrap.isUr}" id="isReqUR"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="radioPanelId2" rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}">
+                                    <input type="radio" disabled="disabled" name="radioName" value="{!reqWrap.id}" />
+                                </apex:outputPanel>
+                            </apex:column> 
+                           
+                            <apex:column headerValue="{!$Label.Type}">
+                                <apex:outputPanel id="typePanel" rendered="{!AND(reqWrap.id != selectedaccountReq,OR(ISBLANK(reqWrap.rra.refedge__Account_Request_Status__c),reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable', reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed', NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')), reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr});return false;">
+                                    <apex:outputField id="typePanelField" value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!!(reqWrap.isUR)}">
+                                        <apex:InlineEditSupport event="ondblclick"/>
+                                    </apex:outputField>
+                                    <apex:outputField id="typePanelFieldUnspecified" value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed')}">
+                                        <apex:InlineEditSupport event="ondblclick"/>
+                                    </apex:outputField>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="typePanelEdit" rendered="{!AND(isEdit,OR(ISBLANK(reqWrap.rra.refedge__Account_Request_Status__c),reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable', reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed', NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')), reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}">
+                                    <apex:inputField id="typePanelField1" value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                    <apex:inputField id="typePanelFieldUnspecified1" value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.id == selectedaccountReq)}"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="TypeOutputPanel" rendered="{!AND(NOT(reqWrap.isUR),OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}">
+                                    <apex:outputField id="typeAr" value="{!reqWrap.rra.Reference_Type_Needed__r.Name}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                    <apex:outputPanel id="editLinkDisableOp1" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                                        <a style="pointer-events: none; color : lightgray;">{!reqWrap.rra.Reference_Type_Needed__r.Name}</a>
+                                    </apex:outputPanel>
+                                    <apex:outputField id="typeUr" value="{!reqWrap.unSpec.Reference_Type_Needed__r.Name}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed')}"/>
+                                </apex:outputPanel> 
+                                <apex:outputField id="UrType" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed')}" value="{!reqWrap.unSpec.Reference_Type_Needed__r.Name}"/>
+                                
+                            </apex:column>
+                           
+                            <apex:column headerValue="{!$Label.Account}" >
+                                <apex:outputField id="account" value="{!reqWrap.rra.refedge__Account__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                <apex:outputPanel id="editLinkDisableOp2" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                                    <a href="#" style="pointer-events: none; color : lightgray;">{!reqWrap.rra.Account__r.Name}</a>
+                                </apex:outputPanel>
+                                <apex:outputText value="" rendered="{!(reqWrap.isUR)}"/>
+                            </apex:column>
+                            
+                            <apex:column headerValue="{!$Label.Contact}" >
+                                <apex:outputField id="contact" value="{!reqWrap.rrac.refedge__Contact__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.rrac.refedge__Contact__c != null)}"/>
+                                <apex:commandLink id="contactnew" onClick="PORShowLoading();showContactBlock('{!JSENCODE(reqWrap.rra.refedge__Account__c)}','{!JSENCODE(reqWrap.Id)}');return false;" value="{!$Label.Display}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed', NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')),reqWrap.rra.refedge__Account_Request_Status__c != 'Completed',reqWrap.rrac.refedge__Contact__c == null)}"/>
+                                <apex:outputPanel id="editLinkDisableOp3" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}">
+                                    <a href="#" style="pointer-events: none; color : lightgray;">{!reqWrap.rrac.Contact__r.Name}</a>
+                                </apex:outputPanel>
+                                <apex:outputText value="" rendered="{!(reqWrap.isUR)}"/>
+                            </apex:column>
+                          
+                            <apex:column headerValue="{!$Label.Deadline}">
+                                <apex:outputPanel id="deadlinePanel" rendered="{!AND(reqWrap.id != selectedaccountReq,OR(ISBLANK(reqWrap.rra.refedge__Account_Request_Status__c),reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed', NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')), reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr},false);return false;">
+                                    <apex:outputField id="ArDeadline" value="{!reqWrap.rra.refedge__Deadline__c}" rendered="{!!(reqWrap.isUR)}">
+                                        <apex:InlineEditSupport event="ondblclick"/>
+                                    </apex:outputField>
+                                    <apex:outputField id="UrDeadline" value="{!reqWrap.unSpec.refedge__Deadline__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed')}">
+                                        <apex:InlineEditSupport event="ondblclick"/>
+                                   </apex:outputField>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="deadlinePanelEdit" rendered="{!AND(isEdit,OR(ISBLANK(reqWrap.rra.refedge__Account_Request_Status__c),reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed', NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')), reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}">
+                                    <apex:inputField id="ArDeadline1" value="{!reqWrap.rra.refedge__Deadline__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                    <apex:inputField id="UrDeadline1" value="{!reqWrap.unSpec.refedge__Deadline__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.id == selectedaccountReq)}"/>
+                                </apex:outputPanel>
+                                <apex:outputText style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'color : lightgray;', '')}" value="{!TEXT(MONTH(reqWrap.rra.refedge__Deadline__c))+'/'+TEXT(DAY(reqWrap.rra.refedge__Deadline__c))+'/'+TEXT(YEAR(reqWrap.rra.refedge__Deadline__c))}" rendered="{!AND(NOT(reqWrap.isUR),OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}"/>
+                                <apex:outputText rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed')}" value="{!TEXT(MONTH(reqWrap.unSpec.refedge__Deadline__c))+'/'+TEXT(DAY(reqWrap.unSpec.refedge__Deadline__c))+'/'+TEXT(YEAR(reqWrap.unSpec.refedge__Deadline__c))}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Process}">
+                                <apex:outputPanel Id="processPanel" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr},true);return false;" rendered="{!AND(reqWrap.id != selectedaccountReq,NOT(OR(refRequestObj.refedge__Project_Type__c == 'Candidate',reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                    <apex:outputField Id="ArProcess" value="{!reqWrap.rra.refedge__Process__c}" rendered="{!NOT(reqWrap.isUr)}">
+                                        <apex:InlineEditSupport event="ondblclick"/>
+                                    </apex:outputField>
+                                </apex:outputpanel>
+                                <apex:outputPanel Id="processPanelEdit" rendered="{!AND(isEdit,NOT(OR(refRequestObj.refedge__Project_Type__c == 'Candidate',reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                    <apex:inputField Id="ArProcess1" value="{!reqWrap.rra.refedge__Process__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                </apex:outputpanel>
+                                <apex:outputPanel rendered="{!AND(reqWrap.isUr,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed',NOT(refRequestObj.refedge__Project_Type__c == 'Candidate'))}">
+                                    <apex:outputText value="{!reqWrap.processStatus}" />
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')}">
+                                    <apex:outputText style="{!IF(reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', 'color : lightgray;', '')}" value="{!reqWrap.processStatus}"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!AND(refRequestObj.refedge__Project_Type__c == 'Candidate',NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed')))}">
+                                    <apex:outputText value="{!reqWrap.processStatus}" />
+                                </apex:outputPanel>
+                            </apex:column>
+                           
+                            <apex:column headerValue="{!$Label.Status}">
+                                <apex:outputPanel id="statusPanel" rendered="{!AND(reqWrap.id != selectedaccountReq,OR(ISBLANK(reqWrap.rra.refedge__Account_Request_Status__c),reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed',NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')),  reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,false,{!reqWrap.isUr},false);return false;">
+                                    <apex:outputField id="ArstatusField" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!!(reqWrap.isUR)}">
+                                        <apex:InlineEditSupport id="ArstatusInline" event="ondblclick"/>
+                                    </apex:outputField>
+                                    <apex:outputField id="UrstatusField" value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed')}">
+                                        <apex:InlineEditSupport id="UrstatusInline" event="ondblclick"/>
+                                    </apex:outputField>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="statusPanelEdit" rendered="{!AND(isEdit,OR(ISBLANK(reqWrap.rra.refedge__Account_Request_Status__c),reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed',NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')),  reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}">
+                                    <apex:inputField id="ArstatusField1" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                    <apex:inputField id="UrstatusField1" value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.id == selectedaccountReq)}"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!AND(NOT(reqWrap.isUR),OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable',reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}">
+                                    <apex:outputField value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                        <apex:outputText style="color : lightgray;" value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                                </apex:outputPanel>
+                                <apex:outputText rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed')}" value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Request}">
+                               <apex:commandLink value="{!$Label.Details}" onclick="window.open('/{!reqWrap.rra.Id}');return false;" rendered="{!NOT(reqWrap.isUR)}"/>
+                               <apex:commandLink value="{!$Label.Details}" onclick="window.open('/{!reqWrap.unSpec.Id}');return false;" rendered="{!reqWrap.isUR}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Project_Owner}">
+                                <apex:outputPanel id="ownerPanel" rendered="{!AND(reqWrap.id != selectedaccountReq,OR(reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed',NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')),  reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}" onclick="editRequestInfo('{!JSENCODE(reqWrap.Id)}',this,true,{!reqWrap.isUr},false);return false;">                           
+                                    <apex:outputField id="ownerField" value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!!(reqWrap.isUR)}">
+                                        <apex:InlineEditSupport id="ownerInline" event="ondblclick"/>
+                                    </apex:outputField>
+                                    <apex:outputField id="ownerFieldUn" value="{!reqWrap.unSpec.refedge__Project_Owner__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed')}">
+                                        <apex:InlineEditSupport event="ondblclick"/>
+                                    </apex:outputField>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="ownerPanelEdit" rendered="{!AND(isEdit,OR(reqWrap.isUR,AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'No Response',reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable',reqWrap.rra.refedge__Account_Request_Status__c != 'No Longer Needed',NOT(CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up')),  reqWrap.rra.refedge__Account_Request_Status__c != 'Completed')))}">                           
+                                    <apex:inputField id="ownerField1" value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!AND(!(reqWrap.isUR), reqWrap.id == selectedaccountReq)}"/>
+                                    <apex:inputField id="ownerFieldUn1" value="{!reqWrap.unSpec.refedge__Project_Owner__c}" rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c != 'No Longer Needed', reqWrap.id == selectedaccountReq)}"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!AND(NOT(reqWrap.isUR),OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response',reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed'))}">
+                                    <apex:outputField value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c != 'Unavailable')}"/>
+                                    <apex:outputText style="color : lightgray;" value="{!reqWrap.rra.Project_Owner__r.Name}" rendered="{!AND(NOT(reqWrap.isUR),reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable')}"/>
+                                </apex:outputPanel>
+                                <apex:outputField rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed')}" value="{!reqWrap.unSpec.refedge__Project_Owner__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Notes}" >
+                                <apex:outputpanel rendered="{!AND(!(reqWrap.isUR),reqWrap.rra.refedge__Request_Notes__c != '')}">
+                                    <apex:outputText id="RRANotes" title="{!reqWrap.rra.refedge__Request_Notes__c}" value="{!$Label.Display}"/>
+                                </apex:outputpanel>
+                                <apex:outputpanel rendered="{!AND(reqWrap.isUR,reqWrap.unSpec.refedge__Request_Notes__c != '')}">
+                                    <!--<a href="/{!reqWrap.unSpec.Id}" id="{!reqWrap.unSpec.Id}"   title="{!reqWrap.unSpec.refedge__Request_Notes__c}" >{!$Label.Display}</a>-->
+                                    <apex:outputText title="{!reqWrap.unSpec.refedge__Request_Notes__c}" value="{!$Label.Display}"/>
+                                </apex:outputpanel>
+                                <apex:inputhidden id="denyNotes" value="{!reqWrap.rra.refedge__Approve_Deny_Notes__c}"/>
+                                <apex:inputhidden id="denyNotesUn" value="{!reqWrap.unSpec.refedge__Notes__c}"/>
+                           </apex:column>
+                           <apex:column id="headerFooterId2" headerValue="{!$Label.Edit}" rendered="{!isInlineEditingDisabled}">
+                                <apex:commandLink rendered="{!AND(!isEdit,NOT(OR(reqWrap.rra.refedge__Account_Request_Status__c == 'No Response', reqWrap.rra.refedge__Account_Request_Status__c == 'No Longer Needed', CONTAINS(reqWrap.rra.refedge__Account_Request_Status__c, 'Give Up'), reqWrap.rra.refedge__Account_Request_Status__c == 'Completed', reqWrap.rra.refedge__Account_Request_Status__c == 'Unavailable', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'No Longer Needed', reqWrap.unSpec.refedge__Unspecified_Request_Status__c == 'Account Specified')))}" action="{!editRow}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="requestPanel,msgId">
+                                    <apex:image url="{!$Resource.refedge__Edit}" height="12px" width="12px"/>
+                                    <apex:param name="requestToEdit" value="{!reqWrap.id}" assignTo="{!selectedaccountReq}" />
+                                </apex:commandLink>
+                                <apex:commandLink rendered="{!AND(isEdit, reqWrap.id == selectedaccountReq)}" onclick="getReqInfoDetailsEdit('{!JSENCODE(reqWrap.Id)}',{!reqWrap.isUr});return false;" oncomplete="PORHideLoading();" reRender="requestPanel,msgId">
+                                    <apex:image url="{!$Resource.refedge__Save}" height="12px" width="12px"/>
+                                </apex:commandLink>&nbsp;&nbsp;&nbsp;
+                                <apex:commandLink rendered="{!AND(isEdit, reqWrap.id == selectedaccountReq)}" onclick="PORShowLoading();cancelUpdateOperation();return false;" oncomplete="PORHideLoading();" reRender="requestPanel,msgId">
+                                    <apex:image url="{!$Resource.refedge__Cancel}" height="12px" width="12px"/>
+                                    <apex:param name="requestToEdit" value="{!reqWrap.id}" assignTo="{!selectedaccountReq}"/>
+                                </apex:commandLink>
+                            </apex:column> 
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            </apex:outputPanel>
+            <apex:outputPanel id="contactOpId">
+                    <apex:pageBlockSection columns="1" id="contactPbsId" title="{!$Label.Contacts} ({!contacts.size})" rendered="{!isContactBlock}">
+                        <apex:outputPanel rendered="{!contacts.size == 0}">
+                                <apex:pageMessage summary="{!$Label.Contact_No_matches_found}" severity="Warning" strength="3" />
+                        </apex:outputPanel>
+                        <apex:pageBlockTable value="{!contacts}" var="contWrap" id="pbtContact" rendered="{!AND(contacts!= null, contacts.size > 0)}">
+                            <apex:column id="headerFooterId2" headerValue="{!$Label.Action}" style="width:8%;">
+                                <apex:outputPanel >
+                                    <apex:outputLink style="font-weight:bold;" onClick="PORShowLoading();assignContact('{!JSENCODE(contWrap.con.refedge__Contact__c)}'); return false;">{!$Label.Assign}</apex:outputLink>
+                                </apex:outputPanel>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Contact_Name}">
+                                <apex:outputLink value="/{!contWrap.con.Contact__r.Id}">{!contWrap.con.contact__r.name}</apex:outputLink>
+                            </apex:column>
+                            <apex:column headervalue="{!$Label.Account_Name}" value="{!contWrap.con.Contact__r.AccountId}" />
+                            <apex:column headervalue="{!$Label.Contact_Owner}" value="{!contWrap.con.Contact__r.OwnerId}" />  
+                            <apex:column headervalue="{!$Label.Referenceability}" value="{!contWrap.con.refedge__Referenceability__c}" /> 
+                            <apex:column headervalue="{!$Label.Attributes}" value="{!contWrap.con.refedge__Attributes__c}"/> 
+                            <apex:column headervalue="{!$Label.Last} {!RULPeriodLengthContact} {!$Label.days}" value="{!contWrap.con.refedge__Default_Period_Completed_Uses__c}" /> 
+                            <apex:column headervalue="{!$Label.T_Last_Used}" value="{!contWrap.con.refedge__RUL_Last_Activity_Date__c}" /> 
+                            <apex:column headervalue="{!$Label.Notice}">
+                                <apex:outputText id="contactNoticeId" value="{!IF(isAccountLevelLimit.refedge__Account_Level_RUL__c, IF(isAccountLevelLimit.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''),IF(contWrap.con.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''))}" style="color:red;"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Assigned}">
+                                <apex:outputText value="{!contWrap.relatedAR}"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:pageBlockSection>
+            </apex:outputPanel>
+            <apex:outputPanel id="reqInfoSec" >
+                <apex:outputPanel rendered="{!showInfo}">
+                    <apex:pageBlockSection id="blckSection" title="{!$Label.Requested_Information}" columns="1">
+                        <apex:commandLink style="color:#1797C0"  immediate="true" action="{!EditInformation}" value="{!$Label.Select_And_Edit}" id="theCommandLink"/>
+                        <apex:repeat value="{!fieldAPINames}" var="fieldName">
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="{!fieldAPILabelMap[fieldName]}" rendered="{!fieldVisibleMap[fieldName+refName]}" />
+                                <apex:outputPanel rendered="{!fieldVisibleMap[fieldName+refName]}">
+                                    <div class="{!If(fieldRequiredMap[fieldName+refName], 'requiredInput', '')}">
+                                    <div class="{!If(fieldRequiredMap[fieldName+refName], 'requiredBlock', '')}"></div>
+                                        <apex:outputField rendered="{!If(IsNULL(rrAddInfo[fieldName]),false,true)}" value="{!rrAddInfo[fieldName]}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!AND(NOT(showInfo),showNoFieldMessage)}">
+                    <apex:pageBlockSection title="{!$Label.Requested_Information}" columns="1">
+                        <apex:outputLabel value="{!$Label.Fields_Not_Available}"/>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:outputPanel id="hitListId" >
+                <apex:pageBlockSection columns="1" id="hitList" title="{!$Label.Hit_List}" rendered="{!hitListRecords.size>0}">
+                    <apex:outputPanel style="margin-left: 40%;width:100%;float:left;">
+                        <apex:commandButton value="{!$Label.Release_All}" onclick="confirmReleaseAll(); return false;"/>
+                        <apex:commandButton id="saveButton" onclick="chkForRadioSelectedonSave('');return false;" style="display:none;width:50px;padding: 4px 3px !important;"  value="{!$Label.Save}"/>
+                        <apex:commandButton style="display:none;width:50px;padding: 4px 3px !important;" id="cancelButton" rerender="hitList" value="{!$Label.Cancel}" action="{!cancelHitList}"/>
+                    </apex:outputPanel>
+                    <apex:actionStatus onstart="PORShowLoading();" onstop="PORHideLoading();" id="porStatus"/>
+                    <apex:outputPanel style="width:100%">
+                        
+                        <apex:pageBlockTable value="{!hitListRecords}" var="hitRecord" id="hitlistTableId">
+                            <apex:column headerValue="{!$Label.Action}" style="width:18%;">
+                                <apex:inputhidden value="{!hitRecord.Id}" id="selecthitsingleHidden"/>
+                                <apex:commandLink rendered="{!OR(hitRecord.refedge__Disposition__c ='',hitRecord.refedge__Disposition__c ='Contacted')}" value="{!$Label.Assign}" onclick="chkForRadioSelected('{!JSENCODE(hitRecord.Id)}');return false;" /> 
+                                <apex:outputLabel value=" {!$Label.Assign}" rendered="{!AND(hitRecord.refedge__Disposition__c !='',hitRecord.refedge__Disposition__c !='Contacted')}"/> | 
+                                <apex:commandLink value=" {!$Label.Reminder}" rendered="{!OR(hitRecord.refedge__Disposition__c ='',hitRecord.refedge__Disposition__c ='Contacted')}" onclick="window.open('{!$Page.refedge__ReminderAction}?Id={!URLENCODE(hitRecord.Id)}&retPage={!$Page.refedge__RefRequestProject}&retId={!URLENCODE(refRequestObj.Id)}','_self');return false;" /> 
+                                <apex:outputLabel value=" {!$Label.Reminder}" rendered="{!AND(hitRecord.refedge__Disposition__c !='',hitRecord.refedge__Disposition__c !='Contacted')}"/>
+                                <apex:outputPanel rendered="{!AND(isProCom,showPostLink[hitRecord.Id])}" > |&nbsp; </apex:outputPanel> <apex:commandLink value="Post" onclick="showPostCommunityPopup(true,'{!JSENCODE(hitRecord.Id)}');return false;" rendered="{!AND(isProCom,showPostLink[hitRecord.Id])}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Dispostion}">
+                                <apex:outputPanel Id="dispositionPanel" onclick="checkHitlistRecord('{!JSENCODE(hitRecord.Id)}', this);return false;" rendered="{!AND(hitRecord.id != hitRecordId,OR(hitRecord.refedge__Disposition__c ='',hitRecord.refedge__Disposition__c ='Contacted'))}">
+                                    <apex:outputField value="{!hitRecord.refedge__Disposition__c}" id="dispositionCol">
+                                        <apex:InlineEditSupport event="ondblclick" showOnEdit="saveButton, cancelButton"/>
+                                    </apex:outputField>
+                                </apex:outputPanel>
+                                <apex:inputField id="dispositionColEdit" value="{!hitRecord.refedge__Disposition__c}" rendered="{!AND(isEdit,hitRecord.id == hitRecordId,OR(hitRecord.refedge__Disposition__c ='',hitRecord.refedge__Disposition__c ='Contacted'))}"/>
+                                <apex:outputField value="{!hitRecord.refedge__Disposition__c}" rendered="{!AND(hitRecord.refedge__Disposition__c !='',hitRecord.refedge__Disposition__c !='Contacted')}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Account}">
+                                <apex:outPutField value="{!hitRecord.refedge__Account__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Contact}">
+                                <apex:outPutField value="{!hitRecord.refedge__Contact__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Phone}">
+                                <apex:outPutField value="{!hitRecord.refedge__Phone__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Email}">
+                                <apex:outPutField value="{!hitRecord.refedge__Email__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.T_Last_Used}">
+                                <apex:outputField value="{!hitRecord.LastModifiedDate}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Note}">
+                                <apex:outputField value="{!hitRecord.refedge__Note__c}">
+                                    <apex:InlineEditSupport event="ondblclick" showOnEdit="saveButton, cancelButton"/>
+                                </apex:outputField>
+                            </apex:column>
+                            <apex:column headerValue="*">
+                                <apex:outputField value="{!hitRecord.refedge__Field1__c}"/>
+                            </apex:column>
+                            <apex:column id="headerFooterId2" headerValue="{!$Label.Edit}" rendered="{!isInlineEditingDisabled}">
+                                <apex:commandLink rendered="{!AND(!isEdit,OR(hitRecord.refedge__Disposition__c ='',hitRecord.refedge__Disposition__c ='Contacted'))}" action="{!editRow}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="hitList">
+                                    <apex:image url="{!$Resource.refedge__Edit}" height="12px" width="12px"/>
+                                    <apex:param name="requestToEdit" value="{!hitRecord.Id}" assignTo="{!hitRecordId}" />
+                                </apex:commandLink>
+                                <apex:commandLink rendered="{!AND(isEdit, hitRecord.Id == hitRecordId)}" onclick="checkHitlistRecord('{!JSENCODE(hitRecord.Id)}', '');chkForRadioSelectedonSave('{!JSENCODE(hitRecord.Id)}');return false;" oncomplete="PORHideLoading();" reRender="pgBlckId,msgId">
+                                    <apex:image url="{!$Resource.refedge__Save}" height="12px" width="12px"/>
+                                </apex:commandLink>&nbsp;&nbsp;&nbsp;
+                                <apex:commandLink rendered="{!AND(isEdit, hitRecord.Id == hitRecordId)}" rerender="hitList" action="{!cancelHitList}" onclick="PORShowLoading();" oncomplete="PORHideLoading();">
+                                    <apex:image url="{!$Resource.refedge__Cancel}" height="12px" width="12px"/>
+                                </apex:commandLink>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            <apex:outputPanel id="communitypanel" >
+                <apex:pageBlockSection columns="1" id="cummunity" title="{!$Label.Community_Invites}" rendered="{!AND(isProCom,communityInviteContacts.size > 0)}">
+                    <apex:outputPanel style="width:100%">
+                        <apex:pageBlockTable value="{!communityInviteContacts}" var="communityRecord" id="communityTableId">
+                            <apex:column headerValue="{!$Label.Action}" style="width:18%;">
+                                <apex:commandLink value="{!$Label.Remove}" onclick="PORShowLoading();" onComplete="PORHideLoading();" action="{!communityInviteContactRecordDeletion}" reRender="requestPanel,communitypanel, pgmsgId,chkRadio">
+                                    <apex:param name="communityIdtoDelete" assignTo="{!communityIdtoDelete}" value="{!communityRecord.Id}"/>
+                                </apex:commandLink> 
+                                 | 
+                                <apex:commandLink value=" {!$Label.Assign}" onclick="chkForRadioSelectedCommunity();assignCommunityRecord('{!JSENCODE(communityRecord.Id)}'); return false;" /> 
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Response}">
+                                <apex:outPutField value="{!communityRecord.refedge__Response__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Type}">
+                                <apex:outPutField value="{!communityRecord.refedge__Referenceability_Type__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Account}">
+                                <apex:outPutField value="{!communityRecord.Contact__r.AccountId}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Contact}">
+                                <apex:outPutField value="{!communityRecord.refedge__Contact__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Phone}">
+                                <apex:outPutField value="{!communityRecord.Contact__r.Phone}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Email}">
+                                <apex:outPutField value="{!communityRecord.Contact__r.Email}"/>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.T_Last_Used}">
+                                <apex:outputField value="{!contactRBIMap[communityRecord.refedge__Contact__c].RUL_Last_Activity_Date__c}"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+         <!-- Start Bound 3 Req -->
+        <div id="dialogBoxDiv" title="{!$Label.Send_notification}" style="display:none;height: 60px; !important;">
+            {!$Label.Options_to_notify}
+        </div>
+        <div id="dialogBoxDivNew" title="{!$Label.Request_Item_Update}" style="display:none;height: 60px; !important;">
+            {!$Label.One_Request_Item_Changed}
+        </div>
+        <!-- End Bound 3 Req -->
+        
+        <div id="dialogBoxDiv1" title="{!$Label.E_mail_Preview}" style="display:none;height:300px;">
+            <div>
+                
+                <table style="width: 80%; margin-left:5%;">
+                    <tr>
+                        <td style="text-align:right;">
+                            <apex:outputText value="{!$Label.Subject}"/>
+                        </td>
+                        <td>
+                            <div style="background-color:white;border:1px solid #cfd0d2;padding: 7px 0 3px 10px;">
+                                <apex:inputText id="Subject" value="{!subjectValue}" style="border: 0;width:100%;"/><br/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div style="background-color:white;border:1px solid #cfd0d2;padding: 7px 0 3px 10px;">
+                                <apex:outputLabel value="{!$Label.Use_Requested}: "/>
+                                <apex:outputText id="UseRequested" value=""/><br/>
+                                <apex:outputLabel value="{!$Label.Reference_Account}: "/>
+                                <apex:outputText id="account" value=""/><br/>
+                                <apex:outputLabel value="{!$Label.Status}: "/>
+                                <apex:outputText id="Status" value=""/><br/>
+                                <apex:outputLabel value="{!$Label.Need_by}: "/>
+                                <apex:outputText id="deadline" value=""/><br/><br/>
+                                <apex:outputLabel value="{!$Label.Notes}: "/><br/>
+                                <apex:inputTextArea style="border: 0;width: 300px;height: 100px;margin:0;margin-top: 5px;" id="notes"  value="{!NoteValue}"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;"><apex:outputText value="{!$Label.Write_to_Notes}"/></td>
+                        <td>
+                            <apex:inputCheckbox id="writetoNoteId" value="{!writetoNote}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Community Modal window for mail -->
+        <div id="dialogBoxDiv8" title="{!$Label.E_mail_Preview}" style="display:none;">
+            <div>
+                
+                <table style="width:70%; margin-left:50px;">
+                    <tr>
+                        <td>
+                            <apex:outputText value="Subject"/>
+                        </td>
+                        <td>
+                            <div style="background-color:white;border:1px solid #cfd0d2;padding: 7px 0 3px 10px;">
+                                <apex:inputText id="CommunitySubject" value="{!communitysubjectValue}" style="border: 0;width:100%;"/><br/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <apex:inputTextArea rows="20" cols="50" id="emailBody"  value="{!editThenSendEmailBody}"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="dialogBoxDiv2" style="display:none;height: 60px; !important;">
+            {!$Label.Change_Request_Message}
+            <br/>
+            <br/>
+            <div style="float:left;width:10%;text-align: center;">-</div><div style="float:left;width:90%;"> {!$Label.Change_Request_Message1} </div>
+            <br/>
+            <div style="float:left;width:10%;text-align: center;">-</div><div style="float:left;width:90%;"> {!$Label.Change_Request_Message2}</div>
+            <br/>
+            <div style="float:left;width:10%;text-align: center;">-</div><div style="float:left;width:90%;"> {!$Label.Change_Request_Message3}</div>
+            <br/>
+            <div style="float:left;width:10%;text-align: center;">-</div><div style="float:left;width:90%;"> {!$Label.Change_Request_Message4}</div>
+            
+            <div style="width:100%;float:left;text-align: center;padding-top: 10px;">{!$Label.Change_Request_Message5}</div>
+        </div>
+        <div id="dialogBoxDiv5" style="display:none;height: 50px; !important;">
+            {!$Label.set_Disposition}
+        </div>
+        
+        <apex:outputPanel id="communityDiv">
+            <div id="dialogBoxDiv6" title="{!$Label.Post_to_Community}" style="display:none;height: 50px; !important;">
+                  <table>
+                    <tr>
+                        <td style="text-align:right;">
+                            <apex:outputLabel value="{!$Label.Type}"/>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId" styleClass="requiredInput" style="margin-left: 8px;" layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:outputText id="referenceType" value=""/>
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;">
+                            
+                            <apex:outputLabel value="{!$Label.With}"/>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId1" styleClass="requiredInput" style="margin-left: 8px;"  layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:inputText value="{!referencePostedWith}" id="with"/>
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;">
+                            
+                            <apex:outputLabel value="{!$Label.Community_Deadline}"/>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId2" styleClass="requiredInput" style="margin-left: 8px;"  layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:inputText title="{!$Label.Community_Deadline}" value="{!communityDeadline}" id="selectDeadlineId" />   
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;">
+                            
+                            <apex:outputLabel value="{!$Label.Details}"/>
+                        </td>
+                        <td>
+                            <apex:outputPanel id="objectId3" styleClass="requiredInput" style="margin-left: 8px;"  layout="block" >
+                                <div class="requiredBlock"></div>
+                                <apex:inputTextArea value="{!communityDetails}" id="details" />   
+                            </apex:outputPanel>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </apex:outputPanel>
+    </apex:form>
+    <apex:outputPanel id="Notes_ListId">
+        <apex:relatedList rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}" list="Reference_Notes__r" />
+    </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,8 @@
+<apex:page showHeader="true" sidebar="true" title="Cirrus Insight Analytics - Package Setup">
+	<apex:sectionHeader title="Cirrus Insight Analytics" subtitle="Analytics Sync Setup" />
+
+	<apex:pageBlock >
+		<p style="font-size: 120%">Cirrus Insight Analytics is now powered by the Cirrus Insight <span style="font-style: italic;">Analytics Sync</span> platform!</p>
+		<p style="font-size: 120%">Please access the <a href="https://dashboard.cirrusinsight.com/#/analytics">Cirrus Insight Account Dashboard</a> to manage Analytics Sync.</p>
+	</apex:pageBlock>
+</apex:page>

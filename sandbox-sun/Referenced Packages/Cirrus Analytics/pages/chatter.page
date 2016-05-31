@@ -1,0 +1,60 @@
+<apex:page showHeader="false" sidebar="false" controller="cirrusadv.ChatterController" standardStylesheets="true">
+	<apex:includeScript value="https://code.jquery.com/jquery-2.1.4.min.js"/>
+	<style>
+		body {
+			overflow-x: hidden;
+		}
+		
+		span.chatter-avatarRegular.feeditemusericon.chatter-avatar, span.feeditemActionMenu, div a.cxcontentcommentaction, div.feeditemcommentphotocontainer, ul.publisherFeedItemTypeChoices, a.cke_button__strike, div.bottomBarLeft {
+			display: none !important;
+		}
+		
+		div.feeditemextras, div.feedcontainer .feeditemcommentnew {
+			padding-right: 0px !important;
+		}
+		
+		div.feeditembody {
+			padding-right: 15px !important;
+		}
+		
+		div.feeditemcontent.cxfeeditemcontent, div.feedcontainer .feeditemcommentnew {
+			margin-left: auto !important;
+		}
+		
+		div.zen-options {
+			width: 190px !important;
+		}
+		
+		span.ciapp_container {
+			width: 100%;
+			display: block;
+			margin-left: 4px;
+		}
+
+		span.ciapp_container h1 {
+			background-image: url(https://na5.salesforce.com/img/icon/chatterC24.png);
+			background-repeat: no-repeat;
+			font-size: 12pt;
+			padding-left: 30px;
+			display: block;
+			margin-top: 6px;
+			height: 25px;
+		}
+	</style>
+	
+	<span class="ciapp_container">
+		<h1>Chatter</h1>
+		<apex:outputPanel rendered="{!(recordId != null)}">
+			<chatter:feed entityId="{!recordId}" id="chatter_feed" showPublisher="true" />
+		</apex:outputPanel>
+		<apex:outputPanel rendered="{!(recordId == null)}">
+			<p>Please load a record in Cirrus Insight.</p>
+		</apex:outputPanel>
+	</span>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('a[href*=".salesforce.com/"]:visible').attr("target", "_blank");
+		});
+	</script>
+</apex:page>

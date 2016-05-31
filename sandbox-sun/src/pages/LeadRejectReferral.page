@@ -1,0 +1,2 @@
+<apex:page standardcontroller="Lead" extensions="LeadRejectReferralExtension" action="{!rejectLead}">
+</apex:page>

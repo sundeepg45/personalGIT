@@ -1,0 +1,29 @@
+<apex:page controller="PartnerStatusControllerExt" tabStyle="Account" action="{!validatePartnerStatus}">
+    <apex:sectionHeader title="Partner Status" description="Add new Partner Status for Account" /> 
+    <apex:form id="changePartnerStatusform">
+        <apex:pageBlock title="Change Partner Status" rendered="{!validationFailed}" >             
+            <br/>    
+            <apex:pageMessages />
+            <br/>
+            <apex:pageBlockButtons > 
+                 <apex:commandButton action="{!back}" value="Cancel" id="BackButton" immediate="true"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:pageBlock title="Change Partner Status" mode="edit" rendered="{! !validationFailed}"> 
+            <apex:pageBlockButtons > 
+                <apex:commandButton action="{!changePartnerStatus}" value="Save" id="SaveButton"/>
+                <apex:commandButton action="{!back}" value="Cancel" id="BackButton" immediate="true"/>
+            </apex:pageBlockButtons>
+            <br/>
+            <apex:pageMessages />
+            <br/>
+            <apex:pageBlockSection title="Reset Form" columns="1">
+                 <apex:pageBlockSectionItem > 
+                    <apex:outputText value="Account Name:"/>
+                    <apex:outputText value="{!accountInfo.Name}"/> 
+                </apex:pageBlockSectionItem>                 
+               <apex:inputField value="{!partnerStatusInfo.PartnerTier__c}" required="true"/>  
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

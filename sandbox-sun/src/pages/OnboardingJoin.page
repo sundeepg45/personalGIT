@@ -1,0 +1,531 @@
+<apex:page controller="OnboardingJoinController" sidebar="false" action="{!init}">
+
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Join</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if IE 9]>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css')}"></script>
+    <![endif]-->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+     <script type="text/javascript">
+
+        //var $j = jQuery.noConflict();
+        $(document).ready(function(){
+            $('#step1 tbody tr:nth-child(1)').mouseenter(function(){
+                // ISV
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Software_Vendors}</p>");
+            });
+            $('#step1 tbody tr:nth-child(2)').mouseenter(function(){
+                // Solution Provider
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Partners_that_may_architect}</p>");
+            });
+            $('#step1 tbody tr:nth-child(3)').mouseenter(function(){
+                // Training
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_RedHat_Training_Partners}</p>");
+            });
+            $('#step1 tbody tr:nth-child(4)').mouseenter(function(){
+                // SI
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Partners_that_architect}</p>");
+            });
+            $('#step1 tbody tr:nth-child(5)').mouseenter(function(){
+                // Alliance & OEM
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Partners_that_architect}</p>");
+            });
+            $('#step1 tbody tr:nth-child(6)').mouseenter(function(){
+                // Embedded
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Embedded}</p>");
+            });
+            $('#step1 tbody tr:nth-child(7)').mouseenter(function(){
+                // Service / Cloud
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Service_Cloud_Partner}</p>");
+            });
+            $('#step1 tbody tr:nth-child(8)').mouseenter(function(){
+                // Certified Cloud & Service Provider
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Certified_Cloud_Service_Provider}</p>");
+            });
+            $('#step1 tbody').mouseleave(function(){
+                $('.modal-window p').remove();
+            });
+        });
+
+
+        function handleCorpResellerCountry(country) {
+          var countries = "{!corpResellerCountries}";
+          var countryList = countries.split(',');
+          for (var i = 0; i < countryList.length; i++) {
+            var cr = countryList[i];
+            if (cr === country) {
+              return;
+            }
+          }
+
+          var cr = $('input[value$=CORPORATE_RESELLER]');
+          if (cr != null) cr.parent().remove();
+        }
+
+    </script>
+
+
+    <script type="text/javascript" src="{!$Label.Red_Hat_Omniture_Script_Header}"></script>
+    <script>
+      surl = document.location.pathname;
+      pagename = surl.substring(1,surl.length);
+      s.pageName = "rh | partner center | " + pagename.toLowerCase();
+      s.server = s.channel = "partner center";
+      s.prop21 = s.eVar18 = encodeURI(window.location.hostname+window.location.pathname).toLowerCase();
+    </script>
+    <script type="text/javascript" src="{!$Label.Red_Hat_Omniture_Script_Footer}"></script>
+
+
+
+  </head>
+
+  <body id="join">
+  <div class="red-hat-content">
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+            </div><!-- /.col-xs-5 -->
+            <div class="col-xs-7">
+              <div class="description">{!$Label.ONB_Join_an_existing_Red_Hat_partner_portal_account}</div>
+            </div><!-- /.col-xs-7 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+
+    <apex:pageMessages />
+
+
+    <div class="join-content-wrap user-signup">
+      <div class="container">
+        <div class="row">
+          <div class="content-wrapper">
+          <apex:form >
+            <h1>Join an existing partner company</h1>
+            <div class="row">
+              <div class="col-xs-12">
+                <p><apex:outputText value="{!$Label.Onboarding_Join_Entry_Welcome}" /></p>
+              </div><!-- /.col-xs-7 -->
+            </div><!-- /.row -->
+            <div class="row">
+              <div class="col-xs-12">
+                <div class="panel-group" id="accordion">
+                  <div class="panel step" id="step1panel">
+                    <div class="panel-heading">
+                      <div class="step-num">
+                        <span class="num">1</span>
+                        <span class="check"></span>
+                      </div>
+                      <h2>{!$Label.ONB_enter_email_and_location}</h2>
+                    </div><!-- /.panel-heading -->
+                    <div id="step1" class="panel-collapse collapse in">
+                      <div class="panel-body">
+                        <div style="width: 65%; float: left;">
+                          <div class="input-container select-options" requiredradio="true">
+                            <label for="partnerType" class="required-field">{!$Label.Onboarding_Register_Partner_Partner_Type}</label>
+                          <div class="input-field">
+                            <apex:actionRegion >
+                            <apex:selectRadio value="{!partnerType}"  id="partnerType" layout="pageDirection" styleClass="label-inline onboardingJoin-step1-labels">
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_ISV}" itemValue="PARTNER_TYPE.ISV" />
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}" itemValue="PARTNER_TYPE.RESELLER" />
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Training}" itemValue="PARTNER_TYPE.TRAINING" />
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_SI}" itemValue="PARTNER_TYPE.SI" />
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_OEM}" itemValue="PARTNER_TYPE.OEM" />
+                                <!-- <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CloudProvider}" itemValue="PARTNER_TYPE.CCNSP" /> -->
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Embedded}" itemValue="Embedded" />
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CloudProvider}" itemValue="PARTNER_TYPE.SERVICECLOUD_PROVIDER" />
+                                <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CorporateReseller}" itemValue="PARTNER_TYPE.CORPORATE_RESELLER" rendered="{!partnerType == 'PARTNER_TYPE.CORPORATE_RESELLER'}" />
+                                <apex:actionSupport event="onchange" reRender="step2panel" />
+                            </apex:selectRadio>
+                            </apex:actionRegion>
+                          </div>
+                          <label id="partnerTypeErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                          </div>
+                        </div>
+                        <div class="modal-window" style="width: 35%; float: right;"></div>
+                        <div class="clearfix"></div>
+                        <div class="input-container" requiredtext="true">
+                          <label for="email" class="required-field">{!$Label.Onboarding_RegisterProfile_Contact_Email}</label>
+                          <div id="email" class="input-field">
+                            <apex:inputField value="{!lead.Email__c}" id="emailAddress">
+                                <apex:actionSupport event="onchange" reRender="email,step2panel" />
+                            </apex:inputField>
+                          </div>
+                          <label id="emailErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <apex:actionRegion >
+                        <div class="input-container" requiredselect="true">
+                          <label for="country" class="required-field">{!$Label.Onboarding_RegisterProfile_Company_Country}</label>
+                          <div class="input-field dropdown-arrow">
+                              <apex:actionRegion >
+                                  <apex:outputPanel id="countrySelection">
+                                        <apex:selectList value="{!leadCountry}" size="1" id="partnerCountrySelect">
+                                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Select_Country}" itemValue="" />
+                                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_US}" itemValue="US" />
+                                            <apex:selectOption itemLabel="-" itemValue="" />
+                                            <apex:selectOptions value="{!selectableCountryOptions}"/>
+                                            <apex:actionSupport event="onchange" reRender="vatPanel,step2panel" />
+                                        </apex:selectList>
+                                    </apex:outputPanel>
+                                </apex:actionRegion>
+                          </div><!-- /.input-field /.dropdown-arrow -->
+                          <label id="countryErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+
+                        </div><!-- /.input-container -->
+                        <div class="input-container">
+                            <apex:outputPanel id="vatPanel">
+                                <apex:outputPanel layout="none" rendered="{!selectedCountry.SearchByVAT__c}">
+                                    <label for="vatNumber">{!$Label.Onboarding_JoinOrRegister_VAT_Number}</label>
+                                    <div class="input-field">
+                                        <apex:inputText id="vatNumber" value="{!VATNumber}">
+                                            <apex:actionSupport event="onchange" reRender="step2panel"/>
+                                        </apex:inputText>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                        </div>
+                        </apex:actionRegion>
+                      </div><!-- /.panel-body -->
+                      <a href="#step2" class="btn accordion-control next pull-right ease" id="step1next">{!$Label.ONB_Next_Step}</a>
+                      <div class="clearfix"></div>
+                    </div><!-- /#step1 -->
+                  </div><!-- /.panel /.step -->
+                  <div class="panel step">
+                    <div class="panel-heading disabled">
+                      <div class="step-num">
+                        <span class="num">2</span>
+                        <span class="check"></span>
+                      </div>
+                      <h2>Select company</h2>
+                      <a href="#" class="tooltip-icon" data-html="true" data-original-title="{!$Label.ONB_step2_select_company_tool_tip}" data-placement="top" data-toggle="tooltip" >{!$Label.ONB_What_is_this}</a>
+                    </div><!-- /.panel-heading -->
+                    <div id="step2" class="panel-collapse collapse">
+                    <apex:outputPanel id="step2panel">
+                      <div class="panel-body company-list">
+
+                        <!--
+                        PARTNER ACCOUNT SEARCH RESULTS
+                         -->
+                        <apex:outputPanel id="step2results" rendered="{!existingPartnerList != null}">
+                            <table id="companyTable">
+                              <thead>
+                                <tr>
+                                  <th class="checkbox"></th>
+                                  <th class="name">{!$Label.Onboarding_JoinOrRegister_Company_Name}</th>
+                                  <th class="type">{!$Label.Onboarding_JoinOrRegister_Partner_Type}</th>
+                                  <th class="location">{!$Label.Onboarding_JoinOrRegister_Location}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                              <apex:repeat value="{!existingPartnerList}" var="status">
+                                <tr>
+                                  <td><input onchange="handlePartnerSelect(this, '{!status.Id}');" name="selectedPartner" type="checkbox" id="partner_{!status.Account__c}"/></td>
+                                  <td><label for="{!status.Account__c}">{!status.Account__r.Name}</label></td>
+                                  <td>{!status.Program__r.Program_Category__c}</td>
+                                  <td>{!status.Account__r.BillingCity}, {!status.Account__r.BillingState}, {!status.Account__r.BillingCountry}</td>
+                                </tr>
+                              </apex:repeat>
+                              </tbody>
+                            </table>
+                       </apex:outputPanel>
+
+
+                       <!--
+                       NO PARTNER ACCOUNTS WERE FOUND
+                        -->
+                       <apex:outputPanel id="step2noResults" rendered="{!existingPartnerList == null}">
+                            <h1 class="request-problem">
+                               <span class="fa fa-exclamation-circle"></span>
+                               <apex:outputText value="{!$Label.Onboarding_Join_Partner_Not_Found_Error}" />
+                            </h1>
+                            <p>
+                               <apex:outputText value="{!$Label.Onboarding_Join_Partner_Not_Found}" />
+                            </p>
+                            <apex:commandLink id="applyLink" styleClass="link-secondary" value="{!$Label.Onboarding_Join_Partner_Apply_Option}" action="{!partnerApply}"/><br/>
+                            <apex:commandLink id="caseLink" styleClass="link-secondary" value="{!$Label.Onboarding_Join_Submit_Case}" action="{!missingAccountCase}"/>
+                       </apex:outputPanel>
+
+
+
+                      </div><!-- /.panel-body -->
+                      </apex:outputPanel>
+                      <div class="action-container">
+                        <a href="#step1" class="btn accordion-control previous ease" id="step2prev">{!$Label.ONB_Previous_Step}</a>
+                        <div class="pull-right">
+                          <!-- <a href="#" class="text-link link-secondary">I can&#39;t find my company.</a>
+                            -->
+                          <apex:commandLink id="noCompanyLink" styleClass="text-link link-secondary" value="{!$Label.Onboarding_Join_Partner_missing_from_list}" action="{!missingAccountCase}"/>
+                          <apex:commandButton action="{!submitApplication}" value="{!$Label.Onboarding_JoinConfirm_Submit_For_Approval}" styleClass="btn accordion-control next ease" id="buttonSubmitApproval"/>
+                        </div>
+                      </div><!-- /.action-container -->
+                      <div class="clearfix"></div>
+                    </div><!-- /#step2 -->
+                  </div><!-- /.panel /.step -->
+                </div><!-- /.panel-group -->
+              </div><!-- /.col-xs-8 -->
+            </div><!-- /.row -->
+            <div style="display:none">
+              <apex:inputText id="selectedPartnerText" value="{!selectedPartnerStatus}"/>
+            </div>
+          </apex:form>
+          </div><!-- /.content-wrapper -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.join-content-wrap /.user-signup -->
+
+    <c:Onboarding_Footer />
+
+  </div> <!--  red-hat-content -->
+</body>
+
+   <script>
+  ;
+(function($) {
+
+  $(function() {
+
+    // init tooltip hover via bootstrap
+    $('.tooltip-icon').tooltip('hide');
+    $('label[id$=ErrorMessage]').hide();
+
+    // init accordion controls via bootstrap
+   // $('#accordion .accordion-control').attr('data-toggle','collapse').attr('data-parent','#accordion');
+        $('#accordion .panel').on('hidden.bs.collapse', function( e ){
+            // accordion panel closed
+            var panel = $(e.currentTarget);
+            console.log('panel closed');
+            /*
+            NOTE:
+            Validation should be applied here to determine if 'complete' class should be added.
+            */
+            //panel.find('.panel-heading .step-num').addClass('complete');
+        });
+        $('#accordion .panel').on('shown.bs.collapse', function( e ){
+            // accordion panel opened
+            console.log('panel opened');
+            var panel = $(e.currentTarget);
+            panel.find('.panel-heading').removeClass('disabled');
+        });
+    // add checkmark for completed step heading on accordion forms
+    //$('.step .step-num.complete').html('<i class="fa fa-check"></i>');
+
+  });
+})(jQuery);
+  </script>
+
+
+  <script>
+
+    $('.collapse').collapse('hide');
+    $('label[id$=ErrorMessage]').hide();
+    $('#step1').collapse("show");
+    //$('#step2').collapse("show");
+
+    $('#step1next').on('click', function(e) {
+        e.preventDefault();
+        /*
+        group = $('[name$=partnerType]');
+        checkedval = group.filter(':checked').val();
+        if (checkedval == null) {
+          console.log('step 1 blocked');
+          return false;
+        }
+        */
+        validatedText = validateRequiredText('step1');
+        validatedSelect = validateRequiredSelect('step1');
+        validatedRadio = validateRequiredRadio('step1');
+        if (!validatedText || !validatedSelect || !validatedRadio) {
+            console.log('step 1 blocked');
+            return false;
+        }
+        $('#step1').collapse('hide');
+        $('#step2').collapse('show');
+        $('#step1panel .step-num').addClass('complete');
+        return true;
+    });
+
+    $('#step2next').on('click', function(e) {
+        e.preventDefault();
+
+        //
+        // Standard required field validation
+        //
+        validatedText = validateRequiredText('step1');
+
+        if (!validatedText) {
+            console.log('step 2 blocked');
+            return false;
+        }
+        console.log('step 2 proceeding');
+        $('#step2').collapse('hide');
+        $('#step3').collapse('show');
+        return true;
+    });
+
+    $('#step2prev').on('click', function(e) {
+        $('#step2').collapse('hide');
+        $('#step1').collapse('show');
+        e.preventDefault();
+        return true;
+    });
+
+    $('input[id$=buttonSubmitApproval]').on('click', function(e) {
+      checked  = $('#companyTable input:checkbox:checked');
+      if (checked.length > 0) {
+        return true;
+      }
+      alert('Select a partner to join before proceeding');
+      return false;
+    });
+
+    function handlePartnerSelect(clicknode, statusid) {
+        if ($(clicknode).prop('checked') == false) {
+          return true;
+        }
+
+      $('#companyTable input:checkbox:checked').each(function () {
+          this.checked = false;
+      });
+        $(clicknode).prop('checked', 'true');
+      $('input[id$=selectedPartnerText]').val(statusid);
+        return true;
+    }
+
+    function validateRequiredSelect(nodeid) {
+        var inputs = $('div[id=' + nodeid + '] div[requiredselect=true]');
+        var error = false;
+        $.each(inputs, function(index) {
+            var items = $('select', this).val();
+            p = $(this).closest('div[requiredselect=true]');
+            msglabel = $('label[id$=ErrorMessage]', p);
+            if (items == undefined || items == null) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+                t = $('option:selected', items).text();
+                if (t != undefined && t.indexOf('-') == 0) {
+                  // placeholder option, same as nothing selected
+                  $(msglabel).show();
+                  error = true;
+                }
+                else {
+                  $(msglabel).hide();
+                }
+            }
+        });
+        return !error;
+    }
+
+    function validateRequiredText(nodeid) {
+        // dynamically find all text inputs that need validating
+        var inputs = $('div[id=' + nodeid + '] div[requiredtext=true] input[type=text]');
+        var error = false;
+        $.each(inputs, function(index) {
+            var v = this.value;
+            p = $(this).closest('div[requiredtext=true]');
+            msglabel = $('label[id$=ErrorMessage]', p);
+            if (v == undefined || v.length == 0) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+                $(msglabel).hide();
+            }
+        });
+        return !error;
+    }
+
+   function validateRequiredRadio(nodeid) {
+        var inputs = $('div[id=' + nodeid + '] div[requiredradio=true]');
+        var error = false;
+        $.each(inputs, function(index) {
+            var items = $('input[type=radio]', this);
+            checklist = $(items).filter(':checked');
+            p = $(this).closest('div[requiredradio=true]');
+            msglabel = $('label[id$=ErrorMessage]', p);
+            if (checklist.length == 0) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+                $(msglabel).hide();
+            }
+
+        });
+        return !error;
+    }
+
+    $(document).ready(function() {
+        $.ajax({
+           url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/getUserInfo',
+           dataType: 'jsonp',
+           success:  function(jsonResult) {
+               if (eval(jsonResult.complete)) {
+                   jQuery('select[name$="partnerCountrySelect"]').val(jsonResult.payload.country);
+                   jQuery('select[name$="partnerCountrySelect"]').change();
+                   //jQuery('input[name$="onboardingCountry"]').val(jsonResult.payload.country);
+                   handleCorpResellerCountry(jsonResult.payload.country);
+
+               }
+           }
+        });
+    });
+
+  </script>
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+  </style>
+</apex:page>

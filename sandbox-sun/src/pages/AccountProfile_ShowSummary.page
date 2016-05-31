@@ -1,0 +1,349 @@
+<apex:page showHeader="false" standardController="Account_Profile__c" >
+<apex:stylesheet value="/sCSS/Theme2/common.css" />
+<apex:stylesheet value="/sCSS/Theme2/dStandard.css" />
+<body class="accountTab detailPage">
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Id}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Name}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Parent.Name}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Executive_Sponsor__r.Name}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.BillingStreet}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.BillingCity}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.BillingState}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.BillingPostalCode}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.BillingCountry}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Industry}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.AnnualRevenue}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.TickerSymbol}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Fiscal_Year_End__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Products_Services__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account__r.Total_of_Subsidiaries_if_Parent__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Linux_Servers__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Unix_Servers__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Microsoft_Servers__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Other_Servers__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Total_Servers__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Linux_Version__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Unix_Version__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Microsoft_Version__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account_s_Biggest_Competitor_s__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account_s_Partners_Alliances__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Industry_Position_Market_Share_History__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Corporate_Objectives__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.C_Level_Priority_Goals__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Positives_About_Current_Infrastructure__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Challenges_About_Current_Infrastructure__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Other_Servers_Type_Version__c}" />
+<apex:outputText rendered="false" value="{!Account_Profile__c.Account_s_Open_Source_Maturity__c}" />
+
+<div class="bPageBlock secondaryPalette">
+<div class="pbHeader" > 
+<table border="0" cellpadding="0" cellspacing="0" > 
+<tbody><tr><td class="pbTitle" > 
+<h2 class="mainTitle" >&#160;</h2></td></tr> 
+</tbody> 
+</table> 
+
+
+<div class="pbSubsection"><table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0"><tbody> 
+
+<tr>
+<td class="dataCol" colspan="2" align="left"><b><font size="4" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.Name}">&#160;</c:OutputString>
+</font></b></td>
+<td colspan="2" ><img src="/servlet/servlet.ImageServer?oid=00D300000000bn6&amp;id=015300000003g7Y" align="right" border="0" /></td>
+</tr>
+
+<tr>
+<td class="dataCol" colspan="2" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.BillingStreet}">&#160;</c:OutputString>
+</td>
+<td class="labelCol" >
+Executive Sponsor
+ : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.Executive_Sponsor__r.Name}">&#160;</c:OutputString>
+</td>
+
+</tr>
+
+<tr>
+<td class="dataCol" colspan="2" >
+{!HTMLENCODE(TRIM(Account_Profile__c.Account__r.BillingCity))}, {!HTMLENCODE(Account_Profile__c.Account__r.BillingState)}, {!HTMLENCODE(Account_Profile__c.Account__r.BillingPostalCode)}
+</td>
+
+<td class="labelCol" >
+Account Team
+ : 
+</td>
+<td class="dataCol" rowspan="3" >
+  <c:AccountTeamMembers value="{!Account_Profile__c.Account__r}" showHeader="false" showTable="false"/>
+</td>
+
+</tr>
+<tr>
+<td class="dataCol" colspan="2" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.BillingCountry}">&#160;</c:OutputString>
+</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+
+
+<div class="pbSubheader tertiaryPalette" ><h3>
+ACCOUNT OVERVIEW
+<span class="titleSeparatingColon" >:</span></h3></div>
+
+<div class="pbSubsection" ><table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0" > 
+
+<tr>
+<td class="labelCol" >
+Parent Account : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.Parent.Name}">&#160;</c:OutputString>
+</td>
+<td class="labelCol" style="white-spacing:nowrap" >
+Total # Of Subsidiaries if Parent : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!TEXT(Account_Profile__c.Account__r.Total_of_Subsidiaries_if_Parent__c)}">&#160;</c:OutputString>
+</td>
+</tr>
+
+<tr>
+<td class="labelCol" >
+Industry : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.Industry}">&#160;</c:OutputString>
+</td>
+<td class="labelCol" >
+Products &amp; Services
+ : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.Products_Services__c}">&#160;</c:OutputString>
+</td>
+</tr>
+
+<tr>
+<td class="labelCol" >
+Annual Revenue : 
+</td>
+<td class="dataCol" >
+    <c:OutputCurrency isoCode="{!Account_Profile__c.Account__r.CurrencyIsoCode}" value="{!NULLVALUE(Account_Profile__c.Account__r.AnnualRevenue,0)}" />
+</td>
+<td class="labelCol" >
+Ticker Symbol
+ : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Account__r.TickerSymbol}">&#160;</c:OutputString>
+</td>
+</tr>
+
+<tr>
+<td class="labelCol" >
+Fiscal Year End
+ : 
+</td>
+<td class="dataCol" >
+    <apex:outputField value="{!Account_Profile__c.Account__r.Fiscal_Year_End__c}"/>
+</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+</table></div>
+
+
+<div class="pbSubheader tertiaryPalette" ><h3>INDUSTRY OVERVIEW
+<span class="titleSeparatingColon" >:</span></h3></div>
+
+<div class="pbSubsection" ><table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0" > 
+
+<tr>
+<td class="labelCol" width="20%" >
+Account’s Biggest Competitor(s)
+ : 
+</td>
+<td class="dataCol" width="70%" >
+  <c:OutputString value="{!Account_Profile__c.Account_s_Biggest_Competitor_s__c}">&#160;</c:OutputString>
+</td><td width="10%" >&#160;</td>
+</tr>
+<tr>
+<td class="labelCol" >
+Account’s Partners &amp; Alliances
+ : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Account_s_Partners_Alliances__c}">&#160;</c:OutputString>
+</td><td >&#160;</td>
+</tr>
+<tr>
+<td class="labelCol" >
+Industry Position and Market Share History
+ : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.Industry_Position_Market_Share_History__c}">&#160;</c:OutputString>
+</td><td >&#160;</td>
+</tr>
+</table></div>
+
+
+<div class="pbSubheader tertiaryPalette" ><h3>OBJECTIVES/GOALS
+<span class="titleSeparatingColon" >:</span></h3></div>
+
+<div class="pbSubsection" ><table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0" > 
+
+<tr>
+<td class="labelCol" width="20%" >
+Corporate Objectives
+ : 
+</td>
+<td class="dataCol" width="70%" >
+  <c:OutputString value="{!Account_Profile__c.Corporate_Objectives__c}">&#160;</c:OutputString>
+</td><td width="10%" >&#160;</td>
+</tr>
+<tr>
+<td class="labelCol" >
+C-Level Priority Goals
+ : 
+</td>
+<td class="dataCol" >
+  <c:OutputString value="{!Account_Profile__c.C_Level_Priority_Goals__c}">&#160;</c:OutputString>
+</td><td >&#160;</td>
+</tr>
+</table></div>
+
+
+
+<c:AccountOpenOpportunities value="{!Account_Profile__c.Account__r}" />
+
+<c:AccountClosedOpportunities value="{!Account_Profile__c.Account__r}" />
+
+<c:AccountLastFiscalYear value="{!Account_Profile__c.Account__r}" />
+
+<c:AccountRelatedContacts value="{!Account_Profile__c.Account__r}" />
+
+<div class="pbSubheader tertiaryPalette"><h3>INFRASTRUCTURE PROFILE
+<span class="titleSeparatingColon" >:</span></h3></div>
+
+<div class="pbSubsection" ><table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0" > 
+
+<tr>
+<td class="labelCol" width="20%" >
+Positives About Current Infrastructure
+ : 
+</td>
+<td class="dataCol" width="70%" >
+<c:OutputString value="{!Account_Profile__c.Positives_About_Current_Infrastructure__c}">&#160;</c:OutputString>
+</td>
+<td width="10%" colspan="2" >&#160;</td>
+</tr>
+<tr>
+<td class="labelCol" >
+Challenges About Current Infrastructure
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!Account_Profile__c.Challenges_About_Current_Infrastructure__c}">&#160;</c:OutputString>
+</td>
+<td colspan="2" >&#160;</td>
+</tr>
+
+<tr>
+<td class="labelCol" >
+Linux Servers
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!TEXT(Account_Profile__c.Linux_Servers__c)}">&#160;</c:OutputString>
+</td>
+<td class="labelCol" >
+Linux Version
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!Account_Profile__c.Linux_Version__c}">&#160;</c:OutputString>
+</td>
+<td>&#160;</td>
+</tr>
+
+
+<tr>
+<td class="labelCol" >
+Unix Servers
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!TEXT(Account_Profile__c.Unix_Servers__c)}">&#160;</c:OutputString>
+</td>
+<td class="labelCol" >
+Unix Version
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!Account_Profile__c.Unix_Version__c}">&#160;</c:OutputString>
+</td>
+<td>&#160;</td>
+</tr>
+
+
+<tr>
+<td class="labelCol" >
+Microsoft Servers
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!TEXT(Account_Profile__c.Microsoft_Servers__c)}">&#160;</c:OutputString>
+</td>
+
+<td class="labelCol" >
+Microsoft Version
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!Account_Profile__c.Microsoft_Version__c}">&#160;</c:OutputString>
+</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td class="labelCol" >
+Other Servers
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!TEXT(Account_Profile__c.Other_Servers__c)}">&#160;</c:OutputString>
+</td>
+<td class="labelCol" >
+ Other Version
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!Account_Profile__c.Other_Servers_Type_Version__c}">&#160;</c:OutputString>
+</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td class="labelCol" >
+Total Servers
+ : 
+</td>
+<td class="dataCol" >
+<c:OutputString value="{!TEXT(Account_Profile__c.Total_Servers__c)}">&#160;</c:OutputString>
+</td>
+<td colspan="2" >&#160;</td>
+</tr>
+</table></div>
+
+<c:AccountProfile_Summary accountProfile="{!Account_Profile__c}" />
+
+</div>
+</div>
+</body>
+</apex:page>

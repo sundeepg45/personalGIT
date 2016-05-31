@@ -1,0 +1,294 @@
+<apex:page controller="OnboardingSearchBeforeCreateController" showHeader="true" sidebar="true" action="{!onLoad}">
+
+    <!-- Performing Search Modal -->
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <div class="search-load-wrapper" style="position: absolute; z-index: 1000; margin: 0px auto; height: 78%; width: 100%; left: 0px; display: none;">
+        <div class="search-load-modal" style="margin: 4% auto 0px; display: block; width: 300px; height: 200px; background: none repeat scroll 0% 0% rgb(255, 255, 255); text-align: center; border-radius: 5px; overflow: hidden; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6); border: 1px solid rgb(170, 170, 170);">
+            <h4 style="margin-top: 50px; display: block; font-size: 19px ! important; color: rgb(51, 51, 51);">Performing search...</h4>
+            <img style="width: 60px; margin-top: 20px;" src="/resource/partnerCenterResources/partnerCenterResources/images/page-loader.gif"/>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function(){
+        $('.searchBtn').click(function(){
+            $('.search-load-wrapper').fadeIn();
+        });
+    });
+    </script>
+
+    <apex:stylesheet value="{!$Page.CommonStyleSheets}"/>
+
+    <apex:outputPanel id="pageMessages">
+        <apex:pageMessages />
+    </apex:outputPanel>
+
+    <apex:form >
+
+        <apex:pageBlock id="confirmation" title="Confirm the Desired Outcome" rendered="{!if(finalized, true, false)}">
+            <apex:outputText value="{!finalOutcomeMessage}"/>
+            <apex:pageBlockButtons id="commandButtons" location="bottom">
+                <apex:commandButton action="{!cancelFinalization}" value="Cancel"/>
+                <apex:commandButton action="{!finalize}" value="Proceed"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+
+        <apex:pageBlock id="matchedData" title="Matched Data" rendered="{!if(finalized && matchedData != null, true, false)}">
+            <apex:pageBlockTable value="{!matchedData}" var="result">
+                <apex:column headerValue="Party Name">
+                    <apex:outputText value="{!result.CDHResult.partyName}"/>
+                </apex:column>
+                <apex:column headerValue="Party Number">
+                    <apex:outputText value="{!result.CDHResult.partyNumber}"/>
+                </apex:column>
+                <apex:column headerValue="Party Type">
+                    <apex:outputText value="{!result.CDHResult.partyType}"/>
+                </apex:column>
+                <apex:column headerValue="DUNS Number">
+                    <apex:outputText value="{!result.CDHResult.DUNSNumber}"/>
+                </apex:column>
+                <apex:column headerValue="Identifying Address">
+                    <apex:outputText value="{!result.CDHResult.identifyingAddress}"/>
+                </apex:column>
+                <apex:column headerValue="Tax Reference ID">
+                    <apex:outputText value="{!result.CDHResult.taxReference}"/>
+                </apex:column>
+                <apex:column headerValue="Phone">
+                    <apex:outputText value="{!result.CDHResult.phone}"/>
+                </apex:column>
+                <apex:column headerValue="Classification">
+                    <apex:outputText value="{!result.CDHResult.classification}"/>
+                </apex:column>
+                <apex:column breakBefore="true" colspan="8" rendered="{!result.hasAccounts}">
+                    <apex:pageBlockSection >
+                        <apex:pageBlockTable value="{!result.sfAccounts}" var="sfaccount">
+                            <apex:column headerValue="Account Name">
+                                <apex:outputText value="{!sfaccount.account.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Shipping Address">
+                                <apex:outputText value="{!sfaccount.account.ShippingStreet} {!sfaccount.account.ShippingCity} {!sfaccount.account.ShippingState} {!sfaccount.account.ShippingCountry} {!sfaccount.account.ShippingPostalCode}"/>
+                            </apex:column>
+                            <apex:column headerValue="Billing Address">
+                                <apex:outputText value="{!sfaccount.account.BillingStreet} {!sfaccount.account.BillingCity} {!sfaccount.account.BillingState} {!sfaccount.account.BillingCountry} {!sfaccount.account.BillingPostalCode}"/>
+                            </apex:column>
+                            <apex:column headerValue="Region">
+                                <apex:outputText value="{!sfaccount.account.Global_Region__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Subregion">
+                                <apex:outputText value="{!sfaccount.account.Subregion__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Partner Status">
+                                <apex:outputText value="{!sfaccount.account.PartnerStatuses__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Account Owner">
+                                <apex:outputText value="{!sfaccount.account.Owner.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Classification">
+                                <apex:outputText value="{!sfaccount.account.Finder_Partner_Tier__r.Name} {!sfaccount.account.Finder_Partner_Type__r.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Account Type">
+                                <apex:outputText rendered="{!sfaccount.isPartner}" value="Partner"/>
+                                <apex:outputText rendered="{!NOT(sfaccount.isPartner)}" value="Sales"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:pageBlockSection>
+                </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+
+        <apex:pageBlock id="searchFields" title="Search for Existing Party" rendered="{!if(errorMessage == '' && !finalized, true, false)}">
+
+            <table style="width: 100%">
+                <tr>
+                    <td style="width: 50%; vertical-align: bottom">
+                        <apex:pageBlockSection columns="1">
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="partyID" value="Party Number"/>
+                                <apex:outputPanel >
+                                    <div class="requiredInput">
+                                        <div class="requiredBlock"></div>
+                                        <apex:inputText id="partyID" value="{!partyID}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="DUNSNumber" value="DUNS Number"/>
+                                <apex:outputPanel >
+                                    <div class="requiredInput">
+                                        <div class="requiredBlock"></div>
+                                            <apex:inputText id="DUNSNumber" value="{!DUNSNumber}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </td>
+                    <td style="width: 50%">
+                        <apex:pageBlockSection columns="1">
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="accountName" value="Party Name"/>
+                                <apex:outputPanel >
+                                    <div class="requiredInput">
+                                        <div class="requiredBlock"></div>
+                                            <apex:inputText id="accountName" value="{!accountName}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="alternativeName" value="Search Alternative Name"/>
+                                <apex:inputCheckbox id="alternativeName" value="{!alternativeName}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="address" value="Address"/>
+                                <apex:inputTextarea id="address" value="{!address}"/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="city" value="City"/>
+                                <apex:outputPanel >
+                                    <div class="requiredInput">
+                                        <div class="requiredBlock"></div>
+                                            <apex:inputText id="city" value="{!city}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="country" value="Country"/>
+                                <apex:outputPanel >
+                                    <div class="requiredInput">
+                                        <div class="requiredBlock"></div>
+                                        <apex:selectList onchange="updateStatesList();" id="country" value="{!country}" size="1" multiselect="false">
+                                            <apex:selectOptions value="{!countrySelectionList}"/>
+                                        </apex:selectList>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:actionFunction name="updateStatesList" action="{!updateStatesList}" reRender="state"/>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="state" value="State / Province"/>
+                                <apex:outputPanel id="state">
+                                    <apex:inputText value="{!state}" rendered="{!if(stateSelectionList.size < 2, true, false)}"/>
+                                    <apex:selectList value="{!state}" size="1" multiselect="false" rendered="{!if(stateSelectionList.size > 1, true, false)}">
+                                        <apex:selectOptions value="{!stateSelectionList}"/>
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel for="postalCode" value="Postal Code"/>
+                                <apex:inputText id="postalCode" value="{!postalCode}"/>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 50%; text-align: center">
+                        <apex:commandButton action="{!searchPIOrDUNS}" value="Search" styleClass="searchBtn"/>
+                    </td>
+                    <td style="width: 50%; text-align: center">
+                        <apex:commandButton action="{!searchName}" value="Search" styleClass="searchBtn"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td span="2" style="text-align: center">
+                        <apex:pageBlockButtons id="commandButtons" location="bottom">
+                            <apex:commandButton action="{!cancel}" value="Cancel"/>
+                            <apex:commandButton action="{!noMatchFound}" value="No Match Found" rendered="{!searchConducted && onboardingRegistration.Manual_Onboard__c}"/>
+                            <apex:commandButton action="{!matchFound}" value="Proceed with Selected" rendered="{!selectedRecord != '-1'}"/>
+                        </apex:pageBlockButtons>
+                    </td>
+                </tr>
+            </table>
+
+        </apex:pageBlock>
+
+        <apex:pageBlock id="searchResults" title="Search Results" rendered="{!if(resultsAvailable && errorMessage = '' && !finalized, true, false)}">
+            <apex:pageBlockTable value="{!searchResults}" var="result">
+                <apex:column >
+                    <apex:outputPanel rendered="{!and(result.index != '', result.index != selectedRecord)}">
+                        <input id="{!result.index}" type="radio" value="{!result.index}" onclick="changeSelectedRecord({!result.index})"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!result.index == selectedRecord}">
+                        <input type="radio" checked="checked"/>
+                    </apex:outputPanel>
+                </apex:column>
+                <apex:column headerValue="Party Name">
+                    <apex:outputText value="{!result.CDHResult.partyName}"/>
+                </apex:column>
+                <apex:column headerValue="Party Number">
+                    <apex:outputText value="{!result.CDHResult.partyNumber}"/>
+                </apex:column>
+                <apex:column headerValue="Party Type">
+                    <apex:outputText value="{!result.CDHResult.partyType}"/>
+                </apex:column>
+                <apex:column headerValue="DUNS Number">
+                    <apex:outputText value="{!result.CDHResult.DUNSNumber}"/>
+                </apex:column>
+                <apex:column headerValue="Identifying Address">
+                    <apex:outputText value="{!result.CDHResult.identifyingAddress}"/>
+                </apex:column>
+                <apex:column headerValue="Tax Reference ID">
+                    <apex:outputText value="{!result.CDHResult.taxReference}"/>
+                </apex:column>
+                <apex:column headerValue="Phone">
+                    <apex:outputText value="{!result.CDHResult.phone}"/>
+                </apex:column>
+                <apex:column headerValue="Classification">
+                    <apex:outputText value="{!result.CDHResult.classification}"/>
+                </apex:column>
+                <apex:column breakBefore="true" colspan="8" rendered="{!result.hasAccounts}">
+                    <apex:pageBlockSection >
+                        <apex:pageBlockTable value="{!result.sfAccounts}" var="sfaccount">
+<!--
+                            <apex:column >
+                                <apex:outputPanel rendered="{!sfaccount.index != selectedRecord}">
+                                    <input id="{!sfaccount.index}" type="radio" value="{!sfaccount.index}" onclick="changeSelectedRecord({!sfaccount.index})"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!sfaccount.index == selectedRecord}">
+                                    <input type="radio" checked="checked"/>
+                                </apex:outputPanel>
+                            </apex:column>
+-->
+                            <apex:column headerValue="Account Name">
+                                <apex:outputText value="{!sfaccount.account.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Shipping Address">
+                                <apex:outputText value="{!sfaccount.account.ShippingStreet} {!sfaccount.account.ShippingCity} {!sfaccount.account.ShippingState} {!sfaccount.account.ShippingCountry} {!sfaccount.account.ShippingPostalCode}"/>
+                            </apex:column>
+                            <apex:column headerValue="Billing Address">
+                                <apex:outputText value="{!sfaccount.account.BillingStreet} {!sfaccount.account.BillingCity} {!sfaccount.account.BillingState} {!sfaccount.account.BillingCountry} {!sfaccount.account.BillingPostalCode}"/>
+                            </apex:column>
+                            <apex:column headerValue="Region">
+                                <apex:outputText value="{!sfaccount.account.Global_Region__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Subregion">
+                                <apex:outputText value="{!sfaccount.account.Subregion__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Partner Status">
+                                <apex:outputText value="{!sfaccount.account.PartnerStatuses__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Account Owner">
+                                <apex:outputText value="{!sfaccount.account.Owner.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Classification">
+                                <apex:outputText value="{!sfaccount.account.Finder_Partner_Tier__r.Name} {!sfaccount.account.Finder_Partner_Type__r.Name}"/>
+                            </apex:column>
+                            <apex:column headerValue="Account Type">
+                                <apex:outputText rendered="{!sfaccount.isPartner}" value="Partner"/>
+                                <apex:outputText rendered="{!NOT(sfaccount.isPartner)}" value="Sales"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:pageBlockSection>
+                </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+
+        <apex:pageBlock rendered="{!if(errorMessage != '' && !finalized, true, false)}">
+            <apex:pageBlockButtons id="commandButtons" location="bottom">
+                <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+
+        <apex:actionFunction name="changeSelectedRecord" action="{!changeSelectedRecord}" reRender="searchResults, searchFields">
+                <apex:param name="selectedRecord" assignTo="{!selectedRecord}" value=""/>
+        </apex:actionFunction>
+
+    </apex:form>
+
+</apex:page>

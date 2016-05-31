@@ -1,0 +1,40 @@
+<apex:page controller="PartnerUserInvitationController" action="{!loadInvitations}">
+    <apex:sectionHeader title="{!$Label.User_Invitations}"/>
+    <apex:pageBlock id="rerenderMain">
+        <apex:pageMessages id="messages" />
+        <apex:form >
+        <apex:pageBlockTable value="{!invitations}" var="invite">
+            <apex:column >
+                <apex:facet name="header">{!$Label.Invitation_Table_Col_Sent}</apex:facet>
+                <apex:outputText id="dateSent" value="{!invite.Date_Sent__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.Invitation_Table_Col_Created_By}</apex:facet>
+                <apex:outputText id="createdBy" value="{!invite.CreatedBy.Name}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.Invitation_Table_Col_Email}</apex:facet>
+                <apex:outputText id="email" value="{!invite.Email__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.Invitation_Table_Col_Response}</apex:facet>
+                <apex:outputText id="responseType" value="{!invite.Response_Type__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.Invitation_Table_Col_Response_Date}</apex:facet>
+                <apex:outputText id="dateResponded" value="{!invite.Date_Responded__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:commandButton action="{!resendInvitation}" value="{!$Label.Invitation_Table_Col_Resend_Email}" styleClass="rowbutton" id="buttonResend" rendered="{!invite.Response_Type__c != 'A'}"  rerender="rerenderMain">
+                    <apex:param name="commandInvitationId" value="{!invite.Id}" assignTo="{!commandInvitationId}"/>
+                </apex:commandButton>
+            </apex:column>
+            <apex:column >
+                <apex:commandButton action="{!deleteInvitation}" value="{!$Label.Invitation_Table_Col_Delete}" styleClass="rowbutton" id="buttonDelete" rendered="{!invite.Response_Type__c != 'A'}" rerender="rerenderMain">
+                    <apex:param name="commandInvitationId" value="{!invite.Id}" assignTo="{!commandInvitationId}"/>
+                </apex:commandButton>
+            </apex:column>
+        </apex:pageBlockTable>
+        </apex:form>
+    </apex:pageBlock>
+ </apex:page>

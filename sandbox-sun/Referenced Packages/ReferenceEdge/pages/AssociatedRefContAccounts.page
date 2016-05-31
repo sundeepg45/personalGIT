@@ -1,0 +1,35 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page controller="refedge.RfSearchController" id="pageId" sidebar="false" >
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:pageBlock title="{!$Label.T_Associated_Accounts}" id="pbId" rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlockTable value="{!assAccounts.listAccount}" var="acc" id="pbtId">
+            <apex:column value="{!acc.Name}"/>
+            <apex:column value="{!acc.Type}"/>
+            <apex:column value="{!acc.Phone}"/>
+            <apex:column headervalue="{!$Label.Referenceable}">
+                <apex:outputField rendered="{!acc.Reference_Basic_Informations__r.size > 0 }" value="{!acc.Reference_Basic_Informations__r[0].Is_Referenceable__c}"/>
+            </apex:column>    
+            <apex:column headervalue="{!$Label.Referenceability_Status}" >                        
+                <apex:outputField rendered="{!acc.Reference_Basic_Informations__r.size > 0}" value="{!acc.Reference_Basic_Informations__r[0].Referenceability_Status__c}" /> 
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+</apex:page>

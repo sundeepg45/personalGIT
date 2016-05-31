@@ -1,0 +1,1 @@
+{"Payload":{"SyncRequest":{"KeyValue":"REPLACE_WITH_ID","EntityName":"Contact","KeyName":"SFDC_CONTACT_ID"}},"Header":{"Operation":"SYNC","EventKey":"Contact.SFDC_CONTACT_ID","Type":"Contact","InstanceId":6,"Timestamp":"2014-09-11T09:36:26"}}

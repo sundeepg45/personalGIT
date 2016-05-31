@@ -1,0 +1,118 @@
+<apex:page controller="PCController" showHeader="false"
+    standardStylesheets="false" sidebar="false" cache="false">
+    <div style="display:none;">
+        <!-- This has to be here for the results to print, visualforce weirdness -->
+        <apex:outputText value="{!resultPage.size}"/>
+    </div>
+    <apex:outputText rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+        <div class="paginationBlock">
+            <div class="pageIndicator" id="pageIndicatorTop">{!$Label.PF_Page_x} <span id="currentPageTop">{!result.currentPage}</span> {!$Label.PF_Page_X_of} <span id="ofPageTop">{!result.totalPages}</span></div>
+            <apex:include pageName="PCPaginationControl" />
+        </div>
+    </apex:outputText>
+    <apex:outputText rendered="{! NOT(ISNULL(resultPage)) && resultPage.size == 0}" value="{!$Label.PC_result_MSG_noresults}"/>
+    <apex:variable var="cnt" value="{!0}" />
+<apex:form >
+    <apex:repeat value="{!resultPage}" var="product" id="results">
+        <div class="card" id="businessCard{!product.productId}{!cnt}">
+
+            <div class="corner_topleft"></div>
+            <div class="corner_topright"></div>
+            <div class="corner_bottomleft"></div>
+            <div class="corner_bottomright"></div>
+
+            <div class="cardLogo" id="productLogo{!product.productId}{!cnt}">
+                <apex:image rendered="{!NOT(ISNULL(product.logoId))}" value="{!URLFOR($Action.Attachment.Download, product.logoId)}"/>
+            </div>
+            <div class="cardMain">
+                <div class="productPartnerName">
+                    <span class="productName"><strong>
+                        <a id="productNameLink{!product.productId}{!cnt}" href="PCProductDetail?id={!product.productId}">{!product.Name}</a>
+                    </strong></span><span class="partnerName"><a id="partnerDetailsLink" target="_blank" href="/finder/PFPartnerDetail?id={!product.partnerId}">{!product.partnerName}</a></span>
+                </div>
+            </div>
+            <!-- /cardMain -->
+            <div class="cardBody">
+                <div class="prodCardCol1">
+                    <div><strong><apex:outputLabel value="{!$ObjectType.PartnerProduct__c.fields.Product_Types__c.label}"/> </strong></div>
+                    <apex:outputText rendered="{!NOT(ISNULL(product.productType))}">
+                        <div id="productApplicationType{!product.productId}{!cnt}">{!product.productType}</div>
+                    </apex:outputText>
+                    <apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!ISNULL(product.productType)}"/>
+                </div>
+                <div class="prodCardCol2">
+                    <apex:outputText rendered="{!product.hasRHELPlatforms}">
+                        <div class="appCertificationRhel" id="rhelPlatformAvailabilityIndicator">Red Hat Enterprise Linux</div>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!product.hasJBossPlatforms}">
+                        <div class="appCertificationJboss" id="jbossPlatformAvailabilityIndicator">JBoss Middleware</div>
+                    </apex:outputText>
+                    <!--
+                    <apex:outputText rendered="{!product.hasRHELPlatforms}">
+                        <div class="appCertificationRhel" id="rhelPlatformAvailabilityIndicator">Red Hat Enterprise Linux <img alt="certified" src="http://www.redhat.com/partner_center/g/red_check.png"/></div>
+                    </apex:outputText>
+                    <apex:outputText rendered="{! NOT(product.hasRHELPlatforms)}">
+                        <div class="appCertificationRhelDisabled" id="rhelPlatformAvailabilityIndicator">Red Hat Enterprise Linux <img alt="certified" src="http://www.redhat.com/partner_center/g/red_check.png"/></div>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!product.hasJBossPlatforms}">
+                        <div class="appCertificationJboss" id="jbossPlatformAvailabilityIndicator">JBoss Middleware <img alt="certified" src="http://www.redhat.com/partner_center/g/red_check.png"/></div>
+                    </apex:outputText>
+                    <apex:outputText rendered="{! NOT(product.hasJBossPlatforms)}">
+                        <div class="appCertificationJbossDisabled" id="jbossPlatformAvailabilityIndicator">JBoss Middleware <img alt="certified" src="http://www.redhat.com/partner_center/g/red_check.png"/></div>
+                    </apex:outputText>
+                    -->
+                </div>
+            </div>
+            <!-- /cardBody -->
+            <div class="cardAssets">
+                <div class="cardApplicationTab1">
+                    <a href="javascript:void(0);" onClick="toggleDetails('productCardAssetDiv{!product.productId}{!cnt}');" id="platformsDisplayToggle{!product.productId}{!cnt}" tabindex="0" class=""> Platforms </a>
+                </div>
+            </div>
+            <div class="more">
+                    <a id="productDetailsLink{!product.productId}{!cnt}" href="PCProductDetail?id={!product.productId}">Details &gt;</a>
+            </div>
+        </div>
+
+
+        <div style="" class="cardAssetsOff" id="productCardAssetDiv{!product.productId}{!cnt}">
+        <div class="cardAssetsTop">
+        </div>
+
+        <div id="cardAssets{!product.productId}{!cnt}" class="assetsCol1">
+            <label>{!$ObjectType.PartnerProduct__c.fields.Platforms__c.label}</label>
+            <apex:outputText rendered="{!product.platforms.size > 0}">
+                <ul>
+                    <apex:repeat value="{!product.platforms}" var="platform">
+                        <li id="productPlatform{!product.productId}{!cnt}_1">{!platform}</li>
+                    </apex:repeat>
+                </ul>
+            </apex:outputText>
+            <div><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!product.platforms.size == 0}"/></div>
+        </div>
+        <div id="cardAssets{!product.productId}{!cnt}" class="assetsCol2">
+            <label>{!$ObjectType.PartnerProduct__c.fields.JBoss_Platform__c.label}</label>
+            <apex:outputText rendered="{!product.middleware.size > 0}">
+                <ul>
+                    <apex:repeat value="{!product.middleware}" var="mw">
+                        <li id="productMiddleware{!product.productId}{!cnt}_1">{!mw}</li>
+                    </apex:repeat>
+                </ul>
+            </apex:outputText>
+            <div><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!product.middleware.size == 0}"/></div>
+        </div>
+    </div>
+    <apex:variable var="cnt" value="{!cnt+1}"/>
+    </apex:repeat>
+</apex:form>
+    <div class="paginationBottom">
+        <apex:outputText rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+            <div class="paginationBlock">
+                <div class="pageIndicator" id="pageIndicatorBottom">{!$Label.PF_Page_x} <span id="currentPageBottom">{!result.currentPage}</span> {!$Label.PF_Page_X_of} <span id="ofPageBottom">{!result.totalPages}</span></div>
+                <apex:include pageName="PCPaginationControl" />
+            </div>
+            <br/>
+            <div>Results returned in {!result.msExecutionTime}ms<input type="hidden" name="totalResults" id="totalResults" value="{!result.resultIdList.size}"/></div>
+        </apex:outputText>
+    </div>
+</apex:page>

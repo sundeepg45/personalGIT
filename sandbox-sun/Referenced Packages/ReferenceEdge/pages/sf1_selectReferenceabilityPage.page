@@ -1,0 +1,153 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="refedge.SF1_filtersClass">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:pageMessages id="pgmsgId"/>
+    <style>
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        .sf1input[type="checkbox"] {
+         -webkit-appearance: none;
+         display: inline-block;
+         height: 22px;
+         margin: 0 6px 0 0;
+         border: 1px solid #c3c6c9;
+         padding: 0;
+         width: 22px;
+         vertical-align: middle;
+        background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+       box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+    }
+    
+    .sf1input[type="checkbox"]:checked {
+        border: 1px solid #2c75a3;
+        background-color: #3b9fdd;
+        -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+        -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+        box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+        background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+        background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+       background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+    }
+    
+    .sf1input[type="checkbox"]:checked::after {
+        display: block;
+        left: 3px;
+        top: 3px;
+        height: 6px;
+        width: 10px;
+        border-bottom: 4px solid white;
+        border-left: 4px solid white;
+        -webkit-transform: rotate(-45deg);
+        position: relative;
+        content: '';
+    }
+    .sf1label {
+        font-family: 'ProximaNovaSoft-Regular','Helvetica Neue';
+        font-size: 13px;
+        color: #696e71;
+        margin: 0;
+        padding-bottom: 8px;
+        padding-top: 8px;
+        display: block;
+        min-width: 100px;
+    }
+    .sf1button {
+        font-size: 16px;
+        color: #44596c;
+        text-shadow: none;
+        margin: 0;
+        padding: 4px 14px;
+        height: 35px;
+        font-size: 16px;
+        font-family: 'ProximaNovaSoft-Regular';
+        font-weight: normal;
+        border: 1px solid #bbc0c4;
+        border-radius: 5px;
+        background: -moz-linear-gradient(#ffffff,#f1f1f1);
+        background: -webkit-linear-gradient(#ffffff,#f1f1f1);
+        background: -ms-linear-gradient(#ffffff,#f1f1f1);
+        background: linear-gradient(#ffffff,#f1f1f1);
+        box-shadow: none;
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    
+    .sf1button:active {
+        background: #e9e9e9;
+    }
+    </style>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <body>
+        <div class="container oneStyle oneOne tablet">
+            <div class="dialog-wrapper tablet onePanelManager">
+                <div class="panel tablet  one onePanel active panelReady">
+                    <div class="body" style="background:#f0f1f2;">
+                        <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+                            <section>
+                                <apex:actionFunction name="saveRefTypeSelected" action="{!saveRefTypeSelected}" >
+                                </apex:actionFunction>
+                                <apex:actionFunction name="cancel" action="{!cancel}" >
+                                </apex:actionFunction>
+                                <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                                    <ul class="buttonList horizontal forceButtonBar">
+                                        <li class="buttonItem">
+                                            <button class="sf1button" title="Edit"  onclick="saveRefTypeSelected();" accesskey="" type="button" >
+                                                <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Submit}</span>
+                                            </button>
+                                            <button class="sf1button" onclick="cancel();" title="Edit" accesskey="" type="button" >
+                                                <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Cancel}</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                 <apex:outputPanel layout="block"  id="mainOpId" >
+                                    <div class="full forcePageBlock forceRecordLayout" id="accountDivId">
+                                        <section class="full twoCol forcePageBlockSection forcePageBlockSectionEdit" >
+                                            <h4 class="title primaryPaletteBorder" style="display:block;">{!$Label.Referenceability}</h4>
+                                            <apex:repeat value="{!allReferenceability}" var="refType" id="accountRepeatId">
+                                                <div class="full forcePageBlockSectionRow"> 
+                                                    <div class="full forcePageBlockItem forcePageBlockItemEdit">
+                                                        <div class="uiInput uiInputCheckbox">
+                                                             <apex:inputCheckBox style="margin-left:2%;" styleClass="uiInput uiInputCheckbox"   value="{!refType.isSelected}"/>
+                                                             <apex:outputLabel style="padding-left:2%;"   value="{!refType.referenceability.Name}"/> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </apex:repeat>
+                                        </section>
+                                    </div>
+                                </apex:outputPanel> 
+                            </section>
+                        </apex:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</apex:page>

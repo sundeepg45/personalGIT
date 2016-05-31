@@ -1,0 +1,10 @@
+<apex:page standardController="Contact" extensions="Contact_ConvertToUser" action="{!convertToUser}">
+    <apex:variable var="contactAccountGlobalRegion" value="{!Contact.Account.Global_Region__c}" />
+    <apex:variable var="contactEmail" value="{!Contact.Email}" />
+    <apex:variable var="contactFirstName" value="{!Contact.FirstName}" />
+    <apex:variable var="contactLastName" value="{!Contact.LastName}" />
+    <apex:variable var="contactFederationId" value="{!Contact.LoginName__c}" />
+    
+    <apex:sectionHeader title="{!$ObjectType.Contact.Label} - Enable Partner User" subtitle="{!Contact.Name}" />
+    <apex:pageMessages />
+</apex:page>

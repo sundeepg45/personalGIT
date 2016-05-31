@@ -1,0 +1,1 @@
+public class DataRequiredException extends Exception {}

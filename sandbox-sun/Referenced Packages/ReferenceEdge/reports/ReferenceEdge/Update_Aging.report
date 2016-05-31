@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <buckets>
+        <bucketType>number</bucketType>
+        <developerName>BucketField_51096125</developerName>
+        <masterLabel>Update Aging Range</masterLabel>
+        <nullTreatment>z</nullTreatment>
+        <sourceColumnName>Reference_Basic_Information__c.Refresh_Ageing__c</sourceColumnName>
+        <useOther>false</useOther>
+        <values>
+            <sourceValues>
+                <to>0</to>
+            </sourceValues>
+            <value>No update since creation</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>0</from>
+                <to>30</to>
+            </sourceValues>
+            <value>Updated in the last 30 days</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>30</from>
+                <to>90</to>
+            </sourceValues>
+            <value>Updated in the last 3 months</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>90</from>
+                <to>180</to>
+            </sourceValues>
+            <value>Updated in the last 6 months</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>180</from>
+                <to>365</to>
+            </sourceValues>
+            <value>Updated in the last 12 months</value>
+        </values>
+        <values>
+            <sourceValues>
+                <from>365</from>
+            </sourceValues>
+            <value>Last update more than 12 months ago</value>
+        </values>
+    </buckets>
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Account__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Contact__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Last_Att_Ref_Update__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Refresh_Ageing__c</field>
+    </columns>
+    <description>Shows when the Referenceabilty &amp; Attributes on a Reference Profile were last updated</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>BucketField_51096125</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Update Aging</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Reference_Basic_Information__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

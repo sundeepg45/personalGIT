@@ -1,0 +1,35 @@
+<apex:page standardcontroller="Account_Profile__c" extensions="AccountProfile_ManageSWOT" readOnly="false" showChat="false" showHeader="true" sidebar="true" id="page">
+	<apex:sectionHeader title="{!$Label.AccountProfile_AccountProfileSWOTAnalysis}" subtitle="{!Account_Profile__c.Account__r.Name}" />
+	<apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+		<apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+		<apex:outputLink value="/{!Id}">
+			<apex:outputText value="{!$Label.AccountProfile_BacktoAccountProfile}: " />
+			<apex:outputText value="{!Account_Profile__c.Account__r.Name}" />
+		</apex:outputLink>
+	</apex:outputPanel>  
+	<apex:form id="form">
+		<apex:pageBlock mode="detail" id="swotTable">
+			<c:AccountProfileSWOT profileId="{!Id}" showHelp="{!$ObjectType.Account_Profile_SWOT__c.updateable}"/>
+		</apex:pageBlock>
+		<apex:pageBlock title="{!$Label.AccountProfile_SWOTAnalysisManagement}" mode="edit"  rendered="{!$ObjectType.Account_Profile_SWOT__c.updateable}">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="{!$Label.Common_Save}" action="{!save}" reRender="form"/>
+				<apex:commandButton value="{!$Label.AccountProfile_SaveandContinue}" action="{!saveAndContinue}" reRender="form"/>
+				<apex:commandButton value="{!$Label.AccountProfile_Reset}" action="{!reset}" immediate="true" reRender="form"/>
+				<apex:commandButton value="{!$Label.Common_Cancel}" action="{!cancel}" immediate="true" />
+			</apex:pageBlockButtons>
+			<apex:pageMessages />
+			<apex:pageBlockTable value="{!swotEditors}" var="editor"  rendered="{!$ObjectType.Account_Profile_SWOT__c.updateable}" id="editList">
+				<apex:column headerValue="{!$Label.AccountProfile_Delete}" width="5%"  rendered="{!$ObjectType.Account_Profile_SWOT__c.deletable}">
+					<apex:inputCheckbox value="{!editor.isDeleted}"/>
+				</apex:column>
+				<apex:column headerValue="{!$ObjectType.Account_Profile_SWOT__c.fields.Statement__c.label}" width="80%">
+					<apex:inputField value="{!editor.swot.Statement__c}" style="width:98%" required="{!NOT(ISBLANK(editor.swot.Id))}" rendered="{!OR(NOT(ISBLANK(editor.swot.Id)),$ObjectType.Account_Profile_SWOT__c.createable)}"/>
+				</apex:column>
+				<apex:column headerValue="{!$ObjectType.Account_Profile_SWOT__c.fields.Type__c.label}" width="15%">
+					<apex:inputField value="{!editor.swot.Type__c}" required="{!NOT(ISBLANK(editor.swot.Id))}" rendered="{!OR(NOT(ISBLANK(editor.swot.Id)),$ObjectType.Account_Profile_SWOT__c.createable)}"/>
+				</apex:column>
+			</apex:pageBlockTable>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

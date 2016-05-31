@@ -1,0 +1,138 @@
+<apex:page showHeader="false" standardController="Opportunity" extensions="BookingScheduleControllerExtension" id="BookingScheduleForm">
+<head>
+<apex:stylesheet value="/css/ie_global.css"/>
+<apex:stylesheet value="/css/ie_navigation.css"/>
+<apex:stylesheet value="/css/accounts_styles.css"/>
+
+<title>Booking Schedule</title>
+
+<style>
+td { padding-left: 1ex; padding-right: 1ex }
+th { padding-left: 1ex; padding-right: 1ex; font-weight: bold }
+div { padding-bottom: 1ex }
+</style>
+
+</head>
+
+<body>
+
+ <table frame='void' cellspacing='1' cellpadding='3' border='0' width='100%'> 
+ <tr>
+ <td>
+ 
+    <table border='0' width='100%' cellpadding='8' cellspacing='1'>
+
+    <tr style="background-color: #CCCCCC">
+
+      <td width="10%" align="center" colspan="9"><b>Booking Schedule By Product</b></td>
+
+    </tr>
+    
+    </table>
+    
+    <table cellspacing='1' cellpadding='3' border='0' width='100%'>   
+
+    <tr style="background-color: #ECEAE2">
+
+      <td width="10%" align="left"><b>Product Code</b></td>
+      <td width="8%" align="center"><b>Start Date</b></td>
+      <td width="8%" align="center"><b>End Date</b></td>
+      <td width="8%" align="right"><b>Quantity</b></td>
+      <td width="9%" align="right"><b>Unit Price</b></td>     
+      <td width="9%" align="right"><b>Total Price</b></td>
+      <td width="8%" align="right"><b>Year 1</b></td>
+      <td width="8%" align="right"><b>Year 2</b></td>     
+      <td width="8%" align="right"><b>Year 3</b></td>
+      <td width="8%" align="right"><b>Year 4</b></td>
+      <td width="8%" align="right"><b>Year 5</b></td>     
+      <td width="8%" align="right"><b>Year 6</b></td>
+
+    </tr>
+
+    <apex:repeat value="{!opportunityProductList}" var="product">
+      <tr style="background-color: #ECEAE2">
+        <td align="left">
+          <apex:outputText value="{!product.ProductCode}" />
+        </td>                    
+        <td align="center">
+          <apex:outputText value="{!product.StartDate}" />
+        </td>
+        <td align="center">
+          <apex:outputText value="{!product.EndDate}" />
+        </td>
+        <td align="right">                  
+          <apex:outputText value="{!product.Quantity}" />
+        </td>        
+        <td align="right">
+          <apex:outputText value="{!product.UnitPrice}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.TotalPrice}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.Year1Amount}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.Year2Amount}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.Year3Amount}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.Year4Amount}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.Year5Amount}" />
+        </td>
+        <td align="right">
+          <apex:outputText value="{!product.Year6Amount}" />
+        </td>
+      </tr>
+    </apex:repeat>
+      
+    <tr style="background-color: #ECEAE2">
+        <td colspan="6"><b>
+            <apex:outputText value="Total" /></b>
+        </td>
+                      
+        <td align="right">
+            <apex:outputText value="{!Year1Amount}" />
+            <apex:outputText rendered="false" value="{!opportunity.Year1Amount__c}" />
+        </td>
+        
+        <td align="right">
+            <apex:outputText value="{!Year2Amount}" />
+            <apex:outputText rendered="false" value="{!opportunity.Year2Amount__c}" />
+        </td>
+        
+        <td align="right">
+            <apex:outputText value="{!Year3Amount}" />
+            <apex:outputText rendered="false" value="{!opportunity.Year3Amount__c}" />
+        </td>
+        
+        <td align="right">
+            <apex:outputText value="{!Year4Amount}" />
+            <apex:outputText rendered="false" value="{!opportunity.Year4Amount__c}" />
+        </td>
+        
+        <td align="right">
+            <apex:outputText value="{!Year5Amount}" />
+            <apex:outputText rendered="false" value="{!opportunity.Year5Amount__c}" />
+        </td>
+        
+        <td align="right">
+            <apex:outputText value="{!Year6Amount}" />
+            <apex:outputText rendered="false" value="{!opportunity.Year6Amount__c}" />
+        </td>
+        
+    </tr>
+        
+    </table>    
+  
+  </td>
+  </tr>  
+  </table>
+
+</body>
+
+</apex:page>

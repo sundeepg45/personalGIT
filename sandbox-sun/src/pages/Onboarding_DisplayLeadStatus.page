@@ -1,0 +1,29 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        <h4><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_App_To_Join}"/>&nbsp;{!Lead.Company}&nbsp;<apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Partner_Account}"/></h4>
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Application_Status}"/></div>
+    </apex:outputPanel>
+
+<apex:form >
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Appl_Status}"/></apex:outputLabel>
+            <apex:outputPanel id="onboardingStatus">{!Lead.Partner_Onboarding_Status__c}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" style="display: none;" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Application_Submitted_On}"/></apex:outputLabel>
+            <apex:outputPanel id="createdDate">{!Lead.CreatedDate}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Company_Name}"/></apex:outputLabel>
+            <apex:outputPanel id="companyName">{!Lead.Company}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Partner_Type}"/></apex:outputLabel>
+            <apex:outputPanel id="partnerType">{!Lead.Partner_Type__r.Name}</apex:outputPanel>
+        </apex:outputPanel> <apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_DisplayLeadStatus_Location}"/></apex:outputLabel>
+            <apex:outputPanel id="location">
+                <apex:outputText value="{!Lead.City}, " rendered="{!NOT(ISBLANK(Lead.City))}" />
+                <apex:outputText value="{!Lead.State}, " rendered="{!NOT(ISBLANK(Lead.State))}" />
+                <apex:outputText value="{!Lead.Country}" rendered="{!NOT(ISBLANK(Lead.Country))}" />
+            </apex:outputPanel>
+        </apex:outputPanel> </fieldset>
+    </apex:form>
+</apex:page>

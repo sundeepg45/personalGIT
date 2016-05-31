@@ -1,0 +1,37 @@
+<apex:page controller="ContentFeedbackCaseCreation">
+        
+        <script >
+        function addfeedback(objectid) {        
+            var valuetext = document.getElementById(objectid).value;
+            if (valuetext != '') {
+                alert ('{!$Label.ContentFeedbackCaseCreationAlert}');
+            }   
+        }
+        </script>
+        <style>
+                h1 {
+                color:#cc0000;
+                font-size:18px;
+                font-size:18px;
+                font-weight:bold;
+                margin:0 0 .7em 0;
+                }
+        </style>
+        
+
+        <p></p>
+        <apex:pageMessages />
+        <div align="left">
+            <h1 >{!$Label.ContentFeedbackCaseCreationSendFeedback}</h1>
+            <p> {!$Label.ContentFeedbackCaseCreationEnterFeedback   }.  </p>
+            <p> <strong>{!$Label.ContentFeedbackCaseCreationTittle}</strong>   {!contentVersionU.Title} </p>
+            <p> <strong>{!$Label.ContentFeedbackCaseCreationDescription}</strong> {!contentVersionU.Description} </p>
+        </div>
+        <apex:form >
+        <p> <apex:inputTextarea id="CaseDescription" value="{!CaseDescription}" cols="100" rows="10"/>  </p>
+        <p>
+            <apex:commandbutton action="{!CreateCase}" value="Add Feedback" onClick="addfeedback('{!$Component.CaseDescription}')"/>
+            <apex:commandbutton action="{!CancelF}" value="Cancel"/>
+        </p>
+        </apex:form>
+</apex:page>

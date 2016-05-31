@@ -1,0 +1,24 @@
+<apex:page standardController="Opportunity" sidebar="false" extensions="refedge.sf1_FindReferenceAccountExt">
+    <c:POR_ModalLoader id="PORLoader"/>
+    <script>
+        jQuery(document).ready(function(){
+            if('{!JSENCODE(minimumStageError)}' == ''){
+                if((typeof sforce != 'undefined')  && (sforce != null)){
+                    sforce.one.navigateToURL('{!$Page.refedge__SF1_RfSearchPage}?opportunityId={!Opportunity.Id}&forAccount=true&forContent=false&SF1=true')
+                }
+                else{
+                    window.open('{!$Page.refedge__RfSearchPage}?opportunityId={!Opportunity.Id}&forAccount=true&forContent=false&PreFilter=true&SF1=false','_self');
+                }
+            }
+            else{
+                alert('{!JSENCODE(minimumStageError)}');
+                if((typeof sforce != 'undefined')  && (sforce != null)){
+                    sforce.one.navigateToSObject('{!opp.Id}')
+                }
+                else{
+                    window.open('/{!opp.Id}','_self');
+                }
+            }
+        });
+    </script>
+</apex:page>

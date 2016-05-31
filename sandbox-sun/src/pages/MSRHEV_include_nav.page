@@ -1,0 +1,22 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+      <ul class="sf-menu">
+          <li id="nav-first"><a href="MSRHEVHome">Overview</a>
+              <ul>
+                  <li><a href="MSRHEVCustomers">Red Hat Customers</a></li>
+              </ul>
+          </li>
+          <li id="nav-second"><a href="MSRHEVBenefits">Benefits</a>
+              <ul>
+                <li><a href="MSRHEVEnterprise">Enterprise-ready</a></li>
+                <li><a href="MSRHEVScalable">Fast and Scalable</a></li>
+                <li><a href="MSRHEVExtensible">Easily extensible</a></li>
+                <li><a href="MSRHEVOpen">Refreshingly open</a></li>
+                <li><a href="MSRHEVRemarkablyAffordable">Remarkably affordable</a></li>
+              </ul>
+          </li>
+          <li id="nav-third"><a href="MSRHEVTestimonials">Testimonials</a></li>
+          <li id="nav-sixth"><a href="MSRHEVResources">Resources</a></li>
+          <li id="nav-seventh"><a href="MSRHEVSupport">Support</a></li>
+      </ul><!-- /#nav -->
+
+</apex:page>

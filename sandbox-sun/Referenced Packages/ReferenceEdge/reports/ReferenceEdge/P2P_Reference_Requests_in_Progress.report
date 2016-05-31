@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r$Account__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r$Deadline__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r$Account_Request_Status__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r$Approval_Status__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r$Approve_Deny_Notes__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r.Reference_Request_Account_Contacts__r$Is_Reminder_to_Owner__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r.Reference_Request_Account_Contacts__r$Is_Escalation_to_Owner_Manager__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r.Reference_Request_Account_Contacts__r$Is_No_Response__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request__c.Reference_Request_Accounts__r.Reference_Request_Account_Contacts__r$Is_Feedback_Notification_Send__c</field>
+    </columns>
+    <description>Shows current state of P2P Requests in progress</description>
+    <filter>
+        <criteriaItems>
+            <column>Reference_Request__c.Reference_Request_Accounts__r$Process__c</column>
+            <operator>equals</operator>
+            <value>Peer2Peer</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Tabular</format>
+    <name>P2P Reference Requests in Progress</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Reference_Requests_in_Progress__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Reference_Request__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CURRENT</interval>
+    </timeFrameFilter>
+</Report>

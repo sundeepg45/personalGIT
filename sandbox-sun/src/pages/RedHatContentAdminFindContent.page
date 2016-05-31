@@ -1,0 +1,56 @@
+<apex:page controller="RHContentListAdminController" cache="true" expires="1">
+	<script language="JavaScript">
+		function isEnterPressed(e)
+		{
+		     var key;
+		     if(window.event)
+		          key = window.event.keyCode;     //IE
+		     else
+		          key = e.which;     //firefox
+		          
+		     return key == 13;
+		}
+	</script>
+
+	<apex:form >
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Red Hat Content<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Find Content to Add to: <strong>{!comboNavObject.Site__c} > {!comboNavObject.Page__c} > {!comboNavObject.Section__c}</strong></h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+		<apex:pageMessages id="messages"/>
+		
+		<apex:pageBlock id="sitePageSection">
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!backToList}" id="cancelAdd" value="Cancel"/>
+			</apex:pageBlockButtons>
+			<apex:outputText >
+				<apex:outputLabel value="Search Content:" for="txtSearch"/>&nbsp;
+				<apex:inputText id="txtSearch" value="{!contentSearchString}" onkeypress="if (isEnterPressed(event)) { document.getElementById('{!$Component.btnSearch}').click(); return false; }"/> 
+				<apex:commandButton id="btnSearch" value="Search" action="{!searchContent}"/> 
+			</apex:outputText>
+			<apex:outputText rendered="{!NOT(ISNULL(contentSearchResult)) && contentSearchResult.size > 0}">
+				<div>&nbsp;</div>
+		        <apex:pageBlockTable value="{!contentSearchResult}" var="contentItem">
+		            <apex:column value="{!contentItem.title}"/>
+		            <apex:column headerValue="Action">
+		            	<span id="{!contentItem.ContentDocumentId}actions">
+			            	<apex:commandLink id="selectContent" value="Add This Document" action="{!selectDocument}">
+			            		<apex:param name="docId" value="{!contentItem.ContentDocumentId}"/>
+			            	</apex:commandLink>
+		            	</span>
+		            </apex:column>
+		        </apex:pageBlockTable> 
+			</apex:outputText>
+			<apex:outputText rendered="{!NOT(ISNULL(contentSearchString)) && NOT(ISNULL(contentSearchResult)) && contentSearchResult.size == 0}">
+				<br/><br/>
+				<div><b>No results found.</b></div>
+			</apex:outputText>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

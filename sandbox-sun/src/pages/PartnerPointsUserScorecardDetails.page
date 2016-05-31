@@ -1,0 +1,58 @@
+<apex:page standardController="Contact" extensions="PPUserScorecardController" action="{!processRedirect}">
+
+		  
+	<apex:form >
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">{! $Label.PP_User_Partner_Points }<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">{! $Label.PP_User_User_Score_Card }: <b><a href="/{!contact.Id}" target="_blank">{!contact.Name}</a></b></h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+		<apex:pageMessages />
+
+		<div><a href="PartnerPointsUserScoreCard?id={!contact.Id}" id="backToCard">{! $Label.PP_User_Scorecard_Detail_Back }</a></div>
+		<br/>
+		<div class="bRelatedList">
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody">
+					<apex:outputText rendered="{! not(isnull(pointsList)) && pointsList.size > 0}">			
+						<table class="list" border="0" cellspacing="0" cellpadding="0">
+							<thead>
+								<tr class="headerRow">
+									<th>{! $Label.PP_User_Scorecard_Detail_Earned }</th>
+									<th>{! $Label.PP_User_Scorecard_Detail_Category }</th>
+									<th>{! $Label.PP_User_Scorecard_Name }</th>
+									<th>{! $Label.PP_User_Scorecard_Detail_NumPoints }</th>
+									<th>{! $Label.PP_User_Scorecard_Detail_Status }</th>
+									<th>{! $Label.PP_User_Scorecard_Detail_Expiring }</th>
+								</tr>
+							</thead>					
+							<tbody>
+								<apex:repeat var="score" value="{!pointsList}">
+									<tr id="{! score.Id }">
+										<td>
+											<apex:outputText value="{0,date, dd MMM, yyyy}">
+												<apex:param value="{!score.When_Earned__c}"/>
+											</apex:outputText>
+										</td>
+										<td>{!score.Subcategory__c}</td>
+										<td>{!score.Name}</td>
+										<td>{!ROUND(score.Points__c,0)}</td>
+										<td>{!score.Points_Status__c}</td>
+										<td>{!score.Expiring_Soon__c}</td>
+									</tr>
+								</apex:repeat>
+							</tbody>							
+						</table>
+					</apex:outputText>
+				</div>
+			</div>
+		</div>
+
+	</apex:form>
+	
+</apex:page>

@@ -1,0 +1,19 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        <h4><apex:outputText value="{!$Label.Onboarding_ErrorUserIsMissing_Your_Partner_Account_Status}"/></h4>
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_ErrorUserIsMissing_Partner_User_Not_Yet_Enabled}"/></div>
+        <p><apex:outputText value="{!$Label.Onboarding_ErrorUserIsMissing_Would_You_Like_To_Submit_Request}"/></p>
+    </apex:outputPanel>
+
+    <apex:form >
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel> 
+            <apex:outputPanel >
+                <apex:commandButton action="{!convertContactSubmit}" value="{!$Label.Onboarding_ErrorUserIsMissing_Submit_For_Activation}" styleClass="rowbutton" id="buttonSubmitForActivation">
+                    <apex:param name="federation-id" value="{!FederationId}" assignTo="{!FederationId}" />
+                </apex:commandButton>
+                <apex:commandButton action="{!convertContactCancel}" value="{!$Label.Onboarding_ErrorUserIsMissing_Cancel}" styleClass="rowbutton" id="buttonBack"/>
+            </apex:outputPanel>
+        </apex:outputPanel></fieldset>
+    </apex:form>
+</apex:page>

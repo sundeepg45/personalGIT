@@ -1,0 +1,36 @@
+<apex:page standardController="SFDC_Channel_Account_Plan__c" extensions="BusinessPlan_ObjectiveSectionController" showHeader="false" standardStylesheets="false" renderAs="PDF" >
+    <apex:stylesheet value="{!$Resource.BusinessPlan_PrintableViewStylesheet}" /> 
+    <apex:stylesheet value="{!$Resource.BusinessPlan_FontSize60}" />
+    <apex:stylesheet value="{!$Resource.BusinessPlan_FontFamilyArialUnicodeMS}" />
+    
+    <apex:pageBlock title="{!$ObjectType.SFDC_Channel_Account_Plan__c.Label}: {!$ObjectType.SFDC_Objective__c.LabelPlural}">
+        <apex:pageBlockSection columns="2" title="{!$ObjectType.SFDC_Channel_Account_Plan__c.Label}">
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.Name.Label}" />
+                <apex:outputText value="{!SFDC_Channel_Account_Plan__c.Name}" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.Partner_Name__c.Label}" />
+                <apex:outputText value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Name}" />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="{!$ObjectType.SFDC_Channel_Account_Plan__c.Fields.Fiscal_Year__c.Label}" />
+                <apex:outputText value="{!SFDC_Channel_Account_Plan__c.Fiscal_Year__c}" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <apex:pageBlock rendered="{!objectiveList.size == 0}">
+        <apex:pageBlockSection title="{!$ObjectType.SFDC_Objective__c.LabelPlural}" columns="1">
+            <apex:outputText value="{!$Label.Common_NoRecordsToDisplay}" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <apex:repeat value="{!objectiveList}" var="objective" rendered="{!objectiveList.size > 0}" >
+        <c:BusinessPlan_ObjectiveSection objective="{!objective}" />
+    </apex:repeat>
+
+    
+</apex:page>

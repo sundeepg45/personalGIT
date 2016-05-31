@@ -1,0 +1,171 @@
+<apex:page standardController="Contact" extensions="PPUserScorecardController" action="{!processRedirect}">
+    <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>-->
+    <script type="text/javascript" src="{! URLFOR($Resource.JQueryDimentions) }"></script>
+    <script type="text/javascript" src="{! URLFOR($Resource.JQueryBGIFrame) }"></script>
+    <!--<script type="text/javascript" src="{! URLFOR($Resource.JQueryToolTip) }"></script>-->
+    
+    <!--<script type="text/javascript">
+        $.noConflict(); 
+        jQuery(document).ready(function() {
+            jQuery('#activePointsHint').tooltip({
+                bodyHandler: function() { 
+                    return '{! $Label.PP_User_Total_capped_Points_Tip }';
+                },
+                showURL: false
+            });
+            jQuery('#totalPointsHint').tooltip({
+                bodyHandler: function() {
+                    return '{! $Label.PP_Total_Uncapped_Points_Tip }';
+                },
+                showURL: false
+            });
+            jQuery('#eligiblityHint').tooltip({
+                bodyHandler: function() {
+                    return '{! $Label.PP_Eligibility_Tip }';
+                },
+                showURL: false
+            });
+
+        });
+    </script>
+    -->
+    
+    <style>
+        <!--#tooltip {
+            position: absolute;
+            z-index: 3000;
+            border: 1px solid #111;
+            background-color: #eee;
+            padding: 5px;
+            opacity: 0.85;
+        }
+        #tooltip h3, #tooltip div { margin: 0; }
+        -->
+        .redbox { 
+            background-color: #c00;
+        }
+        .redbox span {
+            color: white;
+            font-weight: bold;
+        }
+        .redbox a, .redbox a:hover, .redbox a:visited { 
+            color: white;
+        }
+        .greenbox { 
+            background-color: #adff2f; 
+        }
+        .yellowbox { 
+            background-color: #FFFF33; 
+        }
+    </style>
+          
+    <apex:form >
+        <div class="bPageTitle">
+            <div class="ptBody secondaryPalette">
+                <div class="content">
+                    <h1 class="pageType">{! $Label.PP_User_Partner_Points }<span class="titleSeparatingColon">:</span></h1>
+                    <h2 class="pageDescription">{! $Label.PP_User_User_Score_Card }: <b><a href="/{!contact.Id}" target="_blank">{!contact.Name}</a></b></h2>
+                    <div class="blank">&nbsp;</div>
+                </div>
+            </div>
+        </div>
+
+        <apex:pageMessages />
+        <div class="pbBody">
+            <table class="list" border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td align="right">{! $Label.PP_Usr_Points_Eligible }:</td>
+                        <apex:outputText rendered="{!NOT(ISNULL(contact.Point_Accrual_Start__c)) || IsNoElibilityCourseRequired}">
+                            <td class="greenbox">
+                                <span><apex:outputText value="{!$Label.PP_Eligible}" id="isEligible"/></span> <a id="eligiblityHint" href="#" onclick="return false;" class="tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="{! $Label.PP_Eligibility_Tip }">{! $Label.PP_What_Is_This }</a>
+                            </td>
+                        </apex:outputText>
+                        <apex:outputText rendered="{!ISNULL(contact.Point_Accrual_Start__c) && NOT(IsNoElibilityCourseRequired)}">
+                            <td class="redbox">
+                                <apex:outputText value="{!$Label.PP_Not_Eligible}" id="notEligible"/> <a id="eligiblityHint" href="#" onclick="return false;" class="tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="{! $Label.PP_Eligibility_Tip }">{! $Label.PP_What_Is_This }</a>
+                            </td>
+                        </apex:outputText>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_Usr_Points_Guide }:</td>
+                        <td>
+                            <apex:outputText rendered="{!regionCode == 'EMEA'}">
+                                <a href="{!$Label.PP_Points_Guide_Link_EMEA}" target="_blank">{!$Label.PP_Usr_Guide_Download}</a>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!regionCode == 'NA'}">
+                                <a href="{!$Label.PP_Points_Guide_Link_NA}" target="_blank">{!$Label.PP_Usr_Guide_Download}</a>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!regionCode == 'APAC'}">
+                                <a href="{!$Label.PP_Points_Guide_Link_APAC}" target="_blank">{!$Label.PP_Usr_Guide_Download}</a>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!regionCode == 'LATAM'}">
+                                <a href="{!$Label.PP_Points_Guide_Link_LATAM}" target="_blank">{!$Label.PP_Usr_Guide_Download}</a>
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_Usr_Current_Points }:</td>
+                        <td class="greenbox"><apex:outputField value="{!UserPoints.Current_Points__c}" id="ActivePoints"/> <a id="activePointsHint" href="#" onclick="return false;" class="tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="{! $Label.PP_User_Total_capped_Points_Tip }">{! $Label.PP_What_Is_This }</a></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_Usr_PreSales_Points}:</td>
+                        <td class="greenbox"><apex:outputField value="{!UserPoints.PreSales_Points__c}" id="ActivePresalesPoints"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_Usr_Sales_Points }:</td>
+                        <td class="greenbox"><apex:outputField value="{!UserPoints.Sales_Points__c}" id="ActiveSalesPoints"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_Usr_Delivery_Points }:</td>
+                        <td class="greenbox"><apex:outputField value="{!UserPoints.Delivery_Points__c}" id="ActiveDeliveryPoints"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_Scorecard_Detailed_Link }</td>
+                        <td><a href="PartnerPOintsUserScorecardDetails?id={!contact.Id}">{! $Label.PP_User_Scorecard_Details_Link }</a></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_Total_Uncapped_Points }: </td>
+                        <td class="yellowbox"><apex:outputField value="{!UserPoints.Uncapped_Points__c}" id="TotalPoints"/> <a id="totalPointsHint" href="#" onclick="return false;" class="tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="{! $Label.PP_Total_Uncapped_Points_Tip }">{! $Label.PP_What_Is_This }</a></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_Total_Lifetime_Points }: </td>
+                        <td><apex:outputField value="{!UserPoints.Total_Lifetime_Points__c}" id="TotalLifetimePoints"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_user_Total }&nbsp;<strong>{!Contact.Account.Name}</strong>&nbsp;{! $Label.PP_User_Points }: </td>
+                        <td><apex:outputField value="{!AccountPoints.Current_Points__c}" id="TotalCompany"/> - <a href="/apex/PartnerPointsAccountScorecard?id={!Contact.Account.Id}">{! $Label.PP_User_Account_Score_Card }</a></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_You_Contribute }: </td>
+                        <td><apex:outputText value="{! ContactContribution }" id="contributionPercentage"/>%</td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_Expiring_within_3_Months }: </td>
+                        <td><font color="#cc0000"><apex:outputField value="{!UserPoints.Expiring_Points__c}" id="ExpiringPoints"/></font></td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_Ranking_in }&nbsp;<strong>{!Contact.Account.Name}</strong>: </td>
+                        <td>
+                            <div id="RankingCompanyPoints">
+                                <apex:outputText rendered="{!UserPoints.Current_Points__c > 0}">{!Ranking}</apex:outputText>
+                                <apex:outputText rendered="{!UserPoints.Current_Points__c == 0}">{!$Label.Partner_Points_No_Ranking}</apex:outputText>
+                            </div> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">{! $Label.PP_User_Ranking_in_all }&nbsp;<strong>{!Contact.Account.Finder_Partner_Tier__r.Name}</strong>, <strong>{!Contact.Account.Finder_Partner_Type__r.Name}</strong>&nbsp;{! $Label.PP_User_In }&nbsp;<strong>{!Region}: </strong> </td>
+                        <td>
+                            <div id="RankingTierTypePoints">
+                                <apex:outputText rendered="{!UserPoints.Current_Points__c > 0}">{!UserRegionalRanking}</apex:outputText>
+                                <apex:outputText rendered="{!UserPoints.Current_Points__c == 0}">{!$Label.Partner_Points_No_Ranking}</apex:outputText>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>        
+            </table>
+            <br/>
+            <div>{!$Label.Partner_Points_24_Hours_Delay_Warning}</div>
+        </div>
+    </apex:form>
+</apex:page>

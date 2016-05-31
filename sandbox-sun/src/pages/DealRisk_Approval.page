@@ -1,0 +1,24 @@
+<apex:page standardController="Deal_Risk_Assessment__c" tabStyle="Opportunity" extensions="DealRiskAssessmentController">
+       <script src="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"></script>
+            <script>
+                $j = jQuery.noConflict();
+                $j(document).ready(function(){   
+                $j("input[name='piSubmit']").hide();
+                });
+            </script>                    
+    <apex:relatedList list="ProcessSteps">
+    <apex:pagemessages ></apex:pagemessages>
+        <apex:facet name="header">
+            <apex:form >
+                <div align="center">
+                    <apex:commandButton id="submitBtn" value="Submit for Approval" action="{!submitDRA}" rendered="{!Show_Hide_ApprovalsButton}"/>
+                </div>
+            </apex:form>
+        </apex:facet>
+        <apex:outputPanel rendered="{!refreshPnl}">
+           <script type="text/javascript">
+             window.location.reload();
+           </script>
+        </apex:outputPanel>
+        </apex:relatedList>
+</apex:page>

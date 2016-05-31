@@ -1,0 +1,166 @@
+<apex:page controller="PCController" showHeader="false" standardStylesheets="false" sidebar="false" cache="false">
+
+<div style="display:none;">
+    <!-- This has to be here for the results to print, visualforce weirdness -->
+    <apex:outputText value="{!resultPage.size}"/>
+</div>
+
+<center>
+<apex:outputText rendered="{! NOT(ISNULL(resultPage)) && resultPage.size == 0}" value="{!$Label.PC_result_MSG_noresults}"/>
+</center>
+<apex:variable var="cnt" value="{!0}" />
+<apex:form rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+    <div class="container">
+        <div class="row">
+            <div class="search-header">
+                <apex:outputPanel rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+                    <div class="col-xs-6">
+                        <div class="pull-xs-left">
+                            <h4> {!$Label.PF_Page_x} <span id="currentPageTop">{!result.currentPage}</span> {!$Label.PF_Page_X_of} <span id="ofPageTop">{!result.totalPages}</span></h4>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="pull-xs-right">
+                            <ul class="pagination">
+
+                            <apex:outputText rendered="{!result.currentPage != 1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor" id="pageLinkFirst" action="{!ChangePage}" value="|<<">
+                                        <apex:param name="currentPage" value="1"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.prevPage != -1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor prev-page" id="pageLinkPrevText" action="{!ChangePage}" value="{!$Label.PF_Pagination_Prev}">
+                                        <apex:param name="currentPage" value="{!result.prevPage}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.skipFivePrevPages != -1}">
+                            <span>
+                                <apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipFivePrev" action="{!ChangePage}" value="...">
+                                    <apex:param name="currentPage" value="{!result.skipFivePrevPages}"/>
+                                </apex:commandLink>
+                            </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.skipPrevPage != -1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipPrev" action="{!ChangePage}" value="{!result.skipPrevPage}">
+                                        <apex:param name="currentPage" value="{!result.skipPrevPage}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.prevPage != -1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor" id="pageLinkPrev" action="{!ChangePage}" value="{!result.prevPage}">
+                                        <apex:param name="currentPage" value="{!result.prevPage}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <span>
+                                <span class="current" id="page1Top">{!result.currentPage}</span>
+                            </span>
+                            <apex:outputText rendered="{!result.nextPage != -1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor" id="pageLinkNext" action="{!ChangePage}" value="{!result.nextPage}">
+                                        <apex:param name="currentPage" value="{!result.nextPage}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.skipNextPage != -1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipNext" action="{!ChangePage}" value="{!result.skipNextPage}">
+                                        <apex:param name="currentPage" value="{!result.skipNextPage}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.skipFiveNextPages != -1}">
+                            <span>
+                                <apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipFiveNext" action="{!ChangePage}" value="...">
+                                    <apex:param name="currentPage" value="{!result.skipFiveNextPages}"/>
+                                </apex:commandLink>
+                            </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.nextPage != -1}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor next-page" id="pageLinkNextText" action="{!ChangePage}" value="{!$Label.PF_Pagination_Next}">
+                                        <apex:param name="currentPage" value="{!result.nextPage}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!result.currentPage != result.totalPages}">
+                                <span>
+                                    <apex:commandLink styleClass="gwt-Anchor" id="pageLinkLast" action="{!ChangePage}" value=">>|">
+                                        <apex:param name="currentPage" value="{!result.totalPages}"/>
+                                    </apex:commandLink>
+                                </span>
+                            </apex:outputText>
+                        </ul>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+
+
+        <apex:repeat value="{!resultPage}" var="product" id="results">
+            <div class="row">
+                <div class="result-wrapper" id="businessCard{!product.productId}{!cnt}">
+                    <div class="col-xs-4">
+                        <a id="productNameLink{!product.productId}{!cnt}" href="PartnerCatalogDetails?id={!product.productId}"><h5>{!product.Name}</h5></a>
+                        <p>{!$Label.PC_Offered_By} <a id="partnerDetailsLink" target="_blank" href="/finder/PFPartnerDetail?id={!product.partnerId}">{!product.partnerName}</a></p>
+                    </div>
+                    <div class="col-xs-4">
+                        <apex:outputText rendered="{!product.hasRHELPlatforms}">
+                            <h6>{!$ObjectType.PartnerProduct__c.fields.Platforms__c.label}: <span>{!product.platformString}</span></h6>
+                        </apex:outputText>
+                        <apex:outputText rendered="{!NOT(product.hasRHELPlatforms)}">
+                            <h6>{!$ObjectType.PartnerProduct__c.fields.Platforms__c.label}: <span>{!$Label.PF_detail_field_notprovided}</span></h6>
+                        </apex:outputText>
+                        <apex:outputText rendered="{!product.hasJBossPlatforms}">
+                            <h6>{!$ObjectType.PartnerProduct__c.fields.JBoss_Platform__c.label}: <span>{!product.middlewareString}</span></h6>
+                        </apex:outputText>
+                        <apex:outputText rendered="{!NOT(product.hasJBossPlatforms)}">
+                            <h6>{!$ObjectType.PartnerProduct__c.fields.JBoss_Platform__c.label}: <span>{!$Label.PF_detail_field_notprovided}</span></h6>
+                        </apex:outputText>
+                        <!--
+                        <apex:outputText rendered="{!NOT(ISBLANK(product.keywords__c))}">
+                        <h6>{!$ObjectType.PartnerProduct__c.fields.keywords__c.label}: <span>{!product.keywords__c}</span></h6>
+                        </apex:outputText>
+                        -->
+                    </div>
+                    <div class="col-xs-3 col-xs-offset-1">
+                        <div class="resources">
+                            <div class="product-wrapper">
+                                <h6><apex:outputLabel value="{!$ObjectType.PartnerProduct__c.fields.Product_Types__c.label}"/></h6>
+                                <ul>
+                                    <apex:outputText rendered="{!NOT(ISNULL(product.productType))}">
+                                        <div id="productApplicationType{!product.productId}{!cnt}"><li>{!product.productType}</li></div>
+                                    </apex:outputText>
+                                    <apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!ISNULL(product.productType)}"/>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.result-wrapper -->
+            </div><!-- /.row -->
+        </apex:repeat>
+        <apex:outputPanel rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+            <div class="container">
+                <div class="row">
+                    <div class="search-header">
+                        <div class="col-xs-6">
+                            <div class="pull-xs-left">
+                                <apex:outputText rendered="{! NOT(ISNULL(resultPage)) &&  resultPage.size > 0}">
+                                    <h4>{!$Label.PF_Page_x} {!result.currentPage} {!$Label.PF_Page_X_of} {!result.totalPages}</h4>
+                                </apex:outputText>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </apex:outputPanel>
+    </div>
+</apex:form>
+</apex:page>

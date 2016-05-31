@@ -1,0 +1,19 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        <h4><apex:outputText value="{!$Label.Onboarding_ErrorUserIsInactive_Your_Partner_Account_Status}"/></h4>
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_ErrorUserIsInactive_Partner_User_Inactive}"/></div>
+        <p><apex:outputText value="{!$Label.Onboarding_ErrorUserIsInactive_Submit_Activation_Request}"/></p>
+    </apex:outputPanel>
+
+    <apex:form >
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel >
+                <apex:commandButton action="{!activateUserSubmit}" value="{!$Label.Onboarding_ErrorUserIsInactive_Submit_For_Activation}" styleClass="rowbutton" id="buttonSubmitForActivation">
+                    <apex:param name="federation-id" value="{!FederationId}" assignTo="{!FederationId}" />
+                </apex:commandButton>
+                <apex:commandButton action="{!activateUserCancel}" value="{!$Label.Onboarding_ErrorUserIsInactive_Cancel}" styleClass="rowbutton" id="buttonBack"/>
+            </apex:outputPanel>
+        </apex:outputPanel></fieldset>
+    </apex:form>
+</apex:page>

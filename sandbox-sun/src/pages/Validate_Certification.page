@@ -1,0 +1,5 @@
+<apex:page controller="PartnerCertValidationScraper" showHeader="false" standardStylesheets="false" sidebar="false" action="{!doExecute}">
+Validation Result:{!pageOutput}
+PartnerTrainingId:{!certId}:
+OriginalPage:{!originalPage}
+</apex:page>

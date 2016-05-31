@@ -1,0 +1,224 @@
+<apex:page controller="ManualOnboardingController" showHeader="true" sidebar="true" action="{!onLoad}">
+
+    <script type='text/javascript'>
+        function noenter(ev) {
+            if (window.event && window.event.keyCode == 13 || ev. which == 13) {
+                submit();
+                return false;
+            } else {
+                return true;
+            }
+        }
+    </script>
+
+    <apex:outputText escape="false" value="<WM4SF3:WalkMeSnippet ></WM4SF3:WalkMeSnippet>"/>
+
+    <apex:outputPanel id="pageMessages">
+        <apex:pageMessages />
+    </apex:outputPanel>
+
+    <apex:form >
+
+        <apex:pageBlock id="partnerData" title="{!pageTitle}">
+            <apex:pageBlockSection columns="1" rendered="{!OR(NOT(isPartnerUser), hasDistributorProfile)}">
+                <apex:pageBlockSectionItem rendered="{!NOT(hasDistributorProfile)}">
+                    <apex:outputLabel for="partnerType" value="{!$Label.Onb_Man_Partner_Type}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:selectList id="partnerType" value="{!partnerType}" size="1" multiselect="false" onchange="updateFields();" onkeypress="return noenter(event);">
+                                <apex:selectOptions value="{!partnerTypeSelectionList}"/>
+                            </apex:selectList>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!hasDistributorProfile}">
+                    <apex:outputLabel for="partnerTypeCCSP" value="{!$Label.Onb_Man_Partner_Type}"/>
+                    <apex:outputPanel >
+                        <apex:outputText id="partnerTypeCCSP" value="{!partnerType}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="companyName" value="{!$Label.Onb_Man_Company_Name}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputText id="companyName" value="{!companyName}" onkeypress="return noenter(event);"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="address" value="{!$Label.Onb_Man_Company_Address}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputTextarea id="address" value="{!address}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="city" value="{!$Label.Onb_Man_Company_City}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputText id="city" value="{!city}" onkeypress="return noenter(event);"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="country" value="{!$Label.Onb_Man_Company_Country}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:selectList onchange="updateStatesList();" id="country" value="{!country}" size="1" multiselect="false" onkeypress="return noenter(event);">
+                                <apex:selectOptions value="{!countrySelectionList}"/>
+                            </apex:selectList>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="state" value="{!$Label.Onb_Man_Company_St_Pro}"/>
+                    <apex:outputPanel id="state">
+                        <apex:outputPanel rendered="{!if(stateSelectionList.size < 2, true, false)}">
+                            <apex:inputText value="{!state}" onkeypress="return noenter(event);"/>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!if(stateSelectionList.size > 1, true, false)}">
+                            <div class="requiredInput">
+                                <div class="requiredBlock"></div>
+                                <apex:selectList onchange="updateRegionAndSubregion();" value="{!state}" size="1" multiselect="false" onkeypress="return noenter(event);">
+                                    <apex:selectOptions value="{!stateSelectionList}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:outputPanel id="publicSectorSection">
+                    <apex:pageBlockSection columns="1" rendered="{!not(disablePublicSector)}">
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel for="publicSector" value="{!$Label.Onb_Man_Public_Sector}"/>
+                            <apex:inputCheckbox onchange="updateRegionAndSubregion();" id="publicSector" value="{!isPublicSector}" onkeypress="return noenter(event);"/>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="region" value="{!$Label.Onb_Man_Company_Region}"/>
+                    <apex:outputText id="region" value="{!region}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="subregion" value="{!$Label.Onb_Man_Company_Subregion}"/>
+                    <apex:outputText id="subregion" value="{!subregion}"/>
+                </apex:pageBlockSectionItem>
+                <apex:outputPanel id="languageSection">
+                    <apex:pageBlockSection >
+                        <apex:pageBlockSectionItem rendered="{!OR(scpPartnerTypeChosen, embeddedPartnerTypeChosen)}">
+                            <apex:outputLabel for="language" value="{!$Label.Onb_Man_Partner_Language}"/>
+                            <apex:outputPanel >
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <apex:selectList id="language" value="{!language}" size="1" multiselect="false" onkeypress="return noenter(event);">
+                                        <apex:selectOptions value="{!languageSelectionList}"/>
+                                    </apex:selectList>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="postalCode" value="{!$Label.Onb_Man_Company_PC}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                <div class="requiredBlock"></div>
+                                <apex:inputText id="postalCode" value="{!postalCode}" onkeypress="return noenter(event);"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <apex:outputPanel id="firstNamePanel">
+                    <apex:pageBlockSection >
+                        <apex:pageBlockSectionItem rendered="{!NOT(OR(scpPartnerTypeChosen, embeddedPartnerTypeChosen))}">
+                            <apex:outputLabel for="firstName" value="{!$Label.Onb_Man_FirstName}"/>
+                            <apex:inputText id="firstName" value="{!firstName}" onkeypress="return noenter(event);"/>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem rendered="{!OR(scpPartnerTypeChosen, embeddedPartnerTypeChosen)}">
+                            <apex:outputLabel for="firstNameRequired" value="{!$Label.Onb_Man_FirstName}"/>
+                            <apex:outputPanel >
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputText id="firstNameRequired" value="{!firstName}" onkeypress="return noenter(event);"/>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                <apex:outputPanel id="lastNamePanel">
+                    <apex:pageBlockSection >
+                        <apex:pageBlockSectionItem rendered="{!NOT(OR(scpPartnerTypeChosen, embeddedPartnerTypeChosen))}">
+                            <apex:outputLabel for="lastName" value="{!$Label.Onb_Man_LastName}"/>
+                            <apex:inputText id="lastName" value="{!lastName}" onkeypress="return noenter(event);"/>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem rendered="{!OR(scpPartnerTypeChosen, embeddedPartnerTypeChosen)}">
+                            <apex:outputLabel for="lastNameRequired" value="{!$Label.Onb_Man_LastName}"/>
+                            <apex:outputPanel >
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <apex:inputText id="lastNameRequired" value="{!lastName}" onkeypress="return noenter(event);"/>
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="companyEmail" value="{!$Label.Onb_Man_Company_Email}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                <div class="requiredBlock"></div>
+                                <apex:inputText id="companyEmail" value="{!companyEmail}" onkeypress="return noenter(event);"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="phone" value="{!$Label.Onb_Man_Company_Phone}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                <div class="requiredBlock"></div>
+                                <apex:inputText id="phone" value="{!phone}" onkeypress="return noenter(event);"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel for="website" value="{!$Label.Onb_Man_Company_Website}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                <div class="requiredBlock"></div>
+                                <apex:inputText id="website" value="{!website}" onkeypress="return noenter(event);"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockButtons id="commandButtons1" location="bottom" rendered="{!OR(NOT(isPartnerUser), hasDistributorProfile)}">
+                <apex:commandButton id="cancel" action="{!cancel}" value="{!$Label.Onb_Man_Cancel}"/>
+                <apex:commandButton id="submit" action="{!submit}" value="{!$Label.Onb_Man_Submit}"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockButtons id="commandButtons2" location="bottom" rendered="{!AND(isPartnerUser, NOT(hasDistributorProfile))}">
+                <apex:commandButton id="cancel" action="{!cancel}" value="{!$Label.Onb_Man_Cancel}"/>
+            </apex:pageBlockButtons>
+
+        </apex:pageBlock>
+
+        <apex:actionFunction name="updateStatesList" action="{!updateStatesList}" reRender="state, region, subregion, publicSectorSection"/>
+        <apex:actionFunction name="updateRegionAndSubregion" action="{!updateRegionAndSubregion}" reRender="region, subregion"/>
+        <apex:actionFunction name="updateFields" reRender="firstNamePanel, lastNamePanel, languageSection"/>
+        <apex:actionFunction name="submit" action="{!submit}"/>
+
+    </apex:form>
+
+</apex:page>

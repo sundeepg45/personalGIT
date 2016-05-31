@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Genesys Gplus for Salesforce</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <namespacePrefix>g_gplus</namespacePrefix>
+    <types>
+        <members>SSOHelperController</members>
+        <members>SSOHelperControllerTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>SSOHelper</members>
+        <name>ApexPage</name>
+    </types>
+    <version>33.0</version>
+</Package>

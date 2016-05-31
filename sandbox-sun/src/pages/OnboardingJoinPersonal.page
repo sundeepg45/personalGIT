@@ -1,0 +1,24 @@
+<apex:page >
+
+   <p><apex:outputText value="{!$Label.Onboarding_Error_Personal_Account}" escape="false"/></p>
+
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+  </style>
+</apex:page>

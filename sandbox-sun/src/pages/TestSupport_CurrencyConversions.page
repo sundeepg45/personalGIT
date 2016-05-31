@@ -1,0 +1,9 @@
+<apex:page controller="TestSupport_CurrencyConversions" showHeader="false">
+    <apex:repeat value="{!datedConversionRateList}" var="conversion">
+        <div id="DatedConversionRate_{!conversion.IsoCode}">{!conversion.ConversionRate}</div>
+    </apex:repeat>    
+
+    <apex:repeat value="{!currencyTypeList}" var="conversion">
+        <div id="CurrencyType_{!conversion.IsoCode}">{!conversion.ConversionRate}</div>
+    </apex:repeat>    
+</apex:page>

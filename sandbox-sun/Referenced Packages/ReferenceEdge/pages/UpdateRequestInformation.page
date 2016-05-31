@@ -1,0 +1,46 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page extensions="refedge.RefRequestProjectController" standardController="refedge__Reference_Request__c" sidebar="false" id="pageId" tabStyle="RE_Search__tab">
+ <!-- Message -->
+    <apex:pageMessages id="msgId"/>
+     <!-- Sction Header-->
+    <apex:sectionHeader title="{!$Label.Fields}"/>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}"> 
+    <div style="float:left ;">
+         <apex:commandLink style="color:#5C95C4;" immediate="true"  value="{!$Label.Back_to_Request_Reference_Use}"  action="{!backToSearch}" id="backCmdLinkId" />
+    </div>
+    <apex:pageBlock >
+    <apex:pageBlockButtons id="pbbIdTop" location="top" >
+         <div style="width:100%;">
+             <div style="float:left ; width: 20%;">
+                 <apex:commandButton value="{!$Label.Done}" action="{!saveChanges}"  id="doneCmdBtnId"/> 
+             </div>
+         </div>
+    </apex:pageBlockButtons>
+    <apex:pageBlockSection columns="1">
+        <apex:repeat value="{!fieldAPINames}" var="fieldName">
+            <apex:inputField rendered="{!fieldVisibleMap[fieldName+refName]}" required="{!fieldRequiredMap[fieldName+refName]}" value="{!rrAddInfo[fieldName]}"/><br/>
+        </apex:repeat>
+     </apex:pageBlockSection>
+   </apex:pageBlock>
+</apex:form>
+</apex:page>

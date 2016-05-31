@@ -1,0 +1,3 @@
+<apex:page showHeader="false" sidebar="false" standardStyleSheets="false" applyBodyTag="false" applyHtmlTag="false" contentType="application/json">
+    { "SessionID" : "{! $Api.Session_ID }", "SessionURL" : "{! $Api.Enterprise_Server_URL_140 }", "SessionUsername" : "{! $User.Username }" }
+</apex:page>

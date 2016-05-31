@@ -1,0 +1,380 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.ReferenceUseFeedbackController" sidebar="false" id="pageId">
+    <apex:outputPanel rendered="{!NOT(isSF1)}">
+        <!-- Override CSS for Page Block div for title  -->
+        <style>
+            .homeTab .tertiaryPalette, .individualPalette .homeBlock .tertiaryPalette, .layoutEdit .individualPalette .homeBlock .tertiaryPalette {
+                background-color: #1796BE !important;
+                border-color: #1796BE !important;
+            }
+        </style>
+        
+        <!-- Add JavaScript & Jquery-->
+        <c:POR_ModalLoader id="PORLoader"/>
+        
+        <!-- Message -->
+        <apex:pageMessages id="pgmsgId"/>
+        <!-- Sction Header-->
+        <apex:sectionHeader title="{!$Label.Reference_Use_Feedback}"/> 
+        <!-- Form -->
+        <apex:form id="formId">
+            
+            <!-- Action Fuctions -->     
+            <apex:actionFunction name="changeOption" reRender="howDidPbsId,pgmsgId" immediate="true" action="{!changeFeedbakOptions}" oncomplete="PORHideLoading();">
+                <apex:param name="feedback" value="" assignTo="{!refReqAccountContact.refedge__Feedback_Status__c}"/>
+            </apex:actionFunction>
+            
+            <!-- Page  Block for Record Deleted-->
+            <apex:pageBlock id="deletedId"  rendered="{!isRecordDeleted}">
+                <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Access_attemped_recordDeleted_Msg}"/> 
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />   
+            </apex:pageBlock>
+            
+            <!-- Page  Block for Already Feedback-->
+            <apex:pageBlock id="submittedId"  rendered="{!AND(isAlreadyFeedback, NOT(isRecordDeleted))}">
+                <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Feedback_already_Processed}"/> 
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />   
+            </apex:pageBlock>
+            
+            <!-- Pageblock for Reference Use Feedback Details -->
+            <apex:pageBlock title="{!$Label.Reference_Use_Feedback}" id="refUseFbId" rendered="{!AND(NOT(isAlreadyFeedback), NOT(isRecordDeleted))}">
+                <!-- PageblockSection for display Reference Use Details -->
+                <apex:pageBlockSection title="{!$Label.Reference_Use_Details}" id="refUseId">
+                    <apex:outputField value="{!refReqAccountContact.Reference_Request_Account__r.Account__r.Name}"/>    
+                    <apex:outputField label="{!$ObjectType.refedge__Reference_Request_Account_Contact__c.Fields.refedge__Contact__c.Label}" value="{!refReqAccountContact.Contact__r.Name}"/>
+                    <apex:outputField value="{!refReqAccountContact.Reference_Request_Account__r.Reference_Type_Needed__r.Name}" label="{!$Label.Reference_Type}"/>
+                    
+                    <apex:outputText value="{0,date,EEE, MMMM d, yyyy}" label="{!$Label.Creation_Date}">
+                        <apex:param value="{!refReqAccountContact.Reference_Request_Account__r.CreatedDate}" /> 
+                    </apex:outputText>
+                    
+                    <apex:outputText value="{0,date,EEE, MMMM d, yyyy}" label="{!$Label.Use_Date}">
+                        <apex:param value="{!refReqAccountContact.Reference_Request_Account__r.refedge__Deadline__c}" /> 
+                    </apex:outputText>
+                    
+                    <apex:outputField value="{!referenceRequest.Opportunity__r.AccountId}" label="{!$Label.Opportunity_Account}" rendered="{!NOT(ISBLANK(referenceRequest.Opportunity__r.AccountId))}"/>
+                    <apex:outputField value="{!referenceRequest.refedge__Opportunity__c}" label="{!$Label.Opportunity_Name}" rendered="{!NOT(ISBLANK(referenceRequest.refedge__Opportunity__c))}"/>
+                </apex:pageBlockSection>
+                
+                <!-- PageblockSection for get Feedback -->
+                <apex:pageBlockSection title="{!$Label.How_did_it_go}"  columns="1" id="howDidPbsId">
+                    <apex:inputField value="{!refReqAccountContact.refedge__Feedback_Status__c}" id="StatusValue" onchange="PORShowLoading();changeOption(this.value);return false;" required="true"/>
+                    <apex:outputPanel id="unsuccessfulPanel" style="padding-left:18%;" rendered="{!refReqAccountContact.refedge__Feedback_Status__c != null}">
+                        <apex:outputPanel rendered="{!OR(refReqAccountContact.refedge__Feedback_Status__c == 'Use completed - Unsuccessful',refReqAccountContact.refedge__Feedback_Status__c == 'Use will not occur')}"><h3>{!$Label.sorry_what_happened}</h3><br/></apex:outputPanel>
+                        <apex:outputPanel rendered="{!refReqAccountContact.refedge__Feedback_Status__c == 'Use not yet completed'}"><h3>Oh, okay. What happened?</h3><br/></apex:outputPanel>
+                        <apex:outputPanel rendered="{!refReqAccountContact.refedge__Feedback_Status__c == 'Use completed - Success'}"><h3>That’s great! Any highlights you want to share?</h3><br/></apex:outputPanel>
+                        <div style="padding-left:18%;">
+                        <apex:pageBlockSectionItem id="whatHappenPbsmsgId" dataStyleClass="padding-left:18%;">
+                            <apex:outputPanel styleClass="requiredInput" layout="block">
+                                <div id="requiredId" class="requiredBlock"></div>
+                                <script>
+                                    document.getElementById('requiredId').style.display = ({!diplayUnsuccessfulPanel} ? 'block' : 'none');
+                                </script>
+                                <apex:inputTextarea cols="50" rows="5" value="{!feedbakResponse}" />    
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        </div>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel id="notcompletedPanel" style="padding-left:18%;" rendered="{!diplayNotcompletedPanel}">
+                        <h3>{!$Label.update_when_ref_use_will_occur}</h3><br/><br/>
+                        <div style="padding-left:18%;">
+                        <apex:pageBlockSectionItem id="deadlinePbsId" dataStyleClass="padding-left:18%;">
+                            <apex:outputPanel styleClass="requiredInput" layout="block" >
+                            <div class="requiredBlock"></div>
+                                <apex:inputField value="{!refReqAccountContact.Reference_Request_Account__r.refedge__Deadline__c}" id="deadlineId"/>    
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        </div>
+                    </apex:outputPanel>
+                    
+                    <apex:commandButton value="{!$Label.Send_Update}" action="{!sendUpdate}" style="margin-left:250px;" immediate="false"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            
+        </apex:form>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!isSF1}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+        <c:SF1_POR_ModalLoader id="PORLoaderSF1"/>
+        <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+        <style>
+            .uiButton.default:hover{
+                background:none;
+                color: #44596c;
+                text-shadow: none;
+            }
+            .sectionHeader {
+                font-size: 13px;
+                padding: 8px 14px;
+                font-weight: normal;
+                text-transform: uppercase;
+                background-color: #e8eaeb;
+                color: #696e71;
+                width: 100%;
+                margin-top: 10px;
+            }
+            .centerDiv {
+                margin: 0 auto;
+                width: 100%;
+                max-width: 768px;
+                font-family: 'ProximaNovaSoft-Regular';
+            }
+            .datarow {
+                border-top: none;
+                padding: 14px 0;
+                padding-left: 14px;
+                font-family: 'ProximaNovaSoft-Regular';
+                color: #4B4D4E;
+                //width: 50%;
+            }
+            .databox {
+                background-color: rgba(252, 252, 252, 0.95);
+                border: 1px solid #bbc0c4;
+                border-radius: 10px;
+                padding: 14px;
+                margin-bottom: 10px;
+            }
+            .sf1label {
+                font-family: 'ProximaNovaSoft-Regular','Helvetica Neue';
+                font-size: 13px;
+                color: #696e71;
+                margin: 0;
+                padding-bottom: 8px;
+                padding-top: 8px;
+                display: block;
+                min-width: 100px;
+            }
+            .selectList {
+                height: auto;
+                background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiP?YsMTguOCw1NS4wNjYsMTcuODY2eiIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=),linear-gradient(#ffffff,#f1f1f1);
+                background-repeat: no-repeat;
+                background-position: 95% 50%;
+                background-size: 16px 16px,100% 100%;
+                color: #3c3d3e;
+                padding: 7px 14px;
+                line-height: 25px;
+                font-family: 'ProximaNovaSoft-Regular';
+                font-size: 15px;
+                align-items: center;
+                width: 100%;
+                border: 1px solid #bbc0c4;
+                border-radius: 5px;
+            }
+            .sf1input, .sf1textarea {
+               width:100%;
+               font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+               font-size: 15px;
+               color: #3c3d3e;
+               padding: 7px 14px;
+               line-height: 25px;
+               border: 1px solid #cfd0d2;
+               border-radius: 5px;
+               background-color: #e8eaeb;
+               box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+               box-sizing: border-box;
+            }
+            
+            .sf1input:focus, .sf1textarea:focus {
+               border: 1px solid #bbc0c4;
+               background-color: #fff;
+               outline-style: none;
+            }
+            .sf1input[type="checkbox"] {
+                -webkit-appearance: none;
+                display: inline-block;
+                height: 22px;
+                margin: 0 6px 0 0;
+                border: 1px solid #c3c6c9;
+                padding: 0;
+                width: 22px;
+                vertical-align: middle;
+                background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+                box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+            }
+            
+            .sf1input[type="checkbox"]:checked {
+                border: 1px solid #2c75a3;
+                background-color: #3b9fdd;
+                -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+                -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+                box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+                background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+                background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+                background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+                background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+                background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            }
+            
+            .sf1input[type="checkbox"]:checked::after {
+                display: block;
+                left: 3px;
+                top: 3px;
+                height: 9px;
+                width: 14px;
+                border-bottom: 4px solid white;
+                border-left: 4px solid white;
+                -webkit-transform: rotate(-45deg);
+                position: relative;
+                content: '';
+            }
+            .datarow a {
+                text-decoration: none;
+                color: #0e7abd;
+            }
+            .datarow a:hover {
+                text-decoration: none;
+                color: #0e7abd;
+            }
+            .leftcolumn{
+                text-align:right;
+                width: 30%;
+            }
+            .rightcolumn{
+                text-align:left;
+                width: 60%;
+            }
+            .dateFormat {
+                display : none !important;
+            }
+            .dateOnlyInput input{
+                width:100% !important;
+            }
+        </style>
+        <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+        <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+        <script> 
+            function testFunction(){
+                if(isSubmitted == 'true' || isRecordDeleted == 'true' || (isRecordDeleted == 'false' && isAlreadyFeedback == 'true')){
+                    sforce.one.navigateToURL('/_ui/core/chatter/ui/ChatterPage');
+                }
+            }
+        </script>
+        <apex:outputPanel id="ErrorId">
+            <script>
+                isSubmitted = '{!isSubmitted}';
+                isRecordDeleted = '{!isRecordDeleted}';
+                isAlreadyFeedback = '{!isAlreadyFeedback}';
+            </script>
+        </apex:outputPanel>
+        
+        <apex:form id="formIdSF1">
+            <apex:actionFunction name="changeOption" reRender="mainDiv,pgmsgIdSF1" immediate="true" action="{!changeFeedbakOptions}" oncomplete="PORHideLoading();">
+                <apex:param name="feedback" value="" assignTo="{!refReqAccountContact.refedge__Feedback_Status__c}"/>
+            </apex:actionFunction>
+            <body style="background:#f0f1f2;line-height: 1;font-size: 14px;">
+                <!-- Panel for Record Deleted-->
+                <apex:outputPanel id="deletedId"  rendered="{!isRecordDeleted}">
+                    <div class="centerDiv">
+                        <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Access_attemped_recordDeleted_Msg}"/> 
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" styleClass="default one uiBlock uiButton forceActionButton" onComplete="testFunction();" onclick="PORShowLoading();" value="{!$Label.Back_to_Home}" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div> 
+                </apex:outputPanel>
+                
+                <!-- Panel for Already Feedback-->
+                <apex:outputPanel id="submittedId"  rendered="{!AND(isAlreadyFeedback, NOT(isRecordDeleted))}">
+                    <div class="centerDiv">
+                        <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Feedback_already_Processed}"/> 
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" styleClass="default one uiBlock uiButton forceActionButton" onComplete="testFunction();" onclick="PORShowLoading();" value="{!$Label.Back_to_Home}"/>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>  
+                </apex:outputPanel>
+            
+                <!-- Panel for Reference Use Feedback Details -->
+                <apex:outputPanel id="mainDiv" rendered="{!AND(NOT(isAlreadyFeedback), NOT(isRecordDeleted))}">
+                    <div class="centerDiv">
+                        <apex:pageMessages id="pgmsgIdSF1"/>
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" styleClass="default one uiBlock uiButton forceActionButton" onComplete="testFunction();" onclick="PORShowLoading();" value="{!$Label.Send_Update}" action="{!sendUpdate}" reRender="formIdSF1,ErrorId,pgmsgIdSF1"/>
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="width:100%;">
+                            <div class="sectionHeader">{!$Label.Reference_Use_Details}</div>
+                            <div class="datarow">
+                                <table style="width:100%;">
+                                    <tr>
+                                        <td class="datarow">
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;"><apex:outputField value="{!refReqAccountContact.Reference_Request_Account__r.Account__r.Name}"/></div>
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;"><apex:outputField label="{!$ObjectType.refedge__Reference_Request_Account_Contact__c.Fields.refedge__Contact__c.Label}" value="{!refReqAccountContact.Contact__r.Name}"/></div>
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;"><apex:outputField value="{!refReqAccountContact.Reference_Request_Account__r.Reference_Type_Needed__r.Name}" label="{!$Label.Reference_Type}"/></div>
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;">
+                                                <apex:outputText value="{0,date,EEE, MMMM d, yyyy}" label="{!$Label.Creation_Date}">
+                                                    <apex:param value="{!refReqAccountContact.Reference_Request_Account__r.CreatedDate}" /> 
+                                                </apex:outputText>
+                                            </div>
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;">
+                                                <apex:outputText value="{0,date,EEE, MMMM d, yyyy}" label="{!$Label.Use_Date}">
+                                                    <apex:param value="{!refReqAccountContact.Reference_Request_Account__r.refedge__Deadline__c}" /> 
+                                                </apex:outputText>
+                                            </div>
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;"><apex:outputField value="{!referenceRequest.Opportunity__r.AccountId}" label="{!$Label.Opportunity_Account}" rendered="{!NOT(ISBLANK(referenceRequest.Opportunity__r.AccountId))}"/></div>
+                                            <div style="padding-left: 14px;font-size: 14px;padding-right: 14px;"><apex:outputField value="{!referenceRequest.refedge__Opportunity__c}" label="{!$Label.Opportunity_Name}" rendered="{!NOT(ISBLANK(referenceRequest.refedge__Opportunity__c))}"/></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="datarow">
+                                            <div class="sf1label"><apex:outPutText value="{!$ObjectType.refedge__Reference_Request_Account_Contact__c.Fields.refedge__Feedback_Status__c.Label}"/><apex:outputText style="color : #CC0000;" value=" * "/></div>
+                                            <div style="padding-left: 14px;padding-right: 14px;"><apex:inputField styleClass="selectList" value="{!refReqAccountContact.refedge__Feedback_Status__c}" id="StatusValue" onchange="PORShowLoading();changeOption(this.value);return false;" required="true"/></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="datarow" style="padding-top: 0;">
+                                            <apex:outputPanel id="unsuccessfulPanel" rendered="{!diplayUnsuccessfulPanel}">
+                                                <div class="sf1label"><apex:outPutText value="{!$Label.sorry_what_happened}"/></div>
+                                                <div style="padding-left: 14px;padding-right: 14px;" class="sf1label"><apex:outPutText value="{!$Label.Notes}"/><apex:outputText style="color : #CC0000;" value=" * "/></div>
+                                                <div style="padding-left: 14px;padding-right: 14px;">
+                                                    <apex:inputTextarea styleClass="sf1textarea" cols="50" rows="5" value="{!feedbakResponse}" />  
+                                                </div>
+                                            </apex:outputPanel>
+                                            <apex:outputPanel id="notcompletedPanel" rendered="{!diplayNotcompletedPanel}">
+                                                <div class="sf1label"><apex:outPutText value="{!$Label.update_when_ref_use_will_occur}"/></div>
+                                                <div style="padding-left: 14px;padding-right: 14px;height:210px;">
+                                                    <apex:inputField styleClass="sf1input" value="{!refReqAccountContact.Reference_Request_Account__r.refedge__Deadline__c}" id="deadlineId"/>  
+                                                </div>
+                                            </apex:outputPanel>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+            </body>
+        </apex:form>
+    </apex:outputPanel>
+</apex:page>

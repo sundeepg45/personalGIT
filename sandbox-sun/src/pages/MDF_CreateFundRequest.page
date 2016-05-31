@@ -1,0 +1,19 @@
+<apex:page standardController="SFDC_Budget__c" extensions="MDF_CreateFundRequest" action="{!confirmUpdate}">
+    <apex:sectionHeader title="{!$ObjectType.SFDC_Budget__c.Label}" />
+
+    <apex:form >
+        <apex:pageBlock title="{!$ObjectType.SFDC_Budget__c.Label}" >
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Common_Cancel}" action="{!cancelUpdate}" />
+            </apex:pageBlockButtons>
+
+            <apex:pageMessages />
+
+            <apex:pageMessage strength="3" severity="Error" rendered="{!NOT(SFDC_Budget__c.Active__c)}" summary="{!$Label.MDF_ErrorBudgetIsInactive}" />
+
+            <apex:pageMessage strength="3" severity="Error" rendered="{!TODAY() > SFDC_Budget__c.End_Date__c}" summary="{!$Label.MDF_ErrorBudgetDatesAreInPast}" />
+
+            <!-- apex:pageMessage strength="3" severity="Error" rendered="{!ISNULL(accountTeamMember)}" summary="You must have at least Read/Write permissions as an Account Team member to create a new Fund Request." / -->
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

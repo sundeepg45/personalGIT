@@ -1,0 +1,125 @@
+<apex:page controller="RequalificationController" title="{!$Label.Requalification_Home}: {!$Label.Requalification_Partner_Agreement_Title}">
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+    </style>
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.Requalification_Partner_Agreement_Title}"/></h2>
+                <apex:pageMessages />   
+            </div>
+        </div>
+    </div>
+
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText escape="false" value="{!$Label.PRQ_PartnerAgreement_Text}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+
+    <apex:form >
+        <apex:pageBlock title="{!$Label.RequalificationPartnerAgree_Prior_Agreements}"  rendered="{!NOT(partnerAgreementList.size == 0)}">
+            <apex:pageBlockTable value="{!partnerAgreementList}" var="partnerAgreement" >
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Requalification_Partner_Agreement_Name}"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.agreement__r.Name}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Requalification_Partner_Agreement_Version}"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.Version__c}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Requalification_Partner_Agreement_Partner_Type}"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.Agreement__r.PartnerType__r.Name}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="Program Type"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.Agreement__r.Partner_Program__r.Program_Category__c}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Requalification_Partner_Agreement_Approval_Status}"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.PartnerApprovalStatus__c}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Requalification_Partner_Agreement_Activation_Date}"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.ActivationDate__c}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Requalification_Partner_Agreement_Expiration_Date}"/></apex:facet>
+                    <apex:outputText value="{!partnerAgreement.ExpirationDate__c}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:outputText rendered="{!partnerAgreementList.size == 0}" value="{!$Label.Requalification_Partner_Agreement_No_Prior_Found}"/>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:pageBlock title="{!$Label.RequalificationPartnerAgree_Current_Agreements}">
+        <apex:pageBlockSection columns="2">
+            <apex:pageBlockSectionItem >
+		        <apex:outputPanel layout="none">
+		            <ul>
+		                <apex:repeat var="agreement" value="{!agreementList}">
+		                    <apex:variable var="agreementAttachmentNumber" value="{!VALUE('1')}" />
+		    
+		                    
+		                       <apex:repeat var="agreementAttachment" value="{!agreement.Attachments}">
+		                        <li>  
+		                        <apex:outputLink value="/servlet/servlet.FileDownload?file={!agreementAttachment.Id}">
+		                            <apex:outputText value="{0}">
+		                                <apex:param value="{!IF((Find('.',agreementAttachment.Name) == 0), agreementAttachment.Name, (LEFT(agreementAttachment.Name,(Find('.',agreementAttachment.Name) -1))))}" />
+		                            </apex:outputText>                          
+		                         </apex:outputLink>
+		                         <apex:outputText value=" ({0})" rendered="{!(agreement.IsSignatureRequired__c || accountCountry.IsAgreementSignatureRequired__c)}">
+		                                <apex:param value="{!$Label.Onboarding_RegisterAgreements_Sig_required}" />
+		                         </apex:outputText>
+		                        </li>
+		                        <apex:variable var="agreementAttachmentNumber" value="{!agreementAttachmentNumber + 1}" />
+		                    </apex:repeat>
+		                </apex:repeat>
+		            </ul>
+		        </apex:outputPanel>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputText ><strong>{!$Label.Requal_Disagree_With_Terms_Contact_CAM}</strong></apex:outputText>
+			</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+		        
+
+    </apex:pageBlock>
+
+    <br/>
+    <apex:form >
+        <apex:outputPanel layout="block">
+             <apex:outputPanel >{!$Label.Onboarding_RegisterAgreements_Ack_terms}</apex:outputPanel>
+             <br/>
+             <apex:selectRadio value="{!requalRec.AgreementState__c}" layout="pageDirection" disabled="{!OR(requalRec.AgreementConfirmed__c,requalRec.AgreementByFaxConfirmed__c)}"> 
+                 <apex:selectOption id="acceptOption" itemLabel="{!$Label.Onboarding_RegisterAgreements_Accepted}" itemValue="Accepted" />
+                 <apex:selectOption id="declineOption" itemLabel="{!$Label.Onboarding_RegisterAgreements_Declined}" itemValue="Declined" />
+            </apex:selectRadio>
+            <apex:outputText value="{!$Label.Onboarding_RegisterAgreements_If_Declined_Why}"/> <br />
+            <apex:inputTextArea id="declineReasonText" disabled="{!OR(requalRec.AgreementConfirmed__c,requalRec.AgreementByFaxConfirmed__c)}" value="{!requalRec.AgreementDeclinedReason__c}" cols="60" rows="5"/>
+        </apex:outputPanel>
+        <br/>
+       <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Back_to_Requalification_Home}"
+                            action="{!viewHome}" />
+                        <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" action="{!confirmAgreement}" value="{!$Label.PRQ_Agreement_Confirm}" styleClass="rowbutton" disabled="{!OR(requalRec.AgreementConfirmed__c,requalRec.AgreementByFaxConfirmed__c)}" />
+                        <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" action="{!confirmAgreementByFax}" value="{!$Label.PRQ_Confirm_By_Fax}" styleClass="rowbutton" disabled="{!OR(requalRec.AgreementByFaxConfirmed__c,requalRec.AgreementConfirmed__c)}"/>
+                       <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+       
+    </apex:form>
+
+
+</apex:page>

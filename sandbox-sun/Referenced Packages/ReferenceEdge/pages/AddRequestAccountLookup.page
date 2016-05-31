@@ -1,0 +1,83 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pgLookup" controller="refedge.AddRequestAccountLookupController" showHeader="false" sidebar="false" cache="true">
+    <apex:pageMessages id="pgMsg"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <c:POR_ModalLoader id="loadingModalId"/>
+
+    <!-- Script-->
+    <script>
+        window.returnValue = null;
+        var returnedArray = new Array();
+        function callParent(Id, Name) {
+            var winMain = window.opener;
+            if (null == winMain){
+                winMain = window.parent.opener;
+            }
+            winMain.closePopup(Id, Name);  
+        }
+    </script>
+    
+    <apex:form id="frmLookup" style="margin-left:1%" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader id="shLookup" title="{!$Label.Lookup}"/>
+        <apex:outputPanel id="opSearch" >
+            <apex:inputText id="accName" value="{!searchText}" html-placeholder="{!$Label.Search}..."/>&nbsp; 
+            <apex:commandButton id="btnGo" value="{!$Label.Go}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" action="{!search}" reRender="pgMsg,pbLookup,opMessage,opSearch"/>
+            <br />
+            <apex:outputLabel value="{!$Label.Lookup_search_message}" />
+            <br />
+            <br />
+            <apex:outputPanel rendered="{!searchText != ''}">
+                <apex:commandLink value="{!$Label.Clear_Search_Results}" action="{!search}">
+                    <apex:param value="" name="searchText" assignTo="{!searchText}"/>
+                </apex:commandLink>
+                <br/>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:outputPanel id="opMessage" >
+            <apex:outputLabel style="color:red;" value="{!$Label.Search_maximun_rows_message}"  rendered="{!accountList.size > 200}"/>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="pbLookup">
+            <apex:pageBlock mode="edit">
+                <apex:pageBlockTable rendered="{!accountList.size >0}" value="{!accountList}" var="acc">
+                    <apex:column headervalue="{!$ObjectType.Account.fields.Name.label}" onclick="javascript : callParent('{!JSENCODE(acc.Id)}','{!JSENCODE(acc.Name)}');return false;">
+                        <apex:outputLink value="{!acc.Id}">{!acc.Name}</apex:outputLink>
+                    </apex:column>
+                    
+                    <apex:column value="{!acc.Site}" />
+                    <apex:column value="{!acc.Type}" />
+                </apex:pageBlockTable>
+                
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem rendered="{!accountList.size = 0}" >
+                        <apex:outputLabel style="color:red;" value="{!$Label.No_Records_Found}"></apex:outputLabel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+    
+    <script>
+        jQuery(".pageTitleIcon").attr("src","{!URLFOR($Resource.refedge__RESearchFilterIcons, 'search-icon.png')}");
+        jQuery("body .bPageTitle .ptBody h1.noSecondHeader").attr("style","font-weight:bold");
+    </script>
+</apex:page>

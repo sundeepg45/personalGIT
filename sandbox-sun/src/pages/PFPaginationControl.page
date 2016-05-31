@@ -1,0 +1,80 @@
+<apex:page controller="PFController" showHeader="false"
+	standardStylesheets="false" sidebar="false" >
+		<apex:form >
+			<div class="pagination">
+				<apex:outputText rendered="{!result.currentPage != 1}">			
+					<span>
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkFirst" action="{!ChangePage}" value="|<<">
+							<apex:param name="currentPage" value="1"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.prevPage != -1}">			
+					<span>
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkPrevText" action="{!ChangePage}" value="{!$Label.PF_Pagination_Prev}">
+							<apex:param name="currentPage" value="{!result.prevPage}"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.skipFivePrevPages != -1}">			
+				<span>
+					<apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipFivePrev" action="{!ChangePage}" value="...">
+						<apex:param name="currentPage" value="{!result.skipFivePrevPages}"/>
+					</apex:commandLink>
+				</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.skipPrevPage != -1}">			
+					<span>
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipPrev" action="{!ChangePage}" value="{!result.skipPrevPage}">
+							<apex:param name="currentPage" value="{!result.skipPrevPage}"/>
+						</apex:commandLink>
+					</span>					
+				</apex:outputText>
+				<apex:outputText rendered="{!result.prevPage != -1}">			
+					<span>
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkPrev" action="{!ChangePage}" value="{!result.prevPage}">
+							<apex:param name="currentPage" value="{!result.prevPage}"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+				<span>
+					<span class="current" id="page1Top">{!result.currentPage}</span>
+				</span>
+				<apex:outputText rendered="{!result.nextPage != -1}">			
+					<span>	
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkNext" action="{!ChangePage}" value="{!result.nextPage}">
+							<apex:param name="currentPage" value="{!result.nextPage}"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.skipNextPage != -1}">			
+					<span>
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipNext" action="{!ChangePage}" value="{!result.skipNextPage}">
+							<apex:param name="currentPage" value="{!result.skipNextPage}"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.skipFiveNextPages != -1}">			
+				<span>
+					<apex:commandLink styleClass="gwt-Anchor" id="pageLinkSkipFiveNext" action="{!ChangePage}" value="...">
+						<apex:param name="currentPage" value="{!result.skipFiveNextPages}"/>
+					</apex:commandLink>
+				</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.nextPage != -1}">			
+					<span>	
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkNextText" action="{!ChangePage}" value="{!$Label.PF_Pagination_Next}">
+							<apex:param name="currentPage" value="{!result.nextPage}"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+				<apex:outputText rendered="{!result.currentPage != result.totalPages}">			
+					<span>
+						<apex:commandLink styleClass="gwt-Anchor" id="pageLinkLast" action="{!ChangePage}" value=">>|">
+							<apex:param name="currentPage" value="{!result.totalPages}"/>
+						</apex:commandLink>
+					</span>
+				</apex:outputText>
+			</div>
+		</apex:form>
+</apex:page>

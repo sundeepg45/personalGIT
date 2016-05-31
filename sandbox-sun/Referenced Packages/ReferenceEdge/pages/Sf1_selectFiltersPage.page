@@ -1,0 +1,383 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="refedge.RfSearchController">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:pageMessages id="pgmsgId"/>
+    <style>
+        .center{
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+            background-color: #f0f1f2;
+            -webkit-box-flex: 1;
+        }
+        .labelCol1{
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            display: block;
+            word-wrap: break-word;
+            float: left;
+            width:100%;
+            
+            
+        }
+        .labelColLarge{
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            display: block;
+            word-wrap: break-word;
+        }
+        .dataCol{
+            font-size: 15px;
+            color: #3c3d3e;
+            font-weight: normal;
+            min-height: 20px;
+            word-wrap: break-word;
+        }
+        .child1{
+            padding:10px;
+            width:80%;
+            float:left;
+        }
+        .sf1input, .sf1textarea {
+           width:100%;
+           font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+           font-size: 15px;
+           color: #3c3d3e;
+           padding: 7px 14px;
+           line-height: 25px;
+           border: 1px solid #cfd0d2;
+           border-radius: 5px;
+           background-color: #e8eaeb;
+           box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+           box-sizing: border-box;
+           resize: vertical;
+           -webkit-appearance: none;
+           height: 80px;
+           -webkit-user-drag: none;
+           -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+        
+        .sf1input:focus, .sf1textarea:focus {
+           border: 1px solid #bbc0c4;
+           background-color: #fff;
+           outline-style: none;
+        }
+        .container{
+            width:100%;
+            float:left;
+            overflow-x:hidden;
+        }
+        .child2{
+            background-color: rgba(252, 252, 252, 0.95);
+            border: 1px solid #bbc0c4;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            padding:10px;
+            width:100%;
+            float:left;
+        }
+        .requiredField{
+            padding-left: 2px;
+            color: #BD230E;
+            font-family: 'ProximaNovaSoft-Bold';
+        }
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        a{
+            color: #0e7abd;
+            text-decoration: none;
+        }
+        .sf1button {
+        font-size: 16px;
+        color: #44596c;
+        text-shadow: none;
+        margin: 0;
+        padding: 4px 14px;
+        height: 35px;
+        font-size: 16px;
+        font-family: 'ProximaNovaSoft-Semibold';
+        font-weight: normal;
+        border: 1px solid #bbc0c4;
+        border-radius: 5px;
+        background: -moz-linear-gradient(#ffffff,#f1f1f1);
+        background: -webkit-linear-gradient(#ffffff,#f1f1f1);
+        background: -ms-linear-gradient(#ffffff,#f1f1f1);
+        background: linear-gradient(#ffffff,#f1f1f1);
+        box-shadow: none;
+        text-align: center;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .sf1input[type="checkbox"] {
+        -webkit-appearance: none;
+        display: inline-block;
+        height: 22px;
+        margin: 0 6px 0 0;
+        border: 1px solid #c3c6c9;
+        padding: 0;
+        width: 22px;
+        vertical-align: middle;
+        background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0%,rgba(255,255,255,0.05) 100%);
+        box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+    }
+    .sf1input[type="checkbox"]:checked {
+            border: 1px solid #2c75a3;
+        background-color: #3b9fdd;
+        -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+        -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+        box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+        background-image: -webkit-gradient(linear,50% 100%,50% 0%,color-stop(0%,#3b9fdd),color-stop(100%,#3b9fdd));
+        background-image: -webkit-linear-gradient(bottom,#3b9fdd 0%,#3b9fdd 100%);
+        background-image: -moz-linear-gradient(bottom,#3b9fdd 0%,#3b9fdd 100%);
+        background-image: -o-linear-gradient(bottom,#3b9fdd 0%,#3b9fdd 100%);
+        background-image: linear-gradient(bottom,#3b9fdd 0%,#3b9fdd 100%);
+     }
+        
+     .sf1input[type="checkbox"]:checked::after {
+         display: block;
+        left: 3px;
+        top: 3px;
+        height: 6px;
+         width: 10px;
+        border-bottom: 4px solid white;
+        border-left: 4px solid white;
+        -webkit-transform: rotate(-45deg);
+        position: relative;
+        content: '';
+     }
+    .sf1Button .label{
+            font-size: 16px;
+            color: #44596c;
+            text-shadow: none;
+            cursor: pointer;
+            font-family: 'ProximaNovaSoft-Semibold';
+            display: inline-block;
+        }
+      .sf1OutputLabel{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .osOutputLabel{
+        font-size: 15px;
+        font-family: 'ProximaNovaSoft-Regular';
+        color: #3c3d3e;
+        -webkit-font-smoothing: antialiased;
+      }
+      .title{
+        border-top: none;
+        border-bottom: none;
+        margin-top: 0;
+        margin: 21px 0 7px;
+        font-size: 13px;
+        padding: 8px 14px;
+        font-weight: normal;
+        text-transform: uppercase;
+        background-color: #e8eaeb;
+        width: 100%;
+        color: #696e71;
+        font-family: Arial,Helvetica,sans-serif;
+      }
+    </style>
+    
+    
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <body >
+        <apex:Form rendered="{!isFullLicenseAccessible}">
+         <apex:outputPanel layout="block">
+         <div  class="center"  style="margin:0;max-width:100%;">
+            <div class="container"  style="background-color: #f0f1f2;height:100%;">
+                <apex:outputPanel layout="block" style="width:100%;overflow-y:auto;" rendered="{!filterClass.isLabelFilterSelected}" >
+                    <div class="child1">
+                        <apex:actionFunction name="saveFiltersSelected" action="{!filterClass.saveFiltersSelected}" >
+                        </apex:actionFunction>
+                        <apex:actionFunction name="cancel" action="{!filterClass.cancel}" >
+                        </apex:actionFunction>
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;margin-bottom:1%;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <button class="sf1button" onclick="PORShowLoading();cancel();"  accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Cancel}</span>
+                                    </button>
+                                    <button class="sf1button"   onclick="PORShowLoading();saveFiltersSelected();" accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Save}</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <apex:repeat value="{!filterClass.allLabelAttributeWrappers}" var="filter">
+                            <apex:outputPanel rendered="{!filter.label.id = filterClass.selectedFilterId}">
+                                <h4 class="title primaryPaletteBorder" style="display:block;">{!filter.label.Name}</h4>
+                                <apex:repeat value="{!filter.associatedAttributes}" var="attribute" id="labelType">
+                                    <div class="child1">    
+                                        <div class="uiInput uiInputCheckbox" style="float:left;width:100%;margin-bottom:2px;">
+                                             <apex:inputCheckBox style="float:left;" styleClass="sf1input"   value="{!attribute.isSelected}"/>
+                                             <div style="float:left;width:80%;padding-left:2%;word-wrap: break-word;">
+                                                <apex:outputLabel styleclass="osOutputLabel" value="{!attribute.attLabel.Attribute__r.Name}"/> 
+                                             </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                                <apex:outputPanel layout="block" rendered="{!filter.associatedAttributes.size = 0}">
+                                    <apex:outputLabel styleclass="osOutputLabel" value="{!$Label.No_Data_Found}" />
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" style="width:100%;overflow-y:auto;" rendered="{!filterClass.isReferenceabilityFilterSelected}" >
+                    <div class="child1">
+                        <apex:actionFunction name="saveRefTypeSelected" action="{!filterClass.saveRefTypeSelected}" >
+                        </apex:actionFunction>
+                        <apex:actionFunction name="cancel" action="{!filterClass.cancel}" >
+                        </apex:actionFunction>
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;margin-bottom:1%;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <button class="sf1button" onclick="cancel();"  accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Cancel}</span>
+                                    </button>
+                                    
+                                    <button class="sf1button"   onclick="saveRefTypeSelected();" accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Save}</span>
+                                    </button>
+                                    
+                                </li>
+                            </ul>
+                        </div>
+                            <apex:outputPanel layout="block"  id="mainRefType">
+                                <h4 class="title primaryPaletteBorder" style="display:block;">{!$Label.Referenceability}</h4>
+                            <apex:repeat value="{!filterClass.allReferenceability}" var="refType" id="refType">
+                                <div class="child1">    
+                                    <div class="uiInput uiInputCheckbox" style="float:left;width:100%;margin-bottom:2px;">
+                                         <apex:inputCheckBox style="float:left;" styleClass="sf1input"   value="{!refType.isSelected}"/>
+                                         <div style="float:left;width:80%;padding-left:2%;word-wrap: break-word;">
+                                            <apex:outputLabel styleclass="osOutputLabel" value="{!refType.referenceability.Name}"/> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </apex:repeat>
+                            <apex:outputPanel layout="block" rendered="{!filterClass.allReferenceability.size = 0}">
+                                <apex:outputLabel styleclass="osOutputLabel" value="{!$Label.No_Data_Found}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" style="width:100%;overflow-y:auto;" rendered="{!filterClass.isContentTypeFilterSelected}" >
+                    <div class="child1">
+                        <apex:actionFunction name="saveconTypeSelected" action="{!filterClass.saveContentTypeSelected}" >
+                        </apex:actionFunction>
+                        <apex:actionFunction name="cancel" action="{!filterClass.cancel}" >
+                        </apex:actionFunction>
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;margin-bottom:1%;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <button class="sf1button" onclick="cancel();"  accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Cancel}</span>
+                                    </button>
+                                    <button class="sf1button"   onclick="saveconTypeSelected();" accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Save}</span>
+                                    </button>
+                                    
+                                </li>
+                            </ul>
+                        </div>
+                            <apex:outputPanel layout="block"  id="mainType">
+                                <h4 class="title primaryPaletteBorder" style="display:block;">{!$Label.Content_Types}</h4>
+                            <apex:repeat value="{!filterClass.allContentType}" var="conType" id="contType">
+                                <div class="child1">    
+                                    <div class="uiInput uiInputCheckbox" style="float:left;width:100%;margin-bottom:2px;">
+                                         <apex:inputCheckBox style="float:left;" styleClass="sf1input"   value="{!conType.isSelected}"/>
+                                                            
+                                        <div style="float:left;width:80%;padding-left:2%;word-wrap: break-word;">
+                                         <apex:outputLabel styleclass="osOutputLabel" value="{!conType.contentTypeName}"/> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </apex:repeat>
+                            <apex:outputPanel layout="block" rendered="{!filterClass.allContentType.size = 0}">
+                                <apex:outputLabel styleclass="osOutputLabel" value="{!$Label.No_Data_Found}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" style="width:100%;overflow-y:auto;" rendered="{!filterClass.isLanguageFilterSelected}" >
+                    <div class="child1">
+                        <apex:actionFunction name="savelanguage" action="{!filterClass.saveLanguageSelected}" >
+                        </apex:actionFunction>
+                        <apex:actionFunction name="cancel" action="{!filterClass.cancel}" >
+                        </apex:actionFunction>
+                        <div class="actionButtons" style="margin-top:1%;text-align:center;margin-bottom:1%;">
+                            <ul class="buttonList horizontal forceButtonBar">
+                                <li class="buttonItem">
+                                    <button class="sf1button" onclick="cancel();"  accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Cancel}</span>
+                                    </button>
+                                    <button class="sf1button"   onclick="savelanguage();" accesskey="" type="button" >
+                                        <span class=" label bBody truncate" style="color: #44596c;" dir="ltr" >{!$Label.Save}</span>
+                                    </button>
+                                    
+                                </li>
+                            </ul>
+                        </div>
+                            <apex:outputPanel layout="block"  id="mainConType">
+                                <h4 class="title primaryPaletteBorder" style="display:block;">{!$Label.Content_Language}</h4>
+                            <apex:repeat value="{!filterClass.allLanguage}" var="lang" id="contLang">
+                                <div class="child1">    
+                                    <div class="uiInput uiInputCheckbox" style="float:left;width:100%;margin-bottom:2px;">
+                                         <apex:inputCheckBox style="float:left;" styleClass="sf1input"   value="{!lang.isSelected}"/>
+                                        <div style="float:left;width:80%;padding-left:2%;word-wrap: break-word;">
+                                         <apex:outputLabel styleclass="osOutputLabel" value="{!lang.language}"/> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </apex:repeat>
+                            <apex:outputPanel layout="block" rendered="{!filterClass.allLanguage.size = 0}">
+                                <apex:outputLabel styleclass="osOutputLabel" value="{!$Label.No_Data_Found}" />
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                </apex:outputPanel>
+            </div>
+        </div>
+        </apex:outputPanel>
+    </apex:Form>
+    </body>
+</apex:page>

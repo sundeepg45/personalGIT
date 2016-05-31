@@ -1,0 +1,6 @@
+<apex:page standardController="NFR_Request__c" extensions="NFRApprovalExtension" action="{!submitForApproval}">
+    <apex:form >
+        <apex:pageMessages />
+        <br/>&nbsp;<apex:commandButton value="{!$Label.NFRApproval_Back_To_NFR}R" action="{!cancel}"/>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,25 @@
+<apex:page standardController="Lead" tabStyle="Lead">
+   
+
+
+<apex:pageBlock >
+
+<apex:pageBlockSection columns="2"  >
+
+<apex:outputField value="{!Lead.Partner_Full_Name__c}"/>
+<apex:outputField value="{!Lead.Reseller_Email__c}"/>
+<apex:outputField value="{!Lead.Partner_Account_Name__c}"/>
+<apex:outputField value="{!Lead.Reseller_Phone__c}"/>
+<apex:outputField value="{!Lead.PartnerAccount.Finder_Partner_Tier__r.Name}" label="Partner Tier"/>
+<apex:outputField value="{!Lead.PartnerAccount.Finder_Partner_Type__r.Name}" label="Partner Type"/>
+<apex:outputField value="{!Lead.PartnerAccount.PartnerStatuses__c}"/>
+<apex:outputField value="{!Lead.PartnerAccount.Owner__r.Name}" label="Partner Manager"/>
+<apex:outputField value="{!Lead.PartnerAccount.BillingCountry}"/>
+<apex:outputField value="{!Lead.Partner_Program_Participation__c}"/>
+<apex:outputField value="{!Lead.Red_Hat_can_contact_the_Customer__c}"/>
+<apex:outputField value="{!Lead.I_need_additional_sales_presales_support__c}"/>
+
+</apex:pageBlockSection>
+</apex:pageBlock>
+
+</apex:page>

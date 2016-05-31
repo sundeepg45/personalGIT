@@ -1,0 +1,150 @@
+<apex:page controller="PDFReportController" applyBodyTag="true" showHeader="false" tabStyle="report" standardStylesheets="true" sidebar="false" showChat="false" id="report">
+  <apex:stylesheet value="{!URLFOR($Resource.Reports, '/Reports.css')}"/>
+  <style>
+@media print {    
+  .noprint, .noprint * { display: none !important; }
+}
+  </style>
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/Reports.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/cdnjs.cloudflare.com/ajax/libs/d3/3.3.3/d3.min.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/cdnjs.cloudflare.com/ajax/libs/nvd3/1.0.0-beta/nv.d3.min.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/2014-02-05/canvg.googlecode.com/svn/trunk/rgbcolor.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/2014-02-05/canvg.googlecode.com/svn/trunk/StackBlur.js')}" />
+  <apex:includeScript value="{!URLFOR($Resource.Reports, '/2014-02-05/canvg.googlecode.com/svn/trunk/canvg.js')}" />
+  <script type="text/javascript">
+  var reportOptions = {
+    ReportId: '{!$CurrentPage.parameters.id}',
+    XAxisLabel: '{!JSENCODE(BLANKVALUE($CurrentPage.parameters.xaxis,$Label[$CurrentPage.parameters.name+'_xaxis']))}',
+    YAxisLabel: '{!JSENCODE(BLANKVALUE($CurrentPage.parameters.yaxis,$Label[$CurrentPage.parameters.name+'_yaxis']))}',
+    Title: '{!JSENCODE(BLANKVALUE($CurrentPage.parameters.title,$Label[$CurrentPage.parameters.name+'_title']))}',
+    SubTitle: '{!JSENCODE($CurrentPage.parameters.subtitle)}',
+    PDFPage: '{!JSENCODE(BLANKVALUE($CurrentPage.parameters.pdfpage,'/apex/ReportPDF'))}',
+    AggregateNum: {!JSENCODE(BLANKVALUE($CurrentPage.parameters.aggregatenum,'1'))},
+    ChartId: 'chart1',
+    Session_ID: '{!$Api.Session_ID}',
+    pv: [
+      '{!JSENCODE($CurrentPage.parameters.pv0)}',
+      '{!JSENCODE($CurrentPage.parameters.pv1)}',
+      '{!JSENCODE($CurrentPage.parameters.pv2)}',
+      '{!JSENCODE($CurrentPage.parameters.pv3)}',
+      '{!JSENCODE($CurrentPage.parameters.pv4)}',
+      '{!JSENCODE($CurrentPage.parameters.pv5)}',
+      '{!JSENCODE($CurrentPage.parameters.pv6)}',
+      '{!JSENCODE($CurrentPage.parameters.pv7)}',
+      '{!JSENCODE($CurrentPage.parameters.pv8)}',
+      '{!JSENCODE($CurrentPage.parameters.pv9)}',
+      '{!JSENCODE($CurrentPage.parameters.pv10)}',
+      '{!JSENCODE($CurrentPage.parameters.pv11)}',
+      '{!JSENCODE($CurrentPage.parameters.pv12)}',
+      '{!JSENCODE($CurrentPage.parameters.pv13)}',
+      '{!JSENCODE($CurrentPage.parameters.pv14)}',
+      '{!JSENCODE($CurrentPage.parameters.pv15)}',
+      '{!JSENCODE($CurrentPage.parameters.pv16)}',
+      '{!JSENCODE($CurrentPage.parameters.pv17)}',
+      '{!JSENCODE($CurrentPage.parameters.pv18)}',
+      '{!JSENCODE($CurrentPage.parameters.pv19)}' ] };
+  </script>
+  <script type="text/javascript">
+    function showButtons(options) {
+      document.getElementById('report:form:innerHTML').value = document.getElementById('generatedReport').innerHTML;
+      document.getElementById('report:form:pdfPage').value = options.PDFPage+'?Title='+escape(options.Title)+'&SubTitle='+escape(options.SubTitle);
+    }
+  </script>
+  <script type="text/javascript">
+    function convertSvgToCanvasComplete() {
+      document.getElementById(reportOptions.ChartId).parentNode.setAttribute('style','overflow:visible;width:820;height:620');
+      try {
+        document.getElementById(reportOptions.ChartId+'Wait').setAttribute('style','display:none');
+      }
+      catch(e) {}
+      try {
+        a = $('input[value*="Print Report"]');
+        if(a) { a.css("display","inline"); }
+      }
+      catch(e) {}
+      try {
+        var a = $('input[value*="Download PDF"]');
+        if(a) { a.css("display","inline"); }
+      }
+      catch(e) {}
+    }
+  </script>
+  <apex:form id="form">
+    <apex:inputHidden id="innerHTML" value="{!innerHTML}"/>
+    <apex:inputHidden id="pdfPage" value="{!PDFPage}"/>
+    <div class="noprint">
+    <apex:sectionHeader title="{!BLANKVALUE($CurrentPage.parameters.title,$Label[$CurrentPage.parameters.name+'_title'])}" subtitle="{!$CurrentPage.parameters.subtitle}"/>
+    </div>
+    <apex:pageBlock >
+      <apex:pageMessages id="pageMessages"/>
+      <apex:pageBlockButtons location="top" styleClass="noprint">
+        <apex:commandButton value="{!$Label.Print_Report}" id="PrintReport" style="display:none" onclick="window.print();return false" />
+        <apex:commandButton value="{!$Label.Download_PDF}" id="DownloadPDF" style="display:none" action="{!openPDF}" onclick="convertToImage(reportOptions.ChartId);showButtons(reportOptions);return true;" />
+      </apex:pageBlockButtons>
+      <div class="bGeneratedReport" id="generatedReport">
+        <div style="page-break-inside:avoid;">
+          <apex:pageBlockSection collapsible="false"
+            columns="1"
+            title="{!BLANKVALUE($CurrentPage.parameters.title,$Label[$CurrentPage.parameters.name+'_title'])}: {!$CurrentPage.parameters.subtitle}">
+            <apex:outputPanel layout="none">
+              <div class="reportBlock" id="reportBlock">
+                <apex:image width="200" height="200" url="{!URLFOR($Resource.LoadingAnimation)}" alt="Loading... Please Wait."/>
+              </div>
+            </apex:outputPanel>
+            <apex:outputPanel >
+              <apex:outputLabel value="Report Run Date: " for="ReportRunDate"/>
+              <apex:outputField value="{!event.ActivityDateTime}" id="ReportRunDate"/>
+            </apex:outputPanel>
+          </apex:pageBlockSection>
+        </div>
+        <div style="page-break-inside:avoid;">
+          <apex:pageBlockSection collapsible="false"
+            columns="1"
+            title="{!BLANKVALUE($CurrentPage.parameters.title,$Label[$CurrentPage.parameters.name+'_title'])}: {!$CurrentPage.parameters.subtitle}">
+            <img id="chart1Wait" width="200" height="200" src="{!URLFOR($Resource.LoadingAnimation)}" alt="Loading... Please Wait."/>
+            <apex:outputPanel layout="block" style="width:1px;height:1px;overflow:hidden">
+              <svg id="chart1" height="600px" width="800px" />
+            </apex:outputPanel>
+            <apex:outputPanel >
+              <apex:outputLabel value="Report Run Date: " for="ReportRunDate"/>
+              <apex:outputField value="{!event.ActivityDateTime}" id="ReportRunDate"/>
+            </apex:outputPanel>
+          </apex:pageBlockSection>
+        </div>
+      </div>
+    </apex:pageBlock>
+  </apex:form>
+  <script type="text/javascript">
+ $(document).ready(function(){
+  $('body').attr('class','hasMotif reportTab reportRunPage sfdcBody brandQuaternaryBgr');
+  // Make sure you're using a MATRIX Report
+  $.ajax('/services/data/v29.0/analytics/reports/'+reportOptions.ReportId+'/describe',{
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('Authorization', 'Bearer '+reportOptions.Session_ID);
+    },
+    success: function (describeResponse) {
+      for(var i=0;i != reportOptions.pv.length && i != describeResponse.reportMetadata.reportFilters.length;i++) {
+        if(reportOptions.pv[i] != '') {
+          describeResponse.reportMetadata.reportFilters[i].value=reportOptions.pv[i];
+        }
+      }
+      $.ajax({
+        type:'POST',
+        url:'/services/data/v29.0/analytics/reports/'+reportOptions.ReportId,
+        data: JSON.stringify({ reportMetadata: describeResponse.reportMetadata }),
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('Authorization', 'Bearer '+reportOptions.Session_ID);
+        },
+        success: function(response) {
+          $("#reportBlock").html(generateMaxtrixReportTable(response));
+          generateMatrixReportChart(prepareData(response,reportOptions.AggregateNum),reportOptions);
+          convertSvgToCanvasWhenReady(reportOptions.ChartId,0);
+        }
+      });
+    }
+  });
+});
+  </script>
+</apex:page>

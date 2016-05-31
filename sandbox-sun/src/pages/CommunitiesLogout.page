@@ -1,0 +1,20 @@
+<apex:page showHeader="false" sidebar="false">
+<!--
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script>
+        var $j = jQuery.noConflict();
+        $j( document ).ready(function() {
+            var ssoLogoutURL = "{!$Label.Communities_SSO_Logout_URL}";
+            window.location.href = ssoLogoutURL;
+        });
+    </script>
+-->
+  <apex:iframe src="{!$Site.Prefix}/secur/logout.jsp" height="1" width="1"/>
+  <script>
+      function redirectToSSOLogout() {
+          window.location.href="{!$Label.Communities_SSO_Logout_URL}";
+      }
+      setTimeout("redirectToSSOLogout()", 2500);
+  </script>
+
+</apex:page>

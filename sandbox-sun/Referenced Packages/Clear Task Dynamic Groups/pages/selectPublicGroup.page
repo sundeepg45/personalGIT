@@ -1,0 +1,26 @@
+<apex:page standardController="APPR_DGRP__Dynamic_Group__c" extensions="APPR_DGRP.PublicGroupController">
+    <apex:sectionHeader title="Select Public Group" 
+    	subtitle="{!dynamicGroup.Name}"
+    	description="Select one public group to associate the dynamic group with. Public groups that have already been assigned to a dynamic group do not appear in the list."/>
+
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveGroup}" value="Save" rendered="{!isRend}"/>
+                <apex:commandButton action="{!cancel}" immediate="true" value="Cancel"/>
+            </apex:pageBlockButtons>
+    
+            <apex:outputPanel rendered="{!isRend}">
+                <apex:selectList size="20" value="{!dynamicGroup.APPR_DGRP__Group_Id__c}">
+                    <apex:selectOptions value="{!availableGroups}"/>
+                </apex:selectList>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!NOT(isRend)}">
+            	<apex:pageMessage summary="No Public Groups available to assign."
+            		severity="error" strength="3" />
+                
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

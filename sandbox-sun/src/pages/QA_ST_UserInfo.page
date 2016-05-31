@@ -1,0 +1,118 @@
+<apex:page controller="QA_ST_UserInfoController" >
+
+<style>
+    table tr td:first-child {
+    	font-weight: bold;
+    }
+</style>
+
+<apex:outputPanel rendered="{!stuser != null}">
+    <table>
+        <tr>
+            <th></th>
+            <th span="2">Salesforce</th>
+            <th span="2">SumTotal</th>
+        </tr>
+        <tr>
+            <td>SF ID</td>
+            <td id="sfid">{!sfuser.id}</td>
+            <td id="stid">{!stuser.sfid}</td>
+        </tr>
+        <tr>
+            <td>ST ID</td>
+            <td id="sfstid">{!sfuser.SumTotal_ID__c}</td>
+            <td id="ststid">{!stuser.sumtotalid}</td>
+        </tr>
+        <tr>
+            <td>Name</td>
+            <td id="sfname">{!sfuser.FirstName} {!sfuser.LastName}</td>
+            <td id="stname">{!stuser.firstname} {!stuser.lastname}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td id="sfemail">{!sfuser.Email}</td>
+            <td id="stemail">{!stuser.email}</td>
+        </tr>
+        <tr>
+            <td>Manager ID</td>
+            <td id="sfmanagerid">{!sfuser.Contact.Owner.SumTotal_ID__c}</td>
+            <td id="stmanagerid">{!stuser.managerid}</td>
+        </tr>
+        <tr>
+            <td>Job Functions</td>
+            <td id="sfjob">{!jobs}</td>
+            <td id="stjob">{!stuser.jobfunctions}</td>
+        </tr>
+        <tr>
+            <td>Security Role</td>
+            <td>n/a</td>
+            <td id="stsecurityrole">{!stuser.securityrole}</td>
+        </tr>
+        <tr>
+            <td>Language</td>
+            <td id="sflang">{!sfuser.LanguageLocaleKey}</td>
+            <td id="stlang">{!stuser.language}</td>
+        </tr>
+        <tr>
+            <td>Country</td>
+            <td id="sfcountry">
+                <apex:outputPanel rendered="{!sfuser.Contact.Account.ShippingCountry == null}">
+	                {!sfuser.Contact.Account.BillingCountry}
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!sfuser.Contact.Account.ShippingCountry != null}">
+	                {!sfuser.Contact.Account.ShippingCountry}
+                </apex:outputPanel>
+            </td>
+            <td id="stcountry">{!stuser.country}</td>
+        </tr>
+        <tr>
+            <td>Domain/Region</td>
+            <td id="sfregion">
+            <apex:outputPanel rendered="{!sfuser.ContactId != null}">
+				{!sfuser.Contact.Account.Global_Region__c}
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!sfuser.ContactId == null}">
+				{!sfuser.Region__c}
+            </apex:outputPanel>
+        	</td>
+            <td id="stregion">{!stuser.domain}</td>
+        </tr>
+        <tr>
+            <td>Organization</td>
+            <td id="sforg">{!sfuser.Contact.Account.Finder_Partner_Tier_Name__c} {!sfuser.Contact.Account.Finder_Partner_Type_Name__c}</td>
+            <td id="storg">{!stuser.organization}</td>
+        </tr>
+        <tr>
+            <td>Subregion</td>
+            <td id="sfsubregion">{!sfuser.Contact.Account.Subregion__c}</td>
+            <td id="stsubregion">{!stuser.subregion}</td>
+        </tr>
+        <tr>
+            <td>Account ID</td>
+            <td id="sfaccountid">{!sfuser.Contact.AccountId}</td>
+            <td id="staccountid">{!stuser.accountid}</td>
+        </tr>
+        <tr>
+            <td>Account Name</td>
+            <td id="sfaccountname">{!sfuser.Contact.Account.Name}</td>
+            <td id="staccountname">{!stuser.accountname}</td>
+        </tr>
+        <tr>
+            <td>Region/Tier/Type</td>
+            <td id="sfregiontypetier">{!sfuser.Contact.Account.Global_Region__c}.{!sfuser.Contact.Account.Finder_Partner_Tier_Name__c}.{!sfuser.Contact.Account.Finder_Partner_Type_Name__c}</td>
+            <td id="stregiontypetier">{!stuser.regiontypetier}</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+        </tr>
+    </table>
+    <br /><br />
+    <hr />
+    Transaction Time: {!stuser.elapsed}s
+
+</apex:outputPanel>
+<apex:outputText id="STNotFoundMessage" value="User not found in SumTotal" rendered="{!stuser == null}"/>
+<apex:outputText id="SFNotFoundMessage" value="User not found" rendered="{!sfuser == null}"/>
+</apex:page>

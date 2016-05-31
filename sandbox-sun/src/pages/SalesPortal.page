@@ -1,0 +1,155 @@
+<apex:page controller="SalesPortalController" sidebar="false" showHeader="true" contentType="text/html; charset=UTF-8" title="Sales Portal">
+<apex:stylesheet value="{!urlfor($Resource.SalesPortal, '/sales_portal.css')}"/>
+<apex:stylesheet value="{!urlfor($Resource.SalesPortalCustomCSS) }"/>
+<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js" />
+<script type="text/javascript">
+    $.noConflict(); 
+    
+    jQuery(document).ready(function() {
+        <apex:repeat value="{!messages}" var="message">
+        // Investigating #message-{!message.id} - updated? {!message.updated} expandIfUpdated? {!message.expandIfUpdated}
+        <apex:outputText rendered="{!NOT(message.updated) || NOT(message.expandIfUpdated)}"> 
+        jQuery('#message-{!message.id}').hide();
+        </apex:outputText>
+        </apex:repeat>
+    });
+</script>
+<!-- Track a specific Crazy Egg snapshot by name -->
+<script type="text/javascript">
+setTimeout(function(){var a=document.createElement("script");
+var b=document.getElementsByTagName("script")[0];
+a.src=document.location.protocol+"//script.crazyegg.com/pages/scripts/0050/0011.js?"+Math.floor(new Date().getTime()/3600000);
+a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+</script>
+
+<div id="salesportal">
+    <div id="wrapper-sp">
+        <div id="banner-sp"><a href="#" id="logo-rh"><img src="{!urlfor($Resource.SalesPortal, '/images/logo/logo-red-hat.png')}" alt="Red Hat" /></a>
+            <h1><apex:outputText value="Headline"/></h1>
+            <a href="mailto:sales-portal@redhat.com" id="feedback-sp" onclick="piwikTracker.setCustomVariable(1,'Category','Feedback','page'); piwikTracker.setCustomVariable(2,'Title','Feedback/Questions','page');">{!$Label.Sales_Portal_Feedback_Questions}</a>
+        </div>
+        <div id="header-sp">
+            <h2><apex:outputText value="{!$Label.Sales_Portal_Sales_Dashboard}"/></h2>
+            <a title="{!DashBoardLink.linkDescription}" class="action piwik_link" href="{!DashBoardLink.link}" onclick="piwikTracker.setCustomVariable(1,'Category','{!DashBoardLink.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!DashBoardLink.escapedTitle}','page');">{!DashBoardLink.title}</a>
+            <div id="quick-links-sp">
+                <h2><apex:outputText value="{!$Label.Sales_Portal_Quick_Links}"/></h2>
+                <ul>
+                    <apex:repeat value="{!quickLinks}" var="quickLink">                     
+                        <li id="quick-{!quickLink.title}"><apex:outputLink title="{!quickLink.linkDescription}" value="{!quickLink.link}" target="_blank" styleClass="piwik_link" onclick="piwikTracker.setCustomVariable(1,'Category','{!quickLink.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!quickLink.escapedTitle}','page');"><span class="iconImage"><apex:image rendered="{!quickLink.hasIcon}" url="{!URLFOR($Action.Attachment.Download,quickLink.icon.id)}" /></span><span class="iconLink">{!quickLink.title}</span></apex:outputLink></li>
+                    </apex:repeat>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="content-sp">
+            <div id="content-inner-sp">
+                <div id="content-primary-sp">
+                    <h2>{!$Label.Sales_Portal_News}</h2>
+                    <apex:repeat value="{!messages}" var="message">
+                    <div class="content-block" id="message-{!message.id}">
+                        <div class="closeLink"><a href="#" onclick="jQuery('#message-{!message.id}').hide(); return false;">{!$Label.Sales_Portal_Hide}</a></div>
+                        <h3 class="header">{!message.title}</h3>
+                        <div><apex:outputText escape="false" value="{!message.HTML}"/></div>
+                        <br/><br/>
+                    </div>
+                    </apex:repeat>
+                    <div class="content-block" id="featured-story">
+                        <h3 class="header"><apex:outputText value="{!featuredStory.title}"/></h3>
+                        <div class="content-image" style="display:{!if(featuredStory.hasIcon,'inline','none')};">
+                            <a href="{!featuredStory.link}" onclick="piwikTracker.setCustomVariable(1,'Category','{!featuredStory.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!featuredStory.escapedTitle}','page');">
+                                <apex:image rendered="{!featuredStory.hasIcon}" url="{!URLFOR($Action.Attachment.Download,featuredStory.icon.id)}" />
+                            </a>
+                        </div>
+                        <div class="description">
+                            <p><apex:outputText escape="false" value="{!featuredStory.HTML}"/></p>
+                            <a title="{!featuredStory.linkDescription}" class="action" href="{!featuredStory.link}" onclick="piwikTracker.setCustomVariable(1,'Category','{!featuredStory.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!featuredStory.escapedTitle}','page');">See More</a>
+                        </div>
+                    </div>
+                    <div class="content-block" id="collaboration-center">
+                        <h3 class="header"><strong><apex:outputText value="{!$Label.Sales_Portal_Collaboration_Center}"/></strong></h3>
+                        <div class="chatter" onclick="if(!chatterClicked){piwikTracker.setCustomVariable(1,'Category','Chatter','page'); piwikTracker.setCustomVariable(2,'Title','Chatter','page'); piwikTracker.trackPageView('Chatter click'); chatterClicked=true;}"><chatter:feed entityId="{!ChatterGroup}"/></div>
+                    </div>
+                </div>
+                <div id="aside-sp">
+                    <div class="content-block" id="portal-spotlights">
+                        <h2><apex:outputText value="Portal Spotlights"/></h2>
+                        <ul>
+                            <apex:repeat value="{!portalSpotlight}" var="spotLight">
+                                <li id="spotlight-{!spotLight.title}">
+                                    <apex:outputText rendered="{!spotLight.isPortalMessage}">
+                                        <apex:outputLink title="{!spotLight.linkDescription}" value="#" onclick="jQuery('#message-{!spotLight.id}').show(); piwikTracker.setCustomVariable(1,'Category','{!spotLight.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!spotLight.escapedTitle}','page'); piwikTracker.trackPageView('{!spotLight.title}'); return false;"><span class="iconImage"><apex:image rendered="{!spotLight.hasIcon}" url="{!URLFOR($Action.Attachment.Download,spotLight.icon.id)}" /></span><span class="iconLink">{!spotLight.title}</span></apex:outputLink>
+                                    </apex:outputText>
+                                    <apex:outputText rendered="{!NOT(spotLight.isPortalMessage)}">
+                                        <apex:outputLink title="{!spotLight.linkDescription}" value="{!spotLight.link}" target="_blank" styleClass="piwik_link" onclick="piwikTracker.setCustomVariable(1,'Category','{!spotLight.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!spotLight.escapedTitle}','page');"><span class="iconImage"><apex:image rendered="{!spotLight.hasIcon}" url="{!URLFOR($Action.Attachment.Download,spotLight.icon.id)}" /></span><span class="iconLink">{!spotLight.title}</span></apex:outputLink>
+                                    </apex:outputText>
+                                </li>
+                            </apex:repeat>
+                        </ul>
+                    </div>
+                    <div class="content-block" id="latest-content">
+                        <h2><apex:outputText value="Latest Content"/></h2>
+                        <ul>
+                            <apex:repeat value="{!latestDocuments}" var="doc">
+                            <li><a href="/sfc/#version?selectedDocumentId={!doc.ContentDocumentId}" target="_blank" class="piwik_link" onclick="piwikTracker.setCustomVariable(1,'Category','Latest Content','page'); piwikTracker.setCustomVariable(2,'Title','{!doc.Category__c}','page');"><strong>{!doc.title}</strong> {!doc.description}</a></li>
+                            </apex:repeat>
+                        </ul>
+                        <a class="action piwik_link" href="/sfc/" target="_blank" onclick="piwikTracker.setCustomVariable(1,'Category','Latest Content','page'); piwikTracker.setCustomVariable(2,'Title','Download More','page');">{!$Label.Sales_Portal_Download_More}</a>
+                    </div>
+                    <div class="content-block" id="status-bar">
+                        <h2><apex:outputText value="{!statusBar.title}"/></h2>
+                        <div>
+                            <apex:outputText escape="false" value="{!statusBar.HTML}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="content-nav-sp">
+                <h2><apex:outputText value="{!$Label.Sales_Portal_Resources}"/></h2>
+                <ul id="resources-nav">
+                    <apex:repeat value="{!resources}" var="section">
+                        <li><apex:outputLink onclick="return false;">{!section.title}</apex:outputLink>
+                            <ul>
+                                <apex:repeat value="{!section.links}" var="link">
+                                <apex:outputText rendered="{!link.link != null && link.link != '#' && link.link != ''}"> 
+                                    <li class="section-{!link.title}"><apex:outputLink title="{!link.linkDescription}" value="{!link.link}" target="_blank" styleClass="piwik_link" onclick="piwikTracker.setCustomVariable(1,'Category','{!link.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!link.escapedTitle}','page');">{!link.title}</apex:outputLink></li>
+                                </apex:outputText>
+                                </apex:repeat>
+                            </ul>                           
+                        </li>
+                    </apex:repeat>
+                </ul>               
+            </div>
+        </div>
+        <div id="footer-sp">
+            <apex:repeat value="{!footers}" var="section">
+                <div id="section-{!section.title}" class="nav-footer">
+                    <h2><apex:outputText value="{!section.title}"/></h2>
+                    <ul>
+                        <apex:repeat value="{!section.links}" var="link">
+                            <li class="section-{!link.title}"><apex:outputLink title="{!link.linkDescription}" value="{!link.link}" target="_blank" styleClass="piwik_link" onclick="piwikTracker.setCustomVariable(1,'Category','{!link.escapedSectionKey}','page'); piwikTracker.setCustomVariable(2,'Title','{!link.escapedTitle}','page');">{!link.title}</apex:outputLink></li>
+                        </apex:repeat>
+                    </ul>
+                </div>
+            </apex:repeat>           
+        </div>
+    </div>
+</div>
+<!-- Piwik -->
+<script type="text/javascript">
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://{!trackingURL}/" : "http://{!trackingURL}/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script type="text/javascript">
+try {
+var chatterClicked = false;
+var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+piwikTracker.setCustomVariable(1,"UserId","{!$User.Id}","visit");
+piwikTracker.setCustomVariable(2,"Role","{!$UserRole.Name}","visit");
+piwikTracker.setCustomVariable(3,"Profile","{!$Profile.Name}","visit");
+piwikTracker.setCustomVariable(1,"Category","Home Page","page");
+piwikTracker.setCustomVariable(2,"Title",document.title,"page");
+piwikTracker.trackPageView();
+piwikTracker.enableLinkTracking();
+} catch( err ) {}
+</script><noscript><p><img src="http://{!trackingURL}/piwik.php?idsite=1" style="border:0" alt="" /></p></noscript>
+<!-- End Piwik Tracking Code -->
+</apex:page>

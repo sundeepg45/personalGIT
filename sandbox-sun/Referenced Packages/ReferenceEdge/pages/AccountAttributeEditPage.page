@@ -1,0 +1,116 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page standardController="refedge__Account_Attribute__c" sidebar="false" extensions="refedge.AccountAttributeEditController" id="pageId">
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <!-- Add Style-->
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <!-- <apex:includeScript value="{!URLFOR($Resource.JqueryFiles, 'jquery-ui-1.9.2.custom.min.js')}"/> -->
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlock id="BlockId">
+            <apex:actionFunction name="removeAttributes" action="{!removeAttributes}"/>
+            <apex:actionFunction name="saveRecord" action="{!Save}"/>
+                <apex:pageBlockButtons >
+                    
+                    <apex:commandButton value="{!$Label.Cancel}" action="{!Cancel}"/>
+                </apex:pageBlockButtons> 
+            <apex:pageBlockSection id="SectionId" columns="1">
+               
+                <apex:outputField value="{!attAcc.refedge__Account__c}"/>
+                <apex:outputField value="{!attAcc.refedge__Attribute__c}"/>
+                <apex:inputField id="inheritId" value="{!attAcc.refedge__Inheritable__c}" rendered="{!showCheckBox}" onclick="inheritableCheck(this);"/>
+                <apex:outputField value="{!attAcc.refedge__Inheritable__c}" rendered="{!!showCheckBox}"/>
+            </apex:pageBlockSection>
+           
+        </apex:pageBlock>
+         <div id="dialogBoxDiv" style="display:none;height: 60px; !important;">
+                {!$Label.Account_Attribute_Edit_Msg}
+          </div>
+       
+            
+    </apex:form>
+    <style>
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style>
+    <script>
+            function inheritableCheck(obj){
+                 var elevalue=obj.checked;
+                 
+                 if(elevalue== false){
+                 
+                    jQuery( "#dialogBoxDiv" ).dialog({
+                        width: '400px',
+                        modal: true,
+                        resizable: false,
+                        draggable: false,
+                        buttons: [{
+                            text: "{!$Label.Yes}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                               removeAttributes();
+                              jQuery( this ).dialog( "close" );
+                            }
+                        },
+                        {
+                            text: "{!$Label.No}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                                saveRecord();
+                               jQuery( this ).dialog( "close" ); 
+                            }
+                        },
+                        {
+                            text: "{!$Label.Cancel}",
+                            "class": "dialogButtonClass",
+                            click: function() {
+                                 obj.checked = true;
+                                jQuery( this ).dialog( "close" );
+                            }
+                        }]
+                    });
+                   jQuery(".ui-dialog-titlebar").hide();
+                jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                }
+                else{
+                    saveRecord();
+                }
+                
+            } 
+    </script>
+</apex:page>

@@ -1,0 +1,1 @@
+public virtual class ExpectedExceptionNotThrownException extends Exception {}

@@ -1,0 +1,57 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.ManageContentVersionFields" id="pageId" sideBar="false" tabStyle="refedge__Custom_Settings__c">
+    <apex:pageMessages id="pgmsgId" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <style>
+        .apexp .bPageBlock .detailList .list {
+            width: 35%;
+        }
+    </style>
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_the_Custom_Setting_Page}" action="{!returnCustomSettings}"/><br/>
+        </div>
+        
+        <apex:pageBlock id="pbId" title="{!$Label.Reference_Content_Custom_Fields}" rendered="{!listContentFields.size > 0}">
+            <B>{!$Label.Select_the_fields_on_Reference_Content_Edit}</B><br/>
+            {!$Label.required_fields_cannot_be_edited}
+            <apex:pageBlockButtons id="pbbId">
+                <apex:commandButton value="{!$Label.Edit}" rendered="{!NOT(isEdit)}" action="{!edit}" reRender="pgmsgId, pbId" />
+                <apex:commandButton value="{!$Label.Save}" rendered="{!isEdit}" action="{!save}" reRender="pgmsgId, pbId" />
+                <apex:commandButton value="{!$Label.Cancel}" rendered="{!isEdit}" action="{!cancel}" reRender="pgmsgId, pbId"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection id="pbsId" columns="1">
+                <apex:pageBlockTable value="{!listContentFields}" var="cf">
+                    <apex:column headerValue="{!$Label.Field_Name}" value="{!cf.fieldLabel}"/>
+                    <apex:column headerValue="{!$Label.Show}">
+                        <apex:inputCheckbox value="{!cf.isSelected}" disabled="{!OR(NOT(isEdit), cf.isRequired)}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageblock>
+        
+        <apex:pageBlock id="pb2Id" title="{!$Label.Reference_Content_Custom_Fields}" rendered="{!listContentFields.size = 0}">
+            <apex:pageMessage severity="Info"  strength="3" summary="{!$Label.No_Custom_fields_found}"/>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

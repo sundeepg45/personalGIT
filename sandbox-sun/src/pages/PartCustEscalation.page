@@ -1,0 +1,72 @@
+<apex:page controller="PartCustEscalationController">
+	<apex:SectionHeader title="{!$Label.Partner_Customer_Case_Escalation_Request}" />    
+    <apex:form >
+        <apex:pageMessages />
+        <apex:outputText escape="false" value="{!$Label.Partner_Escalation_Intro_Paragraph}"/><br/>
+        <apex:pageBlock >
+            <apex:pageBlockButtons >
+                <apex:commandButton id="actionSave" action="{!submit}" value="{!$Label.Partner_Escalation_Save_Button}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.Partner_Escalation_Requestor}" columns="2" >
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Email_Helptext}">
+	           		<apex:outputLabel value="{!$Label.PER_Your_Email_Address}" for="requestorEmail"/>
+	                <apex:inputText id="requestorEmail" value="{!requestorEmail}" required="true"/>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem >
+	             	<apex:outputLabel value="{!$Label.PER_Your_Phone_Number}" for="requestorPhone"/>
+	                <apex:inputText id="requestorPhone" value="{!requestorPhone}" required="true"/>
+				</apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="{!$Label.PER_Customer_Data}" columns="2" >
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Customer_Name_Helptext}">
+	           		<apex:outputLabel value="{!$Label.PER_Customer_Name}" for="customerName"/>
+	                <apex:inputText id="customerName" value="{!customerName}" required="true"/>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem >
+	             	<apex:outputLabel value="{!$Label.PER_Customer_Contact_Email}" for="customerContactEmail"/>
+	                <apex:inputText id="customerContactEmail" value="{!customerContactEmail}" required="true"/>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem >
+	             	<apex:outputLabel value="{!$Label.PER_Customer_Contact_Phone_Number}" for="customerContactPhone"/>
+	                <apex:inputText id="customerContactPhone" value="{!customerContactPhone}" required="true"/>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem >
+	             	<apex:outputLabel value="{!$Label.PER_Customer_GEO}" for="customerGEO"/>
+	                <apex:selectList id="customerGEO" value="{!customerGEO}" 
+	                     size="1" multiselect="false" required="true" >
+	                     <apex:selectOption itemValue="" itemLabel=""/>
+	                     <apex:selectOption itemValue="APAC" itemLabel="{!$Label.Region_APAC}"/>
+	                     <apex:selectOption itemValue="EMEA" itemLabel="{!$Label.Region_EMEA}"/>
+	                     <apex:selectOption itemValue="NA" itemLabel="{!$Label.Region_NA}"/>
+	                     <apex:selectOption itemValue="LATAM" itemLabel="{!$Label.Region_LATAM}"/>
+	                 </apex:selectList>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Item_Description_Helptext}">
+	             	<apex:outputLabel value="{!$Label.PER_Issue_Description}" for="customerIssueDescription"/>
+	                <apex:inputTextarea rows="4" cols="40" id="customerIssueDescription" value="{!customerIssueDescription}" required="true"/>
+                 </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Expectations_Helptext}">
+	             	<apex:outputLabel value="{!$Label.PER_Expectations}" for="expectations"/>
+ 	                <apex:inputTextarea rows="4" cols="40" id="expectations" value="{!expectations}" required="true"/>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Red_Hat_Account_Number_Helpdesk}">
+	             	<apex:outputLabel value="{!$Label.PER_Red_Hat_Account_Number}" for="redhatAccountNumber"/>
+	                <apex:inputText id="redhatAccountNumber" value="{!redhatAccountNumber}" required="true"/>
+                 </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Support_Ticket_Number_Helptext}">
+	             	<apex:outputLabel value="{!$Label.PER_Support_Ticket_Number}" for="redhatSupportTicketNumber"/>
+ 	                <apex:inputText id="redhatSupportTicketNumber" value="{!redhatSupportTicketNumber}" required="true"/>
+                 </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helptext="{!$Label.Partner_Escalation_Already_Escalated_Helptext}">
+	             	<apex:outputLabel value="{!$Label.PER_Already_Escalated}" for="alreadyEscalated"/>
+	                <apex:selectList id="alreadyEscalated" value="{!alreadyEscalated}" 
+	                     size="1" multiselect="false" required="true" >
+	                     <apex:selectOption itemValue="" itemLabel=""/>
+	                     <apex:selectOption itemValue="Yes" itemLabel="{!$Label.PER_Already_Escalated_Yes}"/>
+	                     <apex:selectOption itemValue="No" itemLabel="{!$Label.PER_Already_Escalated_No}"/>
+	                 </apex:selectList>
+	            </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>       
+    </apex:form>
+</apex:page>

@@ -1,0 +1,269 @@
+<apex:page standardController="Opportunity" extensions="Opportunity_PaymentDetailsController" action="{!saveOpp}" tabStyle="Opportunity" showHeader="false" sidebar="false" docType="html-5.0">
+<script type="text/javascript">
+function reloadOppAndClose() {
+	try {
+		top.window.opener.location.reload();
+	}
+	catch(e) {
+		top.window.opener.location.hash = '#reload';
+	}
+	top.window.close();
+}
+</script>
+    <form id="payment_form" action="{!formAction}" method="post">
+        <apex:pageBlock rendered="{!pageNumber == 1}" mode="edit" title="{!$Label.CC_Add_Credit_Card_Details_1_of_3}">
+            <apex:pageBlockSection title="{!$Label.CC_Cardholder_Information}" columns="1">
+                <apex:outputPanel >
+                    <table  border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_forename">{!$Label.CC_First_Name}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="bill_to_forename" id="bill_to_forename" maxlength="24" value="{!opp.Credit_Card_First_Name__c}"/></div></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_surname">{!$Label.CC_Last_Name}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="bill_to_surname" id="bill_to_surname" maxlength="25" value="{!opp.Credit_Card_Last_Name__c}"/></div></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_email">{!$Label.CC_Email}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="bill_to_email" id="bill_to_email" maxlength="80" value="{!opp.Credit_Card_Email__c}"/></div></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_phone">{!$Label.CC_Phone}</label></td>
+                            <td class="dataCol"><input type="text" name="bill_to_phone" id="bill_to_phone" maxlength="25" value="{!opp.Credit_Card_Phone__c}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_address_country">{!$Label.CC_Country}</label></td>
+                            <td class="dataCol">
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <select name="bill_to_address_country" id="bill_to_address_country" onchange="updateStatePicklist()">
+                                        <option value=""></option>
+                                        <apex:repeat value="{!countries}" var="country">
+                                            <apex:outputText rendered="{!country.Iso3166Alpha2__c == opp.Credit_Card_Country__c}">
+                                                <option value="{!country.Iso3166Alpha2__c}" selected="selected">{!country.Name}</option>
+                                            </apex:outputText>
+                                            <apex:outputText rendered="{!country.Iso3166Alpha2__c != opp.Credit_Card_Country__c}">
+                                                <option value="{!country.Iso3166Alpha2__c}">{!country.Name}</option>
+                                            </apex:outputText>
+                                        </apex:repeat>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>                        
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_address_line1">{!$Label.CC_Address}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="bill_to_address_line1" id="bill_to_address_line1" maxlength="100" value="{!opp.Credit_Card_Address__c}"/></div></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_address_city">{!$Label.CC_City}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="bill_to_address_city" id="bill_to_address_city" maxlength="50" value="{!opp.Credit_Card_City__c}"/></div></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_address_state">{!$Label.CC_State_Province}</label></td>
+                            <td class="dataCol">
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <input type="text" name="bill_to_address_state" id="bill_to_address_state" maxlength="50" value="{!opp.Credit_Card_State__c}"/>
+                                    <select name="bill_to_address_state_select" id="bill_to_address_state_select" onchange="updateState()">
+                                        <option value=""></option>
+                                    </select>
+                                    <script>
+                                        var countryStateDict = {};
+
+                                        <apex:repeat value="{!countries}" var="country">
+                                        <apex:outputText rendered="{!country.States__r.size!=0}" escape="false">
+                                        countryStateDict['{!country.Iso3166Alpha2__c}'] = [new Option('','')<apex:repeat value="{!country.States__r}" var="state">, new Option('{!state.Name}', '{!state.Abbreviation__c}')</apex:repeat>];
+                                        </apex:outputText>
+                                        </apex:repeat>
+
+                                        function updateStatePicklist() {
+                                            countryList = document.getElementById('bill_to_address_country');
+                                            countryValue = countryList.options[countryList.selectedIndex].value;
+                                            state = document.getElementById('bill_to_address_state');
+                                            stateList = document.getElementById('bill_to_address_state_select');
+
+                                            for(i=stateList.options.length-1; i>=0; i--)
+                                            {
+                                                stateList.remove(i);
+                                            }                                
+
+                                            if(countryStateDict[countryValue]) {
+                                                state.style.display = 'none';
+                                                states = countryStateDict[countryValue];
+                                                selectedState = 0;
+                                                for(i=0; i<states.length; i++) {
+                                                    stateList.add(states[i]);
+                                                    if(states[i].value == state.value) {
+                                                        selectedState = i;
+                                                    }
+                                                }
+                                                stateList.selectedIndex = selectedState;
+                                                updateState();
+                                                stateList.style.display = '';
+                                            }
+                                            else {
+                                                stateList.style.display = 'none';
+                                                updateState();
+                                                state.style.display = '';
+                                            }
+                                        }
+
+                                        function updateState() {
+                                            state = document.getElementById('bill_to_address_state');
+                                            stateList = document.getElementById('bill_to_address_state_select');
+                                            if(stateList && stateList.selectedIndex > 0) {
+                                                state.value = stateList.options[stateList.selectedIndex].value;
+                                            }
+                                            else {
+                                                state.value = '';
+                                            }
+                                        }
+
+                                        updateStatePicklist();
+                                    </script>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="bill_to_address_postal_code">{!$Label.CC_Zip_Postal_Code}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="bill_to_address_postal_code" id="bill_to_address_postal_code" maxlength="25" value="{!opp.Credit_Card_Zip__c}"/></div></td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+                
+                <apex:outputPanel >
+                    <input type="hidden" name="access_key" value="{!cybersourceConfig['AccessKey'].Value__c}"/>
+                    <input type="hidden" name="profile_id" value="{!cybersourceConfig['ProfileId'].Value__c}"/>
+                    <input type="hidden" name="transaction_uuid" value="{!uuid}"/>
+                    <input type="hidden" name="signed_field_names" value="access_key,profile_id,transaction_uuid,signed_field_names,unsigned_field_names,signed_date_time,locale,transaction_type,reference_number,amount,currency,payment_method,bill_to_forename,bill_to_surname,bill_to_email,bill_to_phone,bill_to_address_line1,bill_to_address_city,bill_to_address_state,bill_to_address_country,bill_to_address_postal_code"/>
+                    <input type="hidden" name="unsigned_field_names" value="card_type,card_number,card_expiry_date"/>
+                    <input type="hidden" name="signed_date_time" value="{!now}"/>
+                    <input type="hidden" name="locale" value="en"/>
+                    <input type="hidden" name="transaction_type" value="create_payment_token"/>
+                    <input type="hidden" name="reference_number" value="{!$CurrentPage.parameters.Id}"/>
+                    <input type="hidden" name="payment_method" value="card"/>
+                    <input type="hidden" name="amount" value="0"/>
+                    <input type="hidden" name="currency" value="USD"/>
+                </apex:outputPanel>
+
+                <input type="button" class="btn" id="cancel" value="{!$Label.CC_Cancel}" onclick="javascript:window.close();"/>
+                <input type="submit" class="btn" style="float:right;" id="submit" value="{!$Label.CC_Next}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!pageNumber == 2}" mode="edit" title="{!$Label.CC_Add_Credit_Card_Details_2_of_3}">
+            <apex:pageBlockSection title="{!$Label.CC_Card_Information}" columns="1">
+                <apex:outputPanel >
+                    <table  border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td class="labelCol"><label for="card_type">{!$Label.CC_Type}</label></td>
+                            <td class="dataCol">
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <select name="card_type" id="card_type">
+                                        <option value=""></option>
+                                        <apex:repeat value="{!creditCardTypeCodes}" var="creditCardTypeCode">
+                                            <option value="{!creditCardTypeCode}">{!creditCardTypes[creditCardTypeCode]}</option>
+                                        </apex:repeat>
+                                    </select>
+                                </div>                            
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="card_number">{!$Label.CC_Number}</label></td>
+                            <td class="dataCol"><div class="requiredInput"><div class="requiredBlock"></div><input type="text" name="card_number" id="card_number" maxlength="20" value="" autocomplete="off"/></div></td>
+                        </tr>
+                        <tr>
+                            <td class="labelCol"><label for="card_expiry_date">{!$Label.CC_Expiration_Date}</label></td>
+                            <td class="dataCol">
+                                <div class="requiredInput">
+                                    <div class="requiredBlock"></div>
+                                    <input type="hidden" name="card_expiry_date" id="card_expiry_date" maxlength="10" value=""/>
+                                    <select name="card_expiry_month" id="card_expiry_month" onchange="updateCardExpiryDate()">
+                                        <option value=""></option>
+                                        <apex:repeat value="{!expiryDateMonthCodes}" var="expiryDateMonthCode">
+                                            <option value="{!expiryDateMonthCode}">{!expiryDateMonths[expiryDateMonthCode]}</option>
+                                        </apex:repeat>
+                                    </select>
+                                    <select name="card_expiry_year" id="card_expiry_year" onchange="updateCardExpiryDate()">
+                                        <option value=""></option>
+                                        <apex:repeat value="{!expiryDateYears}" var="expiryDateMonthYear">
+                                            <option value="{!expiryDateMonthYear}">{!expiryDateMonthYear}</option>
+                                        </apex:repeat>
+                                    </select>
+                                    <script>
+                                        function updateCardExpiryDate() {
+                                            cardExpiryDate = document.getElementById('card_expiry_date');
+                                            if(cardExpiryDate) {
+                                                cardExpiryMonth = document.getElementById('card_expiry_month');
+                                                cardExpiryYear = document.getElementById('card_expiry_year');
+                                                if(cardExpiryMonth && cardExpiryMonth.selectedIndex > 0 && cardExpiryYear && cardExpiryYear.selectedIndex > 0) {
+                                                    cardExpiryDate.value = cardExpiryMonth.options[cardExpiryMonth.selectedIndex].value + '-' + cardExpiryYear.options[cardExpiryYear.selectedIndex].value;
+                                                }
+                                                else {
+                                                    cardExpiryDate.value = '';
+                                                }
+                                            }
+                                        }
+                                    </script>                           
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+
+                <apex:outputPanel >
+                    <apex:repeat value="{!signedFields}" var="signedFieldKey">
+                        <input type="hidden" id="{!signedFieldKey}" name="{!signedFieldKey}" value="{!signedFields[signedFieldKey]}"/>
+                    </apex:repeat>
+                    <input type="hidden" id="signature" name="signature" value="{!signature}"/>
+                </apex:outputPanel>
+
+                <input type="button" class="btn" id="cancel" value="{!$Label.CC_Cancel}" onclick="javascript:window.close();"/>
+                <div style="float:right;">
+                    <input type="button" class="btn" id="back" value="{!$Label.CC_Back}" onclick="document.location='/apex/Opportunity_PaymentDetails?id={!$CurrentPage.parameters.Id}';"/>
+                    <input type="submit" class="btn" id="next" value="{!$Label.CC_Next}"/>
+                </div>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!pageNumber == 3}" mode="edit" title="{!$Label.CC_Add_Credit_Card_Details_3_of_3}">
+            <apex:pageBlockSection title="{!$Label.CC_Results}" columns="1">
+                <apex:outputPanel >
+                    <apex:outputPanel rendered="{!decision == 'ACCEPT'}">
+                        <table  border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td class="labelCol">{!$Label.CC_Result}</td>
+                                <td class="dataCol">{!$Label.CC_Success}</td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!decision != 'ACCEPT'}">
+                        <table  border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td class="labelCol">{!$Label.CC_Result}</td>
+                                <td class="dataCol">{!$Label.CC_Error}</td>
+                            </tr>
+                            <tr>
+                                <td class="labelCol">{!$Label.CC_Error_Message}</td>
+                                <td class="dataCol"><apex:outputText value="{!message}"/></td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+
+                <apex:outputPanel rendered="false">
+                    <apex:repeat value="{!responseFields}" var="responseFieldKey">
+                        <apex:outputText value="{!responseFieldKey + ':' + responseFields[responseFieldKey]}"/><br/>
+                    </apex:repeat>
+                </apex:outputPanel>
+
+                <apex:outputPanel rendered="{!decision != 'ACCEPT'}">
+                    <input type="button" class="btn" id="cancel" value="{!$Label.CC_Cancel}" onclick="javascript:window.close();"/>
+                    <input type="button" class="btn" style="float:right;" id="back" value="{!$Label.CC_Back}" onclick="document.location='/apex/Opportunity_PaymentDetails?id={!$CurrentPage.parameters.req_reference_number}';"/>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!decision == 'ACCEPT'}">
+                    <input type="button" class="btn" style="float:right;" id="finish" value="{!$Label.CC_Finish}" onclick="javascript:reloadOppAndClose();"/>
+                </apex:outputPanel>
+            </apex:pageBlockSection>       
+        </apex:pageBlock>
+    </form>
+</apex:page>

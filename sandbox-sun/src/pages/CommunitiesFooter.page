@@ -1,0 +1,81 @@
+<apex:page showheader="false" sidebar="false" standardStylesheets="false">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.communitiesReskin)}"/>
+
+
+
+    <!--JS Files -->
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+
+    <div class="red-hat-content">
+        <footer>
+          <div class="container">
+            <div class="row">
+              <div class="row links-container">
+                <div class="col-xs-2">
+                  <a href="http://www.redhat.com/" target="_blank" class="logo">redhat.com</a>
+                </div><!-- /.col-xs-2 -->
+                <div class="col-xs-2">
+                  <div class="list-heading">{!$Label.CommunitiesFooterInfoAndToolsFor}</div>
+                  <ul class="list-unstyled">
+                    <li><a href="{!$Label.CommunitiesFooterSalesURL}">{!$Label.CommunitiesFooterSales}</a></li>
+                    <li><a href="{!$Label.CommunitiesFooterMarketingURL}">{!$Label.CommunitiesFooterMarketing}</a></li>
+                    <li><a href="{!$Label.CommunitiesFooterTechnicalURL}">{!$Label.CommunitiesFooterTechnical}</a></li>
+                  </ul>
+                </div><!-- /.col-xs-2 -->
+                <div class="col-xs-2">
+                  <div class="list-heading">{!$Label.CommunitiesFooterHelpfulLinks}</div>
+                  <ul class="list-unstyled">
+                    <li><a href="{!$Label.CommunitiesFooterInviteNewUsersURL}">{!$Label.CommunitiesFooterInviteNewUsers}</a></li>
+                    <li><a href="{!$Label.CommunitiesFooterNFRSubscriptionsURL}">{!$Label.CommunitiesFooterNFRSubscriptions}</a></li>
+                    <li><a href="{!$Label.CommunitiesFooterPartnerSupportCasesURL}">{!$Label.CommunitiesFooterPartnerSupportCases}</a></li>
+                  </ul>
+                </div><!-- /.col-xs-2 -->
+                <div class="col-xs-2">
+                  <div class="list-heading">{!$Label.CommunitiesFooterYourPartnerConnect}</div>
+                  <ul class="list-unstyled">
+                    <li><a href="{!$Label.CommunitiesFooterMyDashboardURL}">{!$Label.CommunitiesFooterMyDashboard}</a></li>
+                    <li><a href="{!$Label.CommunitiesFooterMyCompanyProfileURL}">{!$Label.CommunitiesFooterMyCompanyProfile}</a></li>
+                    <li><a href="{!$Label.CommunitiesFooterMyTrainingPreferencesURL}">{!$Label.CommunitiesFooterMyTrainingPreferences}</a></li>
+                  </ul>
+                </div><!-- /.col-xs-2 -->
+                <div class="col-xs-2">
+                  <div class="list-heading">{!$Label.CommunitiesFooterSocial}</div>
+                  <ul class="list-unstyled social-links">
+                     <li><a href="{!$Label.CommunitiesFooterTwitterURL}" target="_blank"><img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/twitter.png')}" alt="Google Plus Icon"/><!-- @{!$Label.CommunitiesFooterTwitter} --> </a></li>
+                    <li><a href="{!$Label.CommunitiesFooterLinkedInURL}" target="_blank"><img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/linkedin.png')}" alt="Google Plus Icon"/> <!-- {!$Label.CommunitiesFooterLinkedIn} --></a></li>
+                    <li><a href="{!$Label.CommunitiesFooterYoutubeURL}" target="_blank"><img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/youtube.png')}" alt="Google Plus Icon"/> <!-- {!$Label.CommunitiesFooterYoutube} --> </a></li>
+                  </ul>
+                </div><!-- /.col-xs-2 -->
+                <div class="col-xs-2">
+                  <img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/partner-program-winner.jpg')}" alt="CRN Partner Program Winner 2012" class="img-responsive"/>
+                </div><!-- /.col-xs-2 -->
+              </div><!-- /.row .links-container -->
+              <div class="row">
+                <div class="col-xs-6 col-xs-offset-2">
+                  <p class="copyright"><span>{!$Label.CommunitiesFooterCopyright}</span> <a href="{!$Label.CommunitiesFooterPrivacyPolicyURL}">{!$Label.CommunitiesFooterPrivacyPolicy}</a> | <a href="{!$Label.CommunitiesFooterTermsOfUseURL}">{!$Label.CommunitiesFooterTermsOfUse}</a> <!-- |  <a href="{!$Label.CommunitiesFooterSiteIndexURL}">{!$Label.CommunitiesFooterSiteIndex}</a>  --> </p>
+                </div><!-- /.col-xs-4 .col-xs-offset-2-->
+
+                <div class="col-xs-2">
+                  <!-- removed summit icon here -->
+                </div><!-- /.col-xs-4 -->
+
+                <div class="col-xs-2">
+                  <ul class="list-inline social-links">
+                    <!-- left this ul here to show the class name for the social media links-->
+                  </ul>
+                </div><!-- /.col-xs-2 -->
+
+              </div><!-- /.row -->
+            </div><!-- /.row -->
+          </div><!-- /.container -->
+       </footer>
+    </div><!-- /.red-hat-container -->
+
+</apex:page>

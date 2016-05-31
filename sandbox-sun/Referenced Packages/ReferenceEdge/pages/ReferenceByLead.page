@@ -1,0 +1,113 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Reference_Lead__c" id="pageId" extensions="refedge.ReferenceByLeadController" sideBar="false"> 
+     <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+            color:white !important;
+        }
+    </style>
+    <apex:outputPanel id="scriptPanel">
+        
+        <script>
+            var showMessage = '{!showMessage}';
+            function checkForRadioSelected(){
+                PORShowLoading();
+                var radioChecked = false;
+                jQuery('input:radio').each(function() {
+                    if(this.checked){
+                        radioChecked = true;
+                        redirectToRefLeadForm(this.value);
+                    }
+                });
+                if(!radioChecked){
+                    alert('{!$Label.Select_Response}');
+                }
+                PORHideLoading();
+            }
+            function redirect(){
+                if({!!showMessage}){
+                    redirect();
+                }
+            }
+        </script>
+     </apex:outputPanel>
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="redirect" action="{!loadRefLeadForm}"/>
+        <apex:actionFunction name="redirectToRefLeadForm" action="{!redirectToRefLeadForm}" rerender="pbId,scriptPanel,formId" onComplete="redirect();return false;">
+            <apex:param name="assign" assignTo="{!optionSelected}" value=""/>
+        </apex:actionFunction>
+        <apex:pageBlock rendered="{!!showRefLeadBlock}">
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Response_Notification_msg}"/>
+            <apex:outputPanel >
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!showMessage}">
+            <apex:pageMessage severity="INFO" strength="3" summary="{!$Label.Thanks_for_letting_us_know}"/>
+            <apex:outputPanel >
+                <apex:commandButton value="{!$Label.Back_to_Home}" action="{!returnHomePage}" />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+        <apex:pageBlock id="pbId" rendered="{!AND(showRefLeadBlock,NOT(showMessage))}">
+            <apex:outputpanel layout="block" style="text-align: center;margin-bottom: 10px;">
+                <apex:commandButton value="{!$Label.Submit}" onClick="checkForRadioSelected();return false;"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!returnHomePage}"/>
+            </apex:outputpanel>
+            <apex:pageBlockSection rendered="{!!referenceableBlock}" columns="1">
+                <apex:outputLabel style="font: 18px bold;font-family: Arial,Helvetica,sans-serif;" value="{!SUBSTITUTE($Label.Considered_a_reference_account, '@@@', accountName)}"/>
+                <apex:outputPanel >
+                    <input type="radio" id="radioID" name="radioName" value="1"/>
+                    <apex:outputLabel value="{!option1}" />
+                </apex:outputPanel>
+                <apex:outputPanel >
+                    <input type="radio" id="radioID" name="radioName" value="2"/>
+                    <apex:outputLabel value="{!option2}" />
+                </apex:outputPanel> 
+                <apex:outputPanel >
+                    <input type="radio" id="radioID" name="radioName" value="3"/>
+                    <apex:outputLabel value="{!option3}" />
+                </apex:outputPanel> 
+                   
+            </apex:pageBlockSection>
+            <apex:pageBlockSection rendered="{!referenceableBlock}" title="{!$Label.New_Referenceable_Contacts}" columns="1">
+                <apex:outputLabel value="{!$Label.Referenceable_Contacts_Check}"/>
+                <apex:outputPanel >
+                    <input type="radio" id="radioID" name="radioName" value="1"/>
+                    <apex:outputLabel value="{!option1}" />
+                </apex:outputPanel> 
+                <apex:outputPanel >
+                    <input type="radio" id="radioID" name="radioName" value="2"/>
+                    <apex:outputLabel value="{!option2}" />
+                </apex:outputPanel> 
+            </apex:pageBlockSection>
+            <apex:outputpanel layout="block" style="text-align: center;">
+                <apex:commandButton value="{!$Label.Submit}" onClick="checkForRadioSelected();return false;"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!returnHomePage}"/>
+            </apex:outputpanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

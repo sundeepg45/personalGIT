@@ -1,0 +1,6 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt" action="{!submitForApproval}" tabStyle="Partner_Registration__c">
+    <apex:pageBlock >
+        <apex:pageMessages /><br/>
+        <apex:outputLink value="{! '/' + reg.Id}"><apex:outputText value="{!$Label.Partner_Registration_Return_To_Registration_Record}"/> <b>{!reg.Name}</b></apex:outputLink>
+    </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,248 @@
+<apex:page standardController="Audience__c" extensions="AudienceInput" tabStyle="Audience__c" showHeader="true" sidebar="true">
+    <apex:form >
+
+        <apex:actionFunction name="resetSubregions"
+            action="{!resetSubregions}"
+            rerender="input"/>
+
+        <apex:actionFunction name="resetCountries"
+            action="{!resetCountries}"
+            rerender="countryInput"/>
+
+        <apex:pageBlock id="input" title="Audience Edit" mode="edit">
+
+            <!-- <apex:pageMessages rendered="{!hasErrors}"/> -->
+            <apex:pageMessages />
+
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!save}" value="Save" />
+                <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection title="Audience" columns="2">
+                <apex:inputField value="{!audience.Name}"/>
+                <apex:inputField value="{!audience.Available_to_Unauthenticated_Users__c}"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection Title="Partner Status" columns="2">
+
+                <!-- Global Region  -->
+                <apex:selectList styleClass="regionSelect" onchange="resetSubregions();" label="Partner Region" value="{!selectedRegions}" multiselect="true" size="4">
+                    <apex:selectOptions value="{!regionSelectOptions}"/>
+                </apex:selectList>
+
+                <!-- (Column 2) Specializations -->
+                <apex:selectList label="Specialization" value="{!selectedSpecs}" multiselect="true" size="4">
+                    <apex:selectOptions value="{!specSelectOptions}"/>
+                </apex:selectList>
+
+
+                <!--  SubRegion  -->
+                <apex:selectList styleClass="subRegionSelect" id="subRegionInput" onchange="resetCountries()" label="Partner SubRegion" value="{!selectedSubRegions}" multiselect="true" size="6">
+                    <apex:selectOptions value="{!subregionSelectOptions}"/>
+                </apex:selectList>
+
+
+                <!-- Tier -->
+                <apex:selectList label="Partner Tier" value="{!selectedTiers}" multiselect="true" size="6">
+                    <apex:selectOptions value="{!tierSelectOptions}"/>
+                </apex:selectList>
+
+
+      	         <!--  Country  -->
+      			 <apex:selectList rendered="{!NOT(IsRegionNA)}" styleClass="countrySelect" id="countryInput" label="Partner Country" value="{!selectedCountries}" multiselect="true" size="4">
+                    <apex:selectOptions value="{!countrySelectOptions}"/>
+                </apex:selectList>
+
+                <!-- spacer to render if country is hidden when region = NA -->
+				<apex:pageBlockSectionItem rendered="{!IsRegionNA}"></apex:pageBlockSectionItem>
+
+				<apex:selectList label="Partner Type" value="{!selectedTypes}" multiselect="true" size="6">
+                    <apex:selectOptions value="{!typeSelectOptions}"/>
+                </apex:selectList>
+
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+                <apex:selectList label="Role" value="{!selectedRoles}" multiselect="true" size="4">
+                    <apex:selectOptions value="{!roleSelectOptions}"/>
+                </apex:selectList>
+
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Partner Programs">
+                <apex:selectList label="Partner Program" value="{!selectedPrograms}" multiselect="true" size="6">
+                    <apex:selectOptions value="{!programSelectOptions}"/>
+                </apex:selectList>
+            </apex:pageBlockSection>
+            <!-- ** 7/28/2014 - DEPRECATED: To allow for more than one account, we now use the Audience Target Accounts r elated list **
+            <apex:pageBlockSection title="Target Account">
+                <apex:inputField value="{!audience.Target_Account__c}"/>
+            </apex:pageBlockSection>
+            -->
+            <apex:pageBlockSection Title="Profile and Permission Set">
+                <apex:selectList label="Profile" value="{!selectedProfiles}" multiselect="true" size="6">
+                    <apex:selectOptions value="{!profileSelectOptions}"/>
+                </apex:selectList>
+                <apex:selectList label="Permission Set" value="{!selectedPermissionSets}" multiselect="true" size="6">
+                    <apex:selectOptions value="{!permissionSetSelectOptions}"/>
+                </apex:selectList>
+            </apex:pageBlockSection>
+
+
+
+
+
+
+
+            <script type="text/javascript">
+		      function doSearch() {
+		        searchServer(
+		          document.getElementById("accountName").value
+		          );
+		      }
+		      </script>
+
+            <style type="text/css">
+            .targetAcctTable {
+                /*border: 1px solid black;*/
+                border-collapse: collapse;
+                width: 100%;
+                border-spacing: 10px;
+            }
+            .targetAcctTable td {
+                padding: 4px;
+            }
+
+            .targetAcctTable th {
+                padding: 6px;
+            }
+
+            .searchPane {
+                float: left;
+                width: 50%;
+            }
+
+            .resultsPane {
+                float: right;
+                width: 50%;
+            }
+            .targetAcctTable{
+                background: #fff;
+                border: 1px solid #ccc;
+            }
+            .rich-table-thead{
+                background: #eee;
+            }
+            .account-search{
+                font-weight: bold;
+                padding-top: 15px;
+            }
+            </style>
+
+
+	      <apex:actionFunction name="searchServer" action="{!doAccountSearch}" rerender="searchResults">
+	          <apex:param name="accountName" value="" />
+	      </apex:actionFunction>
+
+
+
+
+            <apex:pageBlockSection Title="Targeted Accounts"  columns="1">
+
+
+                  <!--  ERRORS / MESSAGES  -->
+                         <apex:pageBlockSectionItem >
+                                <apex:pageMessages id="status" />
+                        </apex:pageBlockSectionItem>
+
+
+                    <!-- EXISTING ACCOUNTS TABLE  -->
+                    <apex:pageBlockSectionItem >
+                        <apex:dataTable id="targetAccounts" value="{!targetAccounts}" var="target" styleClass="targetAcctTable">
+                                <apex:column >
+                                    <apex:facet name="header">Name</apex:facet>
+                                    <apex:outputText value="{!target.Name}" />
+                                </apex:column>
+                                <apex:column >
+                                     <apex:facet name="header">Region</apex:facet>
+                                     <apex:outputText value="{!target.Global_Region__c}" />
+                                 </apex:column>
+                        </apex:dataTable>
+                    </apex:pageBlockSectionItem>
+
+
+
+                        <apex:pageBlockSectionItem >
+                            <p class="account-search">Enter an account name below and click Add to select target accounts for this audience.</p>
+                            <p>Account Name <input type="text" id="accountName" length="50" maxsize="255" onKeyUp="doSearch();" /></p>
+                        </apex:pageBlockSectionItem>
+
+
+
+
+                    <!--  SEARCH  -->
+                          <!--
+                            <apex:pageBlockSectionItem >
+                                    Account Name <input type="text" id="accountName" length="50" maxsize="255" onKeyUp="doSearch();" />
+                            </apex:pageBlockSectionItem>
+                            -->
+
+
+
+                    <!-- SEARCH RESULTS  -->
+                       <apex:pageBlockSectionItem >
+
+
+                                    <apex:dataTable id="searchResults" value="{!searchResults}" var="a" styleClass="targetAcctTable targetAcctTable2">
+                                         <apex:column >
+                                             <apex:commandButton id="selectAccount" value="Add" rerender="searchResults, status, targetAccounts" action="{!selectAccount}">
+                                                 <apex:param name="selAcctId" value="{!a.Id}" assignTo="{!selectedAccountId}" />
+                                             </apex:commandButton>
+                                         </apex:column>
+                                         <apex:column >
+                                             <apex:facet name="header">Name</apex:facet>
+                                             <apex:outputText value="{!a.Name}" />
+                                         </apex:column>
+                                         <apex:column >
+                                             <apex:facet name="header">City</apex:facet>
+                                             <apex:outputText value="{!a.BillingCity}" />
+                                         </apex:column>
+                                         <apex:column >
+                                             <apex:facet name="header">Country</apex:facet>
+                                             <apex:outputText value="{!a.BillingCountry}" />
+                                         </apex:column>
+                                         <apex:column >
+                                             <apex:facet name="header">Region</apex:facet>
+                                             <apex:outputText value="{!a.Global_Region__c}" />
+                                         </apex:column>
+                                         <apex:column >
+                                             <apex:facet name="header">Partner Status</apex:facet>
+                                             <apex:outputText value="{!a.PartnerStatuses__c}" />
+                                         </apex:column>
+                                     </apex:dataTable>
+
+                          </apex:pageBlockSectionItem>
+
+
+            </apex:pageBlockSection>
+
+
+
+            <!--
+            <apex:pageBlockSection id="debugInfo" columns="1">
+                SOQL Debug: <apex:outputText value="{!searchSoql}" />
+            </apex:pageBlockSection>
+            -->
+
+        </apex:pageBlock>
+
+
+
+
+
+    </apex:form>
+
+
+
+
+</apex:page>

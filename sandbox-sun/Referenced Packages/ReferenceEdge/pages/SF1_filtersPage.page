@@ -1,0 +1,215 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="refedge.RfSearchController">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:pageMessages id="pgmsgId"/>
+    <style>
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        .sf1List {
+            margin: 0;
+            display: list-item;
+            padding: 14px;
+            border-bottom: solid 1px #cfd4d9;
+            list-style: none;
+            font-size: 16px;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            color: rgb(60, 61, 62);
+            float:left;
+            width:100%;
+            font-weight: bold;
+            color: #0e7abd
+        }
+        
+        .sf1List:first-child {
+            border-radius:4px 4px 0px 0px;
+        }
+        
+        .sf1List:last-child {
+            border-radius:0px 0px 4px 4px;
+            border-bottom:none;
+        }
+        
+        ol {
+            background-color:rgb(230, 230, 230);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-top:5px;
+            border-radius:4px;
+            border:solid 1px #cfd4d9;
+        }
+        
+        .sf1List a {
+            text-decoration: none;
+            color: rgb(4, 111, 218);
+        }
+        .sf1List a:hover {
+            text-decoration: none;
+            color: rgb(4, 111, 218);
+        }
+        .center{
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+            background-color: #f0f1f2;
+            -webkit-box-flex: 1;
+            overflow-y:auto;
+        }
+        .child1{
+            padding:10px;
+            width:80%;
+            float:left;
+        }
+        .container{
+            width:100%;
+            float:left;
+            overflow-x:hidden;
+            overflow-y:auto;
+        }
+        .sf1Button{
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-right-width: 1px;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            margin: 0;
+            padding: 4px 14px;
+            height: 35px;
+            font-size: 16px;
+            font-family: 'ProximaNovaSoft-Regular';
+            font-weight: normal;
+            border: 1px solid #bbc0c4;
+            border-radius: 5px;
+            background: -moz-linear-gradient(#ffffff,#f1f1f1);
+            background: -webkit-linear-gradient(#ffffff,#f1f1f1);
+            background: -ms-linear-gradient(#ffffff,#f1f1f1);
+            background: linear-gradient(#ffffff,#f1f1f1);
+            box-shadow: none;
+        }
+        .sf1Button .label{
+            font-size: 16px;
+            color: #44596c;
+            text-shadow: none;
+            cursor: pointer;
+            font-family: 'ProximaNovaSoft-Semibold';
+            display: inline-block;
+        }
+      
+    </style>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        function clearTheFilters(){
+            PORShowLoading();
+            clearTheFilters1();
+            return false;
+        }
+    </script>
+    <body style="background-color: #f0f1f2;">
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="previous" action="{!applyFilters}" >
+        </apex:actionFunction>
+        <apex:actionFunction name="clearTheFilters" action="{!filterClass.clearTheFilters}" oncomplete="PORHideLoading();"  rerender="mainOpId"/>
+        <apex:outputPanel id="mainOpId">
+            <div  class="center"  style="margin:0;max-width:100%;">
+                <div class="container"  style="background-color: #f0f1f2;height:100%;">
+                    <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                        <ul class="buttonList horizontal forceButtonBar">
+                            <li class="buttonItem">
+                                <button class="sf1Button" title="Edit"  onclick="PORShowLoading();previous();"  accesskey="" type="button" >
+                                    <span class="label" style="color: #44596c;" dir="ltr" >{!$Label.Back}</span>
+                                </button>
+                                <button class="sf1Button" title="Edit" onclick="PORShowLoading();clearTheFilters();return false;" accesskey="" type="button" >
+                                    <span class="label" style="color: #44596c;" dir="ltr" >{!$Label.Clear}</span>
+                                </button> 
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="child1" style="width:100%;padding:0px;">
+                        <ol>
+                          <li class="sf1List" >
+                            <div >
+                                <div style="width: 90%;word-break: break-all;float: left;">
+                                    <apex:outputLabel style="font-weight:bold;" value="{!$Label.Referenceability}"/><br/>
+                                    <apex:outputLabel style="color: rgb(60, 61, 62);font-weight: normal !important;font-size:12px !important; " value="{!filterClass.SelectedReferenceabilities}"/>
+                                </div>
+                                <div style="width: 10%;float:left;font-size: 20px;font-weight: bold;">
+                                    <apex:commandLink value=">" style="float:right;padding-right: 50%;" onClick="PORShowLoading();" action="{!filterClass.referenceabilitySelectionPage}">
+                                    </apex:commandLink> 
+                                </div>
+                             </div>
+                           </li>
+                           <li class="sf1List" >
+                                <div >
+                                    <div style="width: 90%;word-break: break-all;float: left;">
+                                        <apex:outputLabel style="font-weight:bold;" value="{!$Label.Content_Language}"/><br/>
+                                        <apex:outputLabel style="color: rgb(60, 61, 62);font-weight: normal !important;font-size:12px !important;" value="{!filterClass.Selectedlanguages}"/>
+                                    </div>
+                                    <div style="width: 10%;float:left;font-size: 20px;font-weight: bold;">
+                                        <apex:commandLink style="float:right;padding-right: 50%;" value=">" action="{!filterClass.languageSelectionPage}">
+                                        </apex:commandLink>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="sf1List" >
+                                <div >
+                                    <div style="width: 90%;word-break: break-all;float: left;">
+                                        <apex:outputLabel style="font-weight:bold;" value="{!$Label.Content_Types}"/><br/>
+                                        <apex:outputLabel style="color: rgb(60, 61, 62);font-weight: normal !important;font-size:12px !important;" value="{!filterClass.SelectedContentTypes}"/>
+                                    </div>
+                                    <div style="width: 10%;float:left;font-size: 20px;font-weight: bold;">
+                                        <apex:commandLink style="float:right;padding-right: 50%;" value=">" action="{!filterClass.contentTypeSelectionPage}">
+                                        </apex:commandLink>
+                                    </div>
+                                </div>
+                            </li>
+                           <apex:repeat value="{!filterClass.allLabelAttributeWrappers}" var="labelWrap" id="languageId">
+                                <li class="sf1List" >
+                                    <div >
+                                        <div style="width: 90%;word-break: break-all;float: left;">
+                                            <apex:outputLabel style="font-weight:bold;" value="{!labelWrap.label.Name}"/><br/>
+                                            <apex:outputLabel style="color: rgb(60, 61, 62);font-weight: normal !important;font-size:12px !important;" value="{!labelWrap.selectedAttributeName}"/>
+                                        </div>
+                                        <div style="width: 10%;float:left;font-size: 20px;font-weight: bold;">
+                                            <apex:commandLink style="float:right;padding-right: 50%;" value=">" action="{!filterClass.filterSelectionPage}">
+                                                <apex:param name="selectedFilter" assignTo="{!filterClass.selectedFilterId}" value="{!labelWrap.label.Id}"/>
+                                            </apex:commandLink>
+                                        </div>
+                                    </div>
+                                </li>
+                            </apex:repeat>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </apex:outputPanel>
+    </apex:form>
+    </body> 
+</apex:page>

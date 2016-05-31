@@ -1,0 +1,22 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+      <ul class="sf-menu">
+          <li id="nav-first"><a href="RHEV_main">Overview</a>
+              <ul>
+                  <li><a href="RHEV_customers">Red Hat Customers</a></li>
+              </ul>
+          </li>
+          <li id="nav-second"><a href="RHEV_benefits">Benefits</a>
+              <ul>
+                <li><a href="RHEV_enterprise_ready">Enterprise-ready</a></li>
+                <li><a href="RHEV_scalable">Fast and Scalable</a></li>
+                <li><a href="RHEV_easily_extensible">Easily extensible</a></li>
+                <li><a href="RHEV_refreshingly_open">Refreshingly open</a></li>
+                <li><a href="RHEV_remarkably_affordable">Remarkably affordable</a></li>
+              </ul>
+          </li>
+          <li id="nav-third"><a href="RHEV_testimonials">Testimonials</a></li>
+          <li id="nav-sixth"><a href="RHEV_resources">Resources</a></li>
+          <li id="nav-seventh"><a href="RHEV_support">Support</a></li>
+      </ul><!-- /#nav -->
+
+</apex:page>

@@ -1,0 +1,44 @@
+<apex:page controller="TrainingTabController">
+<font color="red"><strong>
+<p>{!$Label.Training_Top_Message_1}</p>
+<p>{!$Label.Training_Top_Message_2}</p>
+</strong>
+</font>
+
+
+<h3>{!$Label.Training_What_is_Sales_College}</h3>
+<p>{!$Label.Training_What_is_Sales_College_a}</p>
+
+<h3>{!$Label.Training_What_benefit_q}</h3>
+<p>{!$Label.Training_What_benefit_a}</p>
+
+<h3>{!$Label.Training_How_Will_This_Help_q}</h3>
+<p>{!$Label.Training_How_Will_This_Help_a}</p>
+
+<h3>{!$Label.Training_Certified_Salesperson_q}</h3>
+<p>{!$Label.Training_Certified_Salesperson_a}</p>
+ 
+      
+<h3>{!$Label.Training_How_Do_I_Enroll_q}</h3>
+<p>{!$Label.Training_How_Do_I_Enroll_a}<br />
+<ul>
+    <li><a href="{!$Label.Red_Hat_Domain_Name}/apps/user/partner/salescollege.html?companyName={!CompanyName}&partnerId={!AccountId}&sf_partner=yes" target="_blank">{!$Label.Training_New_Registration}</a></li>
+    <li><a href="{!$Label.Red_Hat_Domain_Name}/Saba/Web/Partners" target="_blank">{!$Label.Training_Returning_Sales_College_Users}</a></li>
+</ul>
+</p>
+
+<h3>{!$Label.Training_What_Topics_Are_Taught_q}</h3>
+<p>{!$Label.Training_What_Topics_Are_Taught_a}<br />
+<ol>
+<li>{!$Label.Training_The} <strong>{!$Label.Training_RHPP_Certified_Sales_cert}</strong> {!$Label.Training_provide_required_skillset_RHPP}<br /><br /></li>
+<li>{!$Label.Training_The} <strong>{!$Label.Training_RHPM_Certified_Sales_cert}</strong> {!$Label.Training_provide_required_skillset_RHPM}</li>
+</ol>
+</p>
+
+<h3>{!$Label.Training_Have_A_Question_q}</h3>
+<p>{!$Label.Training_Have_A_Question_a}<a href="mailto:partner-college@redhat.com" target="_blank">{!$Label.Training_Have_A_Question_a_email}</a></p>
+<p>{!$Label.Training_Click_Video_sales_revenue}</p>
+
+<p><a href="{!$Label.Red_Hat_Domain_Name}/v/ogg/dlt.ogg" target="_blank">{!$Label.Training_Ogg}</a> | <a href="{!$Label.Red_Hat_Domain_Name}/v/mov/dlt.mov" target="_blank">{!$Label.Training_Quicktime}</a> | <a href="{!$Label.Red_Hat_Domain_Name}/v/rm/dlt.rm">{!$Label.Training_Real}</a> | <a href="{!$Label.Red_Hat_Domain_Name}/v/rm/dlt.ram">{!$Label.Training_Real}</a></p>  
+
+</apex:page>

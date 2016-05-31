@@ -1,0 +1,31 @@
+<apex:page standardController="Teaming_Agreement__c" extensions="Teaming_Agreement_Redirect" action="{!init}">
+
+    <apex:sectionheader title="{!$Label.Teaming_Agreement_RedirectTab}" />
+    <apex:pageblock >
+
+        <apex:outputPanel id="linksPanel" rendered="{!hasAgreements}">
+
+            <apex:repeat var="agreement" value="{!agreements}">
+                <apex:variable var="agreementAttachmentNumber" value="{!VALUE('1')}" />
+
+                   <apex:repeat var="agreementAttachment" value="{!agreement.Attachments}">
+                    <li>
+                        <apex:outputLink target="_blank" value="/servlet/servlet.FileDownload?file={!agreementAttachment.Id}">
+                            <apex:outputText value="{0}">
+                                <apex:param value="{!IF((Find('.',agreementAttachment.Name) == 0), agreementAttachment.Name, (LEFT(agreementAttachment.Name,(Find('.',agreementAttachment.Name) -1))))}" />
+                            </apex:outputText>
+                         </apex:outputLink>
+                    </li>
+                    <apex:variable var="agreementAttachmentNumber" value="{!agreementAttachmentNumber + 1}" />
+                </apex:repeat>
+            </apex:repeat>
+        </apex:outputPanel>
+
+        <!-- <p>View or Download the <a href="/sfc/servlet.shepherd/version/download/06860000000fvM8?asPdf=false&operationContext=CHATTER">Teaming Agreement Program Guide </a></p>
+        <p>View or Download the  <a href="/sfc/servlet.shepherd/version/download/06860000000fvKW?asPdf=false&operationContext=CHATTER">Deal Registration Program Guide</a></p> -->
+        
+    </apex:pageblock>
+
+    <apex:listViews type="Teaming_Agreement__c"/>
+
+</apex:page>

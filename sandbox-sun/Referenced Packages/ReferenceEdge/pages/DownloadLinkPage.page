@@ -1,0 +1,18 @@
+<apex:page controller="refedge.DownloadLinkController" sidebar="false">
+    <apex:pageMessages id="msgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="jsSendContentId" action="{!downloadContent}" reRender="msgId" oncomplete="test();return false;">
+            <apex:param name="contentId" assignTo="{!selectContentDocumentId}" value=""/>
+        </apex:actionFunction>
+    </apex:form>
+    
+    <script>
+        jsSendContentId('{!$CurrentPage.parameters.Id}');
+        function test(){
+        window.open('/sfc/servlet.shepherd/version/download/'+'{!JSENCODE($CurrentPage.parameters.ContentId)}','_self');
+        window.setTimeout(function(){window.parent.close()}, 3000);
+        }
+    </script>
+</apex:page>

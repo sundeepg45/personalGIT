@@ -1,0 +1,99 @@
+<apex:page controller="PartnerGateway" showHeader="false" cache="false" sidebar="false">
+
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Access the Partner Portal - Login or Apply</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css')}"></script>
+    <![endif]-->
+  </head>
+  <body id="access">
+  <div class="red-hat-content">
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+            </div><!-- /.col-xs-5 -->
+            <div class="col-xs-7">
+            </div><!-- /.col-xs-7 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+    <div class="container" id="email-notice">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-xs-12 alert-message">
+            <apex:outputText value="{!$Label.Onboarding_Email_Notice_Text}" escape="false">
+              <apex:param value="{!allowedLogins}" />
+            </apex:outputText>
+            <br />
+
+            <p style="font-size: 15pt">{!$Label.Onboarding_Email_Notice_Valid_Domains}</p>
+            <ul>
+                <apex:repeat value="{!allowedDomainList}" var="domain">
+                    <li>{!domain}</li>
+                </apex:repeat>
+            </ul>
+            <hr />
+
+            <div class="email-notice-response">
+              <apex:outputText value="{!$Label.Onboarding_Email_Domain_Invalid}" rendered="{!NOT(compliant)}" />
+              <apex:form >
+                <div class="text-field">
+                  <apex:inputText value="{!email}"/>
+                </div>
+                <apex:commandButton action="{!updateEmail}" value="{!$Label.Onboarding_Update_Email}" styleClass="ease"/>
+                <apex:commandButton action="{!goLogin}" value="{!$Label.Onboarding_Email_Update_Skip}" rendered="{!allowedLogins > 0}" styleClass="previous ease"/>
+              </apex:form>
+            </div>
+
+          </div><!-- /.col-xs-12 -->
+        </div><!-- /.row -->
+      </div><!-- /.content-wrapper -->
+    </div><!-- /.container -->
+    <c:Onboarding_Footer />
+  </div><!-- /.red-hat-content -->
+</body>
+<style>
+
+  .noSidebarCell, .sidebarCell {
+    padding: 0px !important;
+  }
+  body{
+    margin: 0px !important;
+  }
+  .bPageFooter{
+    padding: 0px !important;
+    display: none;
+  }
+  .bodyDiv .outerNoSidebar {
+    padding: 0px;
+  }
+  .globalHeaderBar {
+    margin: 0;
+  }
+</style>
+</apex:page>

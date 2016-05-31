@@ -1,0 +1,109 @@
+<apex:page controller="ProcessInstance_SetController" readonly="true" showHeader="true" id="Page">
+<apex:sectionHeader title="Approval Processes for {!activeUser.Name}"/>
+<apex:form id="pbForm">
+	<apex:actionStatus id="displayStatus" startText="Requesting Data..."></apex:actionStatus>
+	<apex:actionFunction name="first" action="{!first}" rerender="pbForm" status="displayStatus"/>
+	<apex:pageBlock mode="view" title=" ">
+		<apex:facet name="header">&nbsp;</apex:facet>
+		<apex:pageBlockSection columns="2">
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Display Option" for="displayOption"/>
+				<apex:outputPanel id="displayOption">
+					<apex:selectList value="{!displayOption}" size="1" onchange="first()" >
+						<apex:selectOptions value="{!displayOptions}"/>
+					</apex:selectList>
+				</apex:outputPanel>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Exclude Complete" for="excludeComplete"/>
+				<apex:outputPanel id="excludeComplete">
+					<apex:inputCheckbox value="{!ExcludeComplete}" onchange="first()" />
+				</apex:outputPanel>
+			</apex:pageBlockSectionItem>
+			<apex:pageBlockSectionItem >
+				<apex:outputLabel value="Include Queue Owned" for="groupOwned"/>
+				<apex:outputPanel id="groupOwned">
+					<apex:inputCheckbox value="{!includeGroups}"  onchange="first()"/>
+				</apex:outputPanel>
+			</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+		<apex:pageBlockSection title="Search Results">
+			<apex:pageBlockTable value="{!processInstanceRecords}" var="record"  rendered="{!displayOption == 'Summary'}">
+				<apex:column headerValue="User or Queue">
+					<apex:outputLink value="{!IF(activeUser.Id == record.ActorId,'/','/setup/own/groupdetail.jsp?id=')+record.ActorId}">
+						<apex:outputText value="{!record.Actor}"/>
+					</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Approval Category">
+					<apex:outputText value="{!record.TargetObject}"/>
+				</apex:column>
+			</apex:pageBlockTable>
+			<apex:pageBlockTable value="{!processInstanceStepRecords}" var="record"  rendered="{!displayOption == 'Approval Steps'}">
+				<apex:column headerValue="User or Queue">
+					<apex:outputLink value="{!IF(activeUser.Id == record.ActorId,'/','/setup/own/groupdetail.jsp?id=')+record.ActorId}">
+						<apex:outputText value="{!record.Actor}"/>
+					</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Approval Status">
+					<apex:outputText value="{!record.Status}"/>
+				</apex:column>
+				<apex:column headerValue="Approval Category">
+					<apex:outputLink value="/{!record.TargetObjectId}">
+						<apex:outputText value="{!record.TargetObject}"/>
+					</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Target Object">
+					<apex:outputLink value="/{!record.TargetObjectId}">
+						<apex:outputText value="{!record.TargetObjectName}"/>
+					</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Step Status">
+					<apex:outputText value="{!record.StepStatus}"/>
+				</apex:column>
+			</apex:pageBlockTable>
+			<apex:pageBlockTable value="{!processInstanceWorkitemRecords}" var="record"  rendered="{!displayOption == 'Workitems'}">
+				<apex:column headerValue="User or Queue">
+					<apex:outputLink value="{!IF(activeUser.Id == record.ActorId,'/','/setup/own/groupdetail.jsp?id=')+record.ActorId}">
+						<apex:outputText value="{!record.Actor}"/>
+					</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Status">
+					<apex:outputText value="{!record.Status}"/>
+				</apex:column>
+				<apex:column headerValue="Approval Category">
+					<apex:outputLink value="/{!record.TargetObjectId}">
+						<apex:outputText value="{!record.TargetObject}"/>
+					</apex:outputLink>
+				</apex:column>
+				<apex:column headerValue="Target Object">
+					<apex:outputLink value="/{!record.TargetObjectId}">
+						<apex:outputText value="{!record.TargetObjectName}"/>
+					</apex:outputLink>
+				</apex:column>
+			</apex:pageBlockTable>
+		</apex:pageBlockSection>
+		<apex:pageBlockButtons rendered="{!OR(paginator.HasPrevious,paginator.HasNext)}">
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!first}" rendered="{!paginator.HasPrevious}">First</apex:commandlink>
+				<apex:outputText rendered="{!NOT(paginator.HasPrevious)}" value="First"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!previous}" rendered="{!paginator.HasPrevious}">Previous</apex:commandlink>
+				<apex:outputText rendered="{!NOT(paginator.HasPrevious)}" value="Previous"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!next}" rendered="{!paginator.HasNext}">Next</apex:commandlink>
+				<apex:outputText rendered="{!NOT(paginator.HasNext)}" value="Next"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputPanel layout="none">
+				<apex:commandLink action="{!last}" rendered="{!paginator.HasNext}">Last</apex:commandlink>
+				<apex:outputText rendered="{!NOT(paginator.HasNext)}" value="Last"/>&nbsp;
+			</apex:outputPanel>
+			<apex:outputText value="({0} of {1})">
+				<apex:param value="{!paginator.PageNumber}"/>
+				<apex:param value="{!pageCount}"/>
+			</apex:outputText>
+		</apex:pageBlockButtons>
+	</apex:pageBlock>
+</apex:form>
+</apex:page>

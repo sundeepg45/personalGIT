@@ -1,0 +1,152 @@
+<apex:page controller="TabUIController" extensions="StrategicPlanControllerExtension" showChat="false" showHeader="false" sidebar="false">
+    <style>
+    .scrollTable
+    {
+        max-height:28ex;
+        overflow-y:auto;
+        overflow-x:hidden;
+    }
+    </style>    
+    <apex:outputPanel id="plan">
+        <apex:form id="detailForm">
+            <apex:pageBlock title="{!$Label.StrategicPlan_DetailTitle}" mode="{!IF(mode='view','inlineEdit','edit')}" >
+                <apex:pageMessages id="pageMessages"/>
+                <apex:pageBlockButtons location="both">
+                    <apex:commandButton action="{!editRecord}" id="editButton" value="{!$Label.Edit}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isUpdateable)}" />
+                    <apex:commandButton action="{!deleteRecord}" id="deleteButton" value="{!$Label.Delete}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isDeletable)}" />
+                    <apex:commandButton action="{!submitStrategicPlan}" id="submitButton" value="{!$Label.StrategicPlan_SubmitForManagerReview}" rendered="{!AND(mode='view',NOT(ISBLANK(id)),isUpdateable,StrategicPlan.OwnerId = $User.Id,StrategicPlan.Status__c != 'Submitted')}" />
+                    <apex:commandButton action="{!showSummary}" id="summaryButton" value="{!$Label.StrategicPlan_ShowSummary}" rendered="{!AND(mode='view',NOT(ISBLANK(Id)),ShowSummaryEnabled)}"/>
+                    <apex:commandButton action="{!saveStrategicPlan}" id="saveButton" value="{!$Label.Save}" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(AND(mode='new',isCreateable),AND(NOT(ISBLANK(id)),isUpdateable))}" />
+                    <apex:commandButton action="{!cancelStrategicPlan}" id="cancelButton" value="{!$Label.cancel}" immediate="true" style="{!IF(mode='view','display:none','display:inline')}" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}"/>
+                </apex:pageBlockButtons>
+                <apex:outputPanel layout="none" rendered="{!OR(mode='new',NOT(ISBLANK(id)))}">
+                    <apex:pageBlockSection columns="1" collapsible="false">
+                        <apex:outputText value="{!$Label.StrategicPlan_DetailsInstructions}"/>
+                    </apex:pageBlockSection>                
+                    <apex:pageBlockSection columns="2" collapsible="false">
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, cloneButton, submitButton, summaryButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!StrategicPlan.Name}" rendered="{!mode='view'}" id="strategicPlanNameOutput"/>
+                            <apex:inputField value="{!StrategicPlan.Name}" rendered="{!mode!='view'}" id="strategicPlanNameInput"/>
+                            <apex:outputField value="{!StrategicPlan.PlanNumber__c}" id="strategicPlanNumberOutput"/>
+                            <apex:outputField value="{!StrategicPlan.PlanStartDate__c}" rendered="{!mode='view'}" id="strategicPlanStartDateOutput"/>
+                            <apex:inputField value="{!StrategicPlan.PlanStartDate__c}" rendered="{!mode!='view'}" id="strategicPlanStartDateInput"/>
+                            <apex:outputField value="{!StrategicPlan.PlanEndDate__c}" rendered="{!mode='view'}" id="strategicPlanEndDateOutput"/>
+                            <apex:inputField value="{!StrategicPlan.PlanEndDate__c}" rendered="{!mode!='view'}" id="strategicPlanEndDateInput"/>
+                            <apex:outputField value="{!StrategicPlan.FiscalYear__c}" rendered="{!mode='view'}" id="strategicPlanFiscalYearOutput"/>
+                            <apex:inputField value="{!StrategicPlan.FiscalYear__c}" rendered="{!mode!='view'}" id="strategicPlanFiscalYearInput"/>
+                            <apex:outputField value="{!StrategicPlan.Status__c}" id="strategicPlanStatusOutput">
+                                <apex:inlineEditSupport disabled="true"/>
+                            </apex:outputField>
+                            <apex:outputField value="{!StrategicPlan.AccountProfile__c}" rendered="{!mode='view'}" id="strategicPlanAccountProfileOutput">
+                                <apex:inlineEditSupport disabled="true"/>
+                            </apex:outputField>
+                            <apex:inputField value="{!StrategicPlan.AccountProfile__c}" required="true" rendered="{!mode!='view'}" id="strategicPlanAccountProfileInput"/>
+                            <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(StrategicPlan.CreatedById))}">
+                                <apex:outputLabel value="{!$Label.CreatedBy}" for="createdBy"/>
+                                <apex:outputPanel layout="inline" id="createdBy">
+                                    <apex:outputField value="{!StrategicPlan.CreatedById}" id="strategicPlanCreatedByOutput" />
+                                    <apex:outputText value=", {!StrategicPlan.CreatedDate}" id="strategicPlanCreatedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem rendered="{!NOT(ISBLANK(StrategicPlan.LastModifiedById))}">
+                                <apex:outputLabel value="{!$Label.LastModifiedBy}" for="lastModifiedBy"/>
+                                <apex:outputPanel layout="inline" id="lastModifiedBy">
+                                    <apex:outputField value="{!StrategicPlan.LastModifiedById}" id="strategicPlanModifiedByOutput" />
+                                    <apex:outputText value=", {!StrategicPlan.LastModifiedDate}" id="strategicPlanModifiedDateOutput"/>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                            <apex:outputField value="{!StrategicPlan.AnnualRevenue__c}" rendered="{!mode!='new'}" id="strategicPlanAnnualRevenueOutput"/>
+                            <apex:outputField value="{!StrategicPlan.AnnualITBudget__c}" rendered="{!mode!='new'}" id="strategicPlanAnnualITBudgetOutput"/>
+                            <apex:outputField value="{!StrategicPlan.NumberOfEmployees__c}" rendered="{!mode!='new'}" id="strategicPlanNumberOfEmployeesOutput"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection columns="1" collapsible="false">
+                            <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, cloneButton, submitButton, summaryButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!mode='view'}" />
+                            <apex:outputField value="{!StrategicPlan.Account__c}" rendered="{!mode='view'}" id="strategicPlanAccountOutput"/>
+                            <apex:inputField value="{!StrategicPlan.Account__c}" rendered="{!mode!='view'}" id="strategicPlanAccountInput"/>
+                            <apex:outputField value="{!StrategicPlan.AccountNumber__c}" rendered="{!mode!='new'}" id="strategicPlanAccountNumberOutput"/>
+                            <apex:outputField value="{!StrategicPlan.AccountClassification__c}" rendered="{!mode!='new'}" id="strategicPlanAccountClassificationOutput"/>
+                            <apex:outputField value="{!StrategicPlan.AccountType__c}" rendered="{!mode!='new'}" id="strategicPlanAccountTypeOutput"/>
+                            <apex:outputField value="{!StrategicPlan.AccountBillingAddress__c}" rendered="{!mode!='new'}" id="strategicPlanAccountBillingAddressOutput"/>
+                            <apex:outputField value="{!StrategicPlan.ParentAccount__c}" rendered="{!mode!='new'}" id="strategicPlanParentAccountOutput"/>
+                            <apex:outputPanel layout="block" styleClass="scrollTable" rendered="{!mode!='new'}"> 
+                                <apex:pageBlockTable value="{!accountTeamMembers}" var="accountTeamMember" cellPadding="4" border="1">
+                                    <apex:column ><apex:facet name="header">{!$Label.StrategicPlan_AccountTeamMember}</apex:facet><apex:outputField value="{!accountTeamMember.User.Name}" id="accountTeamMemberNameOutput"/></apex:column>
+                                    <apex:column ><apex:facet name="header">{!$Label.StrategicPlan_AccountTeamRole}</apex:facet><apex:outputField value="{!accountTeamMember.TeamMemberRole}" id="accountTeamMemberRoleOutput"/></apex:column>
+                                </apex:pageBlockTable>
+                            </apex:outputPanel>
+                        </apex:pageBlockSection>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:pageBlock>
+        </apex:form>
+        <apex:form id="reviewForm">
+            <apex:pageBlock title="{!$Label.StrategicPlan_ReviewTitle}" mode="edit" rendered="{!AND(mode='view',approvalWorkItemId!=null)}">
+                <apex:pageBlockButtons location="both">
+                    <apex:commandButton action="{!approveStrategicPlan}" id="approveButton" value="{!$Label.Approve}" />
+                    <apex:commandButton action="{!rejectStrategicPlan}" id="rejectButton" value="{!$Label.Reject}" />
+                </apex:pageBlockButtons>
+                <apex:outputPanel layout="none">
+                    <apex:pageBlockSection columns="1" collapsible="false">
+                        <apex:inputField id="approvalComments" required="true" value="{!reviewHistory.Comments__c}" style="width:100%;" />
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:pageBlock>
+        </apex:form>
+        <apex:form id="reviewHistoryForm">
+            <apex:pageBlock title="{!$Label.StrategicPlan_ReviewHistoryTitle}" rendered="{!AND(mode!='new',reviewHistoryList.size != 0)}">
+                <apex:outputPanel layout="block" styleClass="scrollTable"> 
+                    <c:QueriedList sequenceNumber="{!sequenceNumber}"
+                        object="StrategicPlan_ReviewHistory__c"
+                        fields="ActionDate__c,Action__c,UserName__c,Comments__c"
+                        sortFields="ActionDate__c,Action__c,UserName__c,"
+                        conditions="StrategicPlan__c='{!Id}'"
+                        order="ActionDate__c DESC NULLS LAST,Action__c,UserName__c,Id"
+                        recordsPerPage="50"
+                        actionField="None"
+                        panelClass="scrollTable" />                             
+                </apex:outputPanel>
+            </apex:pageBlock>
+        </apex:form>
+        <apex:form id="contributorsForm">
+            <apex:pageBlock title="{!$Label.StrategicPlan_ContributorsTitle}" rendered="{!mode!='new'}">
+                <apex:outputPanel layout="block" styleClass="scrollTable"> 
+                    <apex:pageBlockTable value="{!planContributors}" var="planContributor" cellPadding="4" border="1">
+                        <apex:column headerValue="{!$Label.StrategicPlan_Contributor}"><apex:outputText value="{!planContributor.fullName}" id="planContributorFullName"/></apex:column>
+                        <apex:column headerValue="{!$Label.StrategicPlan_PlanUpdate}"><apex:outputText value="{!planContributor.editCount}" id="planContributorEditCount"/></apex:column>
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+            </apex:pageBlock>          
+        </apex:form>
+        <apex:form id="actionForm">
+            <apex:pageBlock title="{!$ObjectType.StrategicPlan_Action__c.LabelPlural}" mode="detail" id="actions" rendered="{!NOT(ISBLANK(Id))}">
+                <apex:pageBlockButtons location="top">
+                    <apex:commandButton action="{!newAction}" id="newAction" value="{!$Label.StrategicPlan_NewAction}" immediate="true" rendered="{!AND(mode='view',isCreateable)}" />
+                </apex:pageBlockButtons>
+                <c:QueriedList sequenceNumber="{!sequenceNumber}"
+                    object="StrategicPlan_Action__c"
+                    fields="Name,ActionSubject__c,AssignedTo__c,Status__c,Start__c,End__c,RelatedTo__c"
+                    sortFields="Name,ActionSubject__c,AssignedTo__r.Name,Status__c,Start__c,End__c,RelatedTo_Number__c"
+                    conditions="StrategicPlan__c='{!Id}' and Subject__c='Strategic Plan'"
+                    order="Name,ActionSubject__c,RelatedTo_Number__c,Id"
+                    recordsPerPage="50"
+                    actionField="Name"
+                    panelClass="scrollTable"
+                    rendered="{!NOT(ISBLANK(Id))}" />
+            </apex:pageBlock>
+        </apex:form>
+        <apex:form id="attachmentsForm">
+            <apex:pageBlock title="{!$Label.StrategicPlan_Snapshots}" rendered="{!mode!='new'}">
+                <apex:pageBlockButtons location="top">
+                    <apex:commandButton action="{!attachPlanPDF}" id="attachPlanPDF" value="{!$Label.StrategicPlan_AttachCurrentSnapshot}" immediate="true" rendered="{!mode='view'}" />
+                </apex:pageBlockButtons>
+                <apex:outputPanel layout="block" styleClass="scrollTable">
+                    <apex:pageBlockTable value="{!attachments}" var="attachment" cellPadding="4" border="1">
+                        <apex:column headerValue="{!$ObjectType.Attachment.fields.Name.Label}" id="attachmentName"><apex:commandLink action="/{!attachment.Id}" value="{!attachment.Name}"/></apex:column>
+                        <apex:column value="{!attachment.CreatedDate}" id="attachmentCreatedDate"/>
+                    </apex:pageBlockTable>
+                </apex:outputPanel>
+            </apex:pageBlock>
+        </apex:form>
+    </apex:outputPanel>
+</apex:page>

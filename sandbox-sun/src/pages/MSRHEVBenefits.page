@@ -1,0 +1,83 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" >
+
+	<apex:include pageName="RHEV_include_header"/>
+
+	<body id="second" class="ms dark">
+	<div id="wrapper">
+		<div id="page">
+			<div class="container_12 clearfix">
+				<div id="header" class="grid_12">
+					<div id="sm-logo"><a href="http://www.redhat.com">Red Hat</a></div><!-- /#sm-logo -->
+					<div id="header-links">
+					<ul style="margin-right: 8px;">
+						<li class="first" style=""></li>
+					</ul>
+						<div class="clear"></div>
+						<a target="_blank" class="header-button" href="http://www.redhat.com">redhat.com</a><!-- /.header-button -->
+					</div><!-- /#header-links -->
+					<div id="nav-band">
+					  <div id="primary-nav">
+						<apex:include pageName="MSRHEV_include_nav"/>
+					  </div><!-- /#primary-nav -->
+					</div><!-- /#nav-band -->
+						<apex:include pageName="RHEV_include_promo"/>
+					
+				</div><!-- /#header -->
+				<div class="clear"></div>
+
+				<div id="main">
+<div class="grid_12">
+	
+	<div class="grid_9 alpha two-up"><h1 class="boxed">Benefits</h1>
+		<p></p>
+		<div class="grid_4 alpha" style="width: 340px;">
+			<div class="box-thing">
+				<img src="{!URLFOR($Resource.RHEV_zip, 'i/icon_enterprise.png')}" />
+				<h2><a href="RHEV_enterprise_ready">Enterprise-ready</a></h2>
+				<p>The enterprise features you need to virtualize your most challenging workloads.</p>
+			</div>
+			
+			<div class="box-thing">
+				<img src="{!URLFOR($Resource.RHEV_zip, 'i/icon_scalable.png')}" />
+				<h2><a href="RHEV_scalable">Fast and scalable</a></h2><p>The top virtualization benchmarks for performance and scalability to power your virtual machine workloads. </p>
+			</div>
+			
+			<div class="box-thing">
+				<img src="{!URLFOR($Resource.RHEV_zip, 'i/icon_extensible.png')}" />
+				<h2><a href="RHEV_easily_extensible">Easily extensible</a></h2><p>The same hardware compatibility of Red Hat&reg; Enterprise Linux&reg; and a growing list of software partners whose solutions integrate with Red Hat Enterprise Virtualization. </p>
+			</div>
+		</div><!-- grid_4 -->
+		<div class="grid_4 omega" style="width: 340px;">
+			<div class="box-thing">
+				<img src="{!URLFOR($Resource.RHEV_zip, 'i/icon_open.png')}" />
+				<h2><a href="RHEV_refreshingly_open">Refreshingly open</a></h2><p>No lock-in ever with the only enterprise-ready open source virtualization. </p>
+			</div>
+			
+			<div class="box-thing">
+				<img src="{!URLFOR($Resource.RHEV_zip, 'i/icon_affordable.png')}" />
+				<h2><a href="RHEV_remarkably_affordable">Remarkably affordable</a></h2><p>The most affordable solution available, with customers enjoying a lower total cost of ownership and faster return on investment compared to proprietary solutions.</p>
+			</div>
+		</div><!-- grid_4 -->
+
+	<div class="clear"></div>
+</div><!-- /.grid_9 -->	
+<div class="grid_3 omega">
+	<apex:include pageName="RHEV_include_contact"/>
+</div><!-- /.grid_3 -->
+
+<div class="clear"></div>
+
+		
+</div><!-- /.grid_12 -->
+</div><!-- /#main -->
+
+<div class="clear"></div>
+
+<apex:include pageName="RHEV_include_footer"/>				
+</div>
+</div>
+
+</div>
+</body>
+
+</apex:page>

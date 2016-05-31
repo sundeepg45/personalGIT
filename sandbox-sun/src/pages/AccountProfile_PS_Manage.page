@@ -1,0 +1,72 @@
+<apex:page controller="AccountProfile_PS_SetController" showHeader="true" sidebar="true">
+	<apex:sectionHeader title="{!$Label.AccountProfile_PreferredRedHatPartnerManager}"
+		subtitle="{!accountProfile.Name} ({!accountProfile.Account__r.Name})" />
+	<apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+		<apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+		<apex:outputLink value="/{!accountProfile.Id}">
+			<apex:outputText value="{!$Label.AccountProfile_BacktoAccountProfile}: " />
+			<apex:outputText value="{!accountProfile.Name} ({!accountProfile.Account__r.Name})"/>
+		</apex:outputLink>
+	</apex:outputPanel>
+	<apex:form id="form">
+		<apex:pageBlock mode="edit" title=" ">
+			<apex:facet name="header">&nbsp;</apex:facet>
+			<apex:pageMessages />
+			<apex:pageBlockSection columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="{!$Label.AccountProfile_Search}    " for="search"/>
+					<apex:outputPanel id="search">
+						<apex:inputText value="{!searchString}" size="20">
+							<apex:actionSupport action="{!updateSearchString}" event="onchange" rerender="form" status="statusLoading" />
+						</apex:inputText>
+						<apex:commandButton value="{!$Label.AccountProfile_GO}"/>
+						<apex:commandButton value="{!$Label.AccountProfile_Finish}" action="{!cancel}"/>
+						<br/>{!$Label.AccountProfile_SearchInstructions}
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="{!$Label.AccountProfile_SearchResults}">
+				<apex:pageBlockTable value="{!partnerStatusPagination}" var="ps">
+					<apex:column headerValue="{!$Label.AccountProfile_Action}">
+						<apex:commandLink action="{!ps.addPartnerStatus}" rendered="{!ISBLANK(ps.AccountProfile_PartnerStatus.Id)}" rerender="form">Add</apex:commandLink>
+						<apex:commandLink action="{!ps.deletePartnerStatus}" rendered="{!NOT(ISBLANK(ps.AccountProfile_PartnerStatus.Id))}" rerender="form">Delete</apex:commandLink>
+					</apex:column>
+					<apex:column value="{!ps.PartnerStatus.Partner__c}" />
+					<apex:column headerValue="{!$ObjectType.Account.Fields.Site.Label}" value="{!ps.PartnerStatus.Partner__r.Site}"/>
+					<apex:column headerValue="{!$ObjectType.Account.Fields.OracleAccountNumber__c.Label}" value="{!ps.PartnerStatus.Partner__r.OracleAccountNumber__c}"/>
+					<apex:column headerValue="{!$ObjectType.OpportunityPartner__c.Fields.PartnerTier__c.Label}">
+						<apex:outputText value="{!SUBSTITUTE(ps.PartnerStatus.PartnerTier__r.Hierarchy__c,'Partner Tier » ','')}"/>
+					</apex:column>
+					<apex:column headerValue="{!$ObjectType.OpportunityPartner__c.Fields.PartnerType__c.Label}">
+						<apex:outputText value="{!SUBSTITUTE(ps.PartnerStatus.PartnerType__r.Hierarchy__c,'Partner Type » ','')}"/>
+					</apex:column>
+					<apex:column value="{!ps.PartnerStatus.Partner__r.Type}" headerValue="{!$ObjectType.Account.Fields.Type.Label}" />
+					<apex:column value="{!ps.PartnerStatus.Partner__r.Owner.Alias}" headerValue="{!$Label.AccountProfile_OwnerAlias}" />
+					<apex:column value="{!ps.PartnerStatus.Partner__r.RecordType.Name}" headerValue="{!$Label.AccountProfile_RecordType}" />
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+			<apex:pageBlockButtons rendered="{!OR(partnerStatusRecords.HasPrevious,partnerStatusRecords.HasNext)}">
+				<apex:outputPanel layout="none">
+					<apex:commandLink action="{!first}" rendered="{!partnerStatusRecords.HasPrevious}">{!$Label.AccountProfile_First}</apex:commandlink>
+					<apex:outputText rendered="{!NOT(partnerStatusRecords.HasPrevious)}" value="First"/>&nbsp;
+				</apex:outputPanel>
+				<apex:outputPanel layout="none">
+					<apex:commandLink action="{!previous}" rendered="{!partnerStatusRecords.HasPrevious}">{!$Label.AccountProfile_Previous}</apex:commandlink>
+					<apex:outputText rendered="{!NOT(partnerStatusRecords.HasPrevious)}" value="Previous"/>&nbsp;
+				</apex:outputPanel>
+				<apex:outputPanel layout="none">
+					<apex:commandLink action="{!next}" rendered="{!partnerStatusRecords.HasNext}">{!$Label.AccountProfile_Next}</apex:commandlink>
+					<apex:outputText rendered="{!NOT(partnerStatusRecords.HasNext)}" value="Next"/>&nbsp;
+				</apex:outputPanel>
+				<apex:outputPanel layout="none">
+					<apex:commandLink action="{!last}" rendered="{!partnerStatusRecords.HasNext}">{!$Label.AccountProfile_Last}</apex:commandlink>
+					<apex:outputText rendered="{!NOT(partnerStatusRecords.HasNext)}" value="Last"/>&nbsp;
+				</apex:outputPanel>
+				<apex:outputText value="({0} of {1})">
+					<apex:param value="{!partnerStatusRecords.PageNumber}"/>
+					<apex:param value="{!pageCount}"/>
+				</apex:outputText>
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

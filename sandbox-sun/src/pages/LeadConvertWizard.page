@@ -1,0 +1,53 @@
+<apex:page standardController="Lead" extensions="LeadConvertWizardControllerExtension">
+	<apex:sectionHeader title="Lead Conversion Wizard" subtitle="{!Lead.Name}" />
+	<apex:form id="form">
+		<apex:pageBlock title="{!$ObjectType.Lead.Label}" mode="edit">
+			<apex:pageMessages />
+			<apex:pageBlockButtons location="both">
+				<apex:commandButton value="Continue" action="{!leadConvert}" />
+				<apex:commandButton value="Cancel" action="{!cancel}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection title="Opportunity Conversion Information" columns="1" rendered="{!NOT(currentLead.StandardConversion__c)}">
+				<apex:pageBlockSectionItem rendered="{!NOT(currentLead.StandardConversion__c)}">
+					<apex:outputText styleClass="labelCol" escape="false" value="{!$Label.LeadConversionWizardInfoText1}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!NOT(currentLead.StandardConversion__c)}"/>
+				<apex:repeat value="{!$ObjectType.Lead.FieldSets.LeadConversionWizardFields1}" var="field">
+					<apex:inputField value="{!currentLead[field]}" rendered="{!NOT(currentLead.StandardConversion__c)}" required="{!OR(field.required, field.dbrequired)}" id="currentField"/>
+				</apex:repeat>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="" columns="1" rendered="{!NOT(currentLead.StandardConversion__c)}">
+				<apex:pageBlockSectionItem rendered="{!NOT(currentLead.StandardConversion__c)}">
+					<apex:outputText styleClass="labelCol" value="{!$Label.LeadConversionWizardInfoText2}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!NOT(currentLead.StandardConversion__c)}"/>
+				<apex:repeat value="{!$ObjectType.Lead.FieldSets.LeadConversionWizardFields2}" var="field">
+					<apex:inputField value="{!currentLead[field]}" rendered="{!NOT(currentLead.StandardConversion__c)}" required="{!OR(field.required, field.dbrequired)}" id="currentField"/>
+				</apex:repeat>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="" columns="1" rendered="{!NOT(currentLead.StandardConversion__c)}">
+				<apex:pageBlockSectionItem rendered="{!NOT(currentLead.StandardConversion__c)}">
+					<apex:outputText styleClass="labelCol" value="{!$Label.LeadConversionWizardInfoText3}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!NOT(currentLead.StandardConversion__c)}"/>
+				<apex:repeat value="{!$ObjectType.Lead.FieldSets.LeadConversionWizardFields3}" var="field">
+					<apex:inputField value="{!currentLead[field]}" rendered="{!NOT(currentLead.StandardConversion__c)}" required="{!OR(field.required, field.dbrequired)}" id="currentField"/>
+				</apex:repeat>				
+			</apex:pageBlockSection>
+			<apex:pageBlockSection title="" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputText styleClass="labelCol" value="{!$Label.LeadConversionWizardInfoText4}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem />
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="{!$ObjectType.Lead.fields.StandardConversion__c.Label}" for="primaryBusinessUnit"/>
+					<apex:actionRegion >
+						<apex:inputField value="{!currentLead.StandardConversion__c}">
+							<apex:actionSupport event="onchange" rerender="form"/>
+						</apex:inputField>
+					</apex:actionRegion>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

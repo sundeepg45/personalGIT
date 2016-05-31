@@ -1,0 +1,56 @@
+<apex:page cache="true" expires="1" controller="PPBulkSubmitController" action="{! loadOptions }">
+	<apex:form >
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Partner Points Bulk Upload<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Step 1: Upload File</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+				
+        <apex:pageBlock >
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+            	<apex:commandButton id="submitButton" action="{! uploadCSV }" value="Upload"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection columns="1">
+            	<apex:pageBlockSectionItem id="file">
+            		<apex:outputLabel value="Select CSV File:" for="csvFile"/>
+            		<apex:inputFile contentType="{!csvContentType}" fileName="{!csvFileName}" value="{! csvFile }" id="csvFile"/>
+            	</apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem id="template">
+            		<apex:outputLabel value="CSV Template:" for="csvTemplate"/>
+            		<apex:outputText id="csvTemplate">
+            			<a href="{!$Resource.PPBatchLoadTemplate}">Download</a> (Please add .csv extension before uploading)
+            		</apex:outputText>
+            	</apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem id="region">
+            		<apex:outputLabel value="Region:" for="superRegion"/>
+                    <apex:selectList id="cboRegion" value="{!selectedRegion}" size="1">
+                    	<apex:selectOption itemLabel="- Select One -" itemValue=""/>
+                      	<apex:selectOptions value="{!regionOptions}" />
+                    </apex:selectList>
+            	</apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem id="type">
+            		<apex:outputLabel value="Batch for:" for="batchType"/>
+                    <apex:selectList id="cboBatchType" value="{!batchCode}" size="1">
+                    	<apex:selectOption itemLabel="- Select One -" itemValue=""/>
+                      	<apex:selectOptions value="{!batchTypeOptions}" />
+                    </apex:selectList>
+            	</apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem id="note">
+            		<apex:outputLabel value="Note:" for="noteText"/>
+            		<apex:outputText id="noteText">
+		            	Maximum of 1,000 records per file
+		            </apex:outputText>
+		        </apex:pageBlockSectionItem>
+            	
+            </apex:pageBlockSection>
+		</apex:pageBlock>
+
+		
+	</apex:form>	
+</apex:page>

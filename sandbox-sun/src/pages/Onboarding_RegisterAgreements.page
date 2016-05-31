@@ -1,0 +1,111 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+
+    <script language="javascript" type="text/javascript">
+        
+        function showOrHideDeclinedReasonPanel(element, elementName) {
+            elval = element.value;
+            customBlockId = '{!$Component.mainForm.customTermsBlock}';
+            if (elval == 'Yes') {
+                document.getElementById(elementName).style.display = 'none';
+                el = document.getElementById(customBlockId);
+                if (el != null) el.style.display = 'none';
+            }
+            else if (elval == 'No') {
+                document.getElementById(elementName).style.display = 'inline';
+                el = document.getElementById(customBlockId);
+                if (el != null) el.style.display = 'inline';
+            }
+            else {
+                document.getElementById(elementName).style.display = 'none';
+                el = document.getElementById(customBlockId);
+                if (el != null) el.style.display = 'none';
+            }
+        }
+
+		$(document).ready(function() {
+			var customBlockId = '{!$Component.mainForm.customTermsBlock}';
+			var agreed = '{!agreementAcceptence}';
+			if (customBlockId != '' && agreed != 'No') {
+                document.getElementById(customBlockId).style.display = 'none';
+			}
+		});
+    </script>
+
+
+    <apex:outputPanel layout="none">
+        <h4>{!$Label.Onboarding_RegisterAgreements_Title}</h4>
+        <div id="onboardSectionTitle">{!$Label.Onboarding_RegisterAgreements_T_and_C}</div>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none">
+        <p>{!$Label.Onboarding_RegisterAgreements_Accept_Terms}</p>
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none">
+        <ul>
+            <apex:repeat var="agreement" value="{!relevantAgreementList}">
+                <apex:variable var="agreementAttachmentNumber" value="{!VALUE('1')}" />
+
+                
+                   <apex:repeat var="agreementAttachment" value="{!agreement.Attachments}">
+                    <li>  
+                    <apex:outputLink value="/servlet/servlet.FileDownload?file={!agreementAttachment.Id}">
+                        <apex:outputText value="{0}">
+                            <apex:param value="{!IF((Find('.',agreementAttachment.Name) == 0), agreementAttachment.Name, (LEFT(agreementAttachment.Name,(Find('.',agreementAttachment.Name) -1))))}" />
+                        </apex:outputText>                          
+                     </apex:outputLink>
+                     <apex:outputText value=" ({0})" rendered="{!(agreement.IsSignatureRequired__c || selectedCountry.IsAgreementSignatureRequired__c)}">
+                            <apex:param value="{!$Label.Onboarding_RegisterAgreements_Sig_required}" />
+                     </apex:outputText>
+                    </li>
+                    <apex:variable var="agreementAttachmentNumber" value="{!agreementAttachmentNumber + 1}" />
+                </apex:repeat>
+            </apex:repeat>
+        </ul>
+    </apex:outputPanel>
+
+    <apex:form id="mainForm" >
+        <apex:outputPanel layout="block">
+             <apex:outputPanel >{!$Label.Onboarding_RegisterAgreements_Ack_terms}</apex:outputPanel>
+             <apex:selectRadio onclick="showOrHideDeclinedReasonPanel(this, '{!$Component.declinedReasonPanel}');" value="{!agreementAcceptence}" layout="pageDirection"> 
+                 <apex:selectOption id="selectOptionAccept" itemLabel="{!$Label.Onboarding_RegisterAgreements_Accepted}" itemValue="Yes" />
+                 <apex:selectOption id="selectOptionDecline" itemLabel="{!$Label.Onboarding_RegisterAgreements_Declined}" itemValue="No" />
+            </apex:selectRadio>
+            <apex:outputPanel id="declinedReasonPanel" style="display:inline">
+                <apex:outputText value="{!$Label.Onboarding_RegisterAgreements_If_Declined_Why}"/> <br/>
+                <apex:inputTextarea cols="50" rows="5" value="{!declinedReason}" id="txtDeclineReason"/>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="customTermsBlock" layout="block" rendered="{!SelectedPartnerType.HierarchyKey__c == 'PARTNER_TYPE.SERVICECLOUD_PROVIDER'}">
+            <div>&nbsp;</div>
+            <h2>{!$Label.Onboarding_Custom_Terms_Title}</h2>
+            <hr />
+             <apex:outputPanel >
+                {!$Label.Onboarding_Custom_Terms_Required} &nbsp;&nbsp;&nbsp;
+                 <apex:selectRadio value="{!customTerms}" layout="pageDirection"> 
+                     <apex:selectOption id="selectOptionYes" itemLabel="{!$Label.yes}" itemValue="Yes" />
+                     <apex:selectOption id="selectOptionNo" itemLabel="{!$Label.no}" itemValue="No" />
+                </apex:selectRadio>
+             </apex:outputPanel>
+            <apex:outputPanel >
+                {!$Label.Onboarding_Terms_Delayed_Entry_Message}
+            </apex:outputPanel>
+            <br /><br />
+            <apex:outputPanel id="customTermsPanel" style="display:inline">
+                <apex:outputText value="{!$Label.Onboarding_Custom_Terms_Description}"/> <br/>
+                <apex:inputTextarea cols="50" rows="5" value="{!customTermsText}" id="txtCustomTerms"/>
+            </apex:outputPanel>
+        </apex:outputPanel>
+
+        <fieldset class="fieldsetform"><apex:outputPanel styleClass="rowform" layout="block">
+            <apex:outputLabel >&nbsp;</apex:outputLabel>
+            <apex:outputPanel id="buttonPanel">
+                <apex:commandButton action="{!registerAgreementsSubmit}" value="{!$Label.Onboarding_RegisterAgreements_Save}" styleClass="rowbutton" id="buttonSave"/>
+                <apex:commandButton action="{!registerAgreementsCancel}" value="{!$Label.Onboarding_RegisterAgreements_Back}" styleClass="rowbutton" id="buttonBack"/>
+            </apex:outputPanel>
+        </apex:outputPanel>
+       </fieldset>
+    </apex:form>
+</apex:page>

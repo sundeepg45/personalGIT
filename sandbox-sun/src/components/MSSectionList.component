@@ -1,0 +1,21 @@
+<apex:component controller="MSSectionController" >
+	<apex:attribute name="pageController" description="" type="MSController" required="true" assignTo="{!ctrl}"/>
+	<apex:attribute name="sectionKey" description="" type="String" required="false" assignTo="{!sectionKey}"/>
+	<apex:attribute name="annotation" description="" type="String" required="false" assignTo="{!annotation}"/>
+    <apex:repeat value="{!sectionContent}" var="item">
+        <apex:outputPanel layout="none">
+            <li>
+                <apex:image rendered="{!item.rhcontent.IsNew__c == true}" value="{!$Resource.CloudSiteNewImage}"/>&nbsp;
+                <apex:outputLink rendered="{!item.content.FileType == 'LINK'}" value="{!item.content.ContentUrl}" target="_blank">{!item.content.Title}</apex:outputLink>
+                <apex:outputLink rendered="{!item.content.FileType != 'LINK'}" value="/{!item.rhcontent.ContentDocumentId__c}">{!item.content.Title}</apex:outputLink>
+                <apex:outputPanel rendered="{!NOT(ISBLANK(item.content.Description))}">
+                   <a id="{!item.content.Title}-Description" href="#" class="icon icon-enlarge" title="{!item.content.Description}">Enlarge</a>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!item.rhcontent.IsFeatured__c}">
+                	<a class="icon-featured" href="#">&nbsp;</a>
+                </apex:outputPanel>
+                <span name="foobar" title="{!item.content.Title}" style="display:none;">{!item.annotations}</span>
+            </li>
+        </apex:outputPanel>
+    </apex:repeat>
+</apex:component>

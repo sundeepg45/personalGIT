@@ -1,0 +1,220 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.RefedgeCommunityProfile" sideBar="false">
+    <c:RefedgeCommunityHeader pageHeader="{!$Label.Profile}"/>
+    <apex:pagemessages id="pgMsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isCommunityLicenseAccessible,NOT(IsPageAccessible),isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Contact_must_reference_program_member}" strength="3" severity="Info" rendered="{!AND(IsPageAccessible,NOT(isRefedgeProgramMember))}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            .bodyclass{
+                background:lightblue;
+            }
+            .container{
+                margin-left: 10%;
+                margin-right: 10%;
+                border-radius: 5px;
+                margin-top: 1%;
+                background: white;
+            }
+            .innerBlock{
+                margin : 0 auto;
+                float:left;
+                padding: 2%;
+                border-radius: 5px;
+                background : white;
+            }
+            .topHeader{
+                width:100%;
+                float:left;
+                margin : 0 auto;
+                margin-bottom: 20px;
+                background : white;
+                padding: .5%;
+            }
+            .blockHeading{
+                width:46%;
+                float:left;
+                font-size: x-large;
+                color:darkgrey;
+                margin : 0 auto;
+                background : white;
+            }
+            .mainBody{
+                float:left;
+                background : white;
+                width:100%;
+                margin-bottom: 15px;
+            }
+            .childDiv{
+                width:40%;
+                float:left;
+                background : white;
+           }
+           a{
+            text-decoration: none;
+           }
+            .columnDiv{
+                width:33%;
+                float:left;
+                padding-bottom: 2px;
+           }
+           .innertextstyle{
+                font-size: large;
+                font-weight: bold;
+                padding-bottom: 10px;
+                color: #5C5B5B;
+            }
+            .helpButton{
+                font-size: large !important;
+                font-weight: bold !important;
+                padding-bottom: 10px !important;
+            }
+           
+        </style>
+        <apex:form id="frmId">
+        <body class="bodyclass">
+            <apex:outputPanel layout="block" rendered="{!AND(IsPageAccessible, isRefedgeProgramMember, isCommunityLicenseAccessible)}" id="opAccessiable">
+                <apex:outputPanel rendered="{!!isEdit}">
+                    <div class="container">
+                        <div class="innerBlock">
+                            <div class="topHeader">
+                                <div style="margin-left: 45%;">
+                                    <apex:commandButton value="{!$Label.Edit}" action="{!showEditMode}" rerender="opAccessiable, pgMsgId"/>
+                                </div>
+                            </div>
+                            <div class="mainBody">
+                                <div class="childDiv">
+                                    <apex:repeat value="{!leftSideFieldAPINamesReadOnly}" var="field">
+                                        <div class="mainBody">
+                                            <div class="childDiv" style="font-weight: bold;font-size: 14px;">
+                                                <apex:outputLabel value="{!fieldApiLabelNames[field]}:" style="float:left;padding-right:10px;text-align: left;color: #5C5B5B;margin-left:25%;"/>
+                                            </div>
+                                            <div class="childDiv" style="color: #5C5B5B;font-size: 14px;">
+                                                <apex:outputField value="{!contact[field]}" rendered="{!field != 'Birthdate'}"/>
+                                                
+                                                <apex:outputText value="{!birthday}" rendered="{!field == 'Birthdate'}"/>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                                <div class="childDiv" style="margin-left: 10%;">
+                                    <apex:repeat value="{!rightSideFieldAPINamesReadOnly}" var="field">
+                                        <div class="mainBody">
+                                            <div class="childDiv" style="font-weight: bold;font-size: 14px;">
+                                                <apex:outputLabel value="{!fieldApiLabelNames[field]}:" style="float:left;padding-right:10px;text-align: left;color: #5C5B5B;"/>
+                                            </div>
+                                            <div class="childDiv" style="color: #5C5B5B;font-size: 14px;">
+                                                <apex:outputField value="{!contact[field]}" rendered="{!field != 'Birthdate'}"/>
+                                                
+                                                <apex:outputText value="{!birthday}" rendered="{!field == 'Birthdate'}"/>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                            </div>
+                            
+                            <br/>
+                            <div id="myHeightDiv" style="height: 1px;background-color: #D0D0CE;width:99%;float:left;  margin-left: 0.5%;"></div>
+                            <br/>
+                            
+                            <div class="topHeader">
+                                 <div class="innertextstyle">{!$Label.I_m_willing_and_able_to_participate} <img src="/s.gif" alt="" class="helpOrb" title="{!cs.Community_Ref_Activities_Message__c}"/></div>
+                            </div>
+                            <div class="mainBody" style="padding-left:5%;width:97%;">
+                                <apex:repeat value="{!refTypeWrapperList}" var="ref">
+                                    <div class="columnDiv">
+                                        <apex:outputPanel layout="block" style="width: 5%; float:left;margin-right: 10px;">
+                                        <apex:inputCheckBox disabled="true" id="checkboxId" value="{!ref.isSelected}"/>
+                                   </apex:outputPanel>
+                                   <apex:outputPanel layout="block" style="width:90%; float:left;margin-top: 2px;">
+                                    <apex:outputLabel value="{!ref.refType.Name}" style="color: #5C5B5B;font-size: 14px;"/>
+                                   </apex:outputPanel> 
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+                
+                <apex:outputPanel rendered="{!isEdit}">
+                    <div class="container">
+                        <div class="innerBlock">
+                            <div class="topHeader">
+                                <div style="margin-left: 40%;">
+                                    <apex:commandButton value="{!$Label.Save}" action="{!saveContact}" rerender="opAccessiable, pgMsgId"/>
+                                    <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}" rerender="opAccessiable, pgMsgId"/>
+                                </div>
+                            </div>
+                            <div class="mainBody">
+                                <div class="childDiv">
+                                    <apex:repeat value="{!leftSideFieldAPINamesWriteOnly}" var="field">
+                                        <div class="mainBody">
+                                            <div class="childDiv" style="font-weight: bold;font-size: 14px;">
+                                                <apex:outputLabel value="{!fieldApiLabelNames[field]}:" style="float:left;padding-right:10px;text-align: left;color: #5C5B5B;margin-left:25%;"/>
+                                            </div>
+                                            <div class="childDiv" style="color: #5C5B5B;font-size: 14px;">
+                                                <apex:outputField value="{!contact[field]}" rendered="{!field = 'AccountId'}"/>
+                                                <apex:inputField value="{!contact[field]}" rendered="{!field != 'AccountId'}"/>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                                <div class="childDiv" style="margin-left: 10%;">
+                                    <apex:repeat value="{!rightSideFieldAPINamesWriteOnly}" var="field">
+                                        <div class="mainBody">
+                                            <div class="childDiv" style="font-weight: bold;font-size: 14px;">
+                                                <apex:outputLabel value="{!fieldApiLabelNames[field]}:" style="float:left;padding-right:10px;text-align: left;color: #5C5B5B;"/>
+                                            </div>
+                                            <div class="childDiv">
+                                                <apex:inputField value="{!contact[field]}" rendered="{!isEdit}"/>
+                                            </div>
+                                        </div>
+                                    </apex:repeat>
+                                </div>
+                            </div>
+                            
+                            <br/>
+                            <div id="myHeightDiv" style="height: 1px;background-color: #D0D0CE;width:99%;float:left;  margin-left: 0.5%;"></div>
+                            <br/>
+                            
+                            <div class="topHeader">
+                                <div class="innertextstyle">{!$Label.I_m_willing_and_able_to_participate} <img src="/s.gif" alt="" class="helpOrb" title="{!cs.Community_Ref_Activities_Message__c}"/></div>
+                             </div>
+                             <div class="mainBody" style="padding-left:5%;width:97%;">
+                                <apex:repeat value="{!refTypeWrapperList}" var="ref">
+                                    <div class="columnDiv">
+                                        <apex:outputPanel layout="block" style="width: 5%; float:left;margin-right: 10px;">
+                                        <apex:inputCheckBox id="checkboxId" value="{!ref.isSelected}"/>
+                                   </apex:outputPanel>
+                                   <apex:outputPanel layout="block" style="width:90%; float:left;margin-top: 2px;">
+                                    <apex:outputLabel value="{!ref.refType.Name}" style="color: #5C5B5B;font-size: 14px;"/>
+                                   </apex:outputPanel> 
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </body>
+        </apex:form>
+</apex:page>

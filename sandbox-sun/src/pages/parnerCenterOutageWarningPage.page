@@ -1,0 +1,243 @@
+<apex:page cache="false" sidebar="false" showHeader="false">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Red Hat Partnership Application</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if IE 9]>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css" rel="stylesheet')}" />
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+  </head>
+  <body>
+  <div class="red-hat-content">
+      <section class="container">
+        <section class="warning-message-wrapper">
+            <div class="row">
+                <section class="language-select col-xs-4">
+                    <h2>Select your language</h2>
+                    <ul class="col-xs-6">
+                        <li><a href="#en" class="language-link active" lang="en" hreflang="en">English</a></li>
+                        <!--<li><a href="#de" class="language-link" lang="de" hreflang="de">Deutsch</a></li>-->
+                        <li><a href="#ja" class="language-link" lang="ja" hreflang="ja">日本語</a></li>
+                        <li><a href="#pt-br" class="language-link" lang="pt-br" hreflang="pt-br">Português</a></li>
+                    </ul>
+                    <ul class="col-xs-6">
+                        <li><a href="#zh" class="language-link" lang="zh" hreflang="zh">简体中文</a></li>
+                        <!--<li><a href="#fr" class="language-link" lang="fr" hreflang="fr">Français</a></li>-->
+                        <!--<li><a href="#it" class="language-link" lang="it" hreflang="it">Italiano</a></li>-->
+                        <li><a href="#ko" class="language-link" lang="ko" hreflang="ko">한국어</a></li>
+                        <li><a href="#es" class="language-link" lang="es" hreflang="es">Español</a></li>
+                    </ul>
+                </section>
+                <section class="warning-message col-xs-8">
+                    <div class="english-message">
+                        <h2>Alert:</h2>
+                        <p>All portal services will be unavailable from 2 April to 7 April. Thanks for your patience.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>Continue</a>
+                    </div>
+                    <div class="deutsch-message">
+                        <h2>Attention in Deutsch!</h2>
+                        <p>Lorem ipsum dolor sit amet, morbi quis morbi libero sit consectetuer, fermentum fusce suspendisse. Potenti augue nisl tincidunt, lobortis et est massa donec a libero, arcu cum non tellus massa tristique ante, nulla suscipit dictum. Eget ultricies, ac nulla quisque donec tristique.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>Continue</a>
+                    </div>
+                    <div class="japanese-message">
+                        <h2>注意:</h2>
+                        <p>すべてのポータルサービスは、4 月 2 - 7 日の間はご利用いただけません。この期間はお待ちいただきますようお願いいたします</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>続ける</a>
+                    </div>
+                    <div class="portuguese-message">
+                        <h2>Alerta:</h2>
+                        <p>Todos os serviços do portal estarão indisponíveis de 2 a 7 de abril. Agradecemos sua paciência.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>Continuar</a>
+                    </div>
+                    <div class="chinese-message">
+                        <h2>通知：</h2>
+                        <p>所有门户服务在 4 月 2 日至 7 日将不可用。感谢您的耐心。</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>继续</a>
+                    </div>
+                    <div class="french-message">
+                        <h2>Attention in French!</h2>
+                        <p>Lorem ipsum dolor sit amet, morbi quis morbi libero sit consectetuer, fermentum fusce suspendisse. Potenti augue nisl tincidunt, lobortis et est massa donec a libero, arcu cum non tellus massa tristique ante, nulla suscipit dictum. Eget ultricies, ac nulla quisque donec tristique.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>Continue</a>
+                    </div>
+                    <div class="italian-message">
+                        <h2>Attention in Italian!</h2>
+                        <p>Lorem ipsum dolor sit amet, morbi quis morbi libero sit consectetuer, fermentum fusce suspendisse. Potenti augue nisl tincidunt, lobortis et est massa donec a libero, arcu cum non tellus massa tristique ante, nulla suscipit dictum. Eget ultricies, ac nulla quisque donec tristique.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>Continue</a>
+                    </div>
+                    <div class="korean-message">
+                        <h2>4월</h2>
+                        <p>2일부터 4월 7일까지 모든 포털 서비스 사용이 중단됩니다. 양해해 주셔서 감사합니다.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>계속</a>
+                    </div>
+                    <div class="spanish-message">
+                        <h2>Aviso:</h2>
+                        <p>Los servicios del portal no estarán disponibles entre el 2 y el 7 de abril. Gracias por su paciencia.</p>
+                        <a href="https://partnercenter.force.com/s" class='btn ease'>Continuar</a>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </section>
+  </div>
+  <script type="text/javascript">
+        //var $j = jQuery.noConflict();
+        $(document).ready(function(){
+            $('.language-select a').click(function(){
+                $('.language-select a').removeClass('active');
+                $(this).addClass('active');
+                $('.warning-message').children().hide();
+
+                if($(this).attr('lang') == 'en' ) {
+                    $('.english-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'de'){
+                    $('.deutsch-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'ja'){
+                    $('.japanese-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'pt-br'){
+                    $('.portuguese-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'zh'){
+                    $('.chinese-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'fr'){
+                    $('.french-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'it'){
+                    $('.italian-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'ko'){
+                    $('.korean-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'es'){
+                    $('.spanish-message').fadeIn();
+                }
+            });
+        });
+    </script>
+    
+    <style>
+    body{
+        background-color: rgb(239, 239, 239);
+    }
+    .bodyDiv {
+        background-color: #efefef;
+    }
+    .container{
+        min-width: 1170px;
+    }
+    .warning-message-wrapper{
+        background-color: #fff;
+        margin: 50px 0;
+        padding: 15px;
+    }
+    h1, h2, h3, h4, h5, h6{
+        color: #cc0000;
+    }
+    .language-select h2{
+          margin: 0 0 18px;
+          margin: 0 0 1.8rem;
+          color: #646464;
+          font-size: 26px;
+          font-size: 2.6rem;
+    }
+    .language-select ul{
+        padding: 0;
+    }
+    .language-select li{
+        list-style: none;
+        margin-bottom: 5px;
+        font-family: "Overpass";
+    }
+    .language-select a{
+        text-decoration: none;
+        font-size: 16px;
+        font-size: 1.6rem;
+        color: rgb(76, 76, 76);
+    }
+    .language-select a:hover{
+        color: rgb(8, 192, 252);
+        text-decoration: none;
+    }
+    .language-select a.active{
+        color: rgb(8, 192, 252);
+        text-decoration: none;
+    }
+    .red-hat-content .btn{
+        background-color: #c00;
+        border-radius: 0px;
+        color: #fff;
+        display: inline-block;
+        border: 0;
+        font-size: 16px;
+        font-size: 1.6rem;
+        font-weight: bold;
+        text-decoration: none;
+        text-transform: uppercase;
+        margin-top: 20px !important;
+    }
+    .btn:hover{
+        background-color: #b00;
+        color: #fff;
+    }
+    .ease{
+        -webkit-transition: all 0.3s ease-in-out;
+        -moz-transition: all 0.3s ease-in-out;
+        -o-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+    }
+    .warning-message{
+        border-left: 1px solid #ccc;
+        padding: 0 40px;
+    }
+    .warning-message h2{
+        margin-top: 0;
+    }
+    .deutsch-message, .japanese-message, .portuguese-message, .chinese-message, .french-message, .italian-message, .korean-message, .spanish-message{
+        display: none;
+    }
+    .bodyDiv .outerNoSidebar{
+        padding: 0px;
+    }
+    .bPageFooter{
+        display: none;
+    }
+    body.sfdcBody{
+        background-color: #EFEFEF !important;
+    }    
+    .bodyDiv{
+        box-shadow: none;
+    }
+    </style>
+  </body>
+</apex:page>

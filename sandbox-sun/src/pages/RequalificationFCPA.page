@@ -1,0 +1,107 @@
+<apex:page controller="RequalificationController"
+    title="{!$Label.Requalification_Home}: {!$Label.Requalification_FCPA_Title}">
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+    </style>
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.Requalification_FCPA_Title}"/></h2>
+                <apex:pageMessages />   
+            </div>
+        </div>
+    </div>
+
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText escape="false" value="{!$Label.PRQ_FCPA_Text}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+
+    <apex:form >
+        <apex:pageBlock >
+        <!-- 
+            <apex:pageBlockSection columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >
+                        <apex:outputText value="{!$Label.Onboarding_RegisterProfile_Industry_Focus}" />
+                    </apex:outputLabel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel styleClass="requiredBlock">
+                        <apex:selectList size="5"
+                            multiselect="true" value="{!requalRec.FCPAIndustryFocus__c}">
+                            <apex:selectOptions value="{!IndustryFocusOptions}"/>
+                        </apex:selectList>
+                        <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Control_Click}" /></p>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            -->
+            <apex:pageBlockSection columns="1">
+                <apex:outputPanel styleClass="" layout="block">
+                    <p style="font-weight: bold;"><apex:outputText value="{!$Label.Onboarding_RegisterProfile_With_Respect_To_Any_Officer}" /></p>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2">
+                <apex:outputPanel styleClass="" layout="block">
+                    <p><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Do_They_Act_In_Government_Pos}" /></p>
+                </apex:outputPanel>
+                <apex:outputPanel styleClass="rowform" layout="block">
+                    <apex:outputLabel >&nbsp;</apex:outputLabel>
+                    <apex:outputPanel styleClass="requiredBlock" />
+                    <apex:outputPanel styleClass="radioButtons">
+                        <apex:selectRadio id="optGovPos" value="{!requalRec.FCPAActInGovernmentPosition__c}" disabled="{!requalRec.FCPAConfirmed__c}">
+                            <apex:selectOption id="inGovYesOpt" itemLabel="{!$Label.Onboarding_Yes}"
+                                itemValue="Yes" />
+                            <apex:selectOption id="inGovNoOpt" itemLabel="{!$Label.Onboarding_No}"
+                                itemValue="No" />                            
+                        </apex:selectRadio>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2">
+                <apex:outputPanel styleClass="" layout="block">
+                    <p><apex:outputText value="{!$Label.Onboarding_RegisterProfile_Have_You_Committed_A_Crime}" /></p>
+                </apex:outputPanel>
+                <apex:outputPanel styleClass="rowform" layout="block">
+                    <apex:outputLabel >&nbsp;</apex:outputLabel>
+                    <apex:outputPanel styleClass="requiredBlock" />
+                    <apex:outputPanel styleClass="radioButtons">
+                        <apex:selectRadio id="optConvicted" value="{!requalRec.FCPAConvictedOfCrime__c}" disabled="{!requalRec.FCPAConfirmed__c}">
+                            <apex:selectOption id="convictedYesOpt" itemLabel="{!$Label.Onboarding_Yes}"
+                                itemValue="Yes" />
+                            <apex:selectOption id="convictedNoOpt" itemLabel="{!$Label.Onboarding_No}"
+                                itemValue="No" />
+                        </apex:selectRadio>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="2">
+                <apex:outputPanel styleClass="" layout="block">
+                    <apex:outputText value="{!$Label.Onboarding_RegisterProfile_Underlying_Facts}" /> <br/>
+                </apex:outputPanel>
+                <apex:outputPanel styleClass="" layout="block">
+                    <apex:inputTextarea id="underlyingFacts" value="{!requalRec.FCPA_Underlying_Facts__c}" cols="50" rows="4" disabled="{!requalRec.FCPAConfirmed__c}"/>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+            <br/>
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Save_and_Back_to_Requalification_Home}"
+                            action="{!viewHome}" />
+                        <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" value="{!$Label.RequalificationHome_Confirm}" action="{!confirmFCPA}"
+                            styleClass="col1" disabled="{!requalRec.FCPAConfirmed__c}" />
+                       <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1" rendered="{!NOT(isLastPage)}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

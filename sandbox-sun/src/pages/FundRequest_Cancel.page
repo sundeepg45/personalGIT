@@ -1,0 +1,47 @@
+<apex:page standardController="SFDC_MDF__c" extensions="FundRequest_Cancel">
+    <apex:sectionHeader title="{!$ObjectType.SFDC_MDF__c.Label}" subtitle="Cancel Approved Fund Request" />
+
+    <!-- state variables -->
+    <apex:variable value="{!SFDC_MDF__c.Approval_Status__c == 'Approved'}" var="isApproved" />
+    <apex:variable value="{!SFDC_MDF__c.Approval_Status__c == 'Canceled'}" var="isCanceled" />
+    <apex:variable value="{!SFDC_MDF__c.Budget__r.Active__c}" var="isBudgetActive" />
+    <apex:variable value="{!claimsCount == 0}" var="isClaimsEmpty" />
+    <apex:variable value="{!AND(isApproved,isBudgetActive,isClaimsEmpty)}" var="isUpdateable" />
+
+    <apex:form id="pbCancelFundRequest">
+        <apex:pageBlock >
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!save}" value="Save Changes" disabled="{!NOT(isUpdateable)}" rerender="pbCancelFundRequest" status="statusSaving" />
+                <apex:commandButton action="{!cancel}" value="Back To Fund Request" />
+            </apex:pageBlockButtons>
+
+            <apex:pageMessage strength="2" severity="Error" title="Error:" summary="You cannot cancel a Fund Request that has not yet been approved." rendered="{!AND(NOT(isApproved),NOT(isCanceled))}" />
+
+            <apex:pageMessage strength="2" severity="Error" title="Error:" summary="This Fund Request has already been canceled." rendered="{!isCanceled}" />
+
+            <apex:pageMessage strength="2" severity="Error" title="Error:" summary="You cannot cancel a Fund Request when the associated MDF Budget is not active." rendered="{!NOT(isBudgetActive)}" />
+
+            <apex:pageMessage strength="2" severity="Error" title="Error:" summary="You cannot cancel a Fund Request that has any associated Fund Claims." rendered="{!NOT(isClaimsEmpty)}" />
+
+            <!-- Return page errors -->
+            <apex:pageMessages />
+
+            <!-- Status message during save -->
+            <apex:actionStatus id="statusSaving">
+                <apex:facet name="start">
+                    <apex:pageMessage severity="Confirm" strength="2" title="Please wait:" summary="Saving your changes to Salesforce.com ..." />
+                </apex:facet>
+
+                <apex:facet name="stop">
+                    <apex:pageMessage severity="Warning" strength="2" title="Confirm Changes:" summary="You are canceling an Approved Fund Request ..." rendered="{!isUpdateable}" />
+                </apex:facet>
+            </apex:actionStatus>
+
+            <apex:outputPanel rendered="{!isUpdateable}" >
+                <p>This action will convert the approval status of this fund request from <strong>Approved</strong> to <strong>Canceled</strong>, and will return any allocated 
+                funds to the Available Funds bucket. While you will not be able to return a canceled fund request back to an approved status, 
+                you will be able to submit a new fund request to use the freed funds.</p>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

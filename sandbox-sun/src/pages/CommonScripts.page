@@ -1,0 +1,836 @@
+<apex:page contentType="text/javascript" >
+    // Popup code
+    function showModel(){  
+        var scrollPos = $(window).scrollTop();
+        var width = $(window).width();
+        var height = $(window).height();
+        var top = 150;
+        if(height &lt; 500) {
+           top = 0;
+        }
+        else if(height &lt; 800) {
+           top = (height - 500)/2;
+        }
+        scrollPos =  scrollPos-50;
+        $('.RH_modal-window').css('position','fixed');
+        $('.RH_modal-window').css('max-width',width+'px');
+        $('.RH_modal-window').css('max-height',(height - 2*top)+'px');
+        if(salesAccPopUp){
+            salesAccPopUp = false;
+            $('.RH_modal-window').css('width',width+'px');
+            $('.RH_modal-window').css('height','');
+            $('.RH_modal-window').css('left','0');
+            $('.RH_modal-window').css('margin-left','0');
+        } else {
+            $('.RH_modal-window').css('width','');
+            $('.RH_modal-window').css('left','');
+            $('.RH_modal-window').css('margin-left','');
+        }  
+        $('.RH_modal-window').css('overflow','auto');
+//        $('.RH_modal-window').css('top',scrollPos+'px');       
+        $('.RH_modal-window').css('top',top+'px');
+        $('#RH_header').show();
+        $('#RH_body').show();
+        $('#RH_footer').show();
+        $('body').css('overflow','hidden');
+        $('.RH_bg-fade').fadeIn('slow'); 
+        $('.RH_modal-window').slideDown('slow'); 
+    } 
+    
+    
+    // method for showing and hiding contents
+    function showHideContent(contentNumber){
+        if(document.getElementById('content'+contentNumber).style.display == 'block'){
+           document.getElementById('content'+contentNumber).style.display = 'none'; 
+        }else{
+            document.getElementById('content'+contentNumber).style.display = 'block';
+        } 
+    }
+    
+    
+    var EBSAccountDetails = '';
+    var AddressDetails = '';
+    var ContactDetails = '';
+    var salesAccPopUp = false;    
+    // search for sales accounts
+    function getSalesAccount(accName,SalesAccountId,SalesAccount,EBSAccount,Address,Contact){
+        // if search criteria is present
+        if(accName.length > 1){
+            OrderDetailsExtensions.salesAccountSearch(accName, function(result, event)
+            {
+                 if (event.status)
+                 {      
+                        var salesAccountIdText = $('#'+SalesAccountId).html();
+                        // convert JSON string to JSON Object 
+                        var jsonData = removeQuotes(result);
+                        console.log("---------in getSalesAccount----------");
+                        console.log(result);
+                        // build dynamic Table to be displayed in the popup
+                        var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" style="overflow: scroll;" id="AccTable" >';
+                        table += '<thead><tr><th>Select</th><th>Account Name</th><th>CDH Party Number</th><th>Billing Address</th><th>Account Owner</th><th>Record Type</th><th>{!JSENCODE($ObjectType.Account.Fields.EBS_Account_Numbers__c.Label)}</th><th>{!JSENCODE($ObjectType.Account.Fields.AccountClassification__c.Label)}</th><th>{!JSENCODE($ObjectType.Account.Fields.PartnerPrograms__c.Label)}</th><!-- <th>{!JSENCODE($ObjectType.Account.Fields.Phone.Label)}</th><th>{!JSENCODE($ObjectType.Account.Fields.Fax.Label)}</th> --></tr></thead><tbody>';
+                        var jsonDataLength = jsonData.length - 1;
+                        console.log(jsonData);
+                        for(i = jsonDataLength ; i >= 0 ; i--){
+                            table+='<tr><td width="40px">';
+                            if(salesAccountIdText == jsonData[i].RecId) {
+                                table+='<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" checked="checked"  />';
+                            }
+                            else {
+                                table+='<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'"  />';
+                            }
+                            table+='<span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td><td>'+jsonData[i].RecName+'</td><td>'+jsonData[i].PartyNumber+'</td><td>'+jsonData[i].AccBillingAddress+'</td><td>'+jsonData[i].OwnerName+'</td><td>'+jsonData[i].RecordType+'</td><td>'+jsonData[i].EbsAcc+'</td><td>'+jsonData[i].Classification+'</td><td>'+jsonData[i].PartnerPrograms+'</td><!-- <td>'+jsonData[i].Phone+'</td><td>'+jsonData[i].Fax+'</td> --></tr>';
+                        }
+                        table+='</tbody></table>';
+                        salesAccPopUp = true;
+                        // append to division
+                        $("#SalesAccountTable").html( table );
+                        // initialize data table 
+                        $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                        $('#createAddress').css('display','none');
+                        $('#RH_header').html('Search Sales Account');
+                        $('#continuePopup').css('display','none');
+                        // display popup
+                        showModel();
+                        // functions on buttons
+                        $("#closePopup").attr('onclick','').unbind('click'); 
+                        $('#closePopup').css('display','block');
+                        $("#closePopup").click(function(){ 
+                            addDataToField(SalesAccountId,SalesAccount);
+                            // getAllAccountDetails(); 
+                            clearRelevantFieldData(EBSAccount,Address,Contact);
+                        });
+                 }
+            }, {escape:true});
+        }
+        // prompt user to enter atleast 2 characters for search 
+        else if(accName.length > 0){
+            alert('Please enter atleast 2 characters for search');
+        }
+          // prompt user to enter search criteria
+        else{
+            alert('Please enter search criteria');
+        }
+    }
+    
+    // this method is not being used currently as I am facing some issues. Will be used in future
+    ///////////////////////////////////////////////////////////////////////////////
+    function  getAllAccountDetails(){
+        EBSAccountDetails = '';
+        AddressDetails = '';
+        ContactDetails = '';
+        console.log('entered!!!!');
+        if ($('input[name=accountRec]:checked').length > 0) {
+            selectedAccountRecord = $('input[name=accountRec]:checked').val();
+            OrderDetailsExtensions.GetAllDataForAccount(selectedAccountRecord, function(result, event)
+            {
+                 if (event.status)
+                 {      
+                        console.log('----------'+result);
+                        var results = removeQuotes(result);
+                        EBSAccountDetails = results.EBSAccList;
+                        AddressDetails = results.AddressList;
+                        ContactDetails = results.ContactList;
+                        console.log('-------------'+EBSAccountDetails );
+                 }
+            }, {escape:true});
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////
+    
+    // when a search is made for selecting different sales account, clear off related EBS Account, Address and Contact fields
+    function clearRelevantFieldData(EBSAccount,Address,Contact){
+        if ($('input[name=accountRec]:checked').length > 0) {   
+            $('#'+EBSAccount).val('');
+            $('#'+Address).val('');
+            $('#'+Contact).val('');
+            $('#'+EBSAccount+'Id').html('');
+            $('#'+Address+'Id').html('');
+            $('#'+Contact+'Id').html('');
+        }
+    } 
+    
+    // Get all related EBS Accounts for the selcted Sales account 
+    function getEBSAccount(salesaccountId,EBSAccountId,EBSAccount){
+        if(salesaccountId == null || salesaccountId == ''){
+               alert('Please select Sales Account');
+        }else{
+               OrderDetailsExtensions.EBSAccountSearch(salesaccountId, function(result, event)
+                {
+                     if (event.status)
+                     {      
+                            var ebsAccountIdText = $('#'+EBSAccountId).html();
+                            // convert JSON String to JSON Object
+                            var jsonData = removeQuotes(result);
+                            console.log(jsonData);
+                            // Build Dynamic table
+                            var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                            table += '<thead><tr><th>Select</th><th>EBS Account Number</th><th>EBS Party Number</th><th>EBS Party Name</th><th>Primary EBS Account</th><th>Account Description</th></tr></thead><tbody>';
+                            var jsonDataLength = jsonData.length - 1;
+                            var tableRowNum = 1;
+                            for(i = jsonDataLength ; i >= 0 ; i--){
+                                table+='<tr><td width="40px">';
+                                if(ebsAccountIdText == jsonData[i].RecId) {
+                                    table+='<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" checked="checked"  />';
+                                }
+                                else {
+                                    table+='<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'"  />';
+                                }
+                                table+='<span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td><td>'+jsonData[i].RecName+'</td><td>'+jsonData[i].PartyNumber+'</td><td>'+jsonData[i].PartyName+'</td>';
+                                //Bill to
+                                if(jsonData[i].BillTo == "checked")
+                                    table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                                else
+                                    table += '<td><input type="checkbox" disabled="true"/></td>';
+                                table += '<td>'+jsonData[i].Description+'</td>';
+                                table +='</tr>';
+                                tableRowNum++;
+                            }
+                            $('#RH_header').html('Search EBS Accounts');
+                            table+='</tbody></table>';
+                            
+                            // append the table to division
+                            $("#SalesAccountTable").html( table );
+                            
+                            $('#createAddress').css('display','none');
+                            $('#closePopup').css('display','block');
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            // Initialize data table
+                            $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                            // show popup
+                            showModel();
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            $("#closePopup").click(function(){ addDataToField(EBSAccountId,EBSAccount); });
+                     }
+                }, {escape:true});
+        }    
+    }
+    
+    // method to get all related address for selected sales account
+    function getAddresses(salesaccountId,billAddressId,billAddress,addrIdentifier){
+        if(salesaccountId == null || salesaccountId == ''){
+               alert('Please select Sales Account');
+        }else{
+               OrderDetailsExtensions.AddressSearch(salesaccountId, addrIdentifier, function(result, event)
+                {
+                     if (event.status)
+                     {      
+                            var billAddressIdText = $('#'+billAddressId).html();
+                            // convert JSON String to JSOn Object
+                            var jsonData = removeQuotes(result);
+                            
+                            var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                            table += '<thead><tr><th>Select</th><th>Address 1</th><th>Address 2</th><th>City</th><th>State</th><th>Province</th><th>Country</th><th>Zip/Postal Code</th><th>Bill-To</th><th>Ship-To</th><th>Entitle-To</th><th>Sold-To</th><th>Address Number</th></tr></thead><tbody>';
+                            var jsonDataLength = jsonData.length - 1;
+                            for(i=jsonDataLength; i>=0 ; i--){
+                                // create complete address details to be displayed on the input field
+                                
+                                table +='<tr>';
+                                table += '<td width="40px">';
+                                if(billAddressIdText == jsonData[i].RecId) {
+                                    table += '<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" checked="checked"  />';
+                                }
+                                else {
+                                    table += '<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'"  />';
+                                }
+                                table += '<span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td>';
+                                table += '<td>'+jsonData[i].AddressOne+'</td>';
+                                table += '<td>'+jsonData[i].AddressTwo+'</td>';
+                                //table += '<td>'+jsonData[i].AddressThree+'</td>';
+                                table += '<td>'+jsonData[i].City+'</td>';
+                                table += '<td>'+jsonData[i].State+'</td>';
+                                table += '<td>'+jsonData[i].Province+'</td>';
+                                table += '<td>'+jsonData[i].Country+'</td>';
+                                table += '<td>'+jsonData[i].zipPostal+'</td>';
+                                //Bill to
+                                if(jsonData[i].BillTo == "checked")
+                                    table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                                else
+                                    table += '<td><input type="checkbox" disabled="true"/></td>';
+                                //Shipto
+                                if(jsonData[i].ShipTo == "checked")
+                                    table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                                else
+                                    table += '<td><input type="checkbox" disabled="true"/></td>';
+                                // Entitle to
+                                if(jsonData[i].EntitleTo == "checked")
+                                    table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                                else
+                                    table += '<td><input type="checkbox" disabled="true"/></td>';
+                                // Sold to
+                                if(jsonData[i].SoldTo == "checked")
+                                    table += '<td><input type="checkbox" checked="true" disabled="true" /></td>';
+                                else
+                                    table += '<td><input type="checkbox" disabled="true"/></td>';
+                                //table += '<td>'+jsonData[i].partySiteNumber+'</td>';
+                                table += '<td>'+jsonData[i].AddressNumber +'</td>';
+                                table +='</tr>';
+                            }
+                            table+='</tbody></table>';
+                            // append to table
+                            $("#SalesAccountTable").html( table );
+                            
+                            // initialize data table
+                            $('#AccTable').dataTable({"sPaginationType": "full_numbers","aaSorting": []});
+                            $('#RH_header').html('Search Address');
+                            $("#createAddress").attr('onclick','').unbind('click');
+                            $('#createAddress').css('display','block');
+                            $('#closePopup').css('display','block');
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            
+                            // show popup
+                            showModel();
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            $("#closePopup").click(function(){ addDataToField(billAddressId,billAddress); });
+                            $("#createAddress").click(function(){ createNewAddress(salesaccountId,billAddress,addrIdentifier); });
+                     }
+                }, {escape:true});
+        }    
+    }
+    
+    // get all related contacts for the sals account selected
+    function getContacts(salesaccountId,ContactId,Contact){
+        if(salesaccountId == null || salesaccountId == ''){
+               alert('Please select Sales Account');
+        }else{
+               OrderDetailsExtensions.ContactSearch(salesaccountId, function(result, event)
+                {
+                     if (event.status)
+                     {      
+                            var contactIdText = $('#'+ContactId).html();
+                            // convert JSON Data to JSON object
+                            var jsonData = removeQuotes(result);
+                            
+                            // build dynamic table
+                            var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                            table += '<thead><tr><th>Select</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Department</th><th>Phone</th><th>CDH Party Number</th><th>RHN Entitlement Login</th></tr></thead><tbody>';
+                            var jsonDataLength = jsonData.length - 1;
+                            var tableRowNum = 1;
+                            for(i = jsonDataLength ; i >= 0 ; i--){
+                                //alert(jsonData[i].AccName);
+                                table+='<tr><td width="40px">';
+                                if(contactIdText == jsonData[i].RecId) {
+                                    table+='<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'" checked="checked" />';
+                                }
+                                else {
+                                    table+='<input type="radio" name="accountRec" value="'+jsonData[i].RecId+'"  />';
+                                }
+                                table+='<span class="RH_Hide" id="'+jsonData[i].RecId+'" >'+jsonData[i].RecName+'</span></td><td>'+jsonData[i].firstName+'</td><td>'+jsonData[i].lastName+'</td><td>'+jsonData[i].Email+'</td><td>'+jsonData[i].Department+'</td><td>'+jsonData[i].contactPhone+'</td><td>'+jsonData[i].contactPartyNumber+'</td><td>'+jsonData[i].rhnEntitlementLogin+'</td></tr>';
+                               tableRowNum++;
+                            }
+                            table+='</tbody></table>';
+                            salesAccPopUp = true;
+                            
+                            // append table to the division
+                            $("#SalesAccountTable").html( table );
+                            
+                            // initialize data table
+                            $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                            $('#RH_header').html('Search Contacts');
+                            $('#createAddress').css('display','none');
+                            $('#closePopup').css('display','block');
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            
+                            // show popup
+                            showModel();
+                            $("#closePopup").attr('onclick','').unbind('click');
+                            $("#closePopup").click(function(){ addDataToField(ContactId,Contact); });
+                     }
+                }, {escape:true});
+        }    
+    }
+    
+    // once a record is selected in the popup, this method will put the relavent data in the fields
+    function addDataToField(idFieldData,inputField){
+        // check if any record is selected
+        if ($('input[name=accountRec]:checked').length > 0) {
+            var selectedSalesAccount = $('input[name=accountRec]:checked').val();
+            var accountName = $('#'+selectedSalesAccount).html(); 
+            $('#'+idFieldData).html(selectedSalesAccount);
+            $('#'+inputField).val(accountName.replace('amp;',''));
+            // hide popup
+            $('.RH_modal-window').css('display','none');           
+            $('.RH_bg-fade').fadeOut('slow');
+            $('body').css('overflow','auto');
+        }else{
+            // if no record is selected, just close the popup
+            $('.RH_modal-window').css('display','none');           
+            $('.RH_bg-fade').fadeOut('slow');
+            $('body').css('overflow','auto');
+        }
+    }
+    
+    var addressFieldInstanceId;
+    
+    // method is to initialize address creation
+    function createNewAddress(salesaccountId,addressFieldLabelId,addrIdentifier){
+        $("#closePopup").attr('onclick','').unbind('click');
+        $("#createAddress").attr('onclick','').unbind('click');
+        $('#createAddress').css('display','none');
+        $('#closePopup').css('display','none');
+        $('#RH_header').html('Create New Address');
+        addressFieldInstanceId = addressFieldLabelId;
+        initializeAddressCreation(salesaccountId,addrIdentifier);  
+    } 
+    
+    // once the address is created append the values to the relavent fields
+    function getAddressValues(fld1,fld2){
+        console.log('---------------> '+fld1+' ------------ '+fld2);
+        //console.log('--------------->'+addressFieldInstanceId);
+        $('#'+addressFieldInstanceId).val(fld1);
+        $('#'+addressFieldInstanceId+'Id').html(fld2);
+        // close the popup
+        $('.RH_modal-window').css('display','none');           
+        $('.RH_bg-fade').fadeOut('slow');
+        $('body').css('overflow','auto');
+    }   
+    
+    // method to hide popup
+    function hideThisPopup(){
+        $('.RH_modal-window').css('display','none');           
+        $('.RH_bg-fade').fadeOut('slow');
+        $('body').css('overflow','auto');
+    }
+    
+    // get all states for the country selected in the address creation process
+    function getStates(countryName){
+        if(countryName == '')
+        return;
+        getAllStates(countryName);
+    }
+    
+    // array to store all input fields in the address creation
+    elm = new Array();
+    function getAddressDetails(confirmationReqd){
+        elm = [];
+        // get all input fields in the address popup dynamically
+        $('#inputFields input[id]').each(function(){
+             elm.push($(this).attr('id'));
+        });
+        $('#inputFields select[id]').each(function(){
+             elm.push($(this).attr('id'));
+        });
+        lastElmVal =  elm[elm.length - 1];
+        res = lastElmVal.split(':');
+        resVals = res[res.length - 1];
+        if(resVals == 'countryVal'){
+            addressDetails = '';
+            temp = elm[elm.length - 1];
+            elm[elm.length - 1] = elm[elm.length - 2];
+            elm[elm.length - 2] = temp;
+            
+        }else{
+            addressDetails = '';
+            temp = elm[elm.length - 1];
+            elm[elm.length - 1] = elm[elm.length - 3];
+            elm[elm.length - 3] = temp;
+        }
+        addressLabels = new Array();
+        for(i = 0; i &lt; elm.length;i++){
+            if(document.getElementById(elm[i]).value != ''){
+                addressDetails = addressDetails+','+document.getElementById(elm[i]).value;
+           }
+            if(i > 3){
+                if(document.getElementById(elm[i]+'Label').innerHTML != null)
+                    addressLabels.push(document.getElementById(elm[i]+'Label').innerHTML.replace(/\n/g, ""));
+            }   
+            
+        }
+        addressDetails = addressDetails.slice(1);
+        // check if address is correct using google api
+        validateAddress(confirmationReqd,addressDetails,elm);
+    }
+    
+    formattedAddress = '';
+    
+    
+ // method to validate address    
+    function validateAddress(confirmationReqd,addressDetails,elm){
+
+        console.log('-------------------->Entered validation');
+        //$("#map_canvas").html('loading...');
+        CurrentAddress = addressDetails.replace(/\n/g, "");
+        console.log('-------------------->CurrentAddress'+CurrentAddress);
+        // Create a new Google geocoder
+
+
+        var geocoder;
+            try{
+                geocoder = new google.maps.Geocoder();
+            }catch(err){
+                alert('Error occurred, Please reload the page');
+                return;
+            }
+
+
+
+
+        geocoder.geocode({ 'address': CurrentAddress }, function (results, status) {
+            console.log('-------------------->entered geocoder');
+            // The code below only gets run after a successful Google service call has completed.
+            // Because this is an asynchronous call, the validator has already returned a 'true' result
+            // to supress an error message and then cancelled the form submission.  The code below
+            // needs to fetch the true validation from the Google service and then re-execute the
+            // jQuery form validator to display the error message.  Futhermore, if the form was
+            // being submitted, the code below needs to resume that submit.
+
+
+            // Google reported a valid geocoded address
+            if (status == google.maps.GeocoderStatus.OK) {
+                console.log('-------------------->google api ok');
+                // Get the formatted Google result
+                address = results[0].formatted_address;
+               
+                attrs = new Object();                   
+                for (var i = 0; i &lt; results[0].address_components.length; i++){
+                    attrs[results[0].address_components[i].types[0]] = results[0].address_components[i].long_name;
+                }
+                // get all address lines for street address
+                localAddress = new Array();
+                for(i=0;i&lt;=3;i++){
+                    if((document.getElementById(elm[i]).value).length > 1){
+                        localAddress.push(document.getElementById(elm[i]).value);    
+                    }
+                }
+                
+                localAddressString = localAddress.join(",");
+                // prepare string to be validated for checking if the address received from google api is correct
+                message = 'Street : '+localAddressString+'\n';
+                if(addressLabels.length == 4){
+                    message += addressLabels[0]+': '+attrs.locality;
+                    if(attrs.administrative_area_level_2){
+                        message += ','+attrs.administrative_area_level_2+'\n';
+                    }
+                    message += addressLabels[1]+': '+attrs.administrative_area_level_1+'\n';
+                    message += addressLabels[2]+': '+attrs.country+'\n';
+                    if(attrs.postal_code)
+                        message += addressLabels[3]+': '+attrs.postal_code;
+                    message += '\n\n Is this correct?';
+                }else if(addressLabels.length == 5){
+                    message += addressLabels[0]+': '+attrs.locality+'\n';
+                    if(attrs.administrative_area_level_2){
+                        message += addressLabels[1]+': '+attrs.administrative_area_level_2+'\n';
+                    }
+                    message += addressLabels[2]+': '+attrs.administrative_area_level_1+'\n';
+                    message += addressLabels[3]+': '+attrs.country+'\n';
+                    if(attrs.postal_code)
+                        message += addressLabels[4]+': '+attrs.postal_code;
+                    message += '\n\n Is this correct?';
+                }else{
+                    message += addressLabels[0]+': '+attrs.locality+'\n';
+                    if(attrs.administrative_area_level_3){
+                        message += addressLabels[1]+': '+attrs.administrative_area_level_3+'\n';
+                    }
+                    if(attrs.administrative_area_level_2){
+                        message += addressLabels[2]+': '+attrs.administrative_area_level_2+'\n';
+                    }
+                    message += addressLabels[3]+': '+attrs.administrative_area_level_1+'\n';
+                    message += addressLabels[4]+': '+attrs.country+'\n';
+                    if(attrs.postal_code)
+                        message += addressLabels[5]+': '+attrs.postal_code;
+                    message += '\n\n Is this correct?';
+                
+                }
+                console.log('-------------------->message'+message);
+                console.log('-------------------->confirmationReqd'+confirmationReqd);
+                if(confirmationReqd == 'Yes'){
+                    console.log('-------------------->confirmationReqd'+confirmationReqd);
+                    // prompt user if the address received is correct
+                    r = confirm(message);
+                    if (r == true) {
+                        console.log('-------------------->true');
+                        $('#validateAddressHere').html('true');
+                        if(resVals == 'stateListVal'){
+                            //adminLevelPlace = attrs.administrative_area_level_1;
+                            setAdminLevelOne('State'); 
+                        }else if(resVals == 'countyListVal'){
+                            //adminLevelPlace = attrs.administrative_area_level_1;
+                            setAdminLevelOne('County');    
+                        }else if(resVals == 'provinceListVal'){
+                            //adminLevelPlace = attrs.administrative_area_level_1;
+                            setAdminLevelOne('Province');     
+                        }
+                        else{
+                           document.getElementById('mainPage:form:mainBlock:cityField:citySection:city').value = attrs.locality;
+                           if(attrs.postal_code)
+                               document.getElementById('mainPage:form:mainBlock:ZipPostalField:postalSection:zipPostalVal').value = attrs.postal_code;
+                           if(addressLabels.length == 4){
+                               if(addressLabels[1] == 'Province'){
+                                   document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_1;
+                               }else{
+                                   document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+                               }  
+                           }
+                           else{
+                               document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+                           }
+                           if(addressLabels.length == 6){
+                               if(attrs.administrative_area_level_2)
+                                   document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;
+                               if(attrs.administrative_area_level_3)
+                                   document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_3.replace('County','').trim();//Changes by Niti
+                           }
+                           if(addressLabels.length == 5){
+                               if(attrs.administrative_area_level_2){
+                                   if(addressLabels[1] == 'Province'){
+                                       document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;    
+                                   }else{
+                                       document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_2.replace('County','').trim();//Changes by Niti
+                                   }
+                               }
+                           }        
+                        }
+                        $('#addressMsg').css('color','green');
+                        $('#addressMsg').html('Valid Address !!'); 
+                    } else {
+                        $('#validateAddressHere').html('true');
+                        $('#addressMsg').html('Address not found !!'); 
+                    }
+                }
+                // Count the commas in the fomatted address.
+                // This doesnt look great, but it helps us understand how specific the geocoded address
+                // is.  For example, "CA" will geocde to "California, USA".
+                numCommas = address.match(/,/g) != null ? address.match(/,/g).length : 0 ;
+
+                // A full street address will have at least 3 commas.  Alternate techniques involve
+                // fetching the address_components returned by Google Maps.  That code looks even more ugly.
+                if (r == true) {
+
+                    // Replace the first comma found with a line-break
+                    address = address.replace(/, /, "\n");
+
+                    // Check for the map_canvas, if it exists then position the Google Map
+                    //$("#map_canvas").show();
+                    //Map("map_canvas", results[0].geometry.location);
+         
+                 } else {
+                    // Google Maps was able to geocode the address, but it wasnt specific
+                    // enough (not enough commas) to be a valid street address.
+                    $('#addressMsg').html('Address not found !!'); 
+                    $('#validateAddressHere').html('false');
+                }
+                // Otherwise the address is invalid
+            } else {
+                $("#map_canvas").html('Address Not found');
+                $('#validateAddressHere').html('false');
+            }
+        });
+    }
+    
+    // set list values to text fields
+    function setValuesToFields(){
+       
+       document.getElementById('mainPage:form:mainBlock:cityField:citySection:city').value = attrs.locality;
+       if(attrs.postal_code)
+           document.getElementById('mainPage:form:mainBlock:ZipPostalField:postalSection:zipPostalVal').value = attrs.postal_code;
+       if(addressLabels.length == 4){
+           if(addressLabels[1] == 'Province'){
+               document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_1;
+           }else{
+               document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+           }  
+       }
+       else{
+           document.getElementById('mainPage:form:mainBlock:stateListText:stateTextSection:stateTextVal').value = attrs.administrative_area_level_1;
+       }
+       if(addressLabels.length == 6){
+           if(attrs.administrative_area_level_2)
+               document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;
+           if(attrs.administrative_area_level_3)
+               document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_3.replace('County','').trim();//Changes by Niti
+       }
+       if(addressLabels.length == 5){
+           if(attrs.administrative_area_level_2){
+               if(addressLabels[1] == 'Province'){
+                   document.getElementById('mainPage:form:mainBlock:provinceListText:provinceTextSection:provinceTextVal').value = attrs.administrative_area_level_2;    
+               }else{
+                   document.getElementById('mainPage:form:mainBlock:countyListText:countyTextSection:countyTextVal').value = attrs.administrative_area_level_2.replace('County','').trim();//Changes by Niti
+               }
+           }
+       }
+    }
+    
+    
+    // copy order details fields
+    function copyDetails(fieldSpecification){
+         for(i=1;i &lt; 5;i++){
+             document.getElementById('content'+i).style.display = 'block';
+         }
+         var oppFieldArray = ["billSalesAccount", "billEBSAccount", "billAddress", "billContact", "shipSalesAccount", "shipEBSAccount", "shipAddress", "shipContact", "entitleSalesAccount", "entitleEBSAccount", "entitleAddress", "entitleContact", "SoldSalesAccount", "SoldEBSAccount", "SoldAddress", "SoldContact"];
+         j = parseInt(fieldSpecification);
+         var fieldData = new Array();
+         var fieldHiddenData = new Array();
+         for(i = j - 3; i &lt;= j ; i ++){
+             if($('#'+oppFieldArray[i]).val() != ''){
+                fieldData.push($('#'+oppFieldArray[i]).val());
+                fieldHiddenData.push($('#'+oppFieldArray[i]+'Id').html());
+            }
+             else{
+                fieldData.push('No Value defined for this field');
+                fieldHiddenData.push('No Value defined for this field');
+             } 
+         }
+         for(i= 0;i &lt;= 3; i++){
+             if(fieldData[i] != 'No Value defined for this field'){
+                 $('#'+oppFieldArray[i]).val(fieldData[i]);
+                 $('#'+oppFieldArray[i]+'Id').html(fieldHiddenData[i]);
+                 $('#'+oppFieldArray[i+4]).val(fieldData[i]);
+                 $('#'+oppFieldArray[i+4]+'Id').html(fieldHiddenData[i]);
+                 $('#'+oppFieldArray[i+8]).val(fieldData[i]);
+                 $('#'+oppFieldArray[i+8]+'Id').html(fieldHiddenData[i]);
+                 $('#'+oppFieldArray[i+12]).val(fieldData[i]);
+                 $('#'+oppFieldArray[i+12]+'Id').html(fieldHiddenData[i]);
+             }   
+         
+         }
+         
+     }
+     
+     // build data to update opportunity
+     function updateOpportunity(){
+        //var pendingOMReview = document.getElementById('mainPage:oppForm:pendingOMReview').checked == true ? 'true' : 'No value defined here';
+        var operatingUnit = document.getElementById('mainPage:oppForm:operatingUnit').value;
+        var orderType = operatingUnit.length > 0 ? document.getElementById('mainPage:oppForm:orderType').value : 'No value defined here';
+        var oppFieldArray = ["operatingUnit","orderType","billSalesAccountId", "billEBSAccountId", "billAddressId", "billContactId", "shipSalesAccountId", "shipEBSAccountId", "shipAddressId", "shipContactId", "entitleSalesAccountId", "entitleEBSAccountId", "entitleAddressId", "entitleContactId", "SoldSalesAccountId", "SoldEBSAccountId", "SoldAddressId", "SoldContactId"];
+        if(operatingUnit.length == 0){
+            if(document.getElementById('mainPage:oppForm:hideNonRelevent').value != 'true'){
+                if(document.getElementById('mainPage:oppForm:chkOrderSubmitStatus').value != 'differentProfile'){
+                    alert('Please select Operating Unit');
+                    return;
+                }
+            }
+        }
+        var opportunityDetails = new Array();
+        //opportunityDetails[0] = pendingOMReview; 
+        opportunityDetails[0] = operatingUnit.length > 0 ? operatingUnit : 'No value defined here';
+        opportunityDetails[1] = orderType;
+        for(i = 2 ; i &lt; oppFieldArray.length ; i++){
+            if($('#'+oppFieldArray[i]).html().length > 0)
+                opportunityDetails.push($('#'+oppFieldArray[i]).html());
+            else
+                opportunityDetails.push('No value defined here');   
+        }
+        console.log(opportunityDetails.join(','));
+        opportunityDetailToUpdate = opportunityDetails.join(',');
+        
+        opportunityUpdate(opportunityDetailToUpdate);
+       
+     }
+     
+     
+     // method to submit opportunity
+     function submitOrderOpportunity(){
+        //var pendingOMReview = document.getElementById('mainPage:oppForm:pendingOMReview').checked == true ? 'true' : 'No value defined here';
+        var operatingUnit = document.getElementById('mainPage:oppForm:operatingUnit').value;
+        var orderType = operatingUnit.length > 0 ? document.getElementById('mainPage:oppForm:orderType').value : 'No value defined here';
+        var oppFieldArray = ["operatingUnit","orderType","billSalesAccountId", "billEBSAccountId", "billAddressId", "billContactId", "shipSalesAccountId", "shipEBSAccountId", "shipAddressId", "shipContactId", "entitleSalesAccountId", "entitleEBSAccountId", "entitleAddressId", "entitleContactId", "SoldSalesAccountId", "SoldEBSAccountId", "SoldAddressId", "SoldContactId"];
+        if(operatingUnit.length == 0){
+            alert('Please select Operating Unit');
+            return;
+        }
+        var opportunityDetails = new Array();
+        //opportunityDetails[0] = pendingOMReview; 
+        opportunityDetails[0] = operatingUnit.length > 0 ? operatingUnit : 'No value defined here';
+        opportunityDetails[1] = orderType;
+        for(i = 2 ; i &lt; oppFieldArray.length; i++){
+            console.log('Val: '+$('#'+oppFieldArray[i]).html())
+            if($('#'+oppFieldArray[i]).html().length > 0){
+                console.log('i ' + i + 'Field: ' + oppFieldArray[i] + ' ' + $('#'+oppFieldArray[i]).html());
+                opportunityDetails.push($('#'+oppFieldArray[i]).html());
+            }else{
+                console.log('i ' + i + 'Field: ' + oppFieldArray[i] + ' ' + $('#'+oppFieldArray[i]).html());
+                opportunityDetails.push('No value defined here');
+            }       
+        }
+        
+        //var checkValidation = [2,4,6,8,10,12,14];
+        var checkValidation = [2,4,6,10,14];
+        //var validationFieldLabels = ["Bill-To Sales Account", "Bill-To Address","Ship-To Sales Account", "Ship-To Address", "Entitle-To Sales Account", "Entitle-To Address", "SoldSalesAccountId"]
+        var validationFieldLabels = ["Bill-To Sales Account", "Bill-To Address","Ship-To Sales Account","Entitle-To Sales Account","SoldSalesAccountId"]
+        var errorMessage = '';
+        //alert('Hi');
+        for(i = 0; i &lt; checkValidation.length; i++){
+            //alert('i: ' + i + ' -Check Valiadtion: ' + checkValidation[i] + 'OppDetails: ' + opportunityDetails[checkValidation[i]]);
+            if(opportunityDetails[checkValidation[i]] == 'No value defined here'){
+                if(errorMessage == ''){
+                    errorMessage = validationFieldLabels[i];
+                }else{
+                    errorMessage += ', '+validationFieldLabels[i];
+                }
+            }
+        }
+        if(errorMessage != ''){
+            alert('Please fill details for: \n'+errorMessage);
+            return ;
+        }
+        //if(document.getElementById('mainPage:oppForm:pendingOMReview').checked == false){
+            //alert('Please select Pending OM Review');
+            //return;
+        //}
+        opportunityDetailToUpdate = opportunityDetails.join(',');
+        submitOrderForThisOpportunity(opportunityDetailToUpdate); 
+     }
+     
+     // This method is refferenced in search before create reqmt. The method displays all the account details for any account present while CDH Party is searched.
+     function showSalesAccountForCDH(salesAccouunts){
+        AccountSearchBeforeCreateController.showAccounts(salesAccouunts, function(result, event)
+        {
+             if (event.status)
+             {      
+                    //alert(result);
+                    var jsonData = removeQuotes(result);
+                    var table='<table cellpadding="0" cellspacing="0" border="0" class="dataTable" id="AccTable" >';
+                    table += '<thead><tr><th>Name</th><th>Owner Name</th><th>Owner Email</th><th>CDH Party Number</th><th>Identifying Address</th><th>Record Type</th></tr></thead><tbody>';
+                    var jsonDataLength = jsonData.length - 1;
+                    var tableRowNum = 1;
+                    for(i = jsonDataLength ; i >= 0 ; i--){
+                        //alert(jsonData[i].AccName);
+                        table+='<tr><td><a href="/'+jsonData[i].id+'" TARGET="_blank">'+jsonData[i].name+'</a></td><td>'+jsonData[i].ownerName+'</td><td>'+jsonData[i].ownerEmail+'</td><td>'+jsonData[i].CDHPartyNumber+'</td><td>'+jsonData[i].identifyingAddress+'</td><td>'+jsonData[i].RecordName+'</td></tr>';
+                       tableRowNum++;
+                    }
+                    table+='</tbody></table>';
+                    $('.RH_modal-window').css('width','800px');
+                    $('.RH_modal-window').css('margin-left','-400px');
+                    $('#SalesAccountTable').css('margin-left','0%');
+                    $("#SalesAccountTable").html( table );
+                    $('#AccTable').dataTable({"sPaginationType": "full_numbers"});
+                    $('#closePopup').css('display','block');
+                    $("#continuePopup").css('display','none');
+                    $('#clearPopup').css('display','none');
+                    $("#closePopup").attr('onclick','').unbind('click');
+                    showModel();
+                    $("#closePopup").click(function(){ 
+                        $('.RH_modal-window').css('display','none');           
+                        $('.RH_bg-fade').fadeOut('slow');
+                        $('body').css('overflow','auto');
+                    });
+             }
+        }, {escape:true});
+        
+     }
+     
+     function setDataTableAction(){
+         $('table.dataTable1').dataTable({"sPaginationType": "full_numbers"});
+         document.getElementById("mainPage:formid:mdmresultid").style.paddingBottom= "25px";
+         document.getElementById("mainPage:formid:mdmresultid:datatable_paginate").style.paddingTop= "5px";
+     }
+     
+     function setOrderTypeDefaultValue(operatingUnitValue){
+         var opertunityType = document.getElementById('mainPage:oppForm:opportunityType').innerHTML;
+         console.log('---------------opertunityType'+opertunityType);
+         if(operatingUnitValue == 'Customer Satisfaction')
+            operatingUnitValue = 'CS';
+         operatingUnitValue = operatingUnitValue.replace('New Zealand','NZ');
+         console.log(operatingUnitValue+','+opertunityType); // opertunityType
+         orderTypeCheckValue = operatingUnitValue+','+opertunityType;
+         OrderDetailsExtensions.getDefaultOrderType(orderTypeCheckValue, function(result, event)
+         {
+             if (event.status)
+             {      
+                    //alert(result);
+                    if(result != 'No Defaulting'){
+                    document.getElementById('mainPage:oppForm:orderType').value = result;
+                    }
+             }
+         }, {escape:true});
+     }
+</apex:page>

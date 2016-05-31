@@ -1,0 +1,90 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page showHeader="false" sidebar="false" controller="refedge.InvitationCoworkersLookupController" id="pgLookup" cache="true">
+    <apex:pageMessages id="pgMsg"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <script>
+        PORShowLoading();
+        //return value to the calling window
+        window.returnValue = null;
+        var returnedArray = new Array();
+        function callParent(userId, userEmail) {
+            
+            // Get the user agent string
+            var deviceAgent = navigator.userAgent;
+            var ios = deviceAgent.toLowerCase().match(/(iphone|ipod|ipad)/);
+            var winMain = window.opener;
+            if (null == winMain){
+                winMain = window.parent.opener;
+            }
+            winMain.closePopup(userId, userEmail); 
+        }
+        
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+    </script>
+    
+    <apex:form id="frmLookup" style="margin-left:1%" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader id="shLookup" title="{!$Label.Lookup}"/>
+        <apex:outputPanel >
+            <apex:inputText id="searchText" value="{!searchText}" html-placeholder="{!$Label.Search}..."/>&nbsp; 
+            <apex:commandButton id="btnGo" value="{!$Label.Go}" action="{!getUsers}" rerender="pgMsg,pbLookup,opMessage"/>
+            <br />
+            <apex:outputLabel value="{!$Label.Lookup_search_message}" />
+            <br />
+            <br />
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="opMessage" >
+            <apex:outputLabel style="color:red;" value="{!$Label.Search_maximun_rows_message}"  rendered="{!listUsers.size > 200}"/>
+        </apex:outputPanel>
+        
+        <apex:pageBlock id="pbLookup" mode="edit">
+             <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}" action="{!save}" rerender="pgMsg" onComplete="javascript : callParent('{!JSENCODE(selectedUsersIds)}','{!JSENCODE(selectedUsersEmails)}');return false;"/>
+             </apex:pageBlockButtons>
+            <apex:pageBlockSection id="sectionId" columns="1">
+               
+                <apex:pageBlockTable id="tableId" rendered="{!listUsers.size >0}" value="{!listUsers}" var="subItem">
+                    <apex:column id="checkBoxColumn">
+                        <apex:inputCheckBox id="checkBox" value="{!subItem.isSelected}"/>
+                    </apex:column>
+                    <apex:column headervalue="{!$Label.User_Name}">
+                        <apex:outPutField value="{!subItem.u.Name}" />
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.Email}">
+                        <apex:outPutField value="{!subItem.u.Email}" />
+                    </apex:column>
+                </apex:pageBlockTable>
+                
+                <apex:pageBlockSectionItem rendered="{!listUsers.size = 0}" >
+                    <apex:outputLabel style="color:red;" value="{!$Label.No_Records_Found}"></apex:outputLabel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection> 
+        </apex:pageBlock>
+        
+        <script>
+            jQuery(".pageTitleIcon").attr("src","{!URLFOR($Resource.refedge__RESearchFilterIcons, 'search-icon.png')}");
+            jQuery("body .bPageTitle .ptBody h1.noSecondHeader").attr("style","font-weight:bold");
+        </script>
+    </apex:form>
+</apex:page>

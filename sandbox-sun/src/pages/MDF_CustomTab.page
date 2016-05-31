@@ -1,0 +1,31 @@
+<apex:page controller="MDF_CustomTab" action="{!loadmdf}">
+
+<apex:pageBlock title="My MDF">
+<apex:form >
+<apex:pageBlockTable value="{!mdfs}" var="mdf" rendered="{!mdfsexist}">
+
+<apex:column >
+<apex:facet name="header">Budget Name</apex:facet>
+<apex:outputLink value="/{!mdf.Id}">{!mdf.Name}</apex:outputLink>
+</apex:column>
+<apex:column value="{!mdf.Start_Date__c}"/>
+<apex:column value="{!mdf.End_Date__c}"/>
+<apex:column value="{!mdf.Fiscal_Year__c}"/>
+<apex:column value="{!mdf.Allocated_Budget__c}"/>
+<apex:column value="{!mdf.Available_Budget__c}"/>
+<apex:column value="{!mdf.Active__c}"/>
+
+</apex:pageBlockTable>
+  </apex:form>
+  
+    <apex:pageBlockSection rendered="{!NOT(mdfsexist)}">
+  {!$Label.MDF_CustomTab_Noresults}
+  
+  
+  </apex:pageBlockSection>
+
+
+</apex:pageBlock>
+
+  
+</apex:page>

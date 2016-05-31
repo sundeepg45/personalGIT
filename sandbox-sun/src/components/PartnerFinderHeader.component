@@ -1,0 +1,65 @@
+<apex:component >
+  <div class="header-wrapper">
+    <div class="container">
+      <div class="row">
+        <div class="secondary-nav">
+          <ul class="nav navbar-nav">
+            <li><a class="logo" href="http://www.redhat.com"><img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/redhat-logo-black.png')}"/></a></li>
+            <li><a class="ease" href="http://www.redhat.com/en/customers">{!$Label.PL_Customers}</a></li>
+            <li><a class="ease" href="http://www.redhat.com/en/partners">{!$Label.PL_Partners}</a></li>
+            <li><a class="ease" href="http://www.redhat.com/en/open-source">{!$Label.PL_Open_Source_Communities}</a></li>
+          </ul>
+        </div><!-- /.secondary-nav-->
+      </div><!-- /.row-->
+    </div><!-- /.container-->
+
+    <!--<div class="main-nav-wrapper">
+      <div class="container">
+        <div class="row">
+          <div class="main-nav" role="navigation">
+            <a href="/s/Homepage" class="logo">Red Hat</a>
+            <ul class="nav navbar-nav">
+              <li><a href="/s/Programs">{!$Label.PF_Programs}</a></li>
+              <li><a href="/s/Training">{!$Label.PF_Training}</a></li>
+              <li><a href="/s/Technologies">{!$Label.PF_Technologies}</a></li>
+              <li><a href="/s/Resources">{!$Label.PF_Resources}</a></li>
+              <li><a href="/s/Help">{!$Label.PF_Help}</a></li>
+            </ul>
+
+            <ul class="go-to-top">
+              <li><img src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/images/top-top-arrow.png')}"/></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>--><!-- /.main-nav-wrapper-->
+  </div><!-- /.header-wrapper-->
+  
+  <!--<script>
+      
+    // make navigation sticky on window scroll \\
+    
+    jQuery(window).scroll(function() {
+      var scroll = jQuery(window).scrollTop();
+
+      if (scroll >= 40) {
+        jQuery('.main-nav-wrapper').addClass('main-nav-sticky');
+        jQuery('.main-subnav').addClass('main-subnav-sticky');
+        jQuery('.secondary-nav').css(('margin-bottom' ), 80);
+        jQuery('.go-to-top').fadeIn();
+      } else {
+        jQuery('.main-nav-wrapper').removeClass('main-nav-sticky');
+        jQuery('.main-subnav').removeClass('main-subnav-sticky');
+        jQuery('.secondary-nav').css(('margin-bottom' ), 0);
+       jQuery('.go-to-top').fadeOut();
+      }
+    });
+
+    //scroll to top of window function\\
+
+    jQuery('.go-to-top').click(function() {
+      jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+      return false;
+    });
+  </script>-->
+</apex:component>

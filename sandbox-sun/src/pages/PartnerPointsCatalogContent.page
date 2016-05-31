@@ -1,0 +1,196 @@
+<apex:page controller="PartnerPointsContentController" cache="true" expires="1">
+
+<style type="text/css">
+
+	.pbBody {
+		height: 300px;
+		overflow: scroll;
+	}
+
+	.pbBody.content {
+		height: 250px;
+	}
+
+</style>
+
+
+<div id="mainBlock">
+	<apex:form id="mainForm">
+		<div class="bPageTitle">
+			<div class="ptBody secondaryPalette">
+				<div class="content">
+					<h1 class="pageType">Partner Points Catalog Administration<span class="titleSeparatingColon">:</span></h1>
+					<h2 class="pageDescription">Content Administration</h2>
+					<div class="blank">&nbsp;</div>
+				</div>
+			</div>
+		</div>
+
+	    <apex:pageMessages />
+		<div><apex:commandLink action="{!backToCatalog}" id="backToCatalog" value="< Back to Catalog"/></div>
+		<br/>
+
+		<div class="filterOverview">
+			<apex:selectList id="selectRegion" value="{!selectedRegion}" multiselect="false" size="1">
+				<apex:selectOption itemValue="Global" itemLabel="Global"/>
+				<apex:selectOption itemValue="NA" itemLabel="NA" itemDisabled="{!AND(userRegion != 'NA', NOT(isGlobalPointAdmin))}"/>
+				<apex:selectOption itemValue="EMEA" itemLabel="EMEA" itemDisabled="{!AND(userRegion != 'EMEA', NOT(isGlobalPointAdmin))}"/>
+				<apex:selectOption itemValue="LATAM" itemLabel="LATAM" itemDisabled="{!AND(userRegion != 'LATAM', NOT(isGlobalPointAdmin))}"/>
+				<apex:selectOption itemValue="APAC" itemLabel="APAC" itemDisabled="{!AND(userRegion != 'APAC', NOT(isGlobalPointAdmin))}"/>
+				<apex:actionSupport event="onchange" rerender="mainForm"/>
+			</apex:selectList> &nbsp; &nbsp;
+	        <apex:selectList id="selectWorkspace" value="{!selectedWorkspace}" multiselect="false" size="1">
+	            <apex:selectOptions value="{!workspaceOptions}"/>
+	        </apex:selectList> &nbsp; &nbsp;
+	        <apex:selectList id="selectTrack" value="{!selectedTrack}" multiselect="false" size="1">
+	            <apex:selectOptions value="{!availableTracks}"/>
+	            <apex:actionSupport event="onchange" rerender="mainForm"/>
+	        </apex:selectList> &nbsp; &nbsp;	        
+			<label for="SearchString">Filter:</label><apex:inputText value="{!titleFilter}" id="searchString"/>
+			<apex:commandButton id="filterButton" value="Apply" action="{!filterButton}"/> &nbsp;&nbsp;
+			<apex:commandButton id="resetFilterButton" value="Reset" action="{!resetFilterButton}"/>
+		</div>
+
+		<br/>
+		<h2>Scored Content (points will be awarded for this content)</h2>
+		<div class="bRelatedList">
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody content">
+					<table id="scoredContentTable" class="list" border="0" cellspacing="0" cellpadding="0">
+						<thead class="rich-table-thead">
+						    <tr class="headerRow"> 
+								<th>Title</th>
+								<th>Points</th>
+								<th>Content Size</th>
+								<th>File Type</th>
+								<th>Actions</th>
+								<th>Status</th>
+						    </tr>
+					    </thead>
+					    <apex:repeat var="contentItem" value="{!contentList}">
+					    <tr id="assignedContentRow_{!contentItem.ppContentId}" class="dataRow even first">
+					    	<td id="itemTitle_{!contentItem.ppContentId}">
+					    		<apex:outputText value="{!contentItem.title}"/>
+					    	</td>
+					    	<td align="right" id="itemPoints_{!contentItem.ppContentId}">
+					    		<apex:outputText rendered="{!NOT(ISNULL(contentItem.ppContentId))}">
+					    			{!contentItem.points}
+					    		</apex:outputText>
+					    	</td>
+					    	<td align="right" id="itemSize_{!contentItem.ppContentId}">
+					    		<apex:outputText value="{!contentItem.contentSize}"/>
+					    	</td>
+					    	<td id="itemType_{!contentItem.ppContentId}">
+					    		<apex:outputText value="{!contentItem.fileType}"/>
+					    	</td>
+					    	<td id="itemCommandLinks_{!contentItem.ppContentId}">
+								<apex:commandLink action="{!manageButton}" value="Edit" rendered="{!OR(userRegion == selectedRegion, isGlobalPointAdmin)}">
+									<apex:param name="ppContentId" value="{!contentItem.ppContentId}"/>
+								</apex:commandLink> &nbsp; &nbsp;
+								<apex:commandLink action="{!deleteButton}" value="Delete" rendered="{!OR(userRegion == selectedRegion, isGlobalPointAdmin)}">
+									<apex:param name="ppContentId" value="{!contentItem.ppContentId}"/>
+								</apex:commandLink>								
+								&nbsp; &nbsp;<a href="/{!contentItem.ppContentId}">View</a>
+							</td>
+							<td id="itemDisabled_{!contentItem.ppContentId}">
+								<apex:outputText value="disabled" rendered="{!NOT(contentItem.isActive)}"/>
+							</td>
+					    </tr>
+						</apex:repeat>
+					</table>
+				</div>
+			</div>
+
+			<br />
+
+			<h2>Unscored Content (no points currently assigned to this content)</h2>
+			<div class="bPageBlock secondaryPalette">
+				<div class="pbBody docs">
+					<table id="unscoredContentTable" class="list" border="0" cellspacing="0" cellpadding="0">
+						<thead class="rich-table-thead">
+						    <tr class="headerRow"> 
+								<th>Title</th>
+								<th>Content Size</th>
+								<th>File Type</th>
+								<th>Actions</th>
+						    </tr>
+					    </thead>
+					    <apex:repeat var="unassignedDoc" value="{!unassignedDocs}">
+					    <tr id="unassignedDocRow_{!unassignedDoc.Id}" class="dataRow even first">
+					    	<td id="contentTitle_{!unassignedDoc.Id}">
+					    		<apex:outputText value="{!unassignedDoc.Title}"/>
+					    	</td>
+					    	<td align="right" id="contentSize_{!unassignedDoc.Id}">
+					    		<apex:outputText value="{!unassignedDoc.ContentSize}"/>
+					    	</td>
+					    	<td id="contentFileType_{!unassignedDoc.Id}">
+					    		<apex:outputText value="{!unassignedDoc.FileType}"/>
+					    	</td>
+					    	<td id="contentCommandLinks_{!unassignedDoc.Id}">
+								<apex:commandLink action="{!assignButton}" value="Assign" >
+									<apex:param name="contentId" value="{!unassignedDoc.ContentDocumentId}"/>
+								</apex:commandLink>
+							</td>
+					    </tr>
+						</apex:repeat>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<br/>
+		<br/>
+
+<!-- 
+<hr />
+<br /><br /><br />
+
+	    <apex:pageBlock id="rerenderMain" title="Partner Points: Content Administration">
+
+
+			<apex:pageBlock title="Filter" >
+				<apex:outputLabel value="Filter:"/><apex:inputText value="{!titleFilter}"/>
+	            <apex:commandButton action="{!filterButton}" value="Apply" styleClass="rowbutton" id="buttonFilter" rerender="rerenderMain"/>
+			</apex:pageBlock>
+
+	        <apex:pageBlockSection columns="6">
+				<apex:pageBlockTable value="{!contentList}" var="contentItem">
+	            	<apex:column >
+	                	<apex:facet name="header">
+	                       	<apex:outputText value="Name" />
+	                   </apex:facet>
+	                   <apex:outputText value="{!contentItem.title}"/>
+	               	</apex:column>
+	            	<apex:column >
+	                	<apex:facet name="header">
+	                       	<apex:outputText value="Points" />
+	                   </apex:facet>
+	                   <apex:outputText value="{!contentItem.points}" rendered="{!NOT(ISNULL(contentItem.ppContentId))}"/>
+	               	</apex:column>
+	            	<apex:column >
+	                	<apex:facet name="header">
+	                       	<apex:outputText value="Content Size"/>
+	                   </apex:facet>
+	                   <apex:outputText value="{!contentItem.contentSize}"/>
+	               	</apex:column>
+	            	<apex:column >
+	                	<apex:facet name="header">
+	                       	<apex:outputText value="File Type" />
+	                   </apex:facet>
+	                   <apex:outputText value="{!contentItem.fileType}"/>
+	               	</apex:column>
+		            <apex:column >
+		                <apex:commandButton action="{!manageButton}" value="Manage" styleClass="rowbutton" id="buttonManage" rerender="rerenderMain" rendered="{!NOT(ISNULL(contentItem.ppContentId))}">
+		                    <apex:param name="commandManageId" value="{!contentItem.contentId}" assignTo="{!commandId}"/>
+		                </apex:commandButton>
+		                <apex:commandButton action="{!assignButton}" value="Assign" styleClass="rowbutton" id="buttonAssign" rerender="rerenderMain" rendered="{!ISNULL(contentItem.ppContentId)}">
+		                    <apex:param name="commandManageId" value="{!contentItem.contentId}" assignTo="{!commandId}"/>
+		                </apex:commandButton>
+		            </apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+-->
+	</apex:form>
+</div>
+</apex:page>

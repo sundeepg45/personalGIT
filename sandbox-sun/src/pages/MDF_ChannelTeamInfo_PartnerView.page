@@ -1,0 +1,96 @@
+<apex:page standardController="SFDC_Budget__c" showHeader="false">
+    <apex:stylesheet value="{!$Resource.Common_EmbeddedPageStylesheet}"/>
+    
+    <apex:variable value="{!SFDC_Budget__c.Account_Master__r.Subregion__c == 'Fed Sled'}" var="isFedSled" />
+    <apex:variable value="{!SFDC_Budget__c.Account_Master__r.RecordType.Name == 'EMEA Account'}" var="isEMEAAccount" />
+    <apex:variable value="{!SFDC_Budget__c.Account_Master__r.RecordType.Name == 'EMEA Partner'}" var="isEMEAPartner" />
+    <apex:variable value="{!OR(isEMEAAccount, isEMEAPartner)}" var="isEMEA" />
+    
+    <!-- Rendered only for Fed Sled -->
+    <apex:pageBlock rendered="{!isFedSled}">
+        <apex:pageBlockSection columns="1">
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Marketing_Program_Manager__c.Label}" />
+                <apex:outputText value="{!SFDC_Budget__c.Marketing_Program_Manager__r.Name}" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:outputField value="{!SFDC_Budget__c.Marketing_Program_Manager_Title__c}" />
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Marketing_Program_Manager_Email__c.Label}" />
+                <apex:outputLink value="mailto:{!SFDC_Budget__c.Marketing_Program_Manager_Email__c}">
+                    <apex:outputText value="{!SFDC_Budget__c.Marketing_Program_Manager_Email__c}" />
+                </apex:outputLink>
+            </apex:pageBlockSectionItem>
+
+            <apex:outputField value="{!SFDC_Budget__c.Marketing_Program_Manager_Phone__c}" />
+            <apex:outputField value="{!SFDC_Budget__c.Marketing_Program_Manager_Mobile__c}" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <!-- Rendered for EMEA only -->
+    <apex:pageBlock rendered="{!isEMEA}">
+        <apex:pageBlockSection >
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Channel_Marketing_Manager_Country__c.Label}" />
+                <apex:outputText value="{!SFDC_Budget__c.Channel_Marketing_Manager_Country__r.Name}" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Partner_Manager__c.Label}" />
+                <apex:outputText value="{!SFDC_Budget__c.Partner_Manager__r.Name}" />
+            </apex:pageBlockSectionItem>
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Marketing_Manager_Country__r.Title}" />
+            <apex:outputField value="{!SFDC_Budget__c.Partner_Manager__r.Title}" />
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Marketing_Manager_Country__r.Email}" />
+            <apex:outputField value="{!SFDC_Budget__c.Partner_Manager__r.Email}" />
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Marketing_Manager_Country__r.Phone}" />
+            <apex:outputField value="{!SFDC_Budget__c.Partner_Manager__r.Phone}" />
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Marketing_Manager_Country__r.MobilePhone}" />
+            <apex:outputField value="{!SFDC_Budget__c.Partner_Manager__r.MobilePhone}" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <!-- Rendered for everyone else -->
+    <apex:pageBlock rendered="{!AND(NOT(isEMEA),NOT(isFedSled))}">
+        <apex:pageBlockSection columns="2">
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Channel_Account_Manager__c.Label}" />
+                <apex:outputText value="{!SFDC_Budget__c.Channel_Account_Manager__r.Name}" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Inside_Channel_Account_Manager__c.Label}" />
+                <apex:outputText value="{!SFDC_Budget__c.Inside_Channel_Account_Manager__r.Name}" />
+            </apex:pageBlockSectionItem>
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Account_Manager_Title__c}" />
+            <apex:outputField value="{!SFDC_Budget__c.Inside_Channel_Account_Manager_Title__c}" />
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Channel_Account_Manager_Email__c.Label}" />
+                <apex:outputLink value="mailto:{!SFDC_Budget__c.Channel_Account_Manager_Email__c}">
+                    <apex:outputText value="{!SFDC_Budget__c.Channel_Account_Manager_Email__c}" />
+                </apex:outputLink>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="{!$ObjectType.SFDC_Budget__c.Fields.Inside_Channel_Account_Manager_Email__c.Label}" />
+                <apex:outputLink value="mailto:{!SFDC_Budget__c.Inside_Channel_Account_Manager_Email__c}">
+                    <apex:outputText value="{!SFDC_Budget__c.Inside_Channel_Account_Manager_Email__c}" />
+                </apex:outputLink>
+            </apex:pageBlockSectionItem>
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Account_Manager_Phone__c}" />
+            <apex:outputField value="{!SFDC_Budget__c.Inside_Channel_Account_Manager_Phone__c}" />
+
+            <apex:outputField value="{!SFDC_Budget__c.Channel_Account_Manager_Mobile_formula__c}" />
+            <apex:outputField value="{!SFDC_Budget__c.Inside_Channel_Account_Manager_Mobile__c}" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+</apex:page>

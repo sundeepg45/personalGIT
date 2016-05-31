@@ -1,0 +1,76 @@
+<apex:page controller="PartnerPgmDashController">
+<style>
+  body .bPageTitle .ptBody h1.noSecondHeader{
+    font-size: 14px;
+  }
+</style>
+
+
+<apex:sectionHeader title="{!$Label.Program_Application_Title}"/>
+
+<apex:form >
+<apex:pageMessages />
+
+
+<apex:pageBlock >
+    <apex:pageBlockButtons >
+        <apex:commandButton action="{!submitRequest}" value="{!$Label.Program_Application_Submit}"/>
+        <apex:commandButton action="{!cancelRequest}" value="{!$Label.Program_Agreement_Cancel}"/>
+    </apex:pageBlockButtons>
+
+    <apex:pageBlockSection columns="1">
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Col_Program}"/>
+            <apex:outputText id="txtProgramName" value="{!currentRequest.Program__r.Name}"/>
+        </apex:pageBlockSectionItem>
+
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Col_Account}"/>
+            <apex:outputText id="txtAccountName" value="{!currentRequest.Account__r.Name}"/>
+        </apex:pageBlockSectionItem>
+
+        <apex:inputField id="txtProgramContact" value="{!currentRequest.Program_Contact__c}"/>
+    </apex:pageBlockSection>
+
+    <apex:pageBlockSection title="{!$Label.Program_Application_AdminContact}" columns="1" rendered="{!currentRequest.Program__r.Program_Category__c == 'Embedded'}">
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Admin_Name}"/>
+            <apex:outputPanel >
+                <apex:inputField id="txtAdminName" value="{!currentRequest.Admin_Contact__c}"/>
+                <apex:commandLink target="_blank" action="{!createContact}" value="Create a Contact"/>
+            </apex:outputPanel>
+        </apex:pageBlockSectionItem>
+        <apex:inputField id="txtEDPName" value="{!currentRequest.EDP_name__c}"/>
+    </apex:pageBlockSection>
+
+    <apex:pageBlockSection title="{!$Label.Program_Application_Product_Info_Title}" columns="1" rendered="{!currentRequest.Program__r.Program_Category__c == 'Embedded'}">
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Product_Name}"/>
+            <apex:inputField id="txtProductName" value="{!currentProduct.Product_Name__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$ObjectType.Partner_Program_Product__c.Fields.Product_Description__c.Label}"/>
+            <apex:inputField id="txtProductDescription" value="{!currentProduct.Product_Description__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Product_Website}"/>
+            <apex:inputField id="txtProductURL" value="{!currentProduct.Product_URL__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Desired_RH_Description}"/>
+            <apex:inputField id="txtRequestedProductDesc" value="{!currentProduct.Requested_Descriptions__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_Dev_Support_Subs}"/>
+            <apex:inputField id="txtDevSupportSubs" value="{!currentProduct.Developer_Support__c}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="{!$Label.Program_Application_PO}"/>
+            <apex:inputField id="txtDevSupportPOs" value="{!currentProduct.Support_POs__c}"/>
+        </apex:pageBlockSectionItem>
+    </apex:pageBlockSection>
+
+</apex:pageBlock>
+
+</apex:form>
+</apex:page>

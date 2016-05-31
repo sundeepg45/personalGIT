@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Attribute__c$Parent__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c$Name</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Content_Attributes__r$Reference_Content__c.Reference_Content_Type_Name__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Content_Attributes__r$Is_fromMapping__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Content_Attributes__r$Reference_Content__c.Content_Status__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Content_Attributes__r$Reference_Content__c.Featured_Content__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Content_Attributes__r$Reference_Content__c.Internal_Use__c</field>
+    </columns>
+    <columns>
+        <field>Attribute__c.Content_Attributes__r$Account__c</field>
+    </columns>
+    <description>Attributes with Reference Content and associated Account</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Attribute__c.Content_Attributes__r$Reference_Content__c.Title__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Attributes with Reference Content</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Attributes_with_Reference_Content__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Attribute__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

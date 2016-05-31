@@ -1,0 +1,37 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none">
+        <h4><apex:outputText value="{!$Label.Onboarding_JoinConfirm_Application_To_Join_Company}"/>&nbsp;{!Lead.Company}&nbsp;<apex:outputText value="{!$Label.Onboarding_JoinConfirm_Partner_Account}"/></h4>
+        <div id="onboardSectionTitle"><apex:outputText value="{!$Label.Onboarding_JoinConfirm_Company_Verification}"/></div>
+    </apex:outputPanel>
+
+    <apex:form >
+        <fieldset class="fieldsetform">
+        	<apex:outputPanel styleClass="rowform" layout="block">
+            	<apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_JoinConfirm_Company_Name}"/></apex:outputLabel>
+            	<apex:outputPanel >{!Lead.Company}</apex:outputPanel>
+        	</apex:outputPanel>
+        	<apex:outputPanel styleClass="rowform" layout="block">
+            	<apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_JoinConfirm_Partner_Type}"/></apex:outputLabel>
+            	<apex:outputPanel >
+            		<apex:outputText rendered="{!SelectedPartnerType.Name != 'Reseller'}">{!SelectedPartnerType.Name}</apex:outputText>
+            		<apex:outputText rendered="{!SelectedPartnerType.Name == 'Reseller'}">{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}</apex:outputText>
+            	</apex:outputPanel>
+        	</apex:outputPanel>
+        	<apex:outputPanel styleClass="rowform" layout="block">
+        		<apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_JoinConfirm_Location}"/></apex:outputLabel>
+            	<apex:outputPanel style="display:inline; margin-left: 9px;">
+	               	<apex:outputText style="display:inline; margin-left: 0px;" value="{!joinStatus.Partner__r.BillingCity}, " rendered="{!NOT(ISBLANK(joinStatus.Partner__r.BillingCity))}"  id="txtCity"/>
+	               	<apex:outputText style="display:inline; margin-left: 0px;" value="{!joinStatus.Partner__r.BillingState}, " rendered="{!NOT(ISBLANK(joinStatus.Partner__r.BillingState))}"  id="cboState"/>
+	               	<apex:outputText style="display:inline; margin-left: 0px;" value="{!joinStatus.Partner__r.BillingCountry}" rendered="{!NOT(ISBLANK(joinStatus.Partner__r.BillingCountry))}"  id="cboCountry"/>
+	            </apex:outputPanel>
+	        </apex:outputPanel>
+	        <apex:outputPanel styleClass="rowform" layout="block">
+	            <apex:outputLabel >&nbsp;</apex:outputLabel>
+	            <apex:outputPanel >
+	                <apex:commandButton action="{!joinPartnerSubmit}" value="{!$Label.Onboarding_JoinConfirm_Submit_For_Approval}" styleClass="rowbutton" id="buttonSubmit"/>
+	                <apex:commandButton action="{!joinPartnerCancel}" value="{!$Label.Onboarding_JoinConfirm_Back}" styleClass="rowbutton" id="buttonBack"/>
+	        	</apex:outputPanel>
+        	</apex:outputPanel>
+        </fieldset>
+    </apex:form>
+</apex:page>

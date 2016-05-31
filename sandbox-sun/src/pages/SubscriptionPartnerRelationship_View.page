@@ -1,0 +1,21 @@
+<apex:page standardController="SubscriptionPartnerRelationship__c" >
+	<apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+		<apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+		<apex:outputLink value="/{!SubscriptionPartnerRelationship__c.Subscription__c}">
+			<apex:outputText value="Back to Subscription: " />
+			<apex:outputText value="{!SubscriptionPartnerRelationship__c.Subscription__r.Name}" />
+		</apex:outputLink>
+	</apex:outputPanel>
+	<apex:detail subject="{!SubscriptionPartnerRelationship__c.SubscriptionPartner__c}"
+		inlineEdit="true"
+		relatedList="true"
+		relatedListHover="true"
+		showChatter="true"
+		title="true" />
+	<apex:pageBlock title="{!$ObjectType.SubscriptionPartnerRelationship__c.Label} Detail">
+		<apex:pageBlockSection >
+			<apex:outputField value="{!SubscriptionPartnerRelationship__c.Status__c}" />
+			<apex:outputField value="{!SubscriptionPartnerRelationship__c.ErrorMessage__c}" />
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+</apex:page>

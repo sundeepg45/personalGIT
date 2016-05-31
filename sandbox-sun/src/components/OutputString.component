@@ -1,0 +1,11 @@
+<apex:component >
+	<apex:attribute name="value" description="The value being displayed" type="String" required="true" />
+	<apex:attribute name="prefix" description="prefix for value displayed" type="String" required="false" />
+	<apex:attribute name="suffix" description="suffix for value displayed" type="String" required="false" />
+	<apex:outputText rendered="{!NOT(ISBLANK(TRIM(value)))}" value="{0}{1}{2}">
+		<apex:param value="{!prefix}"/>
+		<apex:param value="{!value}"/>
+		<apex:param value="{!suffix}"/>
+	</apex:outputText>
+	<apex:componentBody rendered="{!ISBLANK(TRIM(value))}"/>
+</apex:component>

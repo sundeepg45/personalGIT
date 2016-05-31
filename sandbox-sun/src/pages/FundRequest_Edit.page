@@ -1,0 +1,199 @@
+<apex:page standardController="SFDC_MDF__c" extensions="FundRequest_Edit" action="{!initializeFundRequest}">
+    <apex:sectionHeader title="{!$ObjectType.SFDC_MDF__c.Label}" subtitle="{!SFDC_MDF__c.Name}" />
+    <apex:include pageName="Common_IncludeJqueryUI" />
+
+    <style type="text/css">
+.editPage .bPageBlock .detailList tr td {
+    vertical-align: middle;
+}
+</style>
+
+    <apex:variable value="{!SFDC_MDF__c.Account_Master__r.Subregion__c == 'Fed Sled'}" var="isFedSled" />
+    <apex:variable value="{!SFDC_MDF__c.Account_Master__r.RecordType.Name == 'NA Partner'}" var="isNAPartner" />
+    <apex:variable value="{!SFDC_MDF__c.Account_Master__r.RecordType.Name == 'EMEA Account'}" var="isEMEAAccount" />
+    <apex:variable value="{!SFDC_MDF__c.Account_Master__r.RecordType.Name == 'EMEA Partner'}" var="isEMEAPartner" />
+    <apex:variable value="{!OR(isEMEAAccount, isEMEAPartner)}" var="isEMEA" />
+
+    <apex:form >
+        <apex:pageBlock title="{!$ObjectType.SFDC_MDF__c.Label}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Common_Save}" action="{!upsertRecord}" />
+                <apex:commandButton value="{!$Label.Common_Cancel}" action="{!cancel}" />
+            </apex:pageBlockButtons>
+
+            <apex:pageMessages />
+
+            <!--  Rendered for RH employees -->
+            <apex:pageBlockSection title="{!$Label.FundRequestEdit_InformationHeader}" columns="2" rendered="{!NOT(isPartnerUser)}">
+
+                <apex:outputField value="{!SFDC_MDF__c.Request_Number_new__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Budget__c}" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Name}" required="true" />
+                <apex:outputField value="{!SFDC_MDF__c.Account_master__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Red_Hat_Solution__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Partner_Tier__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Total_Expenditure_of_Activity__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Partner_Type__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Estimated_Red_Hat_Funding_Requested__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Date_of_Request__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.of_Activity_Requiring_Red_Hat_Funding_n__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Accounting_Type__c}" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Red_Hat_Sponsored_Activity__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Activity_Start_Date__c}" />
+                 <apex:inputField value="{!SFDC_MDF__c.Oracle_Project_Code__c}"  />
+
+                <!-- Special for Fed Sled -->
+ <!--               <apex:inputField value="{!SFDC_MDF__c.Oracle_Project_Code__c}" rendered="{!AND(NOT(isPartnerUser),isNAPartner)}" /> -->
+                
+               <apex:outputText rendered="{!OR(NOT(isNAPartner),isPartnerUser)}" />
+                <apex:outputField value="{!SFDC_MDF__c.Activity_End_Date__c}" />
+            </apex:pageBlockSection>
+
+            <!--  Rendered for partner users -->
+            <apex:pageBlockSection title="{!$Label.FundRequestEdit_InformationHeader}" columns="2" rendered="{!isPartnerUser}">
+                <apex:outputField value="{!SFDC_MDF__c.Request_Number_new__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Budget__c}" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Name}" required="true" />
+                <apex:inputField value="{!SFDC_MDF__c.Account_master__c}" required="true" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Red_Hat_Solution__c}" required="true" />
+                <apex:outputField value="{!SFDC_MDF__c.Date_of_Request__c}" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Total_Expenditure_of_Activity__c}" required="true" />
+                <apex:inputField value="{!SFDC_MDF__c.Activity_Start_Date__c}" required="true" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Estimated_Red_Hat_Funding_Requested__c}" required="true" />
+                <apex:inputField value="{!SFDC_MDF__c.Activity_End_Date__c}" required="true" />
+
+                <apex:outputField value="{!SFDC_MDF__c.of_Activity_Requiring_Red_Hat_Funding_n__c}" />
+                <apex:outputText />
+
+                <apex:inputField value="{!SFDC_MDF__c.Red_Hat_Sponsored_Activity__c}" />
+                <apex:outputText />
+            </apex:pageBlockSection>
+
+            <!--  Rendered for RH employees and Partners -->
+            <apex:actionRegion >
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!SFDC_MDF__c.Activity_Type__c}" required="true" onChange="toggleActivityText(this);" styleClass="activityType">
+                        <apex:actionSupport event="onchange" rerender="thePageBlock" status="activityTypeStatus" />
+                    </apex:inputField>
+
+                    <!-- EMEA Red Hat users -->
+                    <apex:outputField rendered="{!AND(NOT(isPartnerUser),isEMEA)}" value="{!SFDC_MDF__c.Activity_Subtype__c}" />
+
+                    <!-- EMEA Partner users -->
+                    <apex:inputField rendered="{!AND(isPartnerUser,isEMEA)}" value="{!SFDC_MDF__c.Activity_Subtype__c}" required="true" />
+
+                    <apex:pageBlockSectionItem >
+                        <apex:outputText />
+                        <apex:outputPanel style="padding: 1.0em; display: block;">
+                            <apex:outputText value="{!$Label.FundRequest_Activity1Text}" styleClass="hidden activityText activity1Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity2Text}" styleClass="hidden activityText activity2Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity3Text}" styleClass="hidden activityText activity3Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity4Text}" styleClass="hidden activityText activity4Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity5Text}" styleClass="hidden activityText activity5Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity6Text}" styleClass="hidden activityText activity6Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity7Text}" styleClass="hidden activityText activity7Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity8Text}" styleClass="hidden activityText activity8Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity9Text}" styleClass="hidden activityText activity9Text" />
+                            <apex:outputText value="{!$Label.FundRequest_Activity10Text}" styleClass="hidden activityText activity10Text" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+
+                    <!-- Only for RH users -->
+                    <apex:outputField rendered="{!NOT(isPartnerUser)}" value="{!SFDC_MDF__c.Activity_Description__c}" style="width: 95%; height: 5em;" />
+                    <apex:outputField rendered="{!AND(NOT(isPartnerUser),NOT(isEMEA))}" value="{!SFDC_MDF__c.Request_Objectives__c}" style="width: 95%; height: 5em;" />
+                    <apex:outputField rendered="{!AND(NOT(isPartnerUser),NOT(isEMEA))}" value="{!SFDC_MDF__c.Partner_Comments__c}" style="width: 95%; height: 5em;" />
+
+                    <!-- Only for partner users -->
+                    <apex:inputField rendered="{!isPartnerUser}" value="{!SFDC_MDF__c.Activity_Description__c}" style="width: 95%; height: 5em;" required="true" />
+                    <apex:inputField rendered="{!AND(isPartnerUser,NOT(isEMEA))}" value="{!SFDC_MDF__c.Request_Objectives__c}" style="width: 95%; height: 5em;" />
+                    <apex:inputField rendered="{!AND(isPartnerUser,NOT(isEMEA))}" value="{!SFDC_MDF__c.Partner_Comments__c}" style="width: 95%; height: 5em;" />
+                </apex:pageBlockSection>
+            </apex:actionRegion>
+
+            <!-- Rendered for RH employees, EMEA -->
+            <apex:pageBlockSection title="{!$Label.FundRequestEdit_ActivityResultsHeader}" columns="2" rendered="{!AND(NOT(isPartnerUser),isEMEA)}">
+                <apex:outputField value="{!SFDC_MDF__c.Key_Initiative__c}" />
+                <apex:inputField value="{!SFDC_MDF__c.Collateral_Required__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Executing_Partner__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Planned_Responses__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Target_Groups__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Planned_Attendees__c}" />
+
+                <apex:outputText />
+                <apex:outputField value="{!SFDC_MDF__c.Planned_Leads__c}" />
+            </apex:pageBlockSection>
+
+            <!-- Rendered for Partners, EMEA -->
+            <apex:pageBlockSection title="{!$Label.FundRequestEdit_ActivityResultsHeader}" columns="2" rendered="{!AND(isPartnerUser,isEMEA)}">
+                <apex:inputField value="{!SFDC_MDF__c.Key_Initiative__c}" required="true" />
+                <apex:inputField value="{!SFDC_MDF__c.Collateral_Required__c}" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Executing_Partner__c}" required="true" />
+                <apex:inputField value="{!SFDC_MDF__c.Planned_Responses__c}" required="true" />
+
+                <apex:inputField value="{!SFDC_MDF__c.Target_Groups__c}" required="true" /> 
+                <apex:inputField value="{!SFDC_MDF__c.Planned_Attendees__c}" required="true" />
+
+                <apex:outputText />
+                <apex:inputField value="{!SFDC_MDF__c.Planned_Leads__c}" required="true" />
+            </apex:pageBlockSection>
+
+            <!-- Rendered to RH employees, EMEA only -->
+            <apex:pageBlockSection title="Comments" columns="1" rendered="{!AND(NOT(isPartnerUser),isEMEA)}">
+                <apex:outputField value="{!SFDC_MDF__c.Participating_Partners__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Request_Objectives__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Partner_Comments__c}" />
+            </apex:pageBlockSection>
+
+            <!-- Rendered to Partners, EMEA only -->
+            <apex:pageBlockSection title="Comments" columns="1" rendered="{!AND(isPartnerUser,isEMEA)}">
+                <apex:inputField value="{!SFDC_MDF__c.Participating_Partners__c}"  style="width: 95%; height: 5em;" required="true"/>
+                <apex:inputField value="{!SFDC_MDF__c.Request_Objectives__c}"  style="width: 95%; height: 5em;" />
+                <apex:inputField value="{!SFDC_MDF__c.Partner_Comments__c}"  style="width: 95%; height: 5em;" />
+            </apex:pageBlockSection>
+
+            <!-- Common fund status section goes at the bottom -->
+            <apex:pageBlockSection title="{!$Label.FundRequestEdit_StatusHeader}" columns="2">
+                <apex:outputField value="{!SFDC_MDF__c.Requester_Name_new__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Approval_Status_Partner__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Email_Address__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Date_Approved__c}" />
+
+                <apex:outputField value="{!SFDC_MDF__c.Reasons_for_Rejection__c}" />
+                <apex:outputField value="{!SFDC_MDF__c.Approval_Status__c}" />
+            </apex:pageBlockSection>
+
+            <script language="javascript" type="text/javascript">
+            function toggleActivityText(select) {
+                $(".activityText").addClass("hidden");
+                $(".activity" + select.selectedIndex + "Text").removeClass("hidden");
+            }
+            
+            $(document).ready(function() {
+                $(".activityText").each(function() {
+                    $(this).html($(this).html().replace(/\n/g, "<br />"));
+                    $(this).html($(this).html().replace(/\*(.*?)\*/g, "<strong>$1</strong>"));
+                });
+                
+                $(".activityType").each(function() {
+                    toggleActivityText(this);
+                });
+            });
+            </script>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

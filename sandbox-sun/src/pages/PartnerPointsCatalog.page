@@ -1,0 +1,31 @@
+<apex:page standardController="PP_Catalog__c" recordSetVar="r" extensions="PartnerPointsCatalogController" cache="true" expires="1">
+
+	<apex:form >
+	    <apex:pageMessages />
+	    <apex:pageBlock id="rerenderMain" title="Partner Points: Catalog Administration">
+
+	        <apex:pageBlockSection columns="1">
+				<apex:pageBlockTable value="{!catalogList}" var="catItem">
+	            	<apex:column >
+	                	<apex:facet name="header">
+	                       	<apex:outputText value="Name" />
+	                   </apex:facet>
+	                   <apex:outputText value="{!catItem.Name}"/>
+	               	</apex:column>
+	            	<apex:column >
+	                	<apex:facet name="header">
+	                       	<apex:outputText value="Description" />
+	                   </apex:facet>
+	                   <apex:outputText value="{!catItem.Description__c}"/>
+	               	</apex:column>
+		            <apex:column >
+		                <apex:commandButton action="{!manageButton}" value="Manage" styleClass="rowbutton" id="buttonManage" rerender="rerenderMain">
+		                    <apex:param name="commandManageId" value="{!catItem.Id}" assignTo="{!commandManageId}"/>
+		                </apex:commandButton>
+		            </apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+
+</apex:page>

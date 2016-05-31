@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <defaultLandingTab>standard-home</defaultLandingTab>
+    <description>The first on demand PRM service integrated with CRM and SFA.</description>
+    <label>PRM</label>
+    <tab>standard-Lead</tab>
+    <tab>standard-Opportunity</tab>
+    <tab>standard-Account</tab>
+    <tab>standard-Contact</tab>
+    <tab>SFDC_Channel_Account_Plan__c</tab>
+    <tab>FiscalGoals__c</tab>
+    <tab>SFDC_MDF_Claim__c</tab>
+    <tab>SFDC_MDF__c</tab>
+    <tab>Customer_Reference__c</tab>
+    <tab>Country__c</tab>
+    <tab>PartnerProduct__c</tab>
+    <tab>PartnerTraining__c</tab>
+    <tab>Agreement_Country__c</tab>
+    <tab>Contact_Converter__c</tab>
+    <tab>Cloud</tab>
+    <tab>RHEL</tab>
+    <tab>Special_Program__c</tab>
+    <tab>BillToAccount__c</tab>
+    <tab>Communities_Navigation_Item__c</tab>
+    <tab>Communities_Tool_Shortcut__c</tab>
+    <tab>Storybook__c</tab>
+    <tab>Storybook_Content_Upload</tab>
+    <tab>Company_Scorecard</tab>
+    <tab>RequalificationMetDashboard</tab>
+    <tab>Manage_My_Track_s</tab>
+    <tab>Request_Specialization</tab>
+    <tab>Company_Accreditations</tab>
+    <tab>Edit_Company_Logo</tab>
+    <tab>Deal_Registration</tab>
+    <tab>NFR_Request__c</tab>
+    <tab>Partner_Registrations</tab>
+    <tab>User_Scorecard</tab>
+    <tab>Featured_Partner__c</tab>
+</CustomApplication>

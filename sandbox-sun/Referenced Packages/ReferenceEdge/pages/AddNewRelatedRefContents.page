@@ -1,0 +1,138 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pageId" standardController="refedge__Account_Reference_Content__c" extensions="refedge.AddNewRelatedRefContentsController" sidebar="false">
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:sectionHeader title="{!$Label.T_Related_Reference_Content_Edit}" subtitle="{!$Label.T_Related_Reference_Content}"  rendered="{!AND(isFromAccount,isFullLicenseAccessible)}"/>
+    <apex:sectionHeader title="{!$Label.T_Associated_Account_Edit}" subtitle="{!$Label.T_New_Associated_Account}"  rendered="{!AND(NOT(isFromAccount),isFullLicenseAccessible)}"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    
+    <script>
+        var lookUpWindowOpen = false;
+        var newWin = null; 
+        var popupflag = false;
+        var currentPgName = '';
+        var isNameChanged = false;
+        function ShowLookup(currentPageName){
+            if(!lookUpWindowOpen){
+                lookUpWindowOpen = true;
+                popupflag = true;
+                //newWin = window.open(encodeURI('{!$Page.refedge__AddRequestAccountLookup}?strText='+selectedAccId),'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no'); 
+                currentPgName = currentPageName;
+                if(currentPageName == '{!$Page.refedge__AddRequestAccountLookup}'){
+                    var accName = document.getElementById('pageId:formId:pageBlockId:pageBlockSectionId2:pbsAccountId:searchAccount').value;
+                    newWin = window.open(encodeURI('{!$Page.refedge__AddRequestAccountLookup}?strText='+accName),'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no'); 
+                }
+                else if(currentPageName == '{!$Page.refedge__CustomLookup}'){
+                    var refName = document.getElementById('pageId:formId:pageBlockId:pageBlockSectionId1:pbsrefConId:searchRefCon').value;
+                    newWin = window.open(encodeURI('{!$Page.refedge__CustomLookup}?strText='+refName+'&obj=Reference_Content__c'),'Popup','height=500,width=700,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+                }
+                lookUpWindowOpen = false;  
+            } 
+        }
+        function closePopup(Id, Name){  
+            if (null != newWin){  
+                newWin.close(); 
+                if(typeof Name != 'undefined'){
+                    if(popupflag){
+                        if(currentPgName == '{!$Page.refedge__AddRequestAccountLookup}'){
+                            isNameChanged = false;
+                            document.getElementById("pageId:formId:pageBlockId:pageBlockSectionId2:pbsAccountId:searchAccount").value = Name;
+                            jsSelectedAcc(Id,isNameChanged);
+                        }
+                        else if(currentPgName == '{!$Page.refedge__CustomLookup}'){
+                            isNameChanged = false;
+                            document.getElementById("pageId:formId:pageBlockId:pageBlockSectionId1:pbsrefConId:searchRefCon").value = Name;
+                            jsSelectedrefCon(Id,isNameChanged);
+                        }
+                        popupflag = false;
+                    }
+                }
+            }    
+        } 
+        function changeName(){
+            isNameChanged = true;
+        }
+        function onSave(){
+            save(isNameChanged);
+        }
+    </script>
+    
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlock id="pageBlockId" title="{!IF(isFromAccount, $Label.T_Related_Reference_Content_Edit, $Label.T_Associated_Account_Edit)}" mode="edit">
+            <apex:actionFunction name="jsSelectedAcc" rerender="opAccountId, pgmsgId">
+                <apex:param name="accId" assignTo="{!accRefContent.refedge__Account__c}" value=""/>
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="jsSelectedrefCon" rerender="opContactId, pgmsgId">
+                <apex:param name="accId" assignTo="{!accRefContent.refedge__Reference_Content__c}" value=""/>
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="save" action="{!save}" rerender="pgmsgId">
+                <apex:param name="accname" assignTo="{!isNameChanged}" value=""/>
+            </apex:actionFunction>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}" onclick="onSave();return false;"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection id="pageBlockSectionId1" columns="1" title="{!$Label.Information}" rendered="{!isFromAccount}">
+                <apex:outputField value="{!accRefContent.refedge__Account__c}"/>
+                <apex:pageBlockSectionitem id="pbsrefConId">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Account_Reference_Content__c.fields.refedge__Reference_Content__c.label}"/>
+                    <apex:outputPanel id="oprefAccId">
+                        <apex:actionRegion >
+                            <div style="float:left" class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputText id="searchRefCon" value="{!refConName}" style="margin-left:0px;width:200px;" onchange="changeName();return false;"/>&nbsp;&nbsp;
+                            </div>
+                            <div style="float:left">
+                            <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="ShowLookup('{!$Page.refedge__CustomLookup}');"/>
+                            </div>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionitem>
+<!--                 <apex:inputField value="{!accRefContent.refedge__Reference_Content__c}"/> -->
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="pageBlockSectionId2" columns="1" title="{!$Label.Information}" rendered="{!NOT(isFromAccount)}">
+                <apex:outputField value="{!accRefContent.refedge__Reference_Content__c}"/>
+                <apex:pageBlockSectionitem id="pbsAccountId">
+                    <apex:outputLabel value="{!$ObjectType.refedge__Account_Reference_Content__c.fields.refedge__Account__c.label}"/>
+                    <apex:outputPanel id="opAccountId">
+                        <apex:actionRegion >
+                            <div style="float:left" class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <apex:inputText id="searchAccount" value="{!accName}" style="margin-left:0px;width:200px;" onchange="changeName();return false;"/>&nbsp;&nbsp;
+                            </div>
+                            <div style="float:left">
+                            <apex:image url="{!$Resource.refedge__lookupIconImage}" height="16px" width="16px" style="cursor:pointer;" onclick="ShowLookup('{!$Page.refedge__AddRequestAccountLookup}');"/>
+                            </div>
+                        </apex:actionRegion>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionitem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,265 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pageId" controller="refedge.ManageRefedgeLicense" sidebar="false">
+    <apex:pageMessages id="pageMessageId"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-1.8.3.js')}"/>
+    
+    <style>
+        a.alpha-link {
+           font-weight: normal;
+           font-size: 91%;
+           padding: 0 4px;
+           color: #015BA7 !important;
+        }
+        
+        a.alpha-link+a.alpha-link {
+           border-left: 1px solid #CFCECE;
+        }
+        
+        a.alpha-link:hover {
+           background-color: #e0f5fc !important;
+        }
+        
+        a.alpha-select {
+           font-weight: bold;
+           text-decoration: none;
+           background-color: #C6E1FF;
+           color: #000000 !important;
+        }
+        .pbSubheader
+        {
+            background-image : none !important;
+            background-color: #79b4cd !important;
+        }
+        th {
+            cursor: default;
+            color: #4a4a56;
+            font-size: 91%;
+            
+        }
+    </style>
+    
+    <script>
+        jQuery(document).ready(function() {
+            PORShowLoading(); 
+            PORHideLoading();
+        });
+        
+        function toggleSelectAll(checkbox){
+            if(checkbox.checked){
+                jQuery(".singleSelect").prop('checked', true);
+            }else{
+                jQuery(".singleSelect").prop('checked', false);
+            }
+        }
+        
+        function toggleItem(){
+            var cbs = jQuery('.singleSelect');
+            if(cbs.filter(':not(:checked)').length==0){
+                jQuery("input[id$=selectAll]").prop('checked', true);
+            }else{
+                jQuery("input[id$=selectAll]").prop('checked', false);
+            }
+        }
+    </script>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!NOT(IsPageAccessible)}" />
+    <apex:pageMessage summary="This page can only be accessed by System Administrator." strength="3" severity="Info" rendered="{!!isAdmin}" />
+    <apex:form id="formId" rendered="{!AND(isAdmin,IsPageAccessible)}">
+        <apex:pageBlock id="pbId" title="{!pbTitle}">
+            <apex:pageBlockButtons id="pbbId" location="top">
+                <apex:commandButton id="btn1" value="{!$Label.Add_RefEdge_Users}" action="{!addRemoveLicense}" reRender="formId, pageMessageId" rendered="{!isMainForm}" oncomplete="toggleItem();">
+                    <apex:param name="pbsTitle" value="{!$Label.Available_Users}" assignTo="{!pbsTitle}"/>
+                    <apex:param name="pbTitle" value="{!$Label.Add_ReferenceEdge_Users}" assignTo="{!pbTitle}"/>
+                    <apex:param name="refedgeLicenseType" value="Full License" assignTo="{!refedgeLicenseType}"/>
+                </apex:commandButton>
+                
+                <apex:commandButton id="btn2" value="{!$Label.Add_Community_Users}" action="{!addRemoveLicense}" reRender="formId, pageMessageId" rendered="{!isMainForm}" oncomplete="toggleItem();">
+                    <apex:param name="pbsTitle" value="{!$Label.Available_Users}" assignTo="{!pbsTitle}"/>
+                    <apex:param name="pbTitle" value="{!$Label.Add_Community_Users}" assignTo="{!pbTitle}"/>
+                    <apex:param name="refedgeLicenseType" value="Community License" assignTo="{!refedgeLicenseType}"/>
+                </apex:commandButton>
+                
+                <apex:commandButton id="btn3" value="{!$Label.Remove_Multiple_Users}" action="{!addRemoveLicense}" reRender="formId, pageMessageId" rendered="{!isMainForm}" oncomplete="toggleItem();">
+                    <apex:param name="pbsTitle" value="{!$Label.Licensed_Users}" assignTo="{!pbsTitle}"/>
+                    <apex:param name="pbTitle" value="{!$Label.Remove_Multiple_Users}" assignTo="{!pbTitle}"/>
+                    <apex:param name="refedgeLicenseType" value="" assignTo="{!refedgeLicenseType}"/>
+                </apex:commandButton>
+                
+                <apex:commandButton id="btn4" value="{!$Label.Done}" action="{!done}" reRender="formId, pageMessageId" rendered="{!NOT(isMainForm)}">
+                    <apex:param name="pbsTitle" value="{!$Label.Licensed_Users}" assignTo="{!pbsTitle}"/>
+                </apex:commandButton>
+                
+                <apex:commandButton id="btn5" value="{!$Label.Cancel}" action="{!reset}" reRender="formId, pageMessageId" rendered="{!NOT(isMainForm)}" oncomplete="toggleItem();">
+                    <apex:param name="pbsTitle" value="{!$Label.Licensed_Users}" assignTo="{!pbsTitle}"/>
+                    <apex:param name="pbTitle" value=" " assignTo="{!pbTitle}"/>
+                    <apex:param name="refedgeLicenseType" value="" assignTo="{!refedgeLicenseType}"/>
+                </apex:commandButton>
+                
+                <apex:actionStatus id="actStatusId" >
+                    <apex:facet name="start">
+                        <img src="/img/loading.gif" />                    
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection id="pbsId1" columns="1" collapsible="true" rendered="{!isMainForm}">
+                <table style="width:50%;">
+                    
+                    <tr>
+                        <th></th>
+                        <th style="text-align: center;">{!$Label.Allowed}</th>
+                        <th style="text-align: center;">{!$Label.Used}</th>
+                        <th style="text-align: center;">{!$Label.Available}</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: right;padding-right:10%;">{!$Label.ReferenceEdge_Licenses}</th>
+                        <td style="text-align: center;">{!refedgeAllowdLicense}</td>
+                        <td style="text-align: center;">{!refedgeUsedLicense}</td>
+                        <td style="text-align: center;">{!refedgeAllowdLicense-refedgeUsedLicense}</td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: right;padding-right:10%;">{!$Label.Community_Licenses}</th>
+                        <td style="text-align: center;">{!communityAllowdLicense}</td>
+                        <td style="text-align: center;">{!communityUsedLicense}</td>
+                        <td style="text-align: center;">{!communityAllowdLicense-communityUsedLicense}</td>
+                    </tr>
+                </table>
+<!--                 <apex:pageBlockSectionItem > -->
+<!--                     <apex:outputLabel value="Allowed Refedge Licenses"/> -->
+<!--                     <apex:outputText value="{!refedgeAllowdLicense}"/> -->
+<!--                 </apex:pageBlockSectionItem> -->
+                
+<!--                 <apex:pageBlockSectionItem > -->
+<!--                     <apex:outputLabel value="Used Refedge Licenses"/> -->
+<!--                     <apex:outputText value="{!refedgeUsedLicense}"/> -->
+<!--                 </apex:pageBlockSectionItem> -->
+                
+<!--                 <apex:pageBlockSectionItem > -->
+<!--                     <apex:outputLabel value="Allowed Community Licenses"/> -->
+<!--                     <apex:outputText value="{!communityAllowdLicense}"/> -->
+<!--                 </apex:pageBlockSectionItem> -->
+                
+<!--                 <apex:pageBlockSectionItem > -->
+<!--                     <apex:outputLabel value="Used Community Licenses"/> -->
+<!--                     <apex:outputText value="{!communityUsedLicense}"/> -->
+<!--                 </apex:pageBlockSectionItem> -->
+            </apex:pageblockSection>
+            
+            <apex:pageBlockSection id="pbsId2" title="{!pbsTitle}" columns="1"> 
+                <apex:outputPanel layout="block">
+                    <span style="float: right; margin: 5px 5px 5px 5px;"> 
+                        <apex:repeat value="{!alphaList}" var="a">
+                            <apex:commandLink status="actStatusId" value="{!a}" action="{!alphabetSorting}" rerender="formId, pageMessageId" styleClass="alpha-link{!if(alphaFilter=a,' alpha-select','')}">
+                                <apex:param name="alphaFilter" value="{!a}" assignTo="{!alphaFilter}" />
+                            </apex:commandLink>
+                        </apex:repeat>
+                    </span>
+                </apex:outputPanel>
+
+                <apex:pageBlockTable id="pbtId" value="{!addRemoveUser}" var="u" rendered="{!addRemoveUser.size > 0}">
+                    <apex:column headerValue="Action" rendered="{!isMainForm}">
+                        <apex:commandLink style="color:#015ba7;" status="actStatusId" value="{!$Label.Remove}" action="{!removeSingleUserLicense}" reRender="formId, pageMessageId">
+                            <apex:param name="nickName" value="{!u.user.Id}" assignTo="{!selectedUserId}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    
+                    <apex:column id="chkboxId" rendered="{!NOT(isMainForm)}">
+                        <apex:facet name="header">
+                            <apex:inputCheckbox id="selectAll" onclick="toggleSelectAll(this);"/>
+                        </apex:facet>
+                        <apex:inputCheckbox id="singleSelect" styleClass="singleSelect" value="{!u.isSelected}" onclick="toggleItem();"/>
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink status="actStatusId" action="{!sortToggle}" rerender="formId, pageMessageId">
+                                <apex:param name="sortField" value="Name" assignTo="{!sortField}" />
+                                <apex:outputText value="{!$ObjectType.User.Fields.Name.Label}{!IF(sortField=='Name',IF(sortDirection='asc','?','?'),'')}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputLink value="/{!u.user.Id}" target="_blank">{!u.user.LastName}{!IF(u.user.FirstName != null,', ','')}{!u.user.FirstName}</apex:outputlink>
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink status="actStatusId" action="{!sortToggle}" rerender="formId, pageMessageId">
+                                <apex:param name="sortField" value="UserRole.Name" assignTo="{!sortField}" />
+                                <apex:outputText value="Role{!IF(sortField=='UserRole.Name',IF(sortDirection='asc','?','?'),'')}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputLink value="/{!u.user.UserRoleId}" target="_blank">{!u.user.UserRole.Name}</apex:outputlink>
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink status="actStatusId" action="{!sortToggle}" rerender="formId, pageMessageId">
+                                <apex:param name="sortField" value="isActive" assignTo="{!sortField}" />
+                                <apex:outputText value="{!$ObjectType.User.Fields.isActive.Label}{!IF(sortField=='isActive',IF(sortDirection='asc','?','?'),'')}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputfield value="{!u.user.isActive}"/>
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink status="actStatusId" action="{!sortToggle}" rerender="formId, pageMessageId">
+                                <apex:param name="sortField" value="Profile.Name" assignTo="{!sortField}" />
+                                <apex:outputText value="Profile{!IF(sortField=='Profile.Name',IF(sortDirection='asc','?','?'),'')}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputLink value="/{!u.user.ProfileId}" target="_blank">{!u.user.Profile.Name}</apex:outputlink>
+                    </apex:column>
+                    
+                    <apex:column rendered="{!isMainForm}">
+                        <apex:facet name="header">
+                            <apex:commandLink status="actStatusId" action="{!sortToggle}" rerender="formId, pageMessageId">
+                                <apex:param name="sortField" value="Refedge_License_Type__c" assignTo="{!sortField}" />
+                                <apex:outputText value="{!$ObjectType.User.Fields.refedge__Refedge_License_Type__c.Label}{!IF(sortField=='Refedge_License_Type__c',IF(sortDirection='asc','?','?'),'')}" />
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputfield value="{!u.user.refedge__Refedge_License_Type__c}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+                
+                <apex:outputLabel rendered="{!addRemoveUser.size = 0}">{!$Label.No_Records_Found}</apex:outputLabel>
+                
+                <apex:outputPanel >
+                    <apex:outputPanel id="pagingPanel" rendered="{!addRemoveUser.size > 0}">
+                        <table border="0" align="center">
+                            <tr> 
+                                <td align="center">
+                                    <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!pagecounter != 1}" width="5px" height="8px"/>&nbsp;
+                                    <apex:commandLink status="actStatusId" action="{!previous}" value="{!$Label.Previous_Page}" rendered="{!pagecounter != 1}" reRender="formId, pageMessageId" oncomplete="toggleItem();"/> 
+                                    &nbsp;&nbsp;
+                                    <apex:outputText >
+                                        {!(pagecounter * recordlimits)+1-recordlimits}-{!(pagecounter * recordlimits) - (recordlimits - addRemoveUser.size)}
+                                    </apex:outputText>
+                                    &nbsp;&nbsp;
+                                    <apex:commandLink status="actStatusId" action="{!next}" value="{!$Label.Next_Page}" rendered="{!isNext}" reRender="formId, pageMessageId" oncomplete="toggleItem();"/>&nbsp; 
+                                    <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!isNext}" width="5px" height="8px"/>
+                                </td> 
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,155 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pageId" controller="refedge.RefedgeCommunityInvite" sidebar="false">
+    <apex:pageMessages id="pageMessageId"/>
+    <apex:sectionHeader title="{!$Label.Refedge_Community_Invite}"  subtitle="{!$Label.Invite_Contacts}" rendered="{!AND(IsPageAccessible, isFullLicenseAccessible)}"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <c:POR_ModalLoader />
+    <style>
+        .singleSelect{
+            
+        }
+        
+        .backstyle{ 
+            text-decoration: none; 
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        jQuery(document).ready(function() {
+            PORShowLoading(); 
+            PORHideLoading();
+        });
+        
+        function toggleSelectAll(checkbox){
+            if(checkbox.checked){
+                jQuery(".singleSelect").prop('checked', true);
+            }else{
+                jQuery(".singleSelect").prop('checked', false);
+            }
+        }
+        
+        function toggleItem(){
+            var cbs = jQuery('.singleSelect');
+            if(cbs.filter(':not(:checked)').length==0){
+                jQuery("input[id$=selectAll]").prop('checked', true);
+            }else{
+                jQuery("input[id$=selectAll]").prop('checked', false);
+            }
+        }
+    </script>
+    
+    <apex:form id="formId" rendered="{!AND(IsPageAccessible, isFullLicenseAccessible)}">
+       <apex:commandLink id="cmdLinkId" styleClass="backstyle" value="<< {!$Label.Back}" action="{!back}" rendered="{!isBlockChange}" reRender="pageMessageId, formId"/>
+        <apex:pageBlock id="pbId" title="{!$Label.Refedge_Community_Invites}">
+            <apex:pageBlockSection id="pbsConactId" title="{!$Label.Reference_Contacts_to_invite}" columns="1" rendered="{!NOT(isBlockChange)}">
+                <apex:commandButton id="stepOneId" style="margin-left: 46%;" value="{!$Label.Select_Continue}" action="{!selectAndContinue}" rendered="{!contactRBIs.size > 0}" reRender="pageMessageId, formId"/>
+                <apex:pageBlockTable id="pbtId" value="{!contactRBIs}" var="r" rendered="{!contactRBIs.size > 0}">
+                    <apex:column id="chkboxId">
+                        <apex:facet name="header">
+                            <apex:inputCheckbox id="selectAll" onclick="toggleSelectAll(this);"/>
+                        </apex:facet>
+                        <apex:inputCheckbox id="singleSelect" styleClass="singleSelect" value="{!r.isSelected}" onclick="toggleItem();"/>
+                    </apex:column>
+                    <apex:column value="{!r.rbi.refedge__Contact__c}"/>
+                    <apex:column value="{!r.rbi.Contact__r.Email}"/>
+                    <apex:column value="{!r.rbi.Contact__r.AccountId}"/>
+                    <apex:column value="{!r.rbi.Contact__r.Account.OwnerId}"/>
+                    <apex:column value="{!r.rbi.Contact__r.Account.Owner.UserRole.Name}"/>
+                </apex:pageBlockTable>
+                
+                <apex:outputPanel id="pagingPanel" rendered="{!contactRBIs.size > 0}">
+                    <table border="0" align="center">
+                        <tr> 
+                            <td align="center">
+                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!pagecounter != 1}" width="5px" height="8px"/>&nbsp;
+                                <apex:commandLink action="{!previous}" value="{!$Label.Previous_Page}" rendered="{!pagecounter != 1}" reRender="pbId, pageMessageId, toggleItemOp"/> 
+                                &nbsp;&nbsp;
+                                <apex:outputText >
+                                    {!(pagecounter * recordlimits)+1-recordlimits}-{!(pagecounter * recordlimits) - (recordlimits - contactRBIs.size)}
+                                </apex:outputText>
+                                &nbsp;&nbsp;
+                                <apex:commandLink action="{!next}" value="{!$Label.Next_Page}" rendered="{!isNext}" reRender="pbId, pageMessageId, toggleItemOp" />&nbsp; 
+                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!isNext}" width="5px" height="8px"/>
+                            </td> 
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+                
+                <apex:outputText value="{!$Label.No_Records_Found}" rendered="{!contactRBIs.size = 0}"/>
+            </apex:pageblockSection>
+            
+            <apex:pageBlockSection id="pbsUsersId" title="{!$Label.Existing_Community_Users} ({!users.size})" columns="1" rendered="{!NOT(isBlockChange)}" >
+                <apex:pageBlockTable id="pbtId" value="{!users}" var="u" >
+                    <apex:column value="{!u.Name}"/>
+                    <apex:column value="{!u.Email}"/>
+                    <apex:column value="{!u.ContactId}"/>
+                    <apex:column value="{!u.AccountId}"/>
+                    <apex:column value="{!u.ProfileId}"/>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="pbsUserId" title="{!$Label.Information_for_new_user}" columns="1" rendered="{!isBlockChange}">
+                <apex:pageBlockSectionItem id="profilePbsiId">
+                    <apex:outputLabel for="profileId" value="{!$Label.Community_Profile}"/>
+                    <apex:outputPanel id="profileOPId" styleClass="requiredInput" layout="block">
+                        <div class="requiredBlock"></div>
+                        <apex:selectList size="1" value="{!selectedProfile}" id="profileId">
+                            <apex:selectOptions value="{!profiles}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <apex:inputField value="{!user.EmailEncodingKey}"/>
+                <apex:inputField value="{!user.TimeZoneSidKey}"/>
+                <apex:inputField value="{!user.LanguageLocaleKey}"/>
+                <apex:inputField value="{!user.LocaleSidKey}"/> 
+            </apex:pageblockSection>
+            
+            <apex:pageBlockSection id="pbsSelectedConactId" title="{!$Label.Selected_Contacts_to_invite}" columns="1" rendered="{!isBlockChange}">
+                <apex:commandButton style="margin-left: 46%;" id="inviteId" value="{!$Label.Invite}" action="{!inviteContactRBIs}" reRender="pageMessageId, pbId"/>
+                <apex:pageBlockTable id="pbtId" value="{!selectedContacts}" var="r" >
+                    <apex:column value="{!r.rbi.refedge__Contact__c}"/>
+                    <apex:column value="{!r.rbi.Contact__r.AccountId}"/>
+                    <apex:column value="{!r.rbi.Contact__r.Email}"/>
+                   
+                    <apex:column headerValue="{!$ObjectType.User.Fields.username.Label}">
+                        <apex:inputField value="{!r.usr.username}" style="width:300px;"/>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.User.Fields.communityNickname.Label}">
+                        <apex:inputField value="{!r.usr.communityNickname}"/>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.User.Fields.alias.Label}">
+                        <apex:inputField value="{!r.usr.alias}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageblockSection>
+        </apex:pageBlock>
+    </apex:form>
+    
+    <apex:outputPanel id="toggleItemOp">
+        <script>
+            toggleItem();
+        </script>
+    </apex:outputPanel>
+</apex:page>

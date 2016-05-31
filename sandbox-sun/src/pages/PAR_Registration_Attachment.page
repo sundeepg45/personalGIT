@@ -1,0 +1,32 @@
+<apex:page standardController="Partner_Registration__c" extensions="Partner_RegistrationControllerExt" tabStyle="Partner_Registration__c">
+
+    <apex:form enctype="multipart/form-data"  rendered="{!NOT(attachmentComplete)}">
+        
+        <apex:pageMessages />
+    
+        <apex:pageBlock title="{!$Label.Partner_Registration_Proof_of_Performance}" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!attachPopDocuments}" value="{!$Label.Save}"/>
+                <apex:commandButton action="{!cancelAttachment}" value="{!$Label.cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.Partner_Registration_Proof_of_Performance_Attachment}" columns="1">
+                <p><apex:outputText value="{!$Label.Partner_Registration_Proof_of_Performance_Instructions}"/></p>
+                <p><apex:inputFile value="{!proofOfPerf.body}" filename="{!proofOfPerf.name}"/></p>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:pageBlock rendered="{!attachmentComplete}" >
+        
+        <apex:pageMessages />
+    
+        <p>
+            <apex:outputText value="{!$Label.Partner_Registration_Proof_of_Performance_Complete}" />
+        </p>
+        <p>
+            <apex:outputLink value="{! '/' + reg.Id}"><apex:outputText value="{!$Label.Partner_Registration_Return_To_Registration_Record}"/> {!reg.Name}</apex:outputLink>
+        </p>
+    </apex:pageBlock>
+
+
+</apex:page>

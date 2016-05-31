@@ -1,0 +1,33 @@
+<apex:page controller="itemsToApproveController" showHeader="false" sidebar="false" >
+    <apex:form >
+        <apex:pageBlock title="Items To Approve" >
+            <apex:pageBlockButtons title="Test" location="top">
+            	<input id="manageAllButton" value="Manage All" title="Manage All" type="button" onclick="window.parent.location.href='/04i';" />	
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable id="itemListNoRecords" value="{!headerRow}" var="empty" rendered="{!itemList.size = 0}">
+            	<apex:column headerValue="No records to display" />
+            </apex:pageBlockTable>            
+            <apex:pageBlockTable id="itemsListWithRecords" value="{!itemList}" var="item" rendered="{!itemList.size > 0}" >               
+                <apex:column headerValue="Action" width="175px" >  
+                    <apex:outputLink id="viewOnlyLink" target="_parent" value="/apex/PartnerAntiCorruptionReviewForm?id={!item.p.ProcessInstance.TargetObjectId}&sfdc.override=1" rendered="{!item.viewOnly = true}">View Record</apex:outputLink>
+                    <apex:outputLink id="reassignLink" target="_parent" value="/{!item.p.id}/e?et=REASSIGN&retURL=%2Fhome%2Fhome.jsp" rendered="{!item.viewOnly = false}">Reassign</apex:outputLink><apex:outputText id="linkDiv" value=" | " rendered="{!item.viewOnly = false}"/><apex:outputLink id="approveRejectLink" target="_parent" value="/p/process/ProcessInstanceWorkitemWizardStageManager?id={!item.p.id}" rendered="{!item.viewOnly = false}">Approve / Reject</apex:outputLink>
+                </apex:column>    
+                <apex:column headerValue="Related To" >
+                    <apex:outputLink id="leadRecord" target="_parent" value="/{!item.p.ProcessInstance.TargetObjectId}" rendered="{!item.leadObjName != null}">{!item.leadObjName}</apex:outputLink>
+                    <apex:outputLink id="objectLink" target="_parent" value="/{!item.p.ProcessInstance.TargetObjectId}" rendered="{!item.leadObjName == null}">{!item.p.ProcessInstance.TargetObject.Name}</apex:outputLink>
+                </apex:column>
+        		<apex:column headerValue="Type" >
+                	<apex:outputText id="objectType">{!item.objName}</apex:outputText>                 
+                </apex:column>
+                <apex:column headerValue="Most Recent Approver" >
+                    <a id="recentApproverLink" target="_parent" href="/{!item.p.CreatedById}">{!item.p.CreatedBy.Name}</a>
+                </apex:column>                
+                <apex:column headerValue="Date Submitted" >
+                    <apex:outputText id="dateSubmitted" value="{0,date,M/dd/yyyy hh:mm a}">
+                    	<apex:param value="{!item.p.CreatedDate}"/>
+                    </apex:outputText>
+                </apex:column>
+            </apex:pageBlockTable>          
+        </apex:pageBlock>   
+    </apex:form>
+</apex:page>

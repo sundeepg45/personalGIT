@@ -1,0 +1,23 @@
+<apex:page controller="PartnerPgmDashController" >
+<style>
+  body .bPageTitle .ptBody h1.noSecondHeader{
+    font-size: 14px;
+  }
+</style>
+
+<apex:sectionHeader title="{!$Label.Program_Agreement_Title}"/>
+<apex:form >
+<apex:pageBlock >
+	<apex:pageBlockButtons >
+		<apex:commandButton id="buttonAccept" action="{!acceptAgreement}" value="{!$Label.Program_Agreement_Accept}"/>
+		<apex:commandButton id="buttonDecline" action="{!declineAgreement}" onclick="return confirm('{!$Label.Program_Application_Agreement_Are_You_Sure}');" value="{!$Label.Program_Agreement_Decline}"/>
+	</apex:pageBlockButtons>
+
+	<apex:outputText value="{!$Label.Program_Agreement_Instructions}"/> <br /><br />
+	<apex:repeat value="{!currentAgreementDocuments}" var="agreementAttachment">
+        <apex:outputLink id="linkAgreementAvailable" value="{!URLFOR($Action.Attachment.Download, agreementAttachment.Id)}" target="_blank">{!agreementAttachment.Name}</apex:outputLink> <br />
+	</apex:repeat>
+
+</apex:pageBlock>
+</apex:form>
+</apex:page>

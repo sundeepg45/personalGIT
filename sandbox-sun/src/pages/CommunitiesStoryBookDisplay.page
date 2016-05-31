@@ -1,0 +1,41 @@
+<apex:page showheader="{!!isEmbedded}" sidebar="{!!isEmbedded}" controller="CommunitiesStorybookDisplayController" standardStylesheets="false">
+
+    <div class="red-hat-content" style="background: none;">
+        <table class="table table-striped">
+        <tr>
+            <th style="vertical-align: bottom;"><b>{!$Label.CommunitiesStorybooksLabel}</b> </th>
+        </tr>
+        <!--
+        <tr>
+            <td style="width:200px;"><b>{!$Label.Published_Date}</b></td>
+            <td></td>
+        </tr>
+        -->
+        <apex:repeat value="{!storybooks}" var="sb">
+            <tr>
+                <!--
+                <td id ="{!LEFT(sb.id,15)}date">
+                    <apex:outputText value="{0,date, M/d/yyyy}">
+                        <apex:param value="{!sb.Publish_Date__c}"/>
+                    </apex:outputText>
+                </td>
+                -->
+                <apex:outputPanel rendered="{!sb.Display_Image_URL__c==null}">
+                    <td id="{!LEFT(sb.id,15)}URL">
+                       <a href="/StorybookContentDisplay?sbId={!sb.Id}" target="_blank">
+                         <apex:outputText value="{!sb.Name}"/>
+                        </a>
+                    </td>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!sb.Display_Image_URL__c!=null}">
+                    <td id="{!LEFT(sb.id,15)}URL">
+                        <a href="/StorybookContentDisplay?sbId={!sb.Id}" target="_blank">
+                            <apex:image value="{!sb.Display_Image_URL__c}"/>
+                        </a>
+                    </td>
+                </apex:outputPanel>
+            </tr>
+        </apex:repeat>
+        </table>
+    </div>
+</apex:page>

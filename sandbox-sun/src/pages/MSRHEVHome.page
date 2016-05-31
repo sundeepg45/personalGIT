@@ -1,0 +1,102 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+    <apex:include pageName="RHEV_include_header"/>
+    <body id="first" class="ms dark">
+    <div id="wrapper">
+        <div id="page">
+            <div class="container_12 clearfix">
+                <div id="header" class="grid_12">
+                    <div id="sm-logo" style="z-index: 20;"><a href="http://www.redhat.com/index.html">Red Hat</a></div><!-- /#sm-logo -->
+                    <div id="header-links">
+                        <ul style="margin-right: 8px;">
+                            <li class="first" style=""></li>
+                        </ul>
+                            <div class="clear"></div>
+                            <a target="_blank" class="header-button" href="http://www.redhat.com">redhat.com</a><!-- /.header-button -->
+                    </div><!-- /#header-links -->
+                    <apex:include pageName="RHEV_include_promo"/>
+                    <div id="nav-band">
+                      <div id="primary-nav">
+                        <apex:include pageName="MSRHEV_include_nav"/>
+                      </div><!-- /#primary-nav -->
+                    </div><!-- /#nav-band -->
+
+                </div><!-- /#header -->
+                <div class="clear"></div>
+                   <apex:include pageName="RHEV_include_mediatracking"/>
+                
+
+            <div id="main">
+<div class="grid_12">
+    
+    <div class="grid_9 alpha">
+        <h1 class="boxed">Choose Red Hat Enterprise Virtualization 3</h1>
+        <p></p>
+        <h2>Virtualization should be easy, fast, open, and affordable</h2>
+
+        <p>Some customers are new to virtualization. Some are switching entirely to a Red Hat&reg; Enterprise Virtualization-based solution. Others are using Red Hat as a second vendor to remove lock-in and save money.</p>
+<!-- 
+            <div id="video1" class="video">
+				<object id="kaltura_player_1328547712" name="kaltura_player_1328547712" type="application/x-shockwave-flash" 
+						allowFullScreen="false" allowNetworking="all" allowScriptAccess="always" height="333" width="400" 
+						bgcolor="#000000" xmlns:dc="http://purl.org/dc/terms/" 
+						xmlns:media="http://search.yahoo.com/searchmonkey/media/" 
+						rel="media:video" resource="http://www.kaltura.com/index.php/kwidget/cache_st/1328547712/wid/_739972/uiconf_id/7085062/entry_id/1_wwfec8r0" 
+						data="http://www.kaltura.com/index.php/kwidget/cache_st/1328547712/wid/_739972/uiconf_id/7085062/entry_id/1_wwfec8r0">
+							<param name="allowFullScreen" value="false" />
+							<param name="allowNetworking" value="all" />
+							<param name="allowScriptAccess" value="always" />
+							<param name="bgcolor" value="#000000" />
+							<param name="flashVars" value="&" />
+							<param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/1328547712/wid/_739972/uiconf_id/7085062/entry_id/1_wwfec8r0" />
+							<a href="http://corp.kaltura.com">video platform</a> 
+							<a href="http://corp.kaltura.com/video_platform/video_management">video management</a> 
+							<a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a> 
+							<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a> 
+							<a rel="media:thumbnail" href="http://cdnbakmi.kaltura.com/p/739972/sp/73997200/thumbnail/entry_id/1_wwfec8r0/width/120/height/90/bgcolor/000000/type/2"></a> 
+							<span property="dc:description" content=""></span><span property="media:title" content="RHEV3 Video 1"></span> 
+							<span property="media:width" content="400"></span><span property="media:height" content="333"></span> 
+							<span property="media:type" content="application/x-shockwave-flash"></span> </object>
+                <p></p>
+            </div>
+-->
+        <h2>Why our customers love RHEV</h2>
+        <p>So why should you choose Red Hat Enterprise Virtualization? The same reason our <a href="MSRHEVCustomers">customers</a> are choosing it:</p>
+        <ul>
+        <li><strong>Open:</strong> No lock-in with a fully open source solution.</li>
+        <li><strong>Cross-platform:</strong> Great performance for Microsoft Windows and Linux&reg; guests.</li>
+        <li><strong>Enterprise-ready:</strong> Powerful mix of enterprise features and a rich set of partners.</li>
+        <li><strong>Affordable:</strong> Lower total cost of ownership and faster return on investment than an equivalent proprietary solution.</li>
+        <li><strong>High-performance:</strong> Top virtualization benchmarks for performance and scalability for Windows and Linux workloads&mdash;so you can be confident it will power your virtual machine workloads.</li>
+        </ul>
+
+        <p class="look"><a href="MSRHEVTestimonials">Read customer testimonials</a></p>
+
+        <p> </p>
+    </div> <!-- /.grid_9 --> 
+    
+    <div class="grid_3 omega">
+      <div class="panel02">
+       <h3>Need more information?</h3>
+          <p class="look"><a href="mailto:rhev@redhat.com">Contact us</a></p>
+      </div>
+      <!-- 
+        <apex:include pageName="RHEV_include_contact"/>
+        -->
+    </div> <!-- /.grid_3 -->
+    
+    <div class="clear"></div>
+        
+</div> <!-- /.grid_12 -->
+
+</div><!-- /#main -->
+<div class="clear"></div>
+
+<apex:include pageName="RHEV_include_footer"/>
+
+</div><!-- page -->
+</div>
+</div><!-- wrapper -->
+
+</body>
+
+</apex:page>

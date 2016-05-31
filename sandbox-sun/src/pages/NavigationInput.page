@@ -1,0 +1,56 @@
+<apex:page standardController="Communities_Navigation_Item__c" extensions="NavigationInputController" showHeader="true" sidebar="true">
+
+    <apex:form >
+
+        <apex:pageBlock id="pageBlock" title="Communities Navigation Item" mode="edit">
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection title="Select Navigation Type">
+                <apex:outputPanel >
+                    <apex:outputLabel for="navType" value="Navigation Type"/>&nbsp;
+                    <apex:inputField id="navType" value="{!navItem.Type__c}"/>
+                    <apex:actionSupport event="onchange" action="{!clearAll}" rerender="pageBlock" />
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Select Content Targeting Method" rendered="{!navItem.Type__c!=null}">
+                <apex:outputPanel >
+                    <apex:outputLabel for="contentTargeting" value="Content Targeting"/>&nbsp;
+                    <apex:inputField id="contentTargeting" value="{!navItem.Content_Targeting__c}"/>
+                    <apex:actionSupport event="onchange" action="{!clearTargetSelections}" rerender="pageBlock" />
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Choose Tab to Duplicate" columns="2" rendered="{!navItem.Content_Targeting__c=='Tab/Object Permissions'}">
+                <apex:outputPanel >
+                    <apex:outputLabel for="tabField" value="Tab"/>&nbsp;
+                    <apex:selectList id="tabField" label="Tab" value="{!selectedTab}" size="1" >
+                        <apex:selectOptions value="{!tabSelectOptions}"/>
+                    </apex:selectList>
+                    <apex:actionSupport event="onchange" action="{!dummyAction}" rerender="pageBlock" />
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Choose Audience" columns="2" rendered="{!navItem.Content_Targeting__c=='Audience'}">
+                <apex:outputPanel >
+                    <apex:outputLabel for="audienceField" value="Audience"/>&nbsp;
+                    <apex:inputField id="audienceField" value="{!navItem.Audience__c}"/>
+                    <apex:actionSupport event="onchange" action="{!dummyAction}" rerender="pageBlock" />
+                </apex:outputPanel>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Navigation Item Details" columns="2" rendered="{!OR(navItem.Audience__c!=null,selectedTab!=null)}">
+                <apex:inputField id="parentItemField" value="{!navItem.Parent_Item__c}"/>
+                <apex:inputField id="sequenceField" value="{!navItem.Sequence__c}"/>
+                <apex:inputField id="URLField" value="{!navItem.URL__c}" rendered="{!selectedTab==null}"/>
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+
+    </apex:form>
+</apex:page>

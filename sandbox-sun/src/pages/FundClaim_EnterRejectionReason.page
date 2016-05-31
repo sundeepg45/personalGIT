@@ -1,0 +1,9 @@
+<apex:page standardController="SFDC_MDF_Claim__c" extensions="FundClaim_RejectionController">
+    <apex:form >
+        <apex:pageBlock title="{!$Label.FundClaim_ReasonsForRejection}">
+            <apex:outputText value="{!$Label.FundClaim_EnterRejectionReason}" styleClass="labelCol"/>
+            <apex:inputField value="{!SFDC_MDF_Claim__c.Reasons_for_Rejection__c}" required="true" />
+            <apex:commandButton action="{!saveFC}" value="{!$Label.Common_Save}" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

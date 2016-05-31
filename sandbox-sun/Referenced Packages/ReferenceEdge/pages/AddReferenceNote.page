@@ -1,0 +1,59 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page id="pgId" standardController="refedge__Reference_Note__c" extensions="refedge.AddReferenceNoteController" sidebar="false">
+    <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Java Script -->
+    <script type="text/javascript">
+        window.onload = setFocus
+        function setFocus() {
+            document.getElementById("{!$Component.pgId.frmI.pbId.pbsId.noteDateId}").focus();
+        }
+    </script>
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <!-- Form -->
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+    <apex:sectionHeader title="{!$Label.T_Reference_Note_Edit}" subtitle="{!IF(ISBLANK(refNote.Name), $Label.T_New_Reference_Note, refNote.Name)}"/>
+        <apex:pageBlock id="pbId" title="{!$Label.T_Reference_Note_Edit}"  mode="Edit">
+            <apex:pageBlockSection id="pbsId" columns="1" title="{!$Label.Information}">
+                <apex:inputField value="{!refNote.refedge__Note_Date__c}" id="noteDateId"/>
+                <apex:outputField value="{!refNote.refedge__Account__c}" rendered="{!NOT(ISBLANK(refNote.refedge__Account__c))}"/>
+                <apex:outputField value="{!refNote.refedge__Contact__c}" rendered="{!NOT(ISBLANK(refNote.refedge__Contact__c))}"/>
+                <apex:outputField value="{!refNote.refedge__Reference_Content__c}" rendered="{!NOT(ISBLANK(refNote.refedge__Reference_Content__c))}"/>
+                <apex:outputField value="{!refNote.refedge__Reference_Request__c}" rendered="{!NOT(ISBLANK(refNote.refedge__Reference_Request__c))}"/>
+                <apex:outputField value="{!refNote.refedge__Account_Request__c}" rendered="{!NOT(ISBLANK(refNote.refedge__Account_Request__c))}"/>
+                <apex:outputField value="{!refNote.refedge__Unspecified_Request__c}" rendered="{!NOT(ISBLANK(refNote.refedge__Unspecified_Request__c))}"/>
+                <apex:inputField value="{!refNote.refedge__Note__c}" required="true"/>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockButtons id="pbbId">
+                <apex:commandButton value="{!$Label.Save}" action="{!save}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

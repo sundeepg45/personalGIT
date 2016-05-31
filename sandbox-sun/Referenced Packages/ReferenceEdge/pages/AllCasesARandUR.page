@@ -1,0 +1,123 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page standardController="Case" showheader="false" sidebar="false" id="pageId" extensions="refedge.AllCasesARandURController">
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:pageblock >
+            <apex:pageMessage severity="Info" strength="2" summary="{!$Label.No_Records_Found}" rendered="{!requestList.size <=0}"/>  
+            <apex:pageBlockTable value="{!requestList}" var="refreq" rendered="{!requestList.size > 0}">
+                <apex:column >
+                    <apex:facet name="header">
+                        {!$Label.All_Reference_Requests}
+                    </apex:facet>
+                    <span style="color: #000;font-size: 12px;font-weight: bold;">
+                        {!refreq.request.Name}
+                    </span>
+                    <apex:outputPanel rendered="{!AND(refreq.accReqs != null,refreq.accReqs.size > 0)}">
+                        <table cellpadding="1" class="list" cellspacing="1" width="100%" border="1" style="border-collapse:collapse;
+                                            border-spacing:1px">
+                            <tr class="headerRow">
+                                <td width="100px">{!$Label.Details} &nbsp;</td>
+                                <td width="100px">{!$Label.Account} &nbsp;</td>
+                                <td width="100px">{!$Label.Reference_Type_Needed} &nbsp;</td>
+                                <td width="100px">{!$Label.Requester} &nbsp;</td>
+                                <td width="80px">{!$Label.Deadline} &nbsp;</td>
+                                <td width="80px">{!$ObjectType.Reference_Request_Account__c.fields.Managed_Request__c.Label} &nbsp;</td>
+                                <td width="100px">{!$ObjectType.Reference_Request_Account__c.fields.Approval_Status__c.Label} &nbsp;</td>
+                                <td width="120px">{!$ObjectType.Reference_Request_Account__c.fields.Account_Request_Status__c.Label} &nbsp;</td>
+                            </tr>
+                            <apex:repeat value="{!refreq.accReqs}" var="accreq" >
+                                <tr class="dataRow" onmouseover="if (window.hiOn){hiOn(this);}" onmouseout="if (window.hiOff){hiOff(this);}">
+                                    <td width="100px">
+                                        <apex:commandLink value="{!accreq.Name}" onclick="window.open('/{!accreq.Id}');return false;"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!accreq.refedge__Account__c}"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!accreq.refedge__Reference_Type_Needed__c}"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!accreq.refedge__Requester__c}"/>
+                                    </td>
+                                    <td width="80px">
+                                        <apex:outputField value="{!accreq.refedge__Deadline__c}"/>
+                                    </td>
+                                    <td width="80px">
+                                        <apex:outputField value="{!accreq.refedge__Managed_Request__c}"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!accreq.refedge__Approval_Status__c}"/>
+                                    </td>
+                                    <td width="120px">
+                                        <apex:outputField value="{!accreq.refedge__Account_Request_Status__c}"/>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(refreq.unspReqs != null,refreq.unspReqs.size > 0)}">
+                        <table cellpadding="1" class="list" cellspacing="1" width="100%" border="1" style="border-collapse:collapse;
+                                            border-spacing:1px">
+                            <tr class="headerRow">
+                                <td width="100px">{!$Label.Details} &nbsp;</td>
+                                <td width="100px">{!$Label.Account} &nbsp;</td>
+                                <td width="100px">{!$Label.Reference_Type_Needed} &nbsp;</td>
+                                <td width="100px">{!$Label.Requester} &nbsp;</td>
+                                <td width="80px">{!$Label.Deadline} &nbsp;</td>
+                                <td width="80px"> &nbsp;</td>
+                                <td width="100px"> &nbsp;</td>
+                                <td width="120px">{!$ObjectType.Unspecified_Request__c.fields.Unspecified_Request_Status__c.Label} &nbsp;</td>
+                            </tr>
+                            <apex:repeat value="{!refreq.unspReqs}" var="unreq">
+                                <tr class="dataRow" onmouseover="if (window.hiOn){hiOn(this);}" onmouseout="if (window.hiOff){hiOff(this);}">
+                                    <td width="100px">
+                                        <apex:commandLink value="{!unreq.Name}" onclick="window.open('/{!unreq.Id}');return false;"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!unreq.refedge__Specified_Account__c}"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!unreq.refedge__Reference_Type_Needed__c}"/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputField value="{!unreq.refedge__Requester__c}"/>
+                                    </td>
+                                    <td width="80px">
+                                        <apex:outputField value="{!unreq.refedge__Deadline__c}"/>
+                                    </td>
+                                    <td width="80px">
+                                        <apex:outputText value="      "/>
+                                    </td>
+                                    <td width="100px">
+                                        <apex:outputText value="      "/>
+                                    </td>
+                                    <td width="120px">
+                                        <apex:outputField value="{!unreq.refedge__Unspecified_Request_Status__c}"/>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                </apex:column>
+            </apex:pageBlockTable>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

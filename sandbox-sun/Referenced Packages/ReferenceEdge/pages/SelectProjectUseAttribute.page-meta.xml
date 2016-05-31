@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>33.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Custom Page for &apos;Select/Edit Values&apos; link on &apos;Request/Project&apos; Page (Bound 3)</description>
+    <label>SelectProjectUseAttribute</label>
+</ApexPage>

@@ -1,0 +1,28 @@
+<apex:component controller="AccountComponentController">
+	<apex:attribute name="value" description="Account to show" type="Account" required="true" assignto="{!account}" />
+	<apex:attribute name="showHeader" description="True if the header should be displayed" type="Boolean" required="false" default="true" />
+	<apex:outputPanel rendered="{!showHeader}" layout="block" styleClass="pbSubheader tertiaryPalette">
+		<h3>RELATED CONTACTS <span class="titleSeparatingColon">:</span></h3>
+	</apex:outputPanel>
+	<div class="pbSubsection">
+		<table style="font-size: 100%;padding-left:1em" class="detailList" border="0" cellpadding="0" cellspacing="0"> 
+			<tbody>
+				<apex:componentBody />
+				<tr>
+					<td width="25%" style="padding-right:5px"><b>Name</b></td>
+					<td width="25%" style="padding-right:5px"><b>Title</b></td>
+					<td width="30%" style="padding-right:5px"><b>Email</b></td>
+					<td width="20%" style="padding-right:5px"><b>Phone</b></td>
+				</tr>
+				<apex:repeat value="{!ContactList}" var="contact">
+					<tr>
+						<td style="padding-right:5px"><c:OutputString value="{!contact.Name}">&#160;</c:OutputString></td>
+						<td style="padding-right:5px"><c:OutputString value="{!contact.Title}">&#160;</c:OutputString></td>
+						<td style="padding-right:5px"><c:OutputString value="{!contact.Email}">&#160;</c:OutputString></td>
+						<td style="white-spacing:nowrap;padding-right:5px"><c:OutputString value="{!contact.Phone}">&#160;</c:OutputString></td>
+					</tr>
+				</apex:repeat>
+			</tbody>
+		</table>
+	</div>
+</apex:component>

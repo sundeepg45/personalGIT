@@ -1,0 +1,518 @@
+<!--
+/**
+ * Used to display Opportunity Header Staging data in custom view 
+ * User Story US55531: [SFDC & EBS] [SFDC] Order Opp Staging Table GUI: Header and Tab structure (No lines & No Partners)
+ * Task TA148344: Create Visual Force Page(s) and asscoiated controller(s)  
+ * User Story US54874: [SFDC & EBS] [SFDC] Order Opp Staging Table GUI: Partner & Lines
+ * Task TA153207: Update the controller and Visual force page to view and Update Partner Information
+ * Task TA153208: Update the controller and Visual force page to view and Update the opportunity line information
+ *  US63564: Updated the field CDHPartyName field in Partner Staging Tab - Shreya Joshi, Line No 437, 459, 460, 461
+ * @version 2014-09-05
+ * @author Sagar Mehta <smehta@redhat.com>
+ * 
+ */
+-->
+
+<apex:page standardController="Opportunity_Header_Staging__c" extensions="OpportunityStaging_Edit_Controller">           
+<style> 
+      .activeTab {
+         background-color: #236FBD; 
+         color:white; 
+         background-image:none;
+      }
+      .inactiveTab {  
+         background-color: lightgrey; 
+         color:black; 
+         background-image:none;
+      }   
+      .RH_OrderDetails_Header_Padding{
+         background: #f8f8f8;      
+      }
+      .RH_MenuTitle{
+         padding:10px;
+         background-color: #d3d3d3;
+         border-radius:5px;
+         font-size:12px;
+         font-family:arial;
+         font-weight:bold;
+         cursor:pointer;
+      }
+      .RH_firsrMenuTitle{
+         margin-top:10px;
+      }
+      .RH_Hide{
+         display:none;
+      } 
+      .RH_contentOutlineBorder{
+         border:1px solid #d3d3d3;
+         margin : 10px 0px 0px 50px;
+         width:1100px;
+         padding:10px;
+      }
+        
+    </style>
+    <script type="text/javascript"> 
+       var selOpportunityValueJS = "{!JSENCODE(selOpportunityValue)}";
+       var tabSaved;
+       var selectedLineIndex = 'test';                            
+              
+       // method for showing and hiding contents
+       function showHideContent1(contentNumber){        
+          if(document.getElementById('partnerStagingContent'+contentNumber).style.display == 'block'){
+            document.getElementById('partnerStagingContent'+contentNumber).style.display = 'none'; 
+          }else{
+            document.getElementById('partnerStagingContent'+contentNumber).style.display = 'block';
+          }
+      }
+      
+      function saveMethodJS(){
+          //alert('{!$Label.StagingUISaveMessage}');
+          saveMethod();          
+      }
+      
+      function callSwitchTabsJS(tabSelected){
+          //alert("---"+tabSelected.split("_")[0]+"---"+tabSelected.split("_")[1]+"----"+document.getElementById("{!$Component.myForm:selectedTab}").value);
+          document.getElementById("{!$Component.myForm:selectedTab}").value = tabSelected.split("_")[0];              
+          //callSwitchTabs(tabSelected.split("_")[1]);            
+          document.getElementById("{!$Component.myForm:stab}").value = tabSelected.split("_")[1];  
+          callSwitchTabs();
+          
+      }   
+      
+      // method for showing and hiding contents
+      function showHideContent(contentNumber){    
+             if(document.getElementById('content'+contentNumber).style.display == 'block'){
+               document.getElementById('content'+contentNumber).style.display = 'none'; 
+             }else{
+               selectedLineIndex = contentNumber; 
+               document.getElementById('content'+contentNumber).style.display = 'block';
+             } 
+      }                
+     
+      function openLookup1(textid, width, modified, searchParam){  
+        var intval = textid.lastIndexOf(":");
+        if(textid!=null)
+          for(var i=0;i<=intval;i++){
+           if(textid.indexOf(":")>0)
+             textid = textid.replace(":","%3A");        
+          }        
+          var baseURL = '/_ui/common/data/LookupPage?lkfm=Page%3AmyForm&lknm='+textid+'&lktp=a4u';                
+          var originalbaseURL = baseURL;
+          var originalwidth = width;
+          var originalmodified = modified;
+          var originalsearchParam = searchParam;    
+            
+          var lookupType = baseURL.substr(baseURL.length-3, 3);
+          if (modified == '1') baseURL = baseURL + searchParam;
+ 
+          var isCustomLookup = false;
+        
+          if(lookupType == "a4u"){ 
+             var urlArr = baseURL.split("&");
+             var txtId = '';      
+             if(urlArr.length > 2) {
+               urlArr = urlArr[1].split('=');
+               txtId = urlArr[1];
+             } 
+             // Following is the url of Custom Lookup page. You need to change that accordingly
+             baseURL = "/apex/CustomMatchingOpportunityLookUpPage?txt=" + txtId;
+         
+             // Following is the id of apex:form control "myForm". You need to change that accordingly
+             baseURL = baseURL + "&frm=" + escapeUTF("{!$Component.myForm}");
+             if(modified == '1'){
+                baseURL = baseURL + "&lksearch=" + searchParam;
+             }
+ 
+             // Following is the ID of inputField that is the lookup to be customized as custom lookup
+             if(txtId.indexOf('matchingOpportunityText') > -1 ){
+                isCustomLookup = true;
+             }
+          } 
+    
+          if(isCustomLookup == true){
+             openPopup(baseURL, "lookup", 350, 480, "width="+width+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+          }else{
+             if (modified == '1') originalbaseURL = originalbaseURL + originalsearchParam;
+             openPopup(originalbaseURL, "lookup", 350, 480, "width="+originalwidth+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+          } 
+      }      
+    </script>    
+<apex:form id="myForm">       
+    <apex:sectionHeader title="{!$Label.Opportunity_Header_Staging}" subtitle="{!Opportunity_Header_Staging__c.Name}"/>
+    <apex:inputHidden id="selectedTab" value="{!selectedTabName}"/>
+    <apex:inputHidden id="stab" value="{!selectedTab}"/>
+    <apex:pageMessages id="errorMsg" />    
+    <!--<apex:outputPanel id="lineMessages">        
+        <apex:pageMessage summary="{!lineMessage}" severity="INFO" strength="3" rendered="{!isLineMessageDisplayed}"/>
+    </apex:outputPanel>-->
+    <apex:actionFunction name="callSwitchTabs" action="{!switchTabs}" rerender="errorMessagePanel, errorMsg, OpportunityHeaderTabPanel" oncomplete="return false;" status="tabStatus">       
+    </apex:actionFunction>
+        <!-- <apex:param name="tabId" assignTo="{!selectedTab}" value=""/> -->
+    <apex:outputPanel id="errorMessagePanel">    
+    <apex:pageBlock rendered="{!AND(matchErrorFlag, errorList != null, errorList.size > 0)}" title="{!$Label.Error_Message}">
+       <apex:pageBlockTable value="{!errorList}" var="error">
+            <apex:column value="{!error.Error_Code__c}"/>
+            <apex:column value="{!error.Opportunity_Product_Staging__c}" rendered="{!selectedTab == 'lineStagingTab'}"/>
+            <apex:column value="{!error.Opportunity_Partner_Staging__c}" rendered="{!selectedTab == 'partnerStagingTab'}"/>
+            <apex:column value="{!error.Related_Field_API_Name__c}"/>
+            <apex:column value="{!error.Error_Description__c}"/>
+       </apex:pageBlockTable>       
+    </apex:pageBlock>
+    </apex:outputPanel>    
+    <div class="individualPalette">
+        <div class="Custom93Block">
+           <div class="bPageBlock brandSecondaryBrd apexDefaultPageBlock secondaryPalette">
+              <div class="pbHeader">
+                 <table border="0" cellpadding="0" cellspacing="0">
+                    <tbody>
+                       <tr>
+                          <td class="pbTitle">&nbsp;</td>
+                          <td class="pbButton">
+                            <apex:commandButton value="{!$Label.Save}" action="{!save}" rerender="errorMsg" status="headerSaveStatus" onclick="alert('{!$Label.StagingUISaveMessage}');"/>                            
+                            <apex:commandButton value="{!$Label.cancel}" action="{!cancel}"/>
+                          </td>
+                       </tr>
+                    </tbody>
+                 </table>
+              </div>
+           </div>
+        </div>
+    </div>    
+    <apex:actionStatus id="tabStatus" startText="{!$Label.Loading}"/>
+    <apex:actionStatus id="headerSaveStatus" startText="{!$Label.Saving}"/>    
+    <apex:tabPanel switchType="ajax" value="{!selectedTabName}" id="OpportunityHeaderTabPanel" tabClass="activeTab" inactiveTabClass="inactiveTab" ><!--  selectedTab="LineStaging"  -->
+        <apex:tab label="{!$Label.Header_Staging_Detail}" name="HeaderDetails" id="headerStagingTab" ontabenter="callSwitchTabsJS('HeaderDetails_headerStagingTab');return false;">
+           <apex:pageBlock title="{!$Label.Opportunity_Header_Staging_Edit}" id="tBlock">                
+                <apex:pageBlockSection title="{!$Label.Assigned_to_Information}" collapsible="true">
+                    <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Assign_To_Informn_FieldSet}" var="fieldValue">
+                        <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                        <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                    </apex:repeat>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Opportunity_Header_Staging_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Opportunity_Staging_Header_UI_FieldSet}" var="fieldValue">
+                      <apex:outputPanel rendered="{!fieldValue == 'Status__c'}" styleClass="dataCol" style="width:100%;margin-left: 162px;">
+                          <apex:outputLabel value="{!$ObjectType.Opportunity_Header_Staging__c.Fields.Status__c.Label}" styleClass="labelCol vfLabelColTextWrap" style="padding-right:20px;"/>
+                          <apex:outputText value="{!status}" rendered="{!isStatusDisplayed}"/>
+                          <apex:selectList value="{!status}" size="1" rendered="{!isStatusPickListDisplayed}">
+                             <apex:selectOptions value="{!statusOptions}"/>
+                          </apex:selectList>    
+                      </apex:outputPanel>
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!AND(fieldValue != 'Status__c',fieldValue != 'Create_New_Opportunity__c',fieldValue !='Sales_Account__c', CONTAINS(fieldNameSet, '['&fieldValue&']'))}" >   
+                          <apex:actionSupport event="onSelect" rerender="tBlock"/> 
+                      </apex:inputField>
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!AND(fieldValue != 'Status__c',fieldValue != 'Create_New_Opportunity__c',fieldValue !='Sales_Account__c',fieldValue !='Order_Status__c', NOT(CONTAINS(fieldNameSet, '['&fieldValue&']')))}"/>  
+                   </apex:repeat>
+                   
+                   <apex:inputCheckbox value="{!Opportunity_Header_Staging__c['Create_New_Opportunity__c']}">  
+                      <apex:actionSupport event="onchange" rerender="tBlock"/>  
+                   </apex:inputCheckbox> 
+                   <!-- This block will be displayed when create new Account is checked------------------------>
+                    <apex:pageBlockSectionItem id="salesAccReq" rendered="{!Opportunity_Header_Staging__c['Create_New_Opportunity__c']}">
+                        <apex:outputLabel value="{!$ObjectType.Opportunity_Header_Staging__c.Fields.Sales_Account__c.Label}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                <div class="requiredBlock" ></div>
+                                 <apex:inputField value="{!Opportunity_Header_Staging__c['Sales_Account__c']}"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <!-- This block will be displayed when create new Account is unchecked------------------------>
+                    <apex:pageBlockSectionItem id="salesAccNotReq" rendered="{!!Opportunity_Header_Staging__c['Create_New_Opportunity__c']}">
+                        <apex:outputLabel value="{!$ObjectType.Opportunity_Header_Staging__c.Fields.Sales_Account__c.Label}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                 <apex:inputField value="{!Opportunity_Header_Staging__c['Sales_Account__c']}"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                           
+                   <apex:pageBlockSectionItem id="lkupPotentialOpp" rendered="{!IF((oppPotentialMatch && !Opportunity_Header_Staging__c['Create_New_Opportunity__c'] ),true,false)}">
+                   <apex:outputLabel for="matchingOpportunityText" id="matchingOpportunityLabel" value="Matching Opportunity"/>
+                   <apex:outputPanel >
+                       <apex:inputtext id="matchingOpportunityText" value="{!selOpportunityValue}" onfocus="selOpportunityValueJS = this.value;"/>
+                       <apex:inputHidden id="matchingOpportunityTextID" value="{!selOpportunityValueID}" />
+                       <img title="Opportunity Lookup (New Window)"
+                            onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';"
+                            onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';"
+                            onfocus="this.className = 'lookupIconOn';"
+                            onblur="this.className = 'lookupIcon';" class="lookupIcon"
+                            alt="Opportunity Lookup (New Window)" src="/s.gif"
+                            onclick="openLookup1('{!$Component.matchingOpportunityText}', 670, 1, '&lksrch='+selOpportunityValueJS+'&searchOppStagingID={!headerStaging.id}'+'&txtID=j_id0\:myForm\:tBlock\:j_id41\:lkupPotentialOpp\:matchingOpportunityTextID')" />                                   
+                   </apex:outputPanel>       
+                   </apex:pageBlockSectionItem> 
+     
+                </apex:pageBlockSection>
+                
+                
+                
+                <apex:pageBlockSection title="{!$Label.Bill_to_Sales_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Bill_To_Sales_Account_Information_Fields}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Bill_To_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Bill_To_Account_Information_Fieldset}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Bill_To_Address_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Bill_To_Address_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Bill_To_Contact_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Bill_To_Contact_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>                
+                <apex:pageBlockSection title="{!$Label.Entitle_To_Sales_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Entitle_To_Sales_Account_Information_Fie}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Entitle_To_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Entitle_To_Account_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Entitle_To_Address_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Entitle_To_Address_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Entitle_To_Contact_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Entitle_To_Contact_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>        
+                <apex:pageBlockSection title="{!$Label.Ship_To_Sales_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Ship_To_Sales_Account_Information_FieldS}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Ship_To_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Ship_To_Account_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>                                
+                <apex:pageBlockSection title="{!$Label.Ship_To_Address_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Ship_To_Address_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Ship_To_Contact_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Ship_To_Contact_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>    
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Sold_To_Sales_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Sold_To_Sales_Account_Information_Field}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>                
+                <apex:pageBlockSection title="{!$Label.Sold_To_Account_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Sold_To_Account_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Sold_To_Address_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Sold_To_Address_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>   
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="{!$Label.Sold_To_Contact_Information}" collapsible="true">
+                   <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Sold_To_Contact_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>
+                   </apex:repeat>                                                
+                </apex:pageBlockSection>     
+                <apex:pageBlockSection title="{!$Label.Non_Entitled_Endco_Information_Section}" collapsible="true">
+                    <apex:repeat value="{!$ObjectType.Opportunity_Header_Staging__c.FieldSets.Non_Entitled_Endco_Information_FieldSet}" var="fieldValue">
+                      <apex:inputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!CONTAINS(fieldNameSet, '['&fieldValue&']')}"/>   
+                      <apex:outputField value="{!Opportunity_Header_Staging__c[fieldValue]}" rendered="{!NOT(CONTAINS(fieldNameSet, '['&fieldValue&']'))}"/>                         
+                    </apex:repeat>
+                </apex:pageBlockSection>   
+            </apex:pageBlock>
+        </apex:tab>     
+        <apex:tab label="{!$Label.Line_Staging_Detail}" name="LineStaging" id="lineStagingTab" ontabenter="callSwitchTabsJS('LineStaging_lineStagingTab');return false;">
+            <apex:pageblock id="lineStagingRelatedList" title="{!$Label.Opportunities_Line_Staging}" rendered="{!AND(relatedOpptyLineStagingList != null, relatedOpptyLineStagingList.size > 0, relatedOpptyLineStagingList.size <= 50)}">       
+               <apex:pageBlockButtons >
+                  <apex:commandButton value="{!$Label.Copy_Entitle_To_From_Header}" action="{!copyEntitleToFromHeaderInformation}" status="copyLoading" rerender="lineStagingPanel, errorMsg" oncomplete="showHideContent(selectedLineIndex);"/>
+                  <apex:actionStatus id="copyLoading" startText="Copying..." />
+               </apex:pageBlockButtons>
+               <table class="list" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr class="headerRow">                
+                        <th scope="col" class="zen-deemphasize" width="13%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Name.label}</th>
+                        <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Product_Code__c.label}</th>
+                        <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Product_Code_Oracle__c.label}</th>
+                        <th scope="col" class="DateElement zen-deemphasize" width="7%">{!$ObjectType.Opportunity_Line_Staging__c.fields.ActualEndDate__c.label}</th>
+                        <th scope="col" class="DateElement zen-deemphasize" width="7%">{!$ObjectType.Opportunity_Line_Staging__c.fields.ActualStartDate__c.label}</th>
+                        <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Base_Price__c.label}</th>
+                        <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Quantity__c.label}</th>
+                        <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.UnitPrice__c.label}</th>
+                        <th scope="col" class="CurrencyElement zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Line_Staging__c.fields.Total_Price__c.label}</th>
+                     </tr>
+                  </tbody>
+               </table>                      
+               <div class="RH_OrderDetails_Header_Padding">
+               <apex:outputPanel id="lineStagingPanel">
+               <apex:variable value="{!0}" var="counter"/>
+               <apex:repeat value="{!relatedOpptyLineStagingList}" var="line" rendered="{!AND(relatedOpptyLineStagingList != null, relatedOpptyLineStagingList.size > 0)}">
+                  <div>
+                     <div onclick="showHideContent({!counter});" id="header1" class="RH_MenuTitle RH_firsrMenuTitle">
+                       <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                         <tbody> 
+                           <tr>
+                             <td width="14%">&nbsp;
+                               {!line.Name}
+                             </td>
+                             <td width="10%">&nbsp;
+                               <apex:outputField value="{!line.Product_Code__c}"/>
+                             </td>
+                             <td width="10%">&nbsp;
+                               {!line.Product_Code_Oracle__c}
+                             </td>
+                             <td width="7%">
+                               <apex:outputField value="{!line.ActualEndDate__c}"/>
+                             </td>
+                             <td width="7%">&nbsp;
+                               <apex:outputField value="{!line.ActualStartDate__c}"/>
+                             </td>
+                             <td width="10%" style="text-align:right;">&nbsp;
+                               <apex:outputField value="{!line.Base_Price__c}"/>
+                             </td>
+                             <td width="10%" style="text-align:right;">&nbsp;
+                               <apex:outputField value="{!line.Quantity__c}"/>
+                             </td>
+                             <td width="10%" style="text-align:right;">&nbsp;
+                               <apex:outputField value="{!line.UnitPrice__c}"/>
+                             </td>                    
+                             <td width="10%" style="text-align:right;">&nbsp;
+                               <apex:outputField value="{!line.Total_Price__c}"/>
+                             </td>
+                           </tr>  
+                         </tbody>
+                       </table>                           
+                     </div>
+                     <div id="content{!counter}" class="RH_Hide RH_contentOutlineBorder">                
+                        <apex:pageBlocksection title="{!$Label.Opportunity_Line_Staging_Information}" collapsible="true">                    
+                           <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Oppty_Line_Staging_Information_FieldSet}"  var="f">
+                              <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                              <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                           </apex:repeat>
+                        </apex:pageBlocksection>
+                        <apex:pageBlocksection title="{!$Label.Entitle_To_Account_Information}" collapsible="true">                   
+                           <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Entitle_To_Account_Information_FieldSet}"  var="f">
+                              <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                              <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                           </apex:repeat>                   
+                        </apex:pageBlocksection>
+                        <apex:pageBlocksection title="{!$Label.Entitle_To_Address_Information}" collapsible="true">                   
+                           <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Entitle_To_Address_Information_FieldSet}"  var="f">
+                              <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                              <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                           </apex:repeat>                   
+                        </apex:pageBlocksection>
+                        <apex:pageBlocksection title="{!$Label.Entitle_To_Contact_Information}" collapsible="true">                   
+                           <apex:repeat value="{!$ObjectType.Opportunity_Line_Staging__c.FieldSets.Entitle_To_Contact_Information_Field_Set}"  var="f">
+                              <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(lineFieldNameSet, f)}"/>   
+                              <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(lineFieldNameSet, f))}"/>   
+                           </apex:repeat>
+                        </apex:pageBlocksection>                   
+                     </div>
+                  </div>    
+                  <apex:variable var="counter" value="{!counter+1}"/>         
+               </apex:repeat>
+               </apex:outputPanel> 
+               </div>       
+               <apex:outputLabel value="{!$Label.No_records_to_display}" rendered="{!AND(relatedOpptyLineStagingList != null, relatedOpptyLineStagingList.size <= 0)}" styleClass="noRowsHeader"/>
+            </apex:pageblock>
+            <apex:pageBlock title="{!$Label.Opportunities_Line_Staging}" rendered="{!AND(relatedOpptyLineStagingList != null, relatedOpptyLineStagingList.size > 50)}">       
+               <apex:pageMessage summary="{!$Label.LineStaging50ErrorMsg}" severity="warning" strength="3" />
+               <br/>
+               <a target="_blank" href="/apex/LineStagingDetailPage?id={!opptyHeaderStagingId}&esa={!Opportunity_Header_Staging__c['Entitle_To_Sales_Account__c']}&ea={!Opportunity_Header_Staging__c['Entitle_To_Account__c']}&ead={!Opportunity_Header_Staging__c['Entitle_To_Address__c']}&ec={!Opportunity_Header_Staging__c['Entitle_To_Contact__c']}">Click here</a>
+            </apex:pageblock>    
+        </apex:tab> 
+        <apex:tab label="Partner Staging Detail" name="PartnerStaging" id="partnerStagingTab" ontabenter="callSwitchTabsJS('PartnerStaging_partnerStagingTab');return false;">
+            <apex:pageblock id="linePartnerRelatedList" title="Opportunities Partner Staging">
+               <table class="list" border="0" cellspacing="0" cellpadding="0">
+                  <tbody>
+                     <tr class="headerRow">                
+                        <th scope="col" class="zen-deemphasize" width="13%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.Name.label}</th>
+                        <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.CDH_Party_Number__c.label}</th>
+                        <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.CDH_Party_Name__c.label}</th>
+                        <th scope="col" class="zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.RelationshipType__c.label}</th>
+                        <th scope="col" class="DateElement zen-deemphasize" width="7%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.Partner_Type__c.label}</th>
+                        <th scope="col" class="DateElement zen-deemphasize" width="7%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.PartnerTier__c.label}</th>
+                        <th scope="col" class="numericalColumn zen-deemphasize" width="10%">{!$ObjectType.Opportunity_Partner_Staging__c.fields.Partner_Contact_CDH_Party_Number__c.label}</th>
+                     </tr>
+                  </tbody>
+               </table>       
+               <div class="RH_OrderDetails_Header_Padding">
+               <apex:variable value="{!0}" var="counter"/>
+               <apex:repeat value="{!relatedOpptyPartnerStagingList}" var="line" rendered="{!AND(relatedOpptyPartnerStagingList != null, relatedOpptyPartnerStagingList.size > 0)}">
+                  <div>
+                     <div id="partnerStagingID{!counter}" onclick="showHideContent1({!counter});" class="RH_MenuTitle RH_firsrMenuTitle">
+                       <table border="0" width="100%" cellspacing="0" cellpadding="0">
+                         <tbody> 
+                           <tr>
+                             <td width="14%">&nbsp;
+                               {!line.Name}
+                             </td>
+                             <td width="10%">&nbsp;
+                               <apex:outputField value="{!line.CDH_Party_Number__c}"/>
+                             </td>
+                             <td width="10%">&nbsp;
+                               <apex:outputField value="{!line.CDH_Party_Name__c}"/>
+                             </td>
+                             <td width="10%">&nbsp;
+                               {!line.RelationshipType__c}
+                             </td>
+                             <td width="7%">
+                               <apex:outputField value="{!line.Partner_Type__c}"/>
+                             </td>
+                             <td width="7%">&nbsp;
+                               <apex:outputField value="{!line.PartnerTier__c}"/>
+                             </td>
+                             <td width="10%" style="text-align:right;">&nbsp;
+                               <apex:outputField value="{!line.Partner_Contact_CDH_Party_Number__c}"/>
+                             </td>                     
+                           </tr>  
+                         </tbody>
+                       </table>                           
+                     </div>
+                     <div id="partnerStagingContent{!counter}" class="RH_Hide RH_contentOutlineBorder">                 
+                        <apex:pageBlocksection title="{!$Label.Opportunity_Partner_Staging_Information}" collapsible="true">                   
+                           <apex:repeat value="{!$ObjectType.Opportunity_Partner_Staging__c.FieldSets.Oppty_Partner_Staging_Info_FieldSet}"  var="f">
+                              <apex:inputField value="{!line[f.fieldPath]}" rendered="{!CONTAINS(partnerFieldNameSet, f)}"/>   
+                              <apex:outputField value="{!line[f.fieldPath]}" rendered="{!NOT(CONTAINS(partnerFieldNameSet, f))}"/>   
+                           </apex:repeat>                   
+                        </apex:pageBlocksection>                
+                     </div>                
+                  </div>                    
+                  <apex:variable var="counter" value="{!counter+1}"/>         
+               </apex:repeat>
+               </div>             
+               <apex:outputLabel value="{!$Label.No_records_to_display}" rendered="{!AND(relatedOpptyPartnerStagingList != null, relatedOpptyPartnerStagingList.size <= 0)}" styleClass="noRowsHeader"/>                       
+            </apex:pageblock> 
+        </apex:tab>   
+    </apex:tabPanel>       
+</apex:form>                 
+</apex:page>

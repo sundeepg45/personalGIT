@@ -1,0 +1,306 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page controller="refedge.ReferenceRequestController" id="pageId" showHeader="false" sidebar="false" docType="html-5.0">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+    <apex:includeScript value="https://code.jquery.com/ui/1.11.1/jquery-ui.js"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css"/>
+    <style>
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        .sectionHeader {
+            font-size: 13px;
+            padding: 8px 14px;
+            font-weight: normal;
+            text-transform: uppercase;
+            background-color: #e8eaeb;
+            color: #696e71;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .centerDiv {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+        }
+        .datarow {
+            border-top: none;
+            padding: 14px;
+            padding-left: 14px;
+            //width: 50%;
+        }
+        .databox {
+            background-color: rgba(252, 252, 252, 0.95);
+            border: 1px solid #bbc0c4;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        .sf1label {
+            font-family: 'ProximaNovaSoft-Regular','Helvetica Neue';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            padding-top: 8px;
+            display: block;
+            min-width: 100px;
+        }
+        .selectList {
+            height: auto;
+            background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiP�YsMTguOCw1NS4wNjYsMTcuODY2eiIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=),linear-gradient(#ffffff,#f1f1f1);
+            background-repeat: no-repeat;
+            background-position: 95% 50%;
+            background-size: 16px 16px,100% 100%;
+            color: #3c3d3e;
+            padding: 7px 14px;
+            line-height: 25px;
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 15px;
+            align-items: center;
+            width: 100%;
+            border: 1px solid #bbc0c4;
+            border-radius: 5px;
+        }
+        .sf1input, .sf1textarea {
+           width:100%;
+           font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+           font-size: 15px;
+           color: #3c3d3e;
+           padding: 7px 14px;
+           line-height: 25px;
+           border: 1px solid #cfd0d2;
+           border-radius: 5px;
+           background-color: #e8eaeb;
+           box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+           box-sizing: border-box;
+        }
+        
+        .sf1input:focus, .sf1textarea:focus {
+           border: 1px solid #bbc0c4;
+           background-color: #fff;
+           outline-style: none;
+        }
+        .sf1input[type="checkbox"] {
+            -webkit-appearance: none;
+            display: inline-block;
+            height: 22px;
+            margin: 0 6px 0 0;
+            border: 1px solid #c3c6c9;
+            padding: 0;
+            width: 22px;
+            vertical-align: middle;
+            background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+        }
+        
+        .sf1input[type="checkbox"]:checked {
+            border: 1px solid #2c75a3;
+            background-color: #3b9fdd;
+            -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+            background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        }
+        
+        .sf1input[type="checkbox"]:checked::after {
+            display: block;
+            left: 3px;
+            top: 3px;
+            height: 9px;
+            width: 14px;
+            border-bottom: 4px solid white;
+            border-left: 4px solid white;
+            -webkit-transform: rotate(-45deg);
+            position: relative;
+            content: '';
+        }
+        .datarow a {
+            text-decoration: none;
+            color: #0e7abd;
+        }
+        .datarow a:hover {
+            text-decoration: none;
+            color: #0e7abd;
+        }
+        .leftcolumn{
+            text-align:right;
+            width: 30%;
+        }
+        .rightcolumn{
+            text-align:left;
+            width: 60%;
+        }
+        .boldOption{
+            font-weight:normal;
+        }
+        .dateOnlyInput input{
+            width:100% !important;
+        }
+        .dateFormat {
+            display : none !important;
+        }
+    </style>
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+    <script> 
+        var isMsgRender = false; 
+        var radioSelect = '';
+        function massUpdateAccounts(){
+            PORShowLoading();
+            var radioSelect = jQuery('input[name="radioButton"]:checked').val();
+            updateAccounts(radioSelect,'SF1');
+        }
+        function jsredirect(){
+            if(!isMsgRender){
+                redirect();
+            }
+            else {
+                PORHideLoading();
+            }
+        }
+    </script>
+    <apex:outputPanel id="datePanel">
+        <script> 
+            jQuery( document ).ready(function(){
+                
+                var $j = jQuery.noConflict();
+                $j(".deadlineDatePicker").datepicker({
+                    onSelect : function(dateText) {
+                        document.getElementById('pageId:formId:deadlineId').value = dateText;
+                        jQuery('.ui-datepicker').css('display','none');
+                    }
+                });
+                jQuery('.ui-datepicker').css('display','none');
+            });
+            function show(e,currentDiv) {
+                var position = jQuery(currentDiv).position();
+                var IE = document.all?true:false;
+                var tempX,tempY;
+                if (IE) { 
+                    tempX = e.clientX + document.body.scrollLeft;
+                    tempY = e.clientY + document.body.scrollTop;
+                } 
+                else {  
+                    tempX = e.pageX;
+                    tempY = e.pageY;
+                }
+                var height = jQuery(currentDiv).css('height');
+                height = parseFloat(height.substring(0,height.indexOf("px")))
+                document.getElementById('ui-datepicker-div').style.left = position.left+'px';
+                document.getElementById('ui-datepicker-div').style.top = (position.top+height)+'px';
+                jQuery('.ui-datepicker').css('display','block');
+                var val = document.getElementById('pageId:formId:deadlineId').value;
+                var date = new Date(val);
+                var $j = jQuery.noConflict();
+                $j(".deadlineDatePicker").datepicker("setDate", date);
+            }
+            
+        </script>
+        <style>
+            .datePicker{
+                display:none !important;
+            }
+            #ui-datepicker-div {
+                position : absolute !important;
+            }
+        </style>
+    </apex:outputPanel>
+    <apex:outputPanel id="errorPanel">
+        <script>
+            isMsgRender = {!isMessageRender};
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="updateAccounts" action="{!selectAndUpdate}" reRender="errorPanel,pgmsgId" oncomplete="jsredirect();">
+            <apex:param name="p5" assignTo="{!selectedValue}" value="" />
+            <apex:param name="p6" assignTo="{!fromWhere}" value=""/>
+        </apex:actionFunction>  
+        
+        <apex:actionFunction name="redirect" action="{!redirect}" />
+        <apex:actionFunction name="changeMinimumDeadline" action="{!changeMinimumDeadline}" oncomplete="PORHideLoading();" reRender="deadline,datePanel,minDeadline">
+            <apex:param name="param" assignTo="{!referenceType}" value=""/>
+        </apex:actionFunction> 
+        <body style="background:#f0f1f2;line-height: 1;">
+            <div class="centerDiv">
+                <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                    <ul class="buttonList horizontal forceButtonBar">
+                        <li class="buttonItem">
+                            <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" value="{!$Label.Cancel}" styleClass="default one uiBlock uiButton forceActionButton" immediate="true" action="{!redirect}"/>
+                        </li>
+                        <li class="buttonItem">
+                            <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" styleClass="default one uiBlock uiButton forceActionButton" value="{!$Label.Save}" onClick="massUpdateAccounts();return false;"/>
+                        </li>
+                    </ul>
+                </div>
+                <div style="width:100%;">
+                    <div class="datarow">
+                        <div class="sf1label"><apex:outputText value="{!$Label.Apply_changes_to}"/></div>
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="text-align:center;">
+                                    <div class="sf1label">{!$Label.This_card_only}&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" checked="checked" name="radioButton" value="The Record Clicked"/></div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="sf1label">{!$Label.All_Cards}&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="radioButton" value="All Selected Records"/></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="datarow">
+                        <div class="sf1label"><apex:outputText value="{!$Label.Reference_Type_Needed}"/><apex:outputText style="color : #CC0000;" value=" * "/></div>
+                        <apex:selectList size="1" value="{!dummyReq.refedge__Reference_Type_Needed__c}" onChange="PORShowLoading();changeMinimumDeadline(this.value);" id="selectRefType" StyleClass="selectList" >
+                            <apex:param value="this.oldValue" assignTo="{!oldReferenceability}" name="previousValue" />
+                            <apex:selectOptions value="{!referenceabilityTypes}"/>
+                        </apex:selectList>
+                    </div>
+                    <div class="datarow">
+                        <div class="sf1label"><apex:outputText value="{!$Label.Deadline}"/><apex:outputText style="color : #CC0000;" value=" * "/></div>
+                        <apex:outputPanel layout="block" id="deadline" onClick="show(event,this);return false;">
+                            <apex:inputField id="deadlineId" styleClass="deadlineDatePicker sf1input" value="{!dummyReq.refedge__Deadline__c}"/>
+                            <script>
+                                document.getElementById('pageId:formId:deadlineId').disabled = true;
+                            </script>
+                        </apex:outputPanel>
+                        <apex:outputText styleclass="sf1label" id="minDeadline" value="{!minDeadlineLabel}" />
+                    </div>
+                    <div class="datarow">
+                        <div class="sf1label"><apex:outputText value="{!$Label.Request_Notes}"/></div>
+                        <apex:inputtextArea styleClass="sf1textarea" Title="{!$Label.Notes}" value="{!dummyReq.refedge__Request_Notes__c}" id="reqNotesId"/>
+                    </div>
+                </div> 
+            </div>
+        </body>
+    </apex:form>
+</apex:page>

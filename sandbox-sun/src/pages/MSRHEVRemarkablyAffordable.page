@@ -1,0 +1,71 @@
+<apex:page controller="MSController" showHeader="false" sidebar="false" standardStylesheets="false" action="{!initWithContent}">
+	<apex:include pageName="RHEV_include_header"/>
+	<body id="second" class="ms dark">
+	<div id="wrapper">
+		<div id="page">
+			<div class="container_12 clearfix">
+				<div id="header" class="grid_12">
+					<div id="sm-logo"><a href="http:/www.redhat.com">Red Hat</a></div><!-- /#sm-logo -->
+					<div id="header-links">
+					<ul style="margin-right: 8px;">
+						<li class="first" style=""></li>
+					</ul>
+						<div class="clear"></div>
+						<a target="_blank" class="header-button" href="http://www.redhat.com">redhat.com</a><!-- /.header-button -->
+					</div><!-- /#header-links -->
+					<div id="nav-band">
+					  <div id="primary-nav">
+					  	<apex:include pageName="MSRHEV_include_nav"/>
+					  </div><!-- /#primary-nav -->
+					</div><!-- /#nav-band -->
+					  	<apex:include pageName="RHEV_include_promo"/>
+				</div><!-- /#header -->
+				<div class="clear"></div>
+
+				<div id="main">
+<div class="grid_12">
+	
+	<div class="grid_9 alpha">
+<h1>Remarkably Affordable</h1>
+
+<p>Red Hat&reg; Enterprise Virtualization is purchased, like all Red Hat software, on the subscription model. This means no high upfront license fees. Just 1 yearly subscription that includes software access, updates, support, and access to our Customer Portal. </p>
+
+<h2>Red Hat Enterprise Virtualization for Servers</h2>
+<p>Sold on a per-socket basis for the hypervisor and includes:</p>
+<ul>
+<li>The RHEV Hypervisor. </li>
+<li>The RHEV Manager application and management engine.</li>
+<li>All the RHEV features, including the power user portal and reports portal.</li>
+</ul>
+
+<p><strong>How to buy:</strong> No tiered editions. No limited SMB bundles. Just count the sockets on your hypervisors, choose a business-hours or 24x7 support level, and buy.</p>
+
+<p class="look">Get more information on pricing a Red Hat Enterprise Virtualization for Servers environment:&nbsp; <c:MSSingle pageController="{!this}"  annotation="server_pricing"/></p>
+
+<h2>Red Hat Enterprise Virtualization for DESKTOPS</h2>
+<p>An addition for Red Hat Enterprise Virtualization for Servers and sold in packs of 25 concurrent desktop connections.</p>
+
+<p><strong>How to buy:</strong> Purchase Red Hat Enterprise Virtualization for Servers subscriptions for all your hypervisors, determine the number of concurrent desktops you need to support, choose a business-hours or 24x7 support level, and buy.</p>
+
+<p class="look">Get more information on pricing a Red Hat Enterprise Virtualization for Desktops environment:&nbsp; <c:MSSingle pageController="{!this}" annotation="desktop_pricing"/></p>
+
+	</div><!-- /.grid_9 -->	
+	<div class="grid_3 omega">
+	  	<apex:include pageName="RHEV_include_contact"/>
+	</div><!-- /.grid_3 -->
+	<div class="clear"></div>
+
+		
+	</div><!-- /.grid_12 -->
+</div><!-- /#main -->
+<div class="clear"></div>
+
+<apex:include pageName="RHEV_include_footer"/>
+
+</div>
+
+</div>
+</div>
+</body>
+
+</apex:page>

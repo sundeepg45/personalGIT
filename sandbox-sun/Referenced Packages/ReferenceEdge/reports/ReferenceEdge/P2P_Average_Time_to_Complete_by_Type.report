@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Reference_Request_Account__c$Account__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Average</aggregateTypes>
+        <field>Reference_Request_Account__c$Time_to_Complete__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request_Account__c$Is_No_Response__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request_Account__c$Reference_Type_Needed__c.min_lead_time_per_request_type__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Request_Account__c$Name</field>
+    </columns>
+    <description>Peer2Peer Average Time to Complete by Type</description>
+    <filter>
+        <criteriaItems>
+            <column>Reference_Request_Account__c$Process__c</column>
+            <operator>equals</operator>
+            <value>Peer2Peer</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Reference_Request_Account__c$Is_No_Response__c</column>
+            <operator>notEqual</operator>
+            <value>1</value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Matrix</format>
+    <groupingsAcross>
+        <dateGranularity>Day</dateGranularity>
+        <field>Reference_Request_Account__c$Reference_Type_Needed__c.Name</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsAcross>
+    <groupingsDown>
+        <dateGranularity>Month</dateGranularity>
+        <field>Reference_Request_Account__c$CreatedDate</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>P2P Average Time to Complete by Type</name>
+    <params>
+        <name>co</name>
+        <value>0</value>
+    </params>
+    <reportType>Account_Requests_with_Request_Type__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Reference_Request_Account__c$Activity_Date__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

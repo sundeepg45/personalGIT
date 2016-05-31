@@ -1,0 +1,102 @@
+<apex:page controller="PartnerEmailConfirmationController" action="{!processConfirmation}"  showHeader="false" standardStylesheets="false" sidebar="false" cache="true" expires="1">
+    <apex:stylesheet value="https://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="https://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Partner_Onboarding_CSS}" />
+
+    <div id="container">
+        <div id="shell-top-simple">
+            <div class="wrap">
+                <div id="header">
+                    <div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div><!-- end logo -->
+					<div id="login-pre">
+		                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso">{!$Label.Onboarding_Header_Log_In}</a>
+		            </div>
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+                <div id="content">
+                    <div id="content-full" style="background: none;">
+					
+						<br />
+						<apex:pageBlock rendered="{!status == 0}">
+							<apex:outputText value="{!$Label.Onboarding_Email_Confirmed}"/>
+						</apex:pageBlock>
+						
+						<apex:pageBlock rendered="{!status >= 1}">
+							<apex:outputText value="{!$Label.Onboarding_Email_Confirmation_Error}"/>
+						</apex:pageBlock>
+						<br />
+						<a href="/partner/">{!$Label.Onboarding_Goto_Login}</a>
+						
+						
+						 
+
+
+
+					</div><!-- end content-full -->
+                </div> <!-- end_content-->
+            </div><!-- end-wrap -->
+        </div><!--end shell-top-simple -->  
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+                    
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>{!$Label.Onboarding_Copyright}</li>
+                            <li>|</li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">{!$Label.Onboarding_Privacy_Policy}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">{!$Label.Onboarding_Terms_Of_Use}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">{!$Label.Onboarding_Patent_Promise}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">{!$Label.Onboarding_Careers_Link}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">{!$Label.Onboarding_Trademark_guidelines}</a></li>
+                            
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_About_Red_Hat}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">{!$Label.Onboarding_Contact_us}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">{!$Label.Onboarding_Site_map}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">{!$Label.Onboarding_FAQs}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">{!$Label.Onboarding_Supplier_requirements}</a></li>
+
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_Company}</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div>
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+
+    <style>
+        .labelCol {
+            font-weight:bold;
+        }
+    </style>
+    <script type="text/javascript">
+        initialize();
+    </script>
+
+</apex:page>

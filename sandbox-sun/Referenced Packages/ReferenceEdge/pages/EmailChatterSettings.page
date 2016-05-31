@@ -1,0 +1,301 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.EmailChatterSettingsController" sideBar="false" id="pageId" tabStyle="refedge__Custom_Settings__c" >
+    <apex:pageMessages id="pgmsgId"/>
+    <script type="text/javascript"> 
+        var alreadyCheckedChatter = false;
+        var alreadyCheckedEmail = false;
+        var sections = 7;
+
+        function checkAllEmail(compValue,clickObj) {
+            if (compValue.checked) {
+                var result = confirm("{!$Label.EmailEnabled_check_message}");
+                if (result) {
+                    document.getElementById(clickObj).checked = true;
+                    for(var i=1; i<=sections; i++){
+                        var id = 'pageId:fromId:pbId:sec'+i;
+                        for(var j=0; j<document.getElementById(id).children[1].children[0].children[0].children.length; j++){
+                            document.getElementById(id).children[1].children[0].children[0].children[j].children[1].children[0].checked = true;
+                        }
+                    }
+                    alreadyCheckedEmail = true;
+                } else {
+                    document.getElementById(clickObj).checked = false;
+                    alreadyCheckedEmail = false;
+                }
+            } else {
+                var result = confirm("{!$Label.EmailEnabled_uncheck_message}");
+                if (result) {
+                    document.getElementById(clickObj).checked = false;
+                    for(var i=1; i<=sections; i++){
+                        var id = 'pageId:fromId:pbId:sec'+i;
+                        for(var j=0; j<document.getElementById(id).children[1].children[0].children[0].children.length; j++){
+                            document.getElementById(id).children[1].children[0].children[0].children[j].children[1].children[0].checked = false;
+                        }
+                    }
+                    alreadyCheckedEmail = false;
+                } else {
+                    document.getElementById(clickObj).checked = true;
+                    alreadyCheckedEmail = true;
+                }
+            }
+        }
+        function checkForEmailEnabled(clickObj){
+            
+            if(document.getElementById(clickObj).checked){
+                if(!alreadyCheckedEmail && ('{!cs.refedge__Email_Enabled__c}' || '{!cs.refedge__Email_Enabled__c}' == 'true')){
+                    
+                    var result = confirm("{!$Label.EmailEnabled_set_ON_message}");
+                    if (result) {
+                        document.getElementById(clickObj).checked = true;
+                    } else {
+                        document.getElementById(clickObj).checked = false;
+                    }
+                }
+            }
+            alreadyCheckedEmail = false;
+            for(var i=1; i<=sections; i++){
+                var id = 'pageId:fromId:pbId:sec'+i;
+                for(var j=0; j<document.getElementById(id).children[1].children[0].children[0].children.length; j++){
+                    if(document.getElementById(id).children[1].children[0].children[0].children[j].children[1].children[0].checked){
+                        alreadyCheckedEmail = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        function checkAllChatter(compValue,clickObj) {
+            if (compValue.checked) {
+                var result = confirm("{!$Label.ChatterEnabled_check_message}");
+                if (result) {
+                    document.getElementById(clickObj).checked = true;
+                    for(var i=1; i<=sections; i++){
+                        var id = 'pageId:fromId:pbId:sec'+i;
+                        for(var j=0; j<document.getElementById(id).children[1].children[0].children[0].children.length; j++){
+                            document.getElementById(id).children[1].children[0].children[0].children[j].children[3].children[0].checked = true;
+                        }
+                    }
+                    alreadyCheckedChatter = true;
+                } else {
+                    document.getElementById(clickObj).checked = false;
+                    alreadyCheckedChatter = false;
+                }
+            } else {
+                var result = confirm("{!$Label.ChatterEnabled_uncheck_message}");
+                if (result) {
+                    document.getElementById(clickObj).checked = false;
+                    for(var i=1; i<=sections; i++){
+                        var id = 'pageId:fromId:pbId:sec'+i;
+                        for(var j=0; j<document.getElementById(id).children[1].children[0].children[0].children.length; j++){
+                            document.getElementById(id).children[1].children[0].children[0].children[j].children[3].children[0].checked = false;
+                        }
+                    }
+                    //document.getElementById('pageId:fromId:pbId:PrivateSec').children[1].children[0].children[0].children[0].children[1].children[0].checked = false;
+                    alreadyCheckedChatter = false;
+                } else {
+                    document.getElementById(clickObj).checked = true;
+                    alreadyCheckedChatter = true;
+                }
+            }
+        }
+        
+        function checkForChatterEnabled(clickObj){
+            
+            if(document.getElementById(clickObj).checked){
+                if(!alreadyCheckedChatter && ('{!cs.refedge__Chatter_Enabled__c}' || '{!cs.refedge__Chatter_Enabled__c}' == 'true')){
+                    
+                    var result = confirm("{!$Label.ChatterEnabled_set_ON_message}");
+                    if (result) {
+                        document.getElementById(clickObj).checked = true;
+                    } else {
+                        document.getElementById(clickObj).checked = false;
+                    }
+                }
+            }
+            alreadyCheckedChatter = false;
+            for(var i=1; i<=sections; i++){
+                var id = 'pageId:fromId:pbId:sec'+i;
+                for(var j=0; j<document.getElementById(id).children[1].children[0].children[0].children.length; j++){
+                    if(document.getElementById(id).children[1].children[0].children[0].children[j].children[3].children[0].checked){
+                        alreadyCheckedChatter = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        function saveJS(){
+            saveMe(alreadyCheckedChatter,alreadyCheckedEmail);
+            return false;
+        }
+        
+        
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="fromId" rendered="{!isFullLicenseAccessible}">
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_the_Custom_Setting_Page}" action="{!returnCustomSettings}"/><br/>
+        </div>
+        <apex:actionFunction name="saveMe" action="{!saveSettings}" reRender="pgmsgId, pbId">
+            <apex:param name="param1" value="" assignTo="{!isChatterEnabled}"/>
+            <apex:param name="param2" value="" assignTo="{!isEmailEnabled}"/>
+        </apex:actionFunction>
+        <apex:pageBlock id="pbId" title="{!$Label.Email_Chatter_Settings}">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Edit}" rendered="{!NOT(isEdit)}" action="{!editSettings}" reRender="pgmsgId, pbId" />
+                <apex:commandButton value="{!$Label.Save}" rendered="{!isEdit}"  onclick="return saveJS();"/>
+                <apex:commandButton value="{!$Label.Cancel}" rendered="{!isEdit}" action="{!returnSettings}" reRender="pgmsgId, pbId"/>
+            </apex:pageBlockButtons>
+            
+            <!-- IN Edit Mode -->
+            <apex:outputPanel id="inputBlk">
+                <apex:pageBlockSection id="sec0" rendered="{!isEdit}" title="{!$Label.Global_Notification_Setting}">
+                    <apex:inputField id="emailId" value="{!cs.refedge__Email_Enabled__c}" onclick="checkAllEmail(this,this.id);"/>
+                    <apex:inputField id="chatterId" value="{!cs.refedge__Chatter_Enabled__c}" onclick="checkAllChatter(this,this.id);"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection id="sec1" rendered="{!isEdit}" title="{!$Label.Peer2Peer_Managed_Request_Notification_Settings}">
+                    <apex:inputField value="{!cs.refedge__Request_Peer2Peer_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Peer2Peer_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Managed_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Managed_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Approval_Decline_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Approval_Decline_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Reminder_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Reminder_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Escalation_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Escalation_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_No_Response_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_No_Response_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="sec2" rendered="{!isEdit}" title="{!$Label.Project_Owner_Status_Update_Notification_Settings}">
+                    <apex:inputField value="{!cs.refedge__Project_Owner_Update_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Project_Owner_Update_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Status_Update_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Status_Update_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Process_Update_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Process_Update_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="sec3" rendered="{!isEdit}" title="{!$Label.Request_Feedback_Notification_Settings}">
+                    <apex:inputField value="{!cs.refedge__Request_Feedback_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Request_Feedback_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="sec4" rendered="{!isEdit}" title="{!$Label.Microsite_Visit_Notification_Settings}">
+                    <apex:inputField value="{!cs.refedge__Microsite_Visit_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Microsite_Visit_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="sec5" rendered="{!isEdit}" title="{!$Label.Nomination_Notification_Settings}">
+                    <apex:inputField value="{!cs.refedge__Nomination_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Nomination_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="sec6" rendered="{!isEdit}" title="{!$Label.Client_Referenceability_Settings}">
+                    <apex:inputField value="{!cs.refedge__Check_back_in_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Check_back_in_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Reference_Lead_No_Response_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Reference_Lead_No_Response_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection id="sec7" rendered="{!isEdit}" title="{!$Label.Reference_Refresh_Notification_Settings}">
+                    <apex:inputField value="{!cs.refedge__Reference_Refresh_Update_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Reference_Refresh_Update_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Reference_Update_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Reference_Update_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Profile_Update_Reminder_Email__c}" onclick="checkForEmailEnabled(this.id);"/>
+                    <apex:inputField value="{!cs.refedge__Profile_Update_Reminder_Chatter__c}" onclick="checkForChatterEnabled(this.id);"/>
+                </apex:pageBlockSection>
+                
+<!--                <apex:pageBlockSection id="PrivateSec" rendered="{!isEdit}" title="{!$Label.Private_Chatter_Setting}">-->
+<!--                    <apex:inputField value="{!cs.Private_Chatter__c}"/>-->
+<!--                </apex:pageBlockSection>    -->
+            </apex:outputPanel>
+            
+            <!-- IN View Mode -->
+            <apex:outputPanel id="outputBlk">
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Global_Notification_Setting}">
+                    <apex:outputField value="{!cs.refedge__Email_Enabled__c}"/>
+                    <apex:outputField value="{!cs.refedge__Chatter_Enabled__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Peer2Peer_Managed_Request_Notification_Settings}">
+                    <apex:outputField value="{!cs.refedge__Request_Peer2Peer_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Peer2Peer_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Managed_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Managed_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Approval_Decline_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Approval_Decline_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Reminder_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Reminder_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Escalation_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Escalation_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_No_Response_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_No_Response_Chatter__c}"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Project_Owner_Status_Update_Notification_Settings}">
+                    <apex:outputField value="{!cs.refedge__Project_Owner_Update_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Project_Owner_Update_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Status_Update_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Status_Update_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Process_Update_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Process_Update_Chatter__c}"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Request_Feedback_Notification_Settings}">
+                    <apex:outputField value="{!cs.refedge__Request_Feedback_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Request_Feedback_Chatter__c}"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Microsite_Visit_Notification_Settings}">
+                    <apex:outputField value="{!cs.refedge__Microsite_Visit_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Microsite_Visit_Chatter__c}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Nomination_Notification_Settings}">
+                    <apex:outputField value="{!cs.refedge__Nomination_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Nomination_Chatter__c}"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Client_Referenceability_Settings}">
+                    <apex:outputField value="{!cs.refedge__Check_back_in_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Check_back_in_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Reference_Lead_No_Response_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Reference_Lead_No_Response_Chatter__c}"/>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Reference_Refresh_Notification_Settings}">
+                    <apex:outputField value="{!cs.refedge__Reference_Refresh_Update_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Reference_Refresh_Update_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Reference_Update_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Reference_Update_Chatter__c}"/>
+                    <apex:outputField value="{!cs.refedge__Profile_Update_Reminder_Email__c}"/>
+                    <apex:outputField value="{!cs.refedge__Profile_Update_Reminder_Chatter__c}"/>
+                </apex:pageBlockSection>
+                
+<!--                <apex:pageBlockSection rendered="{!NOT(isEdit)}" title="{!$Label.Private_Chatter_Setting}">-->
+<!--                    <apex:outputField value="{!cs.Private_Chatter__c}"/>-->
+<!--                </apex:pageBlockSection> -->
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

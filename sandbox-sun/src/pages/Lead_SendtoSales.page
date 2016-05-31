@@ -1,0 +1,58 @@
+<apex:page standardController="Lead" extensions="Lead_SendtoSalesController">
+	<apex:outputText rendered="false" value="{!Lead.Name}"/>
+	<apex:outputText rendered="false" value="{!Lead.Company}"/>
+	<apex:variable var="isMarketingUser" value="{!$User.Is_Marketing_User__c == true}" />
+	<apex:variable var="isMarketingQualified" value="{!Lead.Stage__c == 'Marketing Qualified'}" />
+	<apex:variable var="isDisabled" value="{!OR(NOT(isMarketingUser),isMarketingQualified)}" />
+	<style type="text/css">
+		.headingMsg {
+			display:block;
+			font-size:medium;
+			font-weight:bold;
+			padding-bottom:15px;
+		}
+	</style>
+
+	<apex:form id="frm">
+		<apex:pageBlock title="Send To Sales" mode="View">
+			<apex:pageMessage summary="Sorry... the Send to Sales button is not available for sales users.  If you feel you have reached this message in error, please submit a momentum ticket."
+				severity="error" strength="3" rendered="{!NOT(isMarketingUser)}"/>
+			<apex:pageMessage summary="This lead has already been sent to sales"
+				severity="error" strength="3" rendered="{!isMarketingQualified}"/>
+			<apex:pageMessage summary="Changing the owner to a Partner User will change the ownership of the lead but most Partner Users cannot view leads through Partner Center. Please reach out to the Partner User to let them know that a new lead has been assigned to them and check-in regularly to get updates on the leads progress toward an opportunity. New processes and features are being developed to fully support passing leads to partners via Partner Center while maintaining visibility within Red Hat. These requirements are in the process of being defined and features to support and improve 'Leads to Partners' will be released at a later date." 
+				severity="info" strength="3" rendered="{!NOT(OR(isDisabled,isRouteLead))}"/>
+			<apex:pageMessages />
+
+			<apex:actionFunction name="toggleChangeOwner" rerender="frm"/>
+
+			<apex:pageBlockButtons location="Bottom">
+				<apex:commandButton title="Cancel" action="{!cancel}" value="Cancel" />
+				<apex:actionStatus id="ContinueStatus" rendered="{!NOT(isDisabled)}">
+					<apex:facet name="stop">
+						<apex:commandButton status="ContinueStatus" title="Continue" action="{!processLead}" value="Continue" reRender="frm"/>
+					</apex:facet>
+					<apex:facet name="start">
+						<apex:commandButton status="ContinueStatus" title="Continue" value="Continue" disabled="true" />
+					</apex:facet>
+				</apex:actionStatus>
+			</apex:pageBlockButtons>
+
+			<apex:pageBlockSection title="Send to Sales Options" collapsible="false" rendered="{!NOT(isDisabled)}">
+				<apex:selectRadio layout="pageDirection" value="{!isRouteLead}" onclick="toggleChangeOwner();return true">
+					<apex:selectOption itemValue="true" itemLabel="Route lead using assignment rules" />
+					<apex:selectOption itemValue="false" itemLabel="Change lead owner" />
+				</apex:selectRadio>
+			</apex:pageBlockSection>
+
+			<apex:pageBlockSection id="secChangeOwner" columns="1" rendered="{!NOT(OR(isDisabled,isRouteLead))}" title="Change Lead Owner" collapsible="false">
+				<apex:inputField value="{!lead.ownerId}" required="false" />
+				<apex:pageBlockSectionItem >
+					<apex:outputPanel >
+						<apex:inputCheckbox value="{!sendNotification}" />
+						Send Notification Email
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem> 
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

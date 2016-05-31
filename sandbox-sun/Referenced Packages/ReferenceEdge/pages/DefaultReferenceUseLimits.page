@@ -1,0 +1,77 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Custom_Settings__c" extensions="refedge.ChangeAllNLNRequestsController" tabStyle="refedge__Custom_Settings__c" sidebar="false" id="pageId">
+    <apex:outputPanel id="JSPanelId">
+        <script>
+            function showAlert(){
+                var isUpdateAccount = false;
+                var isUpdateContact = false;
+                var msg = '{!$Label.Update_Existing_Account_Contacts}';
+                if(document.getElementById('pageId:formId:pbId:pbsAccountId:accountId').value != {!cs.refedge__RUL_Period__c}){
+                    var result = window.confirm(msg.replace('@@@','{!$Label.Accounts}'));
+                    if(result){
+                        isUpdateAccount = true;
+                    }
+                    else{
+                        isUpdateAccount = false;
+                    }
+                }
+                if(document.getElementById('pageId:formId:pbId:pbsContactId:contactId').value != {!cs.refedge__RUL_Period_Contact__c}){
+                    result = window.confirm(msg.replace('@@@','{!$Label.Contacts}'));
+                    if(result){
+                        isUpdateContact = true;
+                    }
+                    else{
+                        isUpdateContact = false;
+                    }
+                }
+                save(isUpdateAccount,isUpdateContact);
+            }
+            
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessages id="msgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction action="{!saveChanges}" name="save" reRender="formId,JSPanelId,msgId">
+            <apex:param value="" name="updateaccount" assignTo="{!updateAllAccount}"/>
+            <apex:param value="" name="updatecontact" assignTo="{!updateAllContact}"/>
+        </apex:actionFunction>
+        <apex:pageBlock mode="{!IF(isEdit,'edit','maindetail')}" id="pbId">
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="{!$Label.Edit}" action="{!edit}" reRender="formId" rendered="{!!isEdit}"/>
+                <apex:commandButton value="{!$Label.Save}" onclick="showAlert();return false;" rendered="{!isEdit}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancel}" reRender="formId,JSPanelId,msgId" rendered="{!isEdit}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection id="pbsAccountId" title="{!SUBSTITUTE($Label.DefaultReferenceUseLimits,'@@@',$Label.Accounts)}">
+                <apex:inputField value="{!cs.refedge__RUL_Activities__c}" rendered="{!isEdit}"/>
+                <apex:inputField id="accountId" value="{!cs.refedge__RUL_Period__c}" rendered="{!isEdit}"/>
+                <apex:outputField value="{!cs.refedge__RUL_Activities__c}" rendered="{!!isEdit}"/>
+                <apex:outputField value="{!cs.refedge__RUL_Period__c}" rendered="{!!isEdit}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="pbsContactId" title="{!SUBSTITUTE($Label.DefaultReferenceUseLimits,'@@@',$Label.Contacts)}">
+                <apex:inputField value="{!cs.refedge__RUL_Activities_Contact__c}" rendered="{!isEdit}"/>
+                <apex:inputField id="contactId" value="{!cs.refedge__RUL_Period_Contact__c}" rendered="{!isEdit}"/>
+                <apex:outputField value="{!cs.refedge__RUL_Activities_Contact__c}" rendered="{!!isEdit}"/>
+                <apex:outputField value="{!cs.refedge__RUL_Period_Contact__c}" rendered="{!!isEdit}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

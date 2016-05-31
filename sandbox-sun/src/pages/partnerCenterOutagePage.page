@@ -1,0 +1,559 @@
+<apex:page cache="false" sidebar="false" showHeader="false">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Red Hat Partnership Application</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if IE 9]>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css" rel="stylesheet')}" />
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+  </head>
+  <body>
+  <div class="red-hat-content">
+    <section class="container">
+        <div class="row">
+            <header class="site-down-header col-xs-12">
+                <h1 class="english-header"><i class="fa fa-exclamation-circle"></i> RED HAT CONNECT FOR BUSINESS PARTNERS CURRENTLY NOT AVAILABLE</h1>
+                <h1 class="deutsch-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> Unser Partnerportal Red Hat Connect für Geschäftspartner ist aktuell nicht verfügbar.</h1>
+                <h1 class="japanese-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> パートナーポータル — Red Hat Connect for Business Partners — は現在ご利用いただけません。</h1>
+                <h1 class="portuguese-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> No momento, o portal Red Hat Connect for Business Partners está indisponível.</h1>
+                <h1 class="chinese-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> 我们的合作伙伴门户“红帽业务合作伙伴联系”当前不可用。</h1>
+                <h1 class="french-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> Notre portail des partenaires, Red Hat Connect pour les partenaires commerciaux, est actuellement indisponible.</h1>
+                <h1 class="italian-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> l nostro portale Red Hat Connect for Business Partners non è al momento disponibile.</h1>
+                <h1 class="korean-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> Red Hat Connect for Business Partners 파트너 포털을 현재 사용할 수 없습니다.</h1>
+                <h1 class="spanish-header" style="display:none;"><i class="fa fa-exclamation-circle"></i> Nuestro portal de partners, Red Hat Connect no se encuentra disponible en este momento.</h1>
+            </header>
+        </div>
+        <section class="warning-message-wrapper">
+            <div class="row">
+                <section class="language-select col-xs-4">
+                    <h2>Select your language</h2>
+                    <ul class="col-xs-6">
+                        <li><a href="#en" class="language-link active" lang="en" hreflang="en">English</a></li>
+                        <li><a href="#de" class="language-link" lang="de" hreflang="de">Deutsch</a></li>
+                        <li><a href="#ja" class="language-link" lang="ja" hreflang="ja">日本語</a></li>
+                        <li><a href="#pt-br" class="language-link" lang="pt-br" hreflang="pt-br">Português</a></li>
+                        <li><a href="#zh" class="language-link" lang="zh" hreflang="zh">简体中文</a></li>
+                    </ul>
+                    <ul class="col-xs-6 right-side">
+                        <li><a href="#fr" class="language-link" lang="fr" hreflang="fr">Français</a></li>
+                        <li><a href="#it" class="language-link" lang="it" hreflang="it">Italiano</a></li>
+                        <li><a href="#ko" class="language-link" lang="ko" hreflang="ko">한국어</a></li>
+                        <li><a href="#es" class="language-link" lang="es" hreflang="es">Español</a></li>
+                    </ul>
+                </section>
+                <section class="warning-message col-xs-8">
+                    <div class="english-message">
+                        <p>We&#39;re sorry we can&#39;t provide  what you need at this moment. Red Hat Connect for Business Partners, our partner portal, is undergoing a scheduled maintenance and all services are temporarily unavailable until <em>approximately 2:00 AM EDT on 7 April, 2015</em>.</p>
+                        <p class="region">The affected services include:</p>
+                        <ul>
+                            <li>All partner business tools like deal registration, business planning and Market Development Funds (MDF)</li>
+                            <li>OPEN training</li>
+                            <li>Access to Partner Locator, including updates to your profile on Partner Locator</li>
+                            <li>Applying for Red Hat partnership and joining existing partner accounts</li>
+                        </ul>
+                        <p>We apologize  for any inconvenience  and  encourage you to reach out to your regional partner help-desk  with any questions or items with which you may need assistance during this outage.</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>Email:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>Email (Japan):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>Email:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>Phone:</span> Toll-free 00800 7334 2888 (English, German, French, Italian, Spanish)</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>Email:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>Email:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">Thank you for your patience and understanding!</p>
+                        <p>The Red Hat Partner Team</p>
+                    </div>
+                    <div class="deutsch-message">
+                        <p>Leider können wir Ihnen daher zurzeit nicht die üblichen Services anbieten. An unserem Partnerportal werden planmäßige Wartungsarbeiten vorgenommen. Es steht aber voraussichtlich ab 7. April 2015, 2 Uhr EDT (7 Uhr MEZ) <em>voraussichtlich ab 7. April 2015, 2 Uhr EDT (7 Uhr MEZ)</em> wieder zur Verfügung..</p>
+                        <p class="region">TFolgende Services sind u. a. von den Wartungsarbeiten betroffen:</p>
+                        <ul>
+                            <li>Geschäftstools für Partner, darunter die Registrierung von Geschäftsabschlüssen, Geschäftsplanungsfunktionen und Werbekostenzuschüsse</li>
+                            <li>OPEN Training</li>
+                            <li>Partner-Finder, inklusive Profilupdates</li>
+                            <li>Red Hat Partnerschaftsbewerbung, einschließlich Beitritt zu einem bestehenden Partnerkonto</li>
+                        </ul>
+                        <p>Wir bitten, etwaige Unannehmlichkeiten zu entschuldigen. Wenden Sie sich bei Fragen oder bei Hilfsbedarf bitte in der Zwischenzeit an Ihren regionalen Partner Helpdesk. Wir helfen Ihnen gerne weiter.</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>E-Mail:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>E-Mail (Japan):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>E-Mail:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>Telefon (kostenfrei):</span> 00800 7334 2888 (Englisch, Deutsch, Französisch, Italienisch, Spanisch)</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>E-Mail:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>E-Mail:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">Vielen Dank für Ihre Geduld.</p>
+                        <p>Das Red Hat Partner Team</p>
+                    </div>
+                    <div class="japanese-message">
+                        <p>お客様のご要望にお応えすることができず、誠に申し訳ございません。パートナーポータルは定期保守作業中で、2015 年 4 月 7 日 米国東部夏時間 AM 2:00 頃 に復旧を予定しております。</p>
+                        <p class="region">ご利用いただけないサービス内容:</p>
+                        <ul>
+                            <li>契約登録、ビジネス開発、マーケットデベロップメントファンドなどのパートナービジネスツール</li>
+                            <li>OPEN トレーニング</li>
+                            <li>パートナーロケーター (プロファイル更新を含む)</li>
+                            <li>既存パートナー様のアカウントの追加を含む Red Hat パートナーアプリケーション</li>
+                        </ul>
+                        <p>ご不便をおかけしましたことをお詫び申し上げます。保守期間中にサポートが必要な場合やご質問がある場合は、地域のパートナーヘルプデスクまでお気軽にお問い合わせください。</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>E メール:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>E メール (日本):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>E メール:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>フリーダイヤル:</span>  00 800 7334 2888 (英語、ドイツ語、フランス語、イタリア語、スペイン語)</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>E メール:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>E メール:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">ご協力とご理解をお願いいたします。</p>
+                        <p>Red Hat パートナーチーム</p>
+                    </div>
+                    <div class="portuguese-message">
+                        <p>No momento, não podemos fornecer o que você precisa. Nosso portal de parceiros está passando por manutenção e estará disponível novamente em<em>7 de abril de 2015 aproximadamente às 2 h (EDT)</em>.</p>
+                        <p class="region">Os serviços afetados incluem:</p>
+                        <ul>
+                            <li>Ferramentas para parceiros, tais como: registro de oportunidades, planos de negócios e marketing funds</li>
+                            <li>Treinamento OPEN</li>
+                            <li>Localizador de parceiros, incluindo atualizações para seu perfil</li>
+                            <li>Aplicativo de parceria Red Hat, inclui a possibilidade de entrar para uma conta parceira existente</li>
+                        </ul>
+                        <p>Desculpe-nos pelo transtorno. Enquanto isso, em caso de dúvidas ou assistência, entre em contato com o atendimento ao parceiro da sua região. Será um prazer ajudar.</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>E-mail (Japão):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">Europa, Oriente Médio e África:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>Telefone (ligação gratuita):</span> 00 800 7334 2888 (inglês, alemão, francês, italiano, espanhol)</li>
+                        </ul>
+                        <p class="region">América Latina:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">Agradecemos sua paciência,</p>
+                        <p>Equipe de parceiros da Red Hat.</p>
+                    </div>
+                    <div class="chinese-message">
+                        <p>很抱歉目前无法为您提供需要的服务。我们的合作伙伴门户正在执行计划维修，预计将于美国东部时间 2015 年 4 月 7 日凌晨 2 点左右恢复运行。</p>
+                        <p class="region">受到影响的服务有： </p>
+                        <ul>
+                            <li>合作伙伴业务工具，例如交易注册、业务规划以及市场开发资金</li>
+                            <li>开放 training</li>
+                            <li>Partner 查找器，包括 profile</li>
+                            <li>Red Hat 合作伙伴关系应用程序的更新，以及加入现有的合作伙伴帐户</li>
+                        </ul>
+                        <p>我们对于造成的不便深表歉意。在此期间，如果您需要帮助或是有任何疑问，请联系当地的合作伙伴帮助台。我们将很乐于提供帮助。</p>
+                        <p class="region">亚太地区:</p>
+                        <ul>
+                            <li><span>电子邮件:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>电子邮件（日本）:</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>电子邮件:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>电话（免费）:</span> 00 800 7334 2888（英语、德语、法语、意大利、西班牙）</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>电子邮件:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>电子邮件:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">感谢您的耐心，</p>
+                        <p>红帽合作伙伴团队</p>
+                    </div>
+                    <div class="french-message">
+                        <p>Nous sommes désolés de ne pas être en mesure de vous fournir ce dont vous avez besoin en ce moment. Notre portail des partenaires est en maintenance et sera à nouveau disponible le <em>7 avril 2015, à 14:00 (heure de l&#39;Est) environ</em>.</p>
+                        <p class="region">Voici la liste des services touchés:</p>
+                        <ul>
+                            <li>Les outils commerciaux pour les partenaires, notamment l&#39;enregistrement des contrats, la planification commerciale et le fonds de développement des marchés.</li>
+                            <li>Les formations OPEN</li>
+                            <li>Partner Locator, y compris les mises à jour de votre profile</li>
+                            <li>Les applications du partenariat Red Hat, notamment la fonction permettant de rejoindre le compte existant d&#39;un partenaire.</li>
+                        </ul>
+                        <p>Nous vous prions de nous excuser pour la gêne occasionnée. En attendant, veuillez vous adresser au service régional d&#39;assistance dédié aux partenaires si vous avez besoin d&#39;aide ou si vous avez des questions. Nous serons ravis de vous aider.</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>Adresse électronique:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>Adresse électronique (Japon):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>Adresse électronique:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>Tél. (appel gratuit):</span> 00 800 7334 2888 (anglais, allemand, français, italien, espagnol)</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>Adresse électronique:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>EmaAdresse électroniqueil:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">Merci pour votre patience.</p>
+                        <p>L&#39;équipe des partenaires Red Hat</p>
+                    </div>
+                    <div class="italian-message">
+                        <p>Siamo spiacenti, al momento non possiamo fornire il servizio richiesto. Stiamo eseguendo una manutenzione pianificata al nostro portale dei partner. Il servizio sarà nuovamente disponibile il <em>7 aprile 2015 alle 2 circa ora legale Stati Uniti orientali.</em>.</p>
+                        <p class="region">I servizi interessati comprendono:</p>
+                        <ul>
+                            <li>Gli strumenti aziendali dei partner quali registrazione delle transazioni, business plan e MDF (Market Development Funds)</li>
+                            <li>Corsi di formazione OPEN </li>
+                            <li>Strumento di individuazione di partner, inclusi aggiornamenti del profilo. </li>
+                            <li>Richiesta di partnership Red Hat, incluso l'accesso all'account partner esistente.</li>
+                        </ul>
+                        <p>Ci scusiamo per il disagio. Nel frattempo, contatta l&#39;help desk partner di zona se hai domande o hai bisogno di assistenza. Siamo lieti di aiutarti.</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>E-mail (Giappone):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>Telefono (numero verde):</span> 00 800 7334 2888 (inglese, tedesco, francese, italiano, spagnolo)</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>E-mail:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">Grazie per la pazienza,</p>
+                        <p>Il team di Red Hat Partner</p>
+                    </div>
+                    <div class="korean-message">
+                        <p>현재 필요하신 서비스를 제공해드릴 수 없는 데 진심으로 사과 드립니다. 파트너 포털은 정기 유지 관리 중이며 EDT(미국 동부 서머 타임) 기준 2015년 4월 7일 새벽 2시경 완료될 예정입니다.</p>
+                        <p class="region">사용할 수 없는 서비스는 다음과 같습니다. </p>
+                        <ul>
+                            <li>거래 등록, 비즈니스 계획, 시장 개발 자금과 같은 파트너 비즈니스 툴</li>
+                            <li>OPEN 교육</li>
+                            <li>파트너 검색(사용자 프로필 업데이트 포함)</li>
+                            <li>Red Hat 파트너십 가입 신청(기존 파트너 계정 가입 포함)</li>
+                        </ul>
+                        <p>불편을 드려 죄송합니다. 유지 관리 기간 동안 도움이 필요하거나 질문이 있는 경우 지역별 파트너 헬프 데스크에 문의하십시오. 언제든지 도와드리겠습니다.</p>
+                        <p class="region">아시아, 태평양:</p>
+                        <ul>
+                            <li><span>이메일:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>이메일(일본):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">유럽, 중동 및 아프리카:</p>
+                        <ul>
+                            <li><span>이메일:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>전화 번호(수신자 부담):</span> 00 800 7334 2888(영어, 독일어, 프랑스어, 이탈리아어, 스페인어)</li>
+                        </ul>
+                        <p class="region">라틴 아메리카:</p>
+                        <ul>
+                            <li><span>이메일:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">북미:</p>
+                        <ul>
+                            <li><span>이메일:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">기다려 주셔서 감사합니다.</p>
+                        <p>Red Hat 파트너 팀</p>
+                    </div>
+                    <div class="spanish-message" style="display:none;">
+                        <p>Sentimos mucho no poder ofrecerle lo que necesita en este momento. Se están realizando tareas de mantenimiento programadas en el portal de partners, que volverá a funcionar con normalidad<em> en torno a las 2:00 a.m. (HVE) del 7 de abril de 2015.</em>.</p>
+                        <p class="region">Los servicios que se verán afectados son: </p>
+                        <ul>
+                            <li>Herramientas como deal registration, manejo de oportunidades y planes de negocios.</li>
+                            <li>Capacitación OPEN. </li>
+                            <li>Localizador de partners, incluida la actualización de perfiles. </li>
+                            <li>Solicitud para convertirse en partner de Red Hat, incluida la posibilidad de unirse a una cuenta de partner existente.</li>
+                        </ul>
+                        <p>Rogamos disculpas por las molestias. Mientras tanto, contacte con el centro de ayuda para partners regional si necesita ayuda o tiene alguna pregunta. Estaremos encantados de ayudarle.</p>
+                        <p class="region">APAC:</p>
+                        <ul>
+                            <li><span>Correo electrónico:</span> <a href="mailto:apac-partner-helpdesk@redhat.com">apac-partner-helpdesk@redhat.com</a></li>
+                            <li><span>Email (Japón):</span> <a href="mailto:partnercenter-jp@redhat.com">partnercenter-jp@redhat.com</a></li>
+                        </ul>
+                        <p class="region">EMEA:</p>
+                        <ul>
+                            <li><span>Correo electrónico:</span> <a href="mailto:emea-partner-team@redhat.com">emea-partner-team@redhat.com</a></li>
+                            <li><span>Teléfono (número gratuito):</span> 00 800 7334 2888 (alemán, español, francés, inglés e italiano)</li>
+                        </ul>
+                        <p class="region">LATAM:</p>
+                        <ul>
+                            <li><span>Correo electrónico:</span> <a href="mailto:latam-partner-helpdesk@redhat.com">latam-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="region">NA:</p>
+                        <ul>
+                            <li><span>Correo electrónico:</span> <a href="mailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></li>
+                        </ul>
+                        <p class="thank-you">Gracias por su paciencia.</p>
+                        <p>El equipo de partners de Red Hat</p>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </section>
+  </div>
+  <script type="text/javascript">
+
+        //var $j = jQuery.noConflict();
+        $(document).ready(function(){
+            $('.language-select a').click(function(){
+                $('.language-select a').removeClass('active');
+                $(this).addClass('active');
+                $('.warning-message').children().hide();
+                $('.site-down-header').children().hide();
+
+                if($(this).attr('lang') == 'en' ) {
+                    $('.english-header').fadeIn();
+                    $('.english-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'de'){
+                    $('.deutsch-header').fadeIn();
+                    $('.deutsch-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'ja'){
+                    $('.japanese-header').fadeIn();
+                    $('.japanese-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'pt-br'){
+                    $('.portuguese-header').fadeIn();
+                    $('.portuguese-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'zh'){
+                    $('.chinese-header').fadeIn();
+                    $('.chinese-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'fr'){
+                    $('.french-header').fadeIn();
+                    $('.french-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'it'){
+                    $('.italian-header').fadeIn();
+                    $('.italian-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'ko'){
+                    $('.korean-header').fadeIn();
+                    $('.korean-message').fadeIn();
+                }
+                else if($(this).attr('lang') == 'es'){
+                    $('.spanish-header').fadeIn();
+                    $('.spanish-message').fadeIn();
+                }
+            });
+        });
+
+    </script>
+
+    <style>
+    body{
+        background-color: #efefef;
+    }
+    .red-hat-content h1 {
+        font-size: 42px;
+        margin-bottom: 0 !important;
+    }
+    .container{
+        min-width: 1170px;
+    }
+    .bodyDiv {
+        background-color: #efefef;
+    }
+    .site-down-header{
+        text-align: center;
+    }
+    .site-down-header h1{
+        margin-top: 15px;
+        color: #c00 !important;
+        font-weight: bold;
+        font-family: "Overpass";
+    }
+    .warning-message-wrapper{
+        background-color: #fff;
+        margin: 10px 0 30px 0;
+        padding: 15px;
+    }
+    .warning-message li span{
+        font-weight: 500;
+        color: #000;
+        font-family: 'Overpass';
+    }
+    .region{
+        font-weight:  bold;
+        font-family: 'Overpass';
+        margin-top: 10px !important;
+    }
+    p, li, a{
+        font-size: 16px;
+    }
+    a{
+        color: rgb(8, 192, 252);
+    }
+    a:hover{
+        color: rgb(8, 192, 252) !important;
+    }
+    .red-hat-content .region a:hover{
+        text-decoration: underline !important;
+    }
+    h1, h2, h3, h4, h5, h6{
+        color: #cc0000;
+        font-family: 'Overpass Bold';
+    }
+    .language-select h2{
+          margin: 0 0 18px;
+          margin: 0 0 1.8rem;
+          color: #646464;
+          font-size: 26px;
+          font-size: 2.6rem;
+    }
+    .language-select ul{
+        padding: 0;
+    }
+    .language-select li{
+        list-style: none;
+        margin-bottom: 5px;
+    }
+    .language-select a{
+        text-decoration: none;
+        font-size: 16px;
+        font-size: 1.6rem;
+        color: rgb(76, 76, 76);
+    }
+    .language-select a:hover{
+        color: rgb(8, 192, 252);
+        text-decoration: none;
+    }
+    .language-select a.active{
+        color: rgb(8, 192, 252);
+        text-decoration: none;
+    }
+    .btn{
+        background-color: #c00;
+        border-radius: 0px;
+        color: #fff;
+        display: inline-block;
+        border: 0;
+        font-size: 16px;
+        font-size: 1.6rem;
+        padding: 9px 40px;
+        padding: .9rem 4rem;
+        font-weight: bold;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+    .btn:hover{
+        background-color: #b00;
+        color: #fff;
+    }
+    .ease{
+        -webkit-transition: all 0.3s ease-in-out;
+        -moz-transition: all 0.3s ease-in-out;
+        -o-transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
+    }
+    .language-select{
+        padding: 10px 40px;
+    }
+    .language-select li{
+        font-family: 'Overpass';
+    }
+    .language-select .right-side{
+        padding-left: 40px;
+    }
+    .deutsch-header, .japanese-header, .portuguese-header, .chinese-header, .french-header, .italian-header, .korean-header, .spanish-header{
+        display: none;
+    }
+    .warning-message{
+        border-left: 1px solid #ccc;
+        padding: 10px 40px;
+    }
+    .warning-message em{
+        font-style: normal;
+        font-weight: bold;
+        font-family: 'Overpass';
+    }
+    .warning-message h2{
+        margin-top: 0;
+    }
+    .deutsch-message, .japanese-message, .portuguese-message, .chinese-message, .french-message, .italian-message, .korean-message, .spanish-message{
+        display: none;
+    }
+    .thank-you{
+        margin-top: 30px;
+        font-size: 1.4em;
+    }
+    .bodyDiv .outerNoSidebar{
+        padding: 0px;
+    }
+    .bPageFooter{
+        display: none;
+    }
+    body.sfdcBody{
+        background-color: #EFEFEF !important;
+    }
+    .bodyDiv{
+        box-shadow: none;
+    }
+    </style>
+  </body>
+</apex:page>

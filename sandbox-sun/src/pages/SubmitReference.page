@@ -1,0 +1,10 @@
+<apex:page standardController="Customer_Reference__c" extensions="CRApprovalExtension" action="{!submitForApproval}">
+    <apex:variable var="crName" value="{!Customer_Reference__c.Name}" />
+    <apex:variable var="crStatus1" value="{!Customer_Reference__c.Approval_Status__c}" />
+
+    <apex:form >
+        <apex:pageMessages />
+        <br/>&nbsp;<apex:commandButton value="Back" action="{!cancel}" />
+        &nbsp;<apex:commandButton value="Add Products" action="{!addProducts}" rendered="{!crStatus1 == 'Draft'}" /> 
+    </apex:form>
+</apex:page>

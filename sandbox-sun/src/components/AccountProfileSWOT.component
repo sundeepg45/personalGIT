@@ -1,0 +1,130 @@
+<apex:component controller="AccountProfileSWOTController">
+	<apex:attribute name="profileId" description="This is the Account Profile Id for displaying Acccount Profile SWOT" type="Id" required="false" assignTo="{!accountProfileId}"/>
+	<apex:attribute name="swots" description="This is the list of account profile SWOT objects" type="Account_Profile_SWOT__c[]" required="false" assignTo="{!accountProfileSWOTs}"/>
+	<apex:attribute name="showHelp" description="If true show the help text." type="Boolean" required="false" default="false" />
+	<apex:attribute name="showTableHeader" description="If true the table header will be shown" type="Boolean" required="false" default="true" />
+	<apex:attribute name="renderAsPDF" description="Set true when the containing page is being rendered as PDF." type="Boolean" required="false" default="false" />
+	<apex:outputPanel layout="none" rendered="{!NOT(renderAsPDF)}">
+		<table style="border-spacing:2px 2px 2px 2px;padding:2px 2px 2px 2px;width:100%;">
+			<apex:outputPanel layout="none" rendered="{!showTableHeader}">
+				<tr>
+					<apex:outputPanel layout="none" rendered="{!showHelp}">
+						<th style="width:20%;" />
+					</apex:outputPanel>
+					<th colspan="2" style="background-color:#B0E0E6;border-style:solid;border-width:thin;width:60%;font-weight:bold;text-align:center;">
+						<apex:outputText value="{!$Label.AccountProfile_SWOT_Analysis}" />
+					</th>
+					<apex:outputPanel layout="none" rendered="{!showHelp}">
+						<th style="width:20%;" />
+					</apex:outputPanel>
+				</tr>
+			</apex:outputPanel>
+			<tr>
+				<apex:outputPanel layout="none" rendered="{!showHelp}">
+					<td style="background-color:#E0F8FC;vertical-align:top;width:20%;">
+						<apex:outputText value="{!$Label.AccountProfile_SWOT_RedHatStrengthsHelp}"/>
+					</td>
+				</apex:outputPanel>
+				<td style="vertical-align:top;border-style:solid;border-width:thin;width:20%;">
+					<div style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_RedHatStrengths}" /></div>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!strengths}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</td>
+				<td style="vertical-align:top;border-style:solid;border-width:thin;width:30%">
+					<div style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_RedHatWeaknesses}" /></div>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!weaknesses}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</td>
+				<apex:outputPanel layout="none" rendered="{!showHelp}">
+					<td style="background-color:#E0F8FC;vertical-align:top;width:%20;">
+						<apex:outputText value="{!$Label.AccountProfile_SWOT_RedHatWeaknessesHelp}"/>
+					</td>
+				</apex:outputPanel>
+			</tr>
+			<tr>
+				<apex:outputPanel layout="none" rendered="{!showHelp}">
+					<td style="background-color:#E0F8FC;vertical-align:top;width:20%;">
+						<apex:outputText value="{!$Label.AccountProfile_SWOT_AccountOpportunitiesHelp}"/>
+					</td>
+				</apex:outputPanel>
+				<td style="vertical-align:top;border-style:solid;border-width:thin;width:30%;">
+					<div style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_AccountOpportunities}" /></div>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!opportunities}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</td>
+				<td style="vertical-align:top;border-style:solid;border-width:thin;width=30%;">
+					<div style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_AccountThreats}" /></div>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!threats}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</td>
+				<apex:outputPanel layout="none" rendered="{!showHelp}">
+					<td style="background-color:#E0F8FC;vertical-align:top;width:20%;">
+						<apex:outputText value="{!$Label.AccountProfile_SWOT_AccountThreatsHelp}"/>
+					</td>
+				</apex:outputPanel>
+			</tr>
+		</table>
+	</apex:outputPanel>
+	<!-- The following is for PDF rendering.  We need to use a css style table. -->
+	<apex:outputPanel layout="block" style="margin:0px 0px 0px 0px;padding:0px 0px 0px 0px;border-spacing:0px 0px 0px 0px;width:100%;height:100%;" rendered="{!renderAsPDF}">
+		<apex:outputPanel layout="block" style="border-spacing:0px 0px 0px 0px;padding:0px 0px 0px 0px;width:100%;display:table;" rendered="{!showTableHeader}">
+			<apex:outputPanel layout="block" style="display:table-row;">
+				<apex:outputPanel layout="block" style="vertical-align:top;border-style:none;border-width:none;width:100%;display:table-cell;">
+					<apex:outputPanel layout="block" style="background-color:#B0E0E6;font-weight:bold;text-align:center;vertical-align:top;border-style:solid;border-width:thin;margin:0px 0px 1px 0px;">
+						<apex:outputText value="{!$Label.AccountProfile_SWOT_Analysis}" />
+					</apex:outputPanel>
+				</apex:outputPanel>
+			</apex:outputPanel>
+		</apex:outputPanel>
+		<apex:outputPanel layout="block" style="border-spacing:0px 0px 0px 0px;padding:0px 0px 0px 0px;width:100%;display:table;">
+			<apex:outputPanel layout="block" style="display:table-row;">
+				<apex:outputPanel layout="block" style="vertical-align:top;border-style:solid;border-width:thin;border-spacing:1px 1px 1px 1px;width:50%;display:table-cell;">
+					<apex:outputPanel style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_RedHatStrengths}" /></apex:outputPanel>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!strengths}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</apex:outputPanel>
+				<apex:outputPanel layout="block" style="vertical-align:top;border-style:solid;border-width:thin;border-spacing:1px 1px 1px 1px;width:50%;display:table-cell;">
+					<apex:outputPanel style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_RedHatWeaknesses}" /></apex:outputPanel>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!weaknesses}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</apex:outputPanel>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="display:table-row;">
+				<apex:outputPanel layout="block" style="vertical-align:top;border-style:solid;border-width:thin;border-spacing:1px 1px 1px 1px;width:50%;display:table-cell;">
+					<apex:outputPanel style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_AccountOpportunities}" /></apex:outputPanel>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!opportunities}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</apex:outputPanel>
+				<apex:outputPanel layout="block" style="vertical-align:top;border-style:solid;border-width:thin;border-spacing:1px 1px 1px 1px;width:50%;display:table-cell;">
+					<apex:outputPanel style="font-weight:bold;text-align:center;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;width:100%;margin:0px 0px 0px 0px;"><apex:outputText value="{!$Label.AccountProfile_SWOT_AccountThreats}" /></apex:outputPanel>
+					<ul class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;width:100%;">
+						<apex:repeat value="{!threats}" var="swot">
+							<li style="margin:2px 2px 2px 2ex;padding:0px 0px 0px 0px;text-align:left;"><apex:outputText value="{!swot.Statement__c}"/></li>
+						</apex:repeat>
+					</ul>
+				</apex:outputPanel>
+			</apex:outputPanel>
+		</apex:outputPanel>
+	</apex:outputPanel>
+</apex:component>

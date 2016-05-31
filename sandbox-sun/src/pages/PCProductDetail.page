@@ -1,0 +1,253 @@
+<apex:page controller="PCController" action="{!loadDetails}"
+    showHeader="false" standardStylesheets="false" sidebar="false"
+    cache="true">
+
+    <apex:stylesheet value="http://www.redhat.com/assets/global.css"/>
+    <apex:stylesheet value="http://www.redhat.com/assets/ugc.css"/>
+    <apex:stylesheet value="{!$Resource.Finder_Catalog_CSS}" />
+
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+    <apex:includeScript value="{!$Resource.jqueryFancybox134js}" />
+    <apex:include pageName="Requalification_Fancybox_Widget_CSS"/>
+
+    <script type="text/javascript">
+        $.noConflict();         
+        jQuery(document).ready(function() {
+            jQuery("a.screenshot").fancybox();
+        });
+    </script>
+    <div id="container">
+        <div id="shell-top-simple">
+            <div class="wrap">
+                <div id="header">
+                    <div id="logo">
+                            <h1 class="hide">Red Hat</h1>
+                            <a id="rh-logo" href="{!$Label.Red_Hat_Domain_Name}" title="Red Hat">
+                                <img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" />
+                            </a>
+                    </div><!-- end logo -->
+					<div id="login-pre">
+		                <a href="{!$Label.Red_Hat_Domain_Name}/wapps/sso">{!$Label.Onboarding_Header_Log_In}</a>
+		            </div>
+                    <div id="masthead-simple">
+                        <div class="second-nav-rh" id="secondary-nav">
+                            <div id="search-wrap">
+                            </div>
+                        </div><!-- /secondary-nav -->
+                    </div>
+                </div>
+                <div id="content">
+                    <div id="content-full" style="background: none;">
+			            
+			            
+			            <div class="contentIndent clearWrap">
+			                <h1 id="plBetaTitle">{!$Label.PC_detail_Section_Productcatalog}</h1>
+			                <apex:form >
+			                    <div class="locationCrumbs">
+			                        <a href="/catalog/" class="jumpBack" id="breadcrumbsHome">{!$Label.PC_detail_Section_Productcatalog} </a> &gt;
+			                        <a onClick="history.go(-1); return false;" id="breadcrumbsResults" href="#">{!$Label.PC_detail_section_results}</a> &gt;
+			                        <strong><span id="productDetailsPageTitle">{!$Label.PartnerProduct_Product_Details}</span></strong>
+			                    </div>
+			                </apex:form>
+			            </div>
+			    	
+			    		<apex:outputText rendered="{! NOT(ISNULL(product)) }">
+			    
+			                <div id="productDetails">
+			                    <div class="corner_topleft"></div>
+			                    <div class="corner_topright"></div>
+			                    <div class="corner_bottomleft"></div>
+			                    <div class="corner_bottomright"></div>
+			                    <div class="clearWrap" id="productDetailsInner">
+			                        <div id="firstSection">
+			                            <div class="clearWrap" id="partnerTop">
+			                                <div class="detailsLogo" style="float:right;" id="partnerLogo{!product.productId}">
+			                                    <apex:image width="150" rendered="{!NOT(ISNULL(product.logoId))}" value="{!URLFOR($Action.Attachment.Download, product.logoId)}"/>
+			                                </div>
+			                                <div id="productHead">
+			                                    <h2 id="productName">{!product.Name}</h2>
+			                                    <h3 id="partnerName"><a id="partnerDetailsLink" target="_blank" href="/finder/PFPartnerDetail?id={!product.partnerId}">{!product.partnerName}</a></h3>
+			                                </div>                              
+			                                <div id="website">
+		                                        <br/>
+			                                    <apex:outputPanel rendered="{!NOT(ISNULL(product.website))}">
+			                                        <a id="websiteLink" href="{!product.website}" target="_blank" >{!$Label.PartnerProduct_Website}</a>
+			                                    </apex:outputPanel>
+			                                </div>
+			                                <div id="additionalLink">
+			                                    <apex:outputPanel rendered="{!NOT(ISNULL(product.moreInfoLink)) && NOT(ISNULL(product.moreInfoLinkText))}">
+			                                        <a id="websiteExtraLink" href="{!product.moreInfoLink}" target="_blank" >{!product.moreInfoLinkText}</a>
+			                                    </apex:outputPanel>
+			                                    <apex:outputPanel rendered="{!NOT(ISNULL(product.moreInfoLink)) && ISNULL(product.moreInfoLinkText)}">
+			                                        <a id="websiteExtraLink" href="{!product.moreInfoLink}" target="_blank" >{!$Label.PartnerProduct_Additional_Website}</a>
+			                                    </apex:outputPanel>
+			                                </div>
+			                            </div>
+			                        </div>
+			                        <!-- ===========================[ section 2 ]=========================== -->
+			                        <div id="secondSection">
+			                            <div id="productDescription"><apex:outputText escape="false" value="{!product.details}" rendered="{!NOT(ISNULL(product.details))}"/></div>
+			                        </div>
+			                        <!-- ===========================[ section 3 ]=========================== -->
+			                        <div id="thirdSection">
+			                            <h3 id="partnerInformationSectionHeader" class="sectionHeading">{!$Label.PartnerProduct_Product_Application}</h3>
+			                            <table class="partnerDetailsList">
+			                                <tbody>
+			                                    <tr>
+			                                    <th><apex:outputLabel value="{!$ObjectType.PartnerProduct__c.fields.Product_Types__c.label}"/> </th>
+			
+			                                       <!--- <th>Application Type</th>--->
+			                                        <td>
+			                                            <span id="productType"><apex:outputText value="{!product.productType}" rendered="{!NOT(ISNULL(product.productType))}"/></span>
+			                                            <span id="productTypeNP"><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!ISNULL(product.productType)}"/></span>
+			                                        </td>
+			                                    </tr>
+			                                    <tr>
+			                                    <th><apex:outputLabel value="{!$ObjectType.PartnerProduct__c.fields.Industry_Focus__c.label}"/> </th>
+			                                  <!---      <th>Industry</th>--->
+			                                        <td>
+			                                            <span id="industryFocus"><apex:outputText value="{!product.industryFocus}" rendered="{!NOT(ISNULL(product.industryFocus))}"/></span>
+			                                            <span id="industryFocusNP"><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!ISNULL(product.industryFocus)}"/></span>
+			                                        </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <th>{!$Label.PC_detail_table_platforms}</th>
+			                                        <td>
+			                                            <apex:repeat value="{!product.platforms}" var="platform" id="platformsSupported" rendered="{!product.platforms.size > 0}">
+			                                                <div>
+			                                                    <apex:outputText id="platform" value="{!platform}"/> <br />
+			                                                </div>
+			                                            </apex:repeat>
+			                                            <span id="PlatformsNP"><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!product.platforms.size == 0}"/></span>
+			                                        </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <th>{!$Label.PC_detail_table_jbossplatforms}</th>
+			                                        <td>
+			                                            <apex:repeat value="{!product.jbossPlatforms}" var="jbplatform" id="jbossPlatforms" rendered="{!product.jbossPlatforms.size > 0}">
+			                                                <div>
+			                                                    <apex:outputText id="jbossPlatform" value="{!jbplatform}"/> <br />
+			                                                </div>
+			                                            </apex:repeat>
+			                                            <span id="jbossPlatformsNP"><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!product.jbossPlatforms.size == 0}"/></span>
+			                                        </td>
+			                                    </tr>
+			                                    <tr>
+			                                        <th>{!$Label.PartnerProduct_Language}</th>
+			                                        <td>
+			                                            <apex:repeat value="{!product.languages}" var="language" id="languages" rendered="{!product.languages.size > 0}">
+			                                                <div>
+			                                                    <apex:outputText id="language" value="{!language}"/> <br />
+			                                                </div>
+			                                            </apex:repeat>
+			                                            <span id="languagesNP"><apex:outputText value="{!$Label.PF_detail_field_notprovided}" rendered="{!product.languages.size == 0}"/></span>
+			                                        </td>
+			                                    </tr>
+			
+			                                </tbody>
+			                            </table>
+			                        </div>
+			                        
+			                        <!-- ===========================[ section 4 ]=========================== -->
+			                        <div id="fourthSection">
+			                            <apex:outputPanel rendered="{!NOT(ISNULL(product.callToAction))}">
+			                                <h3 id="gettingStartedSectionHeader" class="sectionHeading">{!$Label.PC_detail_table_calltoaction}</h3>
+			                                <apex:outputText value="{!product.callToAction}" escape="false"/>
+			                            </apex:outputPanel>
+			                        </div>
+			                        
+			                        <!-- ===========================[ section 5 ]=========================== -->
+			                        <div id="fifthSection">
+			                            <apex:outputPanel rendered="{!NOT(ISNULL(product.successStory))}">
+			                                <h3 id="successStoriesSectionHeader" class="sectionHeading">{!$Label.PC_detail_table_successstories}</h3>
+			                                <apex:outputText value="{!product.successStory}" escape="false"/>
+			                            </apex:outputPanel>
+			                        </div>
+			
+			                        <!-- ===========================[ section 6 ]=========================== -->
+			                        <div id="sixthSection">
+			                            <apex:outputPanel rendered="{!NOT(ISNULL(product.pricingSupport))}">
+			                                <h3 id="successStoriesSectionHeader" class="sectionHeading">{!$Label.PartnerProduct_Pricing_Details}</h3>
+			                                <apex:outputText value="{!product.pricingSupport}" escape="false"/>
+			                            </apex:outputPanel>
+			                        </div>
+			
+			                        <div id="screenshotSection">
+			                            <apex:outputPanel rendered="{!product.screenshotIdList.size > 0}">
+			                                <h3 id="productScreenshotSectionHeader" class="sectionHeading">{!$Label.PF_prod_Table_Screenshot}</h3>
+			                                <apex:repeat value="{!product.screenshotIdList}" var="screenshotId">
+			                                    <div style="display:none">
+			                                        <div id="{!screenshotId}">
+			                                            <img src="{!URLFOR($Action.Attachment.Download,screenshotId)}"/>
+			                                        </div>
+			                                    </div>
+			                                    <a rel="screenshots" class="screenshot" href="#{!screenshotId}">
+			                                        <apex:image id="screenshotImage" height="100" value="{!URLFOR($Action.Attachment.Download,screenshotId)}"/>
+			                                    </a>
+			                                    &nbsp; &nbsp;
+			                                </apex:repeat>
+			                            </apex:outputPanel>
+			                        </div>
+			
+			                    </div>
+			                </div>
+					</apex:outputText>                    
+			   		<apex:outputText rendered="{! ISNULL(product) }">
+			   		<div>
+			   			{! $Label.PF_No_Product_Details}
+			   		</div>
+			   		</apex:outputText>
+			   					
+					</div><!-- end content-full -->
+                </div> <!-- end_content-->
+            </div><!-- end-wrap -->
+        </div><!--end shell-top-simple -->  
+        <div id="shell-bottom-simple">
+            <div class="wrap">
+                    
+                <div id="footer">
+                    <div id="footer-nav">
+                        <ul class="social-icons">
+                            <li><span>Connect:</span></li>
+                            <li><a href="http://www.twitter.com/redhatnews" target="_blank"><img src="http://www.redhat.com/assets/images/social/twitter.png" alt="Twitter"/></a></li>
+                            <li><a href="http://www.facebook.com/redhatinc" target="_blank"><img src="http://www.redhat.com/assets/images/social/facebook.png" alt="Facebook"/></a></li>
+                            <li><a href="http://www.youtube.com/user/RedHatVideos" target="_blank"><img src="http://www.redhat.com/assets/images/social/youtube.png" alt="YouTube"/></a></li>
+                            <li><a href="http://www.linkedin.com/groups?home=&amp;gid=2525539&amp;trk=anet_ug_hm" target="_blank"><img src="http://www.redhat.com/assets/images/social/linkedin.png" alt="LinkedIn"/></a></li>
+                        </ul>
+                        <ul class="footer-nav-list">
+                            <li>{!$Label.Onboarding_Copyright}</li>
+                            <li>|</li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/privacy-policy.html">{!$Label.Onboarding_Privacy_Policy}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/terms-of-use.html">{!$Label.Onboarding_Terms_Of_Use}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/patent-promise.html">{!$Label.Onboarding_Patent_Promise}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/work/">{!$Label.Onboarding_Careers_Link}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/mediarelations/trademark.html">{!$Label.Onboarding_Trademark_guidelines}</a></li>
+                            
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/">{!$Label.Onboarding_About_Red_Hat}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/contact/">{!$Label.Onboarding_Contact_us}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/site-map">{!$Label.Onboarding_Site_map}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/footer/faq.html">{!$Label.Onboarding_FAQs}</a></li>
+                               
+                            <li><a href="{!$Label.Red_Hat_Domain_Name}/about/company/supplier.html">{!$Label.Onboarding_Supplier_requirements}</a></li>
+                        </ul>
+                    </div>  <!-- Legal Nav -->
+                </div><!-- / Footer -->
+            </div>
+        </div><!-- end-shell-bottom-simple -->
+    </div><!--end-container -->
+
+    <style>
+        .labelCol {
+            font-weight:bold;
+        }
+    </style>
+
+</apex:page>

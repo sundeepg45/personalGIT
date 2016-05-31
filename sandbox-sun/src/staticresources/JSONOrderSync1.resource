@@ -1,0 +1,16 @@
+{
+   "Payload":{
+      "SyncRequest":{
+         "KeyValue":"REPLACE_WITH_OPP_NUM",
+         "EntityName":"OAGI",
+         "KeyName":"OPPORTUNITY_NUMBER"
+      }
+   },
+   "Header":{
+      "Operation":"SYNC",
+      "EventKey":"OAGI.OPPORTUNITY_NUMBER",
+      "Type":"OAGI",
+      "InstanceId":"1",
+      "Timestamp":"2014-11-21T18:47:31"
+   }
+}

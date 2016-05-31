@@ -1,0 +1,28 @@
+<apex:page standardController="Account" extensions="PartnerSpecializationExtension">
+    
+    <apex:outputPanel >
+        <apex:sectionHeader title="{!$Label.Partner_Specialization_title}" subtitle="{!account.name}"/>
+        <apex:pageMessages />   
+        <apex:form >
+            <apex:inputCheckbox id="chkCloud" value="{!cloudSelected}" disabled="{!hasCloud}"/>
+            <apex:outputText value="{!$Label.Partner_Specialization_Cloud}" />
+            <br />
+
+            <apex:inputCheckbox id="chkDCI" value="{!DCISelected}" disabled="{!hasDCI}" />
+            <apex:outputText value="{!$Label.Partner_Specialization_DCI}" />
+            <br />
+            
+            <apex:inputCheckbox id="chkMWS" value="{!MWSSelected}" disabled="{!hasMWS}"/>
+            <apex:outputText value="{!$Label.Partner_Specialization_MWS}" />
+            <br />
+
+            <apex:inputCheckbox id="chkPubSect" value="{!publicSectorSelected}" rendered="{!globalRegion == 'NA'}" disabled="{!hasPublicSector}"/>
+            <apex:outputText rendered="{!globalRegion == 'NA'}" value="{!$Label.Partner_Specialization_Public_Sector}" />
+            <br />
+          
+            <apex:pageMessage detail="{!$Label.Partner_Specialization_Instructions}"
+                severity="info" strength="2" />
+            <apex:commandButton value="{!$Label.Partner_Specialization_Submit}" action="{!doRequestCase}"/>
+        </apex:form>
+    </apex:outputPanel>
+</apex:page>

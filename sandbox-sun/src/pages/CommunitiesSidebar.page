@@ -1,0 +1,96 @@
+<apex:page showHeader="false" sidebar="false" controller="CommunitiesSidebar" standardStylesheets="false">
+<!--<link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />-->
+<link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+<!--<link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}"/> -->
+
+
+<!--
+<script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+<script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+-->
+
+
+<script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/all.js')}"></script>
+
+<script>
+    var $j = jQuery.noConflict();
+    $j(document).ready(function() {
+        document.getElementById("shortcut-setup-link").href += window.top.location.href;
+    });
+</script>
+<!-- *** Track selection enforcement script *** -->
+<!--
+<apex:outputText rendered="{!!hasTrack}">
+        <script type="text/javascript">
+            $j(document).ready(function() {
+                if(window.top.location.href.match("Manage_Track") == null && window.top.location.search.match("addingtrack=true") == null){
+                    window.top.location.href = "/apex/Manage_Track?sidenavredirect=true";
+                }
+            });
+        </script>
+</apex:outputText>
+-->
+<!-- *** End track selection enforcement *** -->
+
+<div class="red-hat-content sidebar-bg" style="background: #fff">
+
+<div class="user-info">
+    <h2>
+        <span>{!$Label.CommunitiesSideBarWelcome},</span>
+        {!userFirstName} {!userLastName}
+        <span>{!$Label.CommunitiesSideBarOf}</span>
+        {!accName}
+    </h2>
+
+    <div class="row">
+        <div class="col-xs-12 summary">
+
+            <p class="heading"> {!$Label.CommunitiesSidebarYourStatus}: </p> <p> <apex:outputText value="{!accTier}"/> </p>
+            <!--<p class="heading"> {!$Label.CommunitiesSidebarYourPoints}: </p> <p><apex:outputText value="{!currentPartnerPoints}"/> </p>-->
+            <p class="heading"> {!$Label.CommunitiesSidebarAccountManager}: </p> <p> <apex:outputLink value="mailto:{!acc.Owner.Email}"> <apex:outputText value="{!acc.Owner.Name}"/> </apex:outputLink> </p>
+
+        </div> <!-- /.col-xs-6 summary -->
+
+    </div> <!-- /.row -->
+    <!-- *** This link needs an icon and styling *** -->
+    <h3 class="tool-shortcuts-header"> {!$Label.CommunitiesSidebarToolShortcuts} <span><a class="fa fa-gear tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit Your Shortcuts" href="/CommunitiesToolShortcuts?retURL=" id="shortcut-setup-link"></a></span></h3>
+    <apex:outputPanel id="shortcut-panel" rendered="{!sidebarShortcuts.size > 0}">
+        <ul class="shortcuts">
+            <apex:repeat value="{!sidebarShortcuts}" var="shortcut">
+            <li>
+                <span id="{!shortcut.id}"> <a href="{!shortcut.URL}">{!shortcut.label}</a> </span>
+                <span id="{!shortcut.id}-tooltip" class="tooltip-icon" data-html="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="{!shortcut.helpText}"><i class="fa fa-question-circle"></i></span>
+            </li>
+            </apex:repeat>
+        </ul><!-- /.shortcuts -->
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!canRequalify}">
+        <a href="/RequalificationHome" class="btn ease">{!$Label.CommunitiesSidebarRequalify}</a>
+    </apex:outputPanel>
+
+</div> <!-- /.user-info -->
+    <ul class="left-nav">
+        <apex:repeat var="navItem" value="{!sortedNavItems}">
+            <li>
+                <i class="fa fa-caret-right"></i>
+                <span id="{!navItem.id}">
+                    <a href="{!navItem.URL}">{!navItem.label}</a>
+                </span>
+
+                <apex:repeat var="navChild" value="{!navItem.children}">
+                    <ul class="sub-menu">
+                        <li>
+                            <span id="{!navChild.id}">
+                                <a href="{!navChild.URL}">{!navChild.label}</a>
+                            </span>
+                            <!-- TO-DO:  admin message count: make this conditional/dynamic    <span class="notification-badge">5</span>   -->
+                        </li>
+                    </ul> <!-- /.sub-menu -->
+                </apex:repeat>
+            </li>
+        </apex:repeat>
+    </ul> <!-- /.left-nav -->
+
+</div> <!-- /.red-hat-content -->
+
+</apex:page>

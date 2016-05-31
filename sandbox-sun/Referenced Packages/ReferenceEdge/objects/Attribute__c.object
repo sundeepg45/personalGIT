@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides>
+        <actionName>Accept</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>CancelEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Clone</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Delete</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Edit</actionName>
+        <content>NewAttribute</content>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Visualforce</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Follow</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>List</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>New</actionName>
+        <content>NewAttribute</content>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Visualforce</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>SaveEdit</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>Tab</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
+        <type>Default</type>
+    </actionOverrides>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <deprecated>false</deprecated>
+    <description>An object that contains various Attributes.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableEnhancedLookup>false</enableEnhancedLookup>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableReports>true</enableReports>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <fields>
+        <fullName>Attribute_Mapping__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Attribute Mapping</label>
+        <referenceTo>Attribute_Mapping__c</referenceTo>
+        <relationshipLabel>Attributes</relationshipLabel>
+        <relationshipName>Attributes</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Inheritable__c</fullName>
+        <defaultValue>false</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Can Only Be Selected for Level 0 Attributes.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Can Only Be Selected for Level 0 Attributes.</inlineHelpText>
+        <label>Inheritable</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Level__c</fullName>
+        <deprecated>false</deprecated>
+        <description>Level of this attribute in the tree</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Level of this attribute in the tree</inlineHelpText>
+        <label>Level</label>
+        <precision>2</precision>
+        <required>false</required>
+        <scale>0</scale>
+        <trackTrending>false</trackTrending>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>ParentIds__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>ParentIds</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Parent__c</fullName>
+        <deleteConstraint>SetNull</deleteConstraint>
+        <deprecated>false</deprecated>
+        <description>The parent of the attribute</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If Parent not selected then the attribute is a root attribute</inlineHelpText>
+        <label>Parent</label>
+        <referenceTo>Attribute__c</referenceTo>
+        <relationshipLabel>Attributes</relationshipLabel>
+        <relationshipName>Attributes</relationshipName>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Lookup</type>
+    </fields>
+    <fields>
+        <fullName>Product_Attribute_Mapping_Detail__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>Attribute_Mapping__r.Object__c &amp; Attribute_Mapping__r.Related_Object__c &amp; Attribute_Mapping__r.Field_Api_Name__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Product Attribute Mapping Detail</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Product_ID__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Product ID</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Root_Parent__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Root Parent</label>
+        <length>255</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>Attribute</label>
+    <listViews>
+        <fullName>All_Attributes</fullName>
+        <columns>NAME</columns>
+        <columns>Level__c</columns>
+        <columns>Parent__c</columns>
+        <columns>Attribute_Mapping__c</columns>
+        <columns>Inheritable__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All Attributes</label>
+    </listViews>
+    <nameField>
+        <label>Attribute  Name</label>
+        <type>Text</type>
+    </nameField>
+    <pluralLabel>Attributes</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ReadWrite</sharingModel>
+    <validationRules>
+        <fullName>Parent_Level_Check</fullName>
+        <active>false</active>
+        <errorConditionFormula>Level__c = Parent__r.Level__c + 1 || Level__c = 0</errorConditionFormula>
+        <errorDisplayField>Parent__c</errorDisplayField>
+        <errorMessage>Child level must be one more than it&apos;s parent or 0 if it&apos;s a root attribute</errorMessage>
+    </validationRules>
+    <validationRules>
+        <fullName>Root_level_Attribute_Reassigned</fullName>
+        <active>true</active>
+        <errorConditionFormula>AND(NOT(ISBLANK(Parent__c)), Level__c = 0)</errorConditionFormula>
+        <errorMessage>The Root level Attribute cannot be made child of another Attribute.</errorMessage>
+    </validationRules>
+    <webLinks>
+        <fullName>New_Opportunity_Attribute</fullName>
+        <availability>online</availability>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>New Opportunity Attribute</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>false</requireRowSelection>
+        <url>if(&apos;{!Attribute__c.Attribute_Mapping__c}&apos; != &apos;&apos; &amp;&amp; &apos;{!Attribute__c.Product_Attribute_Mapping_Detail__c}&apos; === &apos;OpportunityOpportunityLineItemProduct2&apos;) {
+    window.top.location.href = &quot;/apex/{!$Setup.POR_App_Configuration__c.Namespace__c}NewOpportunityAttribute?attId={!Attribute__c.Id}&quot;;
+} else {
+alert(&apos;{!$Label.Not_an_Opportunity_Attribute1}&apos;);
+}</url>
+    </webLinks>
+</CustomObject>

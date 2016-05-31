@@ -1,0 +1,168 @@
+<apex:page controller="RequalificationController" title="{!$Label.Requalification_Home}: {!$Label.Requalification_Profile_Informartion}">
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+    </style>
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.Requalification_Profile_Informartion}"/></h2>
+                <apex:pageMessages />   
+            </div>
+        </div>
+    </div>
+
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText escape="false" value="{!$Label.PRQ_Profile_Text}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <apex:form >
+        <apex:pageBlock title="Profile">
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Account_Name}"/>
+                    <apex:outputText value="{!account.Name}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!NOT(ISNULL(account.ShippingStreet))}" >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Shipping_Address}"/>
+                    <apex:outputPanel id="shippingAddress" >
+                        <apex:repeat var="street" value="{!shippingStreetAddresses}" id="sStreets">
+                            <apex:outputText id="sStreet" value="{!street}"/><br />
+                        </apex:repeat>
+                        <apex:outputText id="sCity" value="{!account.ShippingCity}"/> &nbsp;
+                        <apex:outputText id="sState" value="{!account.ShippingState}"/> <br />
+                        <apex:outputText id="sZip" value="{!account.ShippingPostalCode}"/> <br />
+                        <apex:outputText id="sCountry" value="{!account.ShippingCountry}"/> <br />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem rendered="{!NOT(ISNULL(account.BillingStreet))}" >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Billing_Address}"/>
+                    <apex:outputPanel id="billingAddress" >
+                        <apex:repeat var="street" value="{!billingStreetAddresses}" id="bStreets">
+                            <apex:outputText id="bStreet" value="{!street}"/><br />
+                        </apex:repeat>
+                        <apex:outputText id="bCity" value="{!account.BillingCity}"/> &nbsp;
+                        <apex:outputText id="bState" value="{!account.BillingState}"/> <br />
+                        <apex:outputText id="bZip" value="{!account.BillingPostalCode}"/> <br />
+                        <apex:outputText id="bCountry" value="{!account.BillingCountry}"/> <br />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Phone}"/>
+                    <apex:outputText value="{!account.Phone}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Toll_Free_Number}"/>
+                    <apex:outputText value="{!account.Toll_Free_Number__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Website}"/>
+                    <apex:outputText value="{!account.Website}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Partner_Type}"/>
+                    <apex:outputText >
+			           	<apex:outputText rendered="{!partnerType.Name != 'Reseller'}">{!partnerType.Name}</apex:outputText>
+			           	<apex:outputText rendered="{!partnerType.Name == 'Reseller'}">{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}</apex:outputText>
+					</apex:outputText>                    
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Partner_Level}"/>
+                    <apex:outputText value="{!partnerTier.Name}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!$Label.RequalificationProfile_Description}"/>
+                    <apex:outputText value="{!account.Description_of_Business__c}"/>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:form >
+        <apex:pageBlock id="logo" title="Logo">
+            <apex:image id="logoImg" rendered="{!NOT(ISNULL(partnerLogo))}" value="{!URLFOR($Action.Attachment.Download,partnerLogo.id)}"/>
+            <apex:outputText id="noLogoMessage" rendered="{!ISNULL(partnerLogo)}" value="No image available"/>
+
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton onclick="alert('{!$Label.Requalification_LeavingRequalWarning}');" value="Edit" action="{!$Page.PartnerLogo}?accountId={!account.Id}" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:form rendered="{!isResellerAandP}">
+        <apex:pageBlock id="specializations" title="{!$Label.Requalification_Specializations}">
+            <apex:pageBlockTable value="{!specializationList}" var="spec" id="specTable">
+                <apex:column >
+                    <apex:outputText id="listSpecialization" value="{!spec}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:outputText rendered="{!AND(specializationList.size == 0, requestedCases.size == 0)}" value="No specializations found.  Please request at least one."/>
+
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationProfile_Request_New}" action="/apex/PartnerSpecializationRequest" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+    </apex:form>
+    
+    <apex:form rendered="{!isResellerAandP}">
+        <apex:pageBlock id="requestedSpecializations" title="{!$Label.RequalificationProfile_Requested_Specializations}">
+            <apex:pageBlockTable value="{!requestedCases}" var="case" id="requestedSpecTable">
+                <apex:column headerValue="{!$Label.RequalificationProfile_Case_Number}">
+                    <apex:outputText value="{!case.CaseNumber}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.RequalificationProfile_Specialization}">
+                    <apex:outputText value="{!case.Specializations__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.RequalificationProfile_Contact}">
+                    <apex:outputText value="{!case.Contact.Name}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.RequalificationProfile_Date_Requested}">
+                    <apex:outputText value="{!case.Date_Opened__c}"/>
+                </apex:column>
+                <apex:column headerValue="{!$Label.RequalificationProfile_Status}" >
+                    <apex:outputText value="{!case.status}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:outputText rendered="{!AND(specializationList.size == 0, requestedCases.size == 0)}" value="No specializations found.  Please add at least one."/>
+        </apex:pageBlock>
+    </apex:form>
+ 
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Back_to_Requalification_Home}" action="/apex/RequalificationHome" />
+                          <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" value="{!$Label.RequalificationHome_Confirm}" action="{!confirmProfile}" styleClass="col1" disabled="{!requalRec.ProfileConfirmed__c}"/>
+                           <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1"/>
+                       <apex:commandButton onclick="alert('{!$Label.Requalification_LeavingRequalWarning}');" value="{!$Label.RequalificationProfile_Edit_Content}" action="/{!account.Id}" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

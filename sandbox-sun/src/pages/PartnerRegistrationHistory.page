@@ -1,0 +1,105 @@
+<apex:page controller="RegistrationHomeController" sidebar="false">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerRegResources, 'partnerRegResources/partner-reg-header-styles.css')}" />
+
+    <!--JS Files -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+
+<body>
+    <header>
+
+        <!--This is where the header widget will go ! -->
+
+    </header>
+
+    <apex:form >
+
+    <div class="partner-programs-dropdown white-bg">
+        <div id="partner-programs-dropdown-container">
+            <apex:outputPanel id="mainPanel" styleClass="registration-deals" rendered="{!NOT(isParList)}">
+                <a href="/apex/RegistrationHome" class="uppercase go-back-btn ease">&#171; Go Back</a>
+                <apex:outputPanel rendered="{!isDealRegList}">
+                    <h2 class="uppercase red">{!$Label.Reg_My_Pending_Registrations}</h2>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!isSalesLeadList}">
+                    <h2 class="uppercase red">{!$Label.Reg_My_Pending_Sales_Leads}</h2>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!isTeamingList}">
+                    <h2 class="uppercase red">{!$Label.Reg_My_Pending_Team_Deals}</h2>
+                </apex:outputPanel>
+                <table cellspacing="2">
+                    <thead>
+                        <tr class="uppercase">
+                            <td>{!$ObjectType.Lead.Fields.CreatedDate.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Company.Label}</td>
+                            <td>{!$Label.Reg_Approval_Status}</td>
+                            <td>{!$ObjectType.Lead.Fields.Email.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Country_of_Order__c.Label}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!leadsBatch}" var="lead" id="leadsTable" rendered="{!NOT(ISNULL(leadsBatch))}">
+                        <tr>
+                            <td><apex:outputField value="{!lead.CreatedDate}" /></td>
+                            <td>
+                                <a href="/{!lead.Id}">{!lead.Company}</a>
+                            </td>
+                            <td>
+                                <apex:outputText value="{!lead.Status}" rendered="{!ISNULL(lead.Deal_Registration_Status__c)}"/>
+                                <apex:outputText value="{!lead.Deal_Registration_Status__c}" rendered="{!NOT(ISNULL(lead.Deal_Registration_Status__c))}"/>
+                            </td>
+                            <td><apex:outputField value="{!lead.Email}" /></td>
+                            <td>{!lead.Country_of_Order__c}</td>
+                            <td><a href="/{!lead.Id}/e" class="edit-button ease">{!$Label.Reg_Edit_Button}</a></td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+                <table cellspacing="2">
+                    <tr>
+                        <td/>
+                        <td><apex:commandLink action="{!getPreviousBatch}" styleClass="uppercase view-all-btn ease" value="{!$Label.AccountProfile_Previous}" rendered="{!previousBatches}" reRender="mainPanel"/></td>
+                        <td><apex:commandLink action="{!getNextBatch}" styleClass="uppercase view-all-btn ease" value="{!$Label.AccountProfile_Next}" rendered="{!moreBatches}" reRender="mainPanel"/></td>
+                        <td/>
+                    </tr>
+                </table>
+            </apex:outputPanel>
+
+            <apex:outputPanel styleClass="registration-deals" rendered="{!isParList}">
+                <a href="/apex/RegistrationHome" class="uppercase go-back-btn ease">&#171; Go Back</a>
+                <h2 class="uppercase red">{!$Label.Reg_My_PAR_Registrations}</h2>
+                <table cellspacing="2">
+                    <thead>
+                        <tr class="uppercase">
+                            <td>{!$ObjectType.Lead.Fields.CreatedDate.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Company.Label}</td>
+                            <td>{!$Label.Reg_Approval_Status}</td>
+                            <td>{!$ObjectType.Partner_Registration__c.Fields.Company_Contact_Email__c.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Country_of_Order__c.Label}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!allParRegistrations}" var="par" id="parTable" rendered="{!NOT(ISNULL(allParRegistrations))}">
+                        <tr class="x-grid3-hd-row border_bottom">
+                            <td><apex:outputField value="{!par.CreatedDate}" /></td>
+                            <td><a href="/{!par.Id}">{!par.Company_Name__c}</a></td>
+                            <td>{!par.Status__c}</td>
+                            <td><apex:outputField value="{!par.Company_Contact_Email__c}" /></td>
+                            <td>{!par.Company_Country__c}</td>
+                            <td><a href="/{!par.Id}/e" class="edit-button ease">{!$Label.Reg_Edit_Button}</a></td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+            </apex:outputPanel>
+
+
+        </div>
+    </div>
+</apex:form>
+</body>
+
+</apex:page>

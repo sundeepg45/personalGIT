@@ -1,0 +1,42 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Nomination__c" pageStyle="height: 200px;" showHeader="false" sidebar="false" id="pageId" extensions="refedge.NominationAttributesInlineController">
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form rendered="{!isFullLicenseAccessible}">
+        <apex:pageBlock >
+            <div id="my-timeline" style="min-height:200px;">
+            <apex:pageBlockSection columns="1">
+                <apex:repeat value="{!nominationList}" var="label">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel >{!label.Label__r.Name}</apex:outputLabel>
+                        <apex:outputPanel >
+                            <apex:variable value="0" var="rowOrder"/>
+                            <apex:repeat value="{!filterAttributes[label]}" var="attr">
+                            <apex:outputText rendered="{!VALUE(rowOrder) > 0}">, </apex:outputText> {!attr} 
+                            <apex:variable value="{!VALUE(rowOrder)+1}" var="rowOrder"/>
+                            </apex:repeat>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:repeat>
+            </apex:pageBlockSection>
+            </div>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

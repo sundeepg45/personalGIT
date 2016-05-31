@@ -1,0 +1,8 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+      <div class="panel02">
+       <h3>Need more information?</h3>
+          <p class="look"><a href="mailto:rhev@redhat.com">Contact us</a></p>
+      </div>
+      
+
+</apex:page>

@@ -1,0 +1,11 @@
+<apex:page standardController="Partner_Onboarding_Registration__c">
+    <apex:stylesheet value="{!$Resource.Common_EmbeddedPageStylesheet}"/>
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="2" >
+                <apex:outputField id="txt_FCPA1" value="{!Partner_Onboarding_Registration__c.Do_they_act_in_any_government_position__c}"/>
+                <apex:outputField id="txt_FCPA2" value="{!Partner_Onboarding_Registration__c.Have_they_been_convicted__c}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,1043 @@
+<apex:page controller="OnboardingApplyController" cache="false" sidebar="false" action="{!init}">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Red Hat Partnership Application</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie8.css" rel="stylesheet')}" />
+    <![endif]-->
+
+    <!--[if IE 9]>
+      <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie9.css" rel="stylesheet')}" />
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap-ie7.css" rel="stylesheet')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/ie7.css" rel="stylesheet')}" />
+
+    <![endif]-->
+
+    <script type="text/javascript">
+
+        //var $j = jQuery.noConflict();
+        $(document).ready(function(){
+            $('#step1 tbody tr:nth-child(1)').mouseenter(function(){
+                // ISV
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Software_Vendors}</p>");
+            });
+            $('#step1 tbody tr:nth-child(2)').mouseenter(function(){
+                // Solution Provider
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Partners_that_may_architect}</p>");
+            });
+            $('#step1 tbody tr:nth-child(3)').mouseenter(function(){
+                // CC&SP
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Service_Cloud_Partner}</p>");
+            });
+            $('#step1 tbody tr:nth-child(4)').mouseenter(function(){
+                // Training
+                $('.modal-window p').remove();
+                $('.modal-window').append("<p>{!$Label.ONB_For_Embedded}</p>");
+            });
+            // $('#step1 tbody tr:nth-child(4)').mouseenter(function(){
+            //     // Training
+            //     $('.modal-window p').remove();
+            //     $('.modal-window').append('<p>Red Hat Training partners are carefully selected by Red Hat to sell and/or deliver authorized technical training to our customers and channel partners.</p>');
+            // });
+            $('#step1 tbody tr:nth-child(5)').mouseenter(function(){
+                // SI
+                $('.modal-window p').remove();
+                $('.modal-window').append('<p>For Partners that architect and implement sophisticated solutions to meet the technical and business needs of your customers.</p>');
+            });
+            $('#step1 tbody tr:nth-child(6)').mouseenter(function(){
+                // Alliance & OEM
+                $('.modal-window p').remove();
+                $('.modal-window').append('<p>Red Hat teams with industry-leading hardware and software companies to optimize selected technology and solutions with Red Hat software.</p>');
+            });
+            $('#step1 tbody tr:nth-child(7)').mouseenter(function(){
+                // Service / Cloud
+                $('.modal-window p').remove();
+                $('.modal-window').append("{!$Label.ONB_For_Service_Cloud_Partner}");
+            });
+           $('#step1 tbody').mouseleave(function(){
+                $('.modal-window p').remove();
+            });
+        });
+
+        function handleCorpResellerCountry(country) {
+          var countries = "{!corpResellerCountries}";
+          var countryList = countries.split(',');
+          for (var i = 0; i < countryList.length; i++) {
+            var cr = countryList[i];
+            if (cr === country) {
+              return;
+            }
+          }
+
+          var cr = $('input[value$=CORPORATE_RESELLER]');
+          if (cr != null) cr.parent().remove();
+        }
+
+    </script>
+
+    <script type="text/javascript" src="{!$Label.Red_Hat_Omniture_Script_Header}"></script>
+    <script>
+      surl = document.location.pathname;
+      pagename = surl.substring(1,surl.length);
+      s.pageName = "rh | partner center | " + pagename.toLowerCase();
+      s.server = s.channel = "partner center";
+      s.prop21 = s.eVar18 = encodeURI(window.location.hostname+window.location.pathname).toLowerCase();
+    </script>
+    <script type="text/javascript" src="{!$Label.Red_Hat_Omniture_Script_Footer}"></script>
+
+
+
+  </head>
+  <body id="apply">
+  <div class="red-hat-content">
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+            </div><!-- /.col-xs-5 -->
+            <div class="col-xs-7">
+              <div class="description">{!$Label.ONB_Apply_for_a_new_Red_Hat_Partner_Portal_Account}</div>
+            </div><!-- /.col-xs-7 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+
+    <div class="apply-content-wrap user-signup">
+    <apex:form id="mainForm">
+      <div class="container">
+        <div class="row">
+          <div class="content-wrapper">
+          <!--
+            <h1>Apply for a partnership</h1>
+            -->
+            <!--
+            <div class="row">
+              <div class="col-xs-12">
+                <p>{!$Label.Onboarding_Register_Partner_Application_To_Become_Partner} <a href="#" class="more inline">Learn More</a></p>
+              </div>
+            </div>
+            -->
+            <apex:pageMessages />
+            <div class="row">
+              <div class="col-xs-12">
+                <div class="panel-group" id="accordion">
+                  <div class="panel step" id="step1panel">
+                    <div class="panel-heading">
+                      <div class="step-num">
+                        <span class="num">1</span>
+                        <span class="check"></span>
+                      </div>
+                      <h2>{!$Label.Onboarding_Register_Partner_Partner_Type}</h2>
+                        <a href="#" class="tooltip-icon" data-html="true" data-original-title="{!$Label.Onboarding_Register_Tooltip_PartnerType}" data-placement="top" data-toggle="tooltip">{!$Label.ONB_What_is_this}</a>
+                    </div><!-- /.panel-heading -->
+                    <div id="step1" class="panel-collapse collapse in">
+                      <div class="panel-body">
+                        <div style="width:50%; float: left;">
+                        <apex:actionRegion >
+                          <apex:selectRadio value="{!partnerType}" id="partnerType" layout="pageDirection" styleClass="label-inline">
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_ISV}" itemValue="PARTNER_TYPE.ISV"  />
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}" itemValue="PARTNER_TYPE.RESELLER" />
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CloudProvider}" itemValue="PARTNER_TYPE.SERVICECLOUD_PROVIDER"/>
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Embedded}" itemValue="Embedded"/>
+                            <apex:selectOption rendered="{!partnerType == 'PARTNER_TYPE.CORPORATE_RESELLER'}" itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CorporateReseller}" itemValue="PARTNER_TYPE.CORPORATE_RESELLER"/>
+                            <!--
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CorporateReseller}" itemValue="PARTNER_TYPE.CORPORATE_RESELLER" rendered="{!IF(contains(selectedCountry.Supported_Specialized_Partner_Types__c, 'Corporate Reseller'), true, false)}"/>
+                            -->
+                            <!--
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Training}" itemValue="PARTNER_TYPE.TRAINING" />
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_SI}" itemValue="PARTNER_TYPE.SI" />
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_OEM}" itemValue="PARTNER_TYPE.OEM" />
+                            <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_CloudProvider}" itemValue="PARTNER_TYPE.SERVICECLOUD_PROVIDER" />
+                            -->
+                            <apex:actionSupport event="onchange" reRender="agreementsPanel,linksPanel"/>
+
+                          </apex:selectRadio>
+                        </apex:actionRegion>
+                        </div>
+                        <div class="modal-window" style="width: 50%; float: right;">
+                        </div>
+                        <div class="clearfix"></div>
+                        <a href="#step2" class="btn accordion-control next pull-right ease" id="step1next">{!$Label.ONB_Next_Step}</a>
+
+                      </div><!-- /.panel-body -->
+                    </div><!-- /#step1 -->
+                  </div><!-- /.panel /.step -->
+
+
+                  <div class="panel step" id="step2panel">
+                    <div class="panel-heading disabled">
+                      <div class="step-num">
+                        <span class="num">2</span>
+                        <span class="check"></span>
+                      </div>
+                      <h2>{!$Label.Onboarding_RegisterProfile_Company_And_Contact_Info}</h2>
+                      <a href="#" class="tooltip-icon" data-html="true" data-original-title="{!$Label.Onboarding_Register_Tooltip_Contact_Info}" data-placement="top" data-toggle="tooltip">{!$Label.ONB_What_is_this}</a>
+                    </div><!-- /.panel-heading -->
+                    <div id="step2" class="panel-collapse collapse">
+                      <div class="panel-body">
+                        <div class="input-container">
+                          <label for="name">{!$Label.Onboarding_RegisterProfile_Company_Name}</label>
+                          <div class="input-field">
+                            <apex:outputText value="{!lead.Company__c}"/>
+                          </div>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredtext="true">
+                          <label for="txtCity" class="required-field">{!$Label.Onboarding_RegisterProfile_Company_City}</label>
+                          <div class="input-field">
+                             <apex:inputText value="{!lead.City__c}"  id="txtCity" required="true" maxlength="40"/>
+                          </div>
+                          <label id="txtCityErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredtextarea="true">
+                          <label for="address" class="required-field">{!$Label.Onboarding_RegisterProfile_Company_Address}</label>
+                          <div class="input-field">
+                            <apex:inputTextArea value="{!lead.Address1__c}"  id="txtStreet" required="true" style="width: 100%;"/>
+                          </div><!-- /.input-field -->
+                          <label id="txtAddress1ErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredselect="true">
+                          <label for="country" class="required-field">{!$Label.Onboarding_Register_Partner_PicklistOption_Select_Country}</label>
+                          <div class="input-field dropdown-arrow">
+                          <apex:actionRegion >
+                          <apex:outputPanel id="countrySelection">
+                                <apex:selectList value="{!leadCountry}" size="1" id="partnerCountrySelect">
+                                    <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_Select_Country}" itemValue="" />
+                                    <apex:selectOption itemLabel="{!$Label.Onboarding_Register_Partner_PicklistOption_US}" itemValue="US" />
+                                    <apex:selectOption itemLabel="-" itemValue="" />
+                                    <apex:selectOptions value="{!selectableCountryOptions}"/>
+                                    <apex:actionSupport event="onchange" reRender="publicSectorInputPanel,vatInputPanel,stateSelection,agreementsPanel,linksPanel" />
+                                </apex:selectList>
+                            </apex:outputPanel>
+                            </apex:actionRegion>
+                          </div>
+                          <label id="countryErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" id="stateInputContaner">
+                            <apex:outputPanel id="stateSelection">
+                              <label for="state">{!$Label.Onboarding_RegisterProfile_Company_State_Province}</label>
+                              <div class="input-field dropdown-arrow">
+                                <apex:selectList value="{!selectedState}" size="1" disabled="{!selectableStateOptions.size == 0}" id="cboState" required="true">
+                                    <apex:selectOption itemLabel="- Select State/Province -" itemValue="" />
+                                    <apex:selectOptions value="{!selectableStateOptions}" />
+                                </apex:selectList>
+                                <script>
+                                 if ({!selectableStateOptions.size} > 0) {
+                                     // make this field required
+                                     $('#stateInputContainer').attr('requiredselect','true');
+                                 }
+                                 else {
+                                     $('#stateInputContainer').removeAttr('requiredselect');
+                                 }
+                                </script>
+                              </div><!-- /.input-field -->
+                              <label id="stateErrorMessage" style="color:red;display:none">{!$Label.ONB_Required}</label>
+                          </apex:outputPanel>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredtext="true">
+                          <label for="mail-code" class="required-field">{!$Label.Onboarding_RegisterProfile_Company_Postal_Code}</label>
+                          <div class="input-field">
+                            <apex:inputText value="{!lead.Postal_Code__c}" id="mail-code" maxlength="20"/>
+                          </div>
+                          <label id="txtZipErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <apex:outputPanel id="vatInputPanel">
+                            <apex:outputPanel rendered="{!selectedCountry.SearchByVAT__c}">
+                                <div class="input-container" id="vatPanel">
+                                  <label for="mail-code">{!$Label.Onboarding_JoinOrRegister_VAT_Number}</label>
+                                  <div class="input-field">
+                                    <apex:inputField value="{!lead.VATNumber__c}"  id="txtVATNumber"/>
+                                  </div>
+                                  <label id="txVATErrorMessage" style="color:red;display:none">{!$Label.ONB_Required}</label>
+                                </div><!-- /.input-container -->
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <div class="input-container email-link">
+                          <label for="email">{!$Label.Onboarding_RegisterProfile_Contact_Email}</label>
+                          <div class="input-field">
+                            <apex:outputField value="{!lead.Email__c}" id="email"/>
+                          </div>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredtext="true">
+                          <label for="phone" class="required-field">{!$Label.Onboarding_RegisterProfile_Phone_Number}</label>
+                          <div class="input-field">
+                            <apex:inputField value="{!lead.Phone__c}" id="phone"/>
+                          </div>
+                          <label id="txtPhoneErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredtext="true">
+                          <label for="website" class="required-field">{!$Label.Onboarding_RegisterProfile_Website}</label>
+                          <div class="input-field">
+                            <apex:inputField value="{!lead.Website__c}" id="website"/>
+                          </div>
+                          <label id="txtWebsiteErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <div class="input-container" requiredselect="true">
+                          <label for="cboCountryOperations" class="required-field">{!$Label.Onboarding_RegisterProfile_Additional_Countries_Opps}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!AdditionalCountriesOfOperations}" size="5" multiselect="true"  id="cboCountryOperations">
+                                <apex:selectOptions value="{!AdditionalCountriesOfOperationsOptions}" />
+                            </apex:selectList>
+                          </div>
+                          <label id="addCountriesErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+                        <div class="input-container">
+                          <label for="">{!$Label.Onboarding_RegisterProfile_If_Other_Countries}</label>
+                          <div class="input-field">
+                            <apex:inputText value="{!lead.Other_Countries__c}" id="txtOtherCountries"/>
+                          </div>
+                        </div><!-- /.input-container -->
+                        <apex:outputPanel id="publicSectorInputPanel">
+                            <apex:outputPanel rendered="{!theLeadCountry == 'US'}">
+                                <div class="input-container" id="publicSectorPanel">
+                                  <label for="cboIsPrimaryPublicSector" class="required-field">{!$Label.Is_primary_market_public_sector}</label>
+                                  <div class="input-field government_check">
+                                    <apex:selectRadio value="{!lead.Is_Primary_Public_Sector__c}"  id="cboIsPrimaryPublicSector" layout="pageDirection" styleClass="label-inline" onchange="handlePublicSectorChange(this);">
+                                        <apex:selectOption itemLabel="{!$Label.No_I_want_to_be_a_Commercial_Partner}" itemValue="No"  id="optPPSNo" />
+                                        <apex:selectOption itemLabel="{!$Label.Yes_I_want_to_be_a_Public_Sector_Partner}" itemValue="Yes"  id="optPPSYes"/>
+                                    </apex:selectRadio>
+                                  </div>
+                                  <label id="txtPublicSectorErrorMessage" style="color:red;display:none">{!$Label.ONB_Required}</label>
+                                </div><!-- /.input-container -->
+                            </apex:outputPanel>
+                            <div id="publicSectorMarketSection" style="display:none">
+                            <apex:outputPanel rendered="{!theLeadCountry == 'US'}">
+                                <div class="input-container">
+                                  <label for="cboPublicSectorMarket">{!$Label.Markets_your_company_sells_into}</label>
+                                  <div class="input-field">
+                                    <apex:selectList value="{!PublicSectorMarket}" size="3" multiselect="true"  id="cboPublicSectorMarket">
+                                        <apex:selectOptions value="{!PublicSectorMarketOptions}" />
+                                    </apex:selectList>
+                                  </div>
+                                  <label id="publicSectorMarketsError" style="color:red;display:none">{!$Label.ONB_Required}</label>
+                                </div><!-- /.input-container -->
+                            </apex:outputPanel>
+                            </div>
+                        </apex:outputPanel>
+                        <div class="bottom">
+                          <p style="margin-top: 25px;">{!$Label.Onboarding_RegisterProfile_With_Respect_To_Any_Officer}</p>
+                          <div class="input-container" requiredradio="true">
+                            <label for="cboGovernmentPosition" class="required-field">{!$Label.Onboarding_RegisterProfile_Do_They_Act_In_Government_Pos}</label>
+                            <div class="input-field">
+                              <apex:selectRadio value="{!lead.Do_they_act_in_any_government_position__c}"  id="cboGovernmentPosition" styleClass="label-inline">
+                                  <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                  <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                              </apex:selectRadio>
+                            </div>
+                            <label id="txtGovtErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                          </div><!-- /.input-container -->
+                          <div class="input-container" requiredradio="true">
+                            <label for="cboHaveBeenConvicted" class="required-field">{!$Label.Onboarding_RegisterProfile_Have_You_Committed_A_Crime}</label>
+                            <div class="input-field">
+                              <apex:selectRadio value="{!lead.Have_they_been_convicted__c}"  id="cboHaveBeenConvicted" styleClass="label-inline">
+                                  <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes"/>
+                                  <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                              </apex:selectRadio>
+                            </div>
+                            <label id="txtCrimeErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                          </div><!-- /.input-container -->
+                          <div class="input-container">
+                            <label for="underlyingFacts">{!$Label.Onboarding_RegisterProfile_Underlying_Facts}</label>
+                            <div class="input-field">
+                              <apex:inputTextarea value="{!lead.FCPA_Underlying_Facts__c}" id="underlyingFacts"/>
+                            </div>
+                          </div><!-- /.input-container -->
+                        </div><!-- /.bottom -->
+                      </div><!-- /.panel-body -->
+
+                      <div class="action-container">
+                        <a href="#step1" class="btn accordion-control previous ease" id="step2prev">{!$Label.ONB_Previous_Step}</a>
+                        <a href="#step3" class="btn accordion-control next pull-right ease" id="step2next">{!$Label.ONB_Next_Step}</a>
+                      </div><!-- /.action-container -->
+                      <div class="clearfix"></div>
+                    </div><!-- /#step2 -->
+                  </div><!-- /.panel /.step -->
+
+
+
+                  <div class="panel step" id="step3panel">
+                    <div class="panel-heading disabled">
+                      <div class="step-num">
+                        <span class="num">3</span>
+                        <span class="check"></span>
+                      </div>
+                      <h2>{!$Label.Onboarding_RegisterDemographics_App_To_Become_Partner}</h2>
+                      <a href="#" class="tooltip-icon" data-html="true" data-original-title="{!$Label.Onboarding_Register_Tooltip_Partnership_Details}" data-placement="top" data-toggle="tooltip">{!$Label.ONB_What_is_this}</a>
+                    </div><!-- /.panel-heading -->
+                    <div id="step3" class="panel-collapse collapse">
+                      <div class="panel-body">
+                        <h3>{!$Label.Onboarding_RegisterDemographics_Company_Overview_and_Market}</h3>
+                        <div class="input-container" requiredtextarea="true">
+                          <label class="required-field" for="companyDescription">{!$Label.Onboarding_RegisterDemographics_Company_Description}</label>
+                          <div class="input-field">
+                            <apex:inputTextArea value="{!lead.Company_Description__c}" id="companyDescription"/>
+                          </div>
+                          <p class="note"><apex:outputText value="{!$Label.Onboarding_RegisterDemographics_Limit_2K}"/></p>
+                          <label id="companyDescriptionErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label class="required-field" for="numberOfEmployees">{!$Label.Onboarding_RegisterDemographics_Number_Of_Employees}</label>
+                          <div class="input-field dropdown-arrow">
+                            <apex:selectList value="{!lead.Number_of_Employees__c}" id="numberOfEmployees">
+                                <apex:selectOptions value="{!NumberOfEmployeesOptions}"/>
+                            </apex:selectList>
+                          </div>
+                          <label id="numberOfEmployeesErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label class="required-field" for="totalAnnualRevenue">{!$Label.Onboarding_RegisterDemographics_Total_Annual_Revenue}</label>
+                          <div class="input-field dropdown-arrow">
+                            <apex:selectList value="{!lead.Total_Annual_Revenue__c}" id="totalAnnualRevenue">
+                                <apex:selectOptions value="{!TotalAnnualRevenueOptions}"/>
+                            </apex:selectList>
+                          </div>
+                          <label id="annualRevenueErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label for="targetMarketSize" class="required-field">{!$Label.Onboarding_RegisterDemographics_Target_Market_Size}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!TargetMarketSize}" id="targetMarketSize" size="5" multiselect="true">
+                                <apex:selectOptions value="{!TargetMarketSizeOptions}"/>
+                            </apex:selectList>
+                          </div>
+                          <label id="targetMarketSizeErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label for="cboSoftwareFocus" class="required-field">{!$Label.Onboarding_RegisterDemographics_Software_Platform}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!SoftwareFocus}" size="5" multiselect="true"  id="cboSoftwareFocus">
+                                <apex:selectOptions value="{!SoftwareFocusOptions}" />
+                            </apex:selectList>
+                          </div>
+                          <label id="softwareFocusErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label for="cboOSSupported" class="required-field">{!$Label.Onboarding_RegisterDemographics_Operating_System_Expertise}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!OperatingSystemSupported}" size="5" multiselect="true"  id="cboOSSupported">
+                                <apex:selectOptions value="{!OperatingSystemSupportedOptions}" />
+                            </apex:selectList>
+                          </div>
+                          <label id="osSupportedErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container">
+                          <label for="txtOtherOS">{!$Label.Onboarding_RegisterDemographics_If_Other_OS}</label>
+                          <div class="input-field">
+                            <apex:inputField value="{!Lead.If_Other_Operating_System__c}"  id="txtOtherOS"/>
+                          </div>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label for="cboMiddleware" class="required-field">{!$Label.Onboarding_RegisterDemographics_Middleware_Supported}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!MiddlewareSupported}" size="5" multiselect="true"  id="cboMiddleware">
+                                <apex:selectOptions value="{!MiddlewareSupportedOptions}" />
+                            </apex:selectList>
+                          </div>
+                          <label id="middlewareSupportedErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container">
+                          <label for="txtMiddlewareOther">{!$Label.Onboarding_RegisterDemographics_If_Other_Middleware}</label>
+                          <div class="input-field">
+                             <apex:inputField value="{!Lead.If_Other_Middleware__c}"  id="txtMiddlewareOther"/>
+                          </div><!-- /.input-field -->
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label for="cboAppTypes" class="required-field">{!$Label.Onboarding_RegisterDemographics_App_Types}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!ApplicationTypes}" size="5" multiselect="true"  id="cboAppTypes">
+                                <apex:selectOptions value="{!ApplicationTypesOptions}" />
+                            </apex:selectList>
+                          </div>
+                          <label id="applicationTypesErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container" requiredselect="true">
+                          <label for="additionalPartnerships" class="required-field">{!$Label.Onboarding_RegisterDemographics_Additional_Partnerships}</label>
+                          <div class="input-field">
+                            <apex:selectList value="{!AdditionalPartnerships}" size="5" multiselect="true"  id="additionalPartnerships">
+                                <apex:selectOptions value="{!AdditionalPartnershipsOptions}" />
+                            </apex:selectList>
+                          </div>
+                          <label id="additionalPartnershipsErrorMessage" style="color:red">{!$Label.ONB_Required}</label>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container">
+                          <label for="txtPartnersOther">{!$Label.Onboarding_RegisterDemographics_Other_Partnerships}</label>
+                          <div class="input-field">
+                            <apex:inputField value="{!Lead.Other_Partnerships__c}"  id="txtPartnersOther"/>
+                          </div>
+                        </div><!-- /.input-container -->
+
+                        <div class="input-container">
+                          <label for="txtPromoCode">{!$Label.Onboarding_RegisterDemographics_Campaign_Promo_Code}</label>
+                          <div class="input-field">
+                            <apex:inputField value="{!Lead.Promo_Code__c}" id="txtPromoCode"/>
+                          </div>
+                        </div><!-- /.input-container -->
+
+                      </div><!-- /.panel-body -->
+
+                      <div class="action-container">
+                        <a href="#step2" class="btn accordion-control previous ease" id="step3prev">{!$Label.ONB_Previous_Step}</a>
+                        <a href="#step4" class="btn accordion-control next pull-right ease" id="step3next">{!$Label.ONB_Next_Step}</a>
+                      </div><!-- /.action-container -->
+
+                    <div class="clearfix"></div>
+                    </div>
+                  </div>
+
+                  <div class="panel step" id="step4panel">
+                    <div class="panel-heading disabled">
+                      <div class="step-num">
+                        <span class="num">4</span>
+                        <span class="check"></span>
+                      </div>
+
+                      <h2 id="section4title">{!$Label.Onboarding_RegisterAgreements_T_and_C}</h2>
+                      <a  id="section4whatsthis" href="#" class="tooltip-icon" data-html="true" data-original-title="{!$Label.Onboarding_Register_Tooltip_Legal_Terms}" data-placement="top" data-toggle="tooltip">{!$Label.ONB_What_is_this}</a>
+                    </div><!-- /.panel-heading -->
+                    <div id="step4" class="panel-collapse collapse">
+                      <div class="panel-body">
+                      <!--
+                        <h3>{!$Label.Onboarding_RegisterAgreements_Title}</h3>
+                        -->
+
+                        <apex:outputPanel id="agreementsPanel">
+                        <script>
+                            $('#section4title').text("{!$Label.Onboarding_RegisterAgreements_T_and_C}");
+                            $('[id$=buttonSubmitApproval]').val("{!$Label.Onboarding_RegisterDemographics_Submit_For_Approval}");
+                            $('#section4whatsthis').attr('data-original-title', "{!$Label.Onboarding_Register_Tooltip_Legal_Terms}");
+                            if ('{!partnerType}' == 'PARTNER_TYPE.SERVICECLOUD_PROVIDER') {
+                              $('#section4title').text("{!$Label.CCSP_Onboarding_Terms_Title}");
+                              $('[id$=buttonSubmitApproval]').val("{!$Label.Submit}");
+                              $('#section4whatsthis').attr('data-original-title', "{!$Label.CCSP_Section_4_Whats_This}");
+                            }
+                            if ('{!partnerType}' == 'Embedded') {
+                              $('#section4title').text("{!$Label.Embedded_Onboarding_Terms_Title}");
+                              $('[id$=buttonSubmitApproval]').val("{!$Label.Submit}");
+                              $('#section4whatsthis').attr('data-original-title', "{!$Label.Embedded_Section_4_Whats_This}");
+                            }
+                        </script>
+                            <p>{!$Label.Onboarding_RegisterAgreements_Accept_Terms}</p>
+                            <div id="pdf" class="terms-body">
+                              <!--<embed src="/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}" width="100%" height="900" type="application/pdf" id="pdf_content"/>-->
+                              <object type="application/pdf" height="900" id="pdf_content" width="100%" data="/partner/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}">Your browser doesn't support PDF viewing. To see the PDF click the link: <a target="_blank" href="/partner/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}">Download PDF</a></object>
+                            </div>
+                            <hr />
+                        </apex:outputPanel>
+                        <label>{!$Label.ONB_Need_More_Information}</label><br />
+                        <apex:outputPanel id="linksPanel">
+                            <ul>
+                                <apex:repeat var="agreement" value="{!agreements}">
+                                    <apex:variable var="agreementAttachmentNumber" value="{!VALUE('1')}" />
+
+                                       <apex:repeat var="agreementAttachment" value="{!agreement.Attachments}">
+                                        <li>
+                                        <apex:outputLink target="_blank" value="/servlet/servlet.FileDownload?file={!agreementAttachment.Id}">
+                                            <apex:outputText value="{0}">
+                                                <apex:param value="{!IF((Find('.',agreementAttachment.Name) == 0), agreementAttachment.Name, (LEFT(agreementAttachment.Name,(Find('.',agreementAttachment.Name) -1))))}" />
+                                            </apex:outputText>
+                                         </apex:outputLink>
+                                         <apex:outputText value=" ({0})" rendered="{!(agreement.IsSignatureRequired__c || selectedCountry.IsAgreementSignatureRequired__c)}">
+                                                <apex:param value="{!$Label.Onboarding_RegisterAgreements_Sig_required}" />
+                                         </apex:outputText>
+                                        </li>
+                                        <apex:variable var="agreementAttachmentNumber" value="{!agreementAttachmentNumber + 1}" />
+                                    </apex:repeat>
+                                </apex:repeat>
+                            </ul>
+                        </apex:outputPanel>
+                        <div class="input-container" id="termsAcceptanceSection">
+                            <label for="terms-accept" class="label-inline required-field">{!$Label.Onboarding_RegisterAgreements_Ack_terms}</label>
+                            <div class="input-field">
+                                <apex:selectRadio id="agreeTermsSelect" value="{!agreeTerms}" styleClass="label-inline" onchange="handleAgreeTerms(this);">
+                                    <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes" />
+                                    <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                                </apex:selectRadio>
+                            </div>
+                        </div>
+                      </div><!-- /.panel-body -->
+                      <div class="panel-body" style="display:none" id="declinedTermsPanel">
+                        <div class="input-container">
+                            <label for="declinedTermsText" class="label-inline">{!$Label.Onboarding_RegisterAgreements_If_Declined_Why}</label>
+                            <div class="input-field" id="declinedTermsText">
+                                <apex:inputTextArea id="declinedReason" value="{!declinedReason}" />
+                            </div>
+                        </div><!-- /.input-container -->
+                      </div>
+                      <!--
+                        for now, custom terms are not being used
+
+                      <div class="panel-body" style="display:none" id="customTermsPanel">
+                        <div class="input-container">
+                          <label for="">{!$Label.Onboarding_Custom_Terms_Required}</label>
+                          <div class="input-field">
+                              <apex:selectRadio value="{!hasCustomTerms}" styleClass="label-inline" onchange="handleHasCustomTerms(this);">
+                                <apex:selectOption itemLabel="{!$Label.yes}" itemValue="Yes" />
+                                <apex:selectOption itemLabel="{!$Label.no}" itemValue="No" />
+                              </apex:selectRadio>
+                          </div>
+                        </div>
+                        <div id="customTermsText" style="display:none">
+                            <p>{!$Label.Onboarding_Terms_Delayed_Entry_Message}</p>
+                            <apex:inputTextArea value="{!customTermsText}" />
+                        </div>
+                      </div>
+                      <-->
+                      <div class="action-container">
+                        <a href="#step3" class="btn accordion-control previous ease" id="step4prev">{!$Label.ONB_Previous_Step}</a>
+                        <!--
+                        <a href="#" class="btn pull-right" id="step4submit">{!$Label.Onboarding_RegisterDemographics_Submit_For_Approval}</a>
+                        -->
+                        <apex:commandButton action="{!submitApplication}" value="{!$Label.Onboarding_RegisterDemographics_Submit_For_Approval}" styleClass="btn pull-right ease" id="buttonSubmitApproval"/>
+
+                      </div><!-- /action-container -->
+                      <div class="clearfix"></div>
+                    </div><!-- /#step4 -->
+                  </div><!-- /.panel /.step -->
+
+                </div><!-- /.panel-group -->
+              </div><!-- /.col-xs-8 -->
+            </div><!-- /.row -->
+          </div>
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+      </apex:form>
+    </div><!-- /.apply-content-wrap /.user-signup -->
+
+    <c:Onboarding_Footer />
+
+    </div> <!-- /.red-hat-content -->
+
+  </body>
+
+  <script>
+  ;
+(function($) {
+
+  $(function() {
+
+    // init tooltip hover via bootstrap
+    $('.tooltip-icon').tooltip('hide');
+    $('label[id$=ErrorMessage]').hide();
+
+    // init accordion controls via bootstrap
+   // $('#accordion .accordion-control').attr('data-toggle','collapse').attr('data-parent','#accordion');
+        $('#accordion .panel').on('hidden.bs.collapse', function( e ){
+            // accordion panel closed
+            var panel = $(e.currentTarget);
+            console.log('panel closed');
+            /*
+            NOTE:
+            Validation should be applied here to determine if 'complete' class should be added.
+            */
+            //panel.find('.panel-heading .step-num').addClass('complete');
+        });
+        $('#accordion .panel').on('shown.bs.collapse', function( e ){
+            // accordion panel opened
+            console.log('panel opened');
+            var panel = $(e.currentTarget);
+            panel.find('.panel-heading').removeClass('disabled');
+        });
+    // add checkmark for completed step heading on accordion forms
+    //$('.step .step-num.complete').html('<i class="fa fa-check"></i>');
+
+/*
+    $(window).load(function() {
+      equalheight('.news-band .box');
+      equalheight('.content-box-3up .box');
+      equalheight('.content-box-3up .box .with-background');
+    });
+
+    $(window).resize(function() {
+      equalheight('.news-band .box');
+      equalheight('.content-box-3up .box');
+      equalheight('.content-box-3up .box .with-background');
+    });
+*/
+  });
+})(jQuery);
+  </script>
+
+
+  <script>
+
+/*
+    if ('{!theLead.Id}' != 'null') {
+      window.location.href = "/OnboardingDisplayLeadStatus?id={!theLead.Id}";
+    }
+*/
+
+    $('.collapse').collapse('hide');
+    $('label[id$=ErrorMessage]').hide();
+    $('#step1').collapse("show");
+    //$('#step2').collapse("show");
+    //$('#step3').collapse("show");
+    //$('#step4').collapse("show");
+
+    $('#step1next').on('click', function(e) {
+        e.preventDefault();
+        var group = $('[name$=partnerType]');
+        checkedval = group.filter(':checked').val();
+        if (checkedval != null) {
+            $('#step1').collapse('hide');
+            $('#step2').collapse('show');
+            $('#step1panel .step-num').addClass('complete');
+            return true;
+        }
+        alert('Please select a partner type to proceed');
+        return false;
+    });
+
+    $('#step2next').on('click', function(e) {
+        e.preventDefault();
+
+        //
+        // Standard required field validation
+        //
+        var validatedText = validateRequiredText('step2');
+        var validatedTextArea = validateRequiredTextArea('step2');
+        var validatedRadio = validateRequiredRadio('step2');
+        var validatedSelect = validateRequiredSelect('step2');
+        var validatedPublicSector = true;
+        var validatedVAT = true;
+
+        //
+        // Validate a state is selected if country is US
+        //
+        if ($('[id$=partnerCountrySelect]').val() == 'US') {
+          var state = $('[id$=cboState]').val();
+          if (state == null || state == '') {
+            $('#stateErrorMessage').show();
+            return false;
+          }
+          else {
+            $('#stateErrorMessage').hide();
+          }
+        }
+
+
+        //
+        // Validate a public sector choice was made only if US
+        //
+        if ($('[id$=cboIsPrimaryPublicSector]').length) {
+            // element exists so must be US
+            validatedPublicSector = validateRequiredRadio('publicSectorPanel');
+            var psval = $('input[name$=cboIsPrimaryPublicSector]:checked').val();
+            if (psval == 'Yes') {
+              var markets = $('select[id$=cboPublicSectorMarket]').val();
+              if (markets == null || markets.length == 0) {
+                $('#publicSectorMarketsError').show();
+                validatedPublicSector = false;
+              }
+              else {
+                $('#publicSectorMarketsError').hide();
+                validatedPublicSector = true;
+              }
+            }
+        }
+
+        //
+        // Validate a VAT was entered if country selection requires it
+        //
+        if ($('[id$=txtVATNumber]').length) {
+            validatedVAT = validateRequiredText('vatPanel');
+        }
+
+        if (!validatedText || !validatedRadio || !validatedPublicSector || !validatedVAT || !validatedTextArea || !validatedSelect) {
+            console.log('step 2 blocked');
+            return false;
+        }
+
+        if ($('input[name$=cboHaveBeenConvicted]:checked').val() == 'Yes' ||
+            $('input[name$=cboGovernmentPosition]:checked').val() == 'Yes') {
+          var facts = $('textarea[id$=underlyingFacts]').val();
+          if (facts.length == 0) {
+            alert('Please describe the underlying facts of the conviction or government position');
+            return false;
+          }
+        }
+        console.log('step 2 proceeding');
+        $('#step2').collapse('hide');
+        $('#step3').collapse('show');
+        $('#step2panel .step-num').addClass('complete');
+        $('html, body').animate({ scrollTop: $("#step2panel").offset().top}, 1000);
+        return true;
+    });
+
+    $('#step2prev').on('click', function(e) {
+        $('#step2').collapse('hide');
+        $('#step1').collapse('show');
+        e.preventDefault();
+        $('html, body').animate({ scrollTop: $("#step1panel").offset().top}, 1000);
+        return true;
+    });
+
+    $('#step3next').on('click', function(e) {
+        var validatedText = validateRequiredTextArea('step3');
+        var validatedRadio = validateRequiredRadio('step3');
+        var validateSelect = validateRequiredSelect('step3');
+        if (!validatedText || !validatedRadio || !validateSelect) {
+            console.log('step 3 blocked');
+            return false;
+        }
+        $('#step3').collapse('hide');
+        $('#step4').collapse('show');
+        $('#step3panel .step-num').addClass('complete');
+        $('html, body').animate({ scrollTop: $("#step3panel").offset().top}, 1000);
+        e.preventDefault();
+        handlePartnerType();
+        return true;
+    });
+
+    $('#step3prev').on('click', function(e) {
+        $('#step3').collapse('hide');
+        $('#step2').collapse('show');
+        e.preventDefault();
+        $('html, body').animate({ scrollTop: $("#step2panel").offset().top}, 1000);
+        return true;
+    });
+
+    $('#step4prev').on('click', function(e) {
+        $('#step4').collapse('hide');
+        $('#step3').collapse('show');
+        e.preventDefault();
+        $('html, body').animate({ scrollTop: $("#step3panel").offset().top}, 500);
+        return true;
+    });
+
+    $('input[id$=buttonSubmitApproval]').on('click', function(e) {
+        var agreeTerms = $('input[name$=agreeTermsSelect]:checked').val();
+        var pType = $("input[name*='partnerType']:checked").val();
+        if (pType != "PARTNER_TYPE.SERVICECLOUD_PROVIDER") {
+          if (pType == "Embedded") {
+            if (!confirm("{!$Label.Embedded_ONB_Are_You_Sure}")) {
+              return false;
+            }
+          } else {
+            if (agreeTerms != null && agreeTerms == 'No') {
+                var declinedVal = $('textarea[id$=declinedReason]').val();
+    //            var declinedVal = $('#declinedReason').val();
+                if (declinedVal == undefined || declinedVal == null || declinedVal.length == 0) {
+                    // put up a REQUIRED message
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            if (agreeTerms == null) {
+                e.preventDefault();
+                return false;
+            }
+    //      $('form').submit();
+          }
+        }
+    });
+
+
+    function validateRequiredRadio(nodeid) {
+        var inputs = $('div[id=' + nodeid + '] div[requiredradio=true]');
+        var error = false;
+        $.each(inputs, function(index) {
+            var items = $('input[type=radio]', this);
+            var checklist = $(items).filter(':checked');
+            var p = $(this).closest('div[requiredradio=true]');
+            var msglabel = $('label[id$=ErrorMessage]', p);
+            if (checklist.length == 0) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+                $(msglabel).hide();
+            }
+
+        });
+        return !error;
+    }
+
+    function validateRequiredSelect(nodeid) {
+        var inputs = $('div[id=' + nodeid + '] div[requiredselect=true]');
+        var error = false;
+        $.each(inputs, function(index) {
+            var items = $('select', this).val();
+            var p = $(this).closest('div[requiredselect=true]');
+            var msglabel = $('label[id$=ErrorMessage]', p);
+            if (items == undefined || items == null) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+//                var t = $('option:selected', items).text();
+                var t = items;
+                if (t != undefined && t.indexOf('-') == 0) {
+                  // placeholder option, same as nothing selected
+                  $(msglabel).show();
+                  error = true;
+                }
+                else {
+                  $(msglabel).hide();
+                }
+            }
+        });
+        return !error;
+    }
+
+    function validateRequiredText(nodeid) {
+        // dynamically find all text inputs that need validating
+        var inputs = $('div[id=' + nodeid + '] div[requiredtext=true] input[type=text]');
+        var error = false;
+        $.each(inputs, function(index) {
+            var v = this.value;
+            var p = $(this).closest('div[requiredtext=true]');
+            msglabel = $('label[id$=ErrorMessage]', p);
+            if (v == undefined || v.length == 0) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+                $(msglabel).hide();
+            }
+        });
+        return !error;
+    }
+
+    function validateRequiredTextArea(nodeid) {
+        // dynamically find all text inputs that need validating
+        var inputs = $('div[id=' + nodeid + '] div[requiredtextarea=true] textarea');
+        var error = false;
+        $.each(inputs, function(index) {
+            var v = this.value;
+            var p = $(this).closest('div[requiredtextarea=true]');
+            msglabel = $('label[id$=ErrorMessage]', p);
+            if (v == undefined || v.length == 0) {
+                $(msglabel).show();
+                error = true;
+            }
+            else {
+                $(msglabel).hide();
+            }
+        });
+        return !error;
+    }
+
+    function handlePartnerType() {
+      var chosen = $("input[name*='partnerType']:checked").val();
+      if (chosen == "PARTNER_TYPE.SERVICECLOUD_PROVIDER" ||
+          chosen == "Embedded") {
+        $("span[id*='agreementsPanel']").hide();
+        $('#termsAcceptanceSection').hide();
+      } else {
+        $("span[id*='agreementsPanel']").show();
+        $('#termsAcceptanceSection').show();
+      }
+    }
+
+    function handlePublicSectorChange(el) {
+        var checked = $(el).filter(':checked');
+        if (checked.val() == 'Yes') {
+            $('#publicSectorMarketSection').show();
+        }
+        else {
+            $('#publicSectorMarketSection').hide();
+        }
+    }
+
+    function handleAgreeTerms(el) {
+        var checked = $(el).filter(':checked');
+        if (checked.val() == 'Yes') {
+            //$('#customTermsPanel').hide();
+            $('#declinedTermsPanel').hide();
+        }
+        else {
+            $('#declinedTermsPanel').show();
+            //$('#customTermsPanel').show();
+        }
+    }
+
+    function handleHasCustomTerms(el) {
+        var checked = $(el).filter(':checked');
+        if (checked.val() == 'Yes') {
+            $('#customTermsText').show();
+        }
+        else {
+            $('#customTermsText').hide();
+        }
+    }
+
+    $(document).ready(function() {
+        $.ajax({
+           url: '{!$Label.Red_Hat_Domain_Name}/wapps/sfconnector/protected/ajax/getUserInfo',
+           dataType: 'jsonp',
+           success:  function(jsonResult) {
+              if (eval(jsonResult.complete)) {
+                $('textarea[id$=txtStreet]').val(jsonResult.payload.street);
+                $('input[id$=txtCity]').val(jsonResult.payload.city);
+                $('input[id$=mail-code]').val(jsonResult.payload.postalcode);
+                $('input[id$=txtPhone]').val(jsonResult.payload.phone);
+                $('select[name$="partnerCountrySelect"]').val(jsonResult.payload.country);
+                $('select[name$="partnerCountrySelect"]').change();
+                $('input[name$="onboardingCountry"]').val(jsonResult.payload.country);
+                $('select[id$=cboState]').val(jsonResult.payload.state);
+                handleCorpResellerCountry(jsonResult.payload.country);
+               }
+           }
+        });
+    });
+
+  </script>
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+  </style>
+  <site:previewAsAdmin />
+</apex:page>

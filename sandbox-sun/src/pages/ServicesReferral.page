@@ -1,0 +1,148 @@
+<apex:page showHeader="true" standardStylesheets="false" sidebar="true">
+
+<head>
+<title>Red Hat Partner Services Referral Program</title>
+<style>
+
+
+    #contentCol h1 {
+        width: 820px;
+        height: 143px;
+        background: url({!URLFOR($Resource.ServicesReferral_zip, 'RH_Partner_Serv_Referral_Prgm_820x143_8983677_0212_ma.png')});
+        text-indent: -9999px;
+        margin-bottom: 3em;
+        display: block;
+    }
+    #contentCol h2 {
+        margin-top: 0;
+        display: block;
+        font-size: 200%;
+    }
+    #contentCol h3 {
+        font-size: 140%;
+    } 
+    #contentCol #leftCol p, #contentCol #leftCol li {
+        font-size: 120%;
+    }
+    #contentCol ul li {
+        margin: 0.5em 0;
+    }
+    #contentCol {
+        width: 820px;
+        margin-left: 15px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    #contentCol a:link, #contentCol a:visited {
+        color: #A41B1B;
+    }
+    #contentCol #leftCol {
+        float: left;
+        width: 535px;
+    }
+    #contentCol #leftCol ul {
+        margin-left: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+    #contentCol #leftCol ul li {
+        padding-left: 20px;
+        background: url({!URLFOR($Resource.ServicesReferral_zip, 'bullet_arrow_red.png')}) no-repeat 0px 3px;
+    }
+    #contentCol #rightCol {
+        float: right;
+        width: 260px;
+    }
+    #contentCol #rightCol #pillBox {
+        border: 1px solid #ccc;
+        background: #efefef;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-size: 90%;
+    }
+    #contentCol #rightCol #pillBox h2 {
+        margin: 0 -10px;
+        margin-bottom: 1em;
+        padding: 8px 10px;
+        background: #dcdcdc;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        font-size: 150%;
+    }
+    #contentCol #pillBox h3 {
+        font-size: 120%;
+        text-transform: uppercase;
+        padding-bottom: 0;
+        margin-bottom: 0.5em;
+    }
+    #contentCol #pillBox p, #pillBox ul {
+        padding-top: 0;
+        margin-top: 0;
+        padding-bottom: 1.0em;
+        font-size: 120%;
+    }
+    #contentCol #pillBox ul {
+        padding-left: 0;
+        margin-left: 1.4em;
+    }
+</style>
+</head>
+<body>
+
+<div id="contentCol">
+
+<h1>Red Hat Partner Services Referral Program</h1>
+
+<div id="leftCol">  
+<h2>Accelerate with Red Hat Services</h2>
+<p style="font-size:150%;">Address both the product and services needs of your clients while driving incremental revenue for your company.</p>
+<p>The Partner Services Referral Program awards partners for referring qualified leads to Red Hat for direct services sale and delivery. Incentives are in the form of tiered, fixed fees for services engagements booked within 180 days of referral approval and delivered within twelve months of booking.</p>
+<p>The process is simple. Simply submit leads via the services tab in Red Hat Deal Registration and earn incremental revenue on those leads that convert to wins.</p>
+<h3>Benefits:</h3>
+<ul>
+    <li>Creates incremental revenue opportunities for partners and fuels additional product sales.</li>
+    <li>Learn and leverage Red Hat services with minimal initial investment.</li>
+    <li>Easy to use referral registration system.</li>
+</ul>
+<h3>The Services Referral program is great for partners who are:</h3>
+<ul>
+    <li>Selling Red Hat products and looking to increase value-add for clients..</li>
+    <li>Without a professional services core competency</li>
+    <li>Looking to build a business case for services capabilities around Red Hat products.</li>
+</ul>
+<h3>Learn more:</h3>
+<ul>
+    <li><a href="https://na4.salesforce.com/06960000000IvES">Partner Services Referral Program</a> (PDF)</li>
+    <li><a target="_blank" href="https://redhat.webex.com/redhat/lsr.php?AT=pb&SP=EC&rID=5646357&rKey=588895AA97B44170">Service Referral Program Learn &amp; Earn Web</a></li>
+    <li><a href="https://na4.salesforce.com/06960000000J8A9">Partner Services Field Guide</a><br />
+    This comprehensive sales guide introduces Red Hat services solutions to help you uncover opportunities. Guide includes pain point to services translations, leading questions and menu of available services.</li>
+</ul>
+</div>
+
+<div id="rightCol">
+
+<div id="pillBox">
+<h2>Get Started Today</h2>
+<h3>Step 1: Enroll</h3>
+<ul>
+    <li>Contact your Red Hat account manager</li>
+    <li>Submit completed Services Referral Addendum</li>
+    <li>Secure access to Services Deal Registration*</li>
+</ul>
+<h3>Step 2: Identify and Refer</h3>
+<ul>
+    <li>Download the <a href="https://na4.salesforce.com/06960000000J8A9">Services Field Guide</a></li>
+    <li>Access Services Deal Registration Form via "Deal Registration" tab</li>
+    <li>Submit the Services Deal Registration Form</li>
+</ul>
+<h3 style="text-transform:none;">Questions?</h3>
+<p>If you have any questions, contact your Red Hat Account manager or email <a href="emailto:na-partner-helpdesk@redhat.com">na-partner-helpdesk@redhat.com</a></p>
+</div>
+
+<p style="font-style:italic;">* Partners will enrolled on a first-come, first-served basis</p>
+</div>
+
+</div>
+
+</body>
+
+</apex:page>

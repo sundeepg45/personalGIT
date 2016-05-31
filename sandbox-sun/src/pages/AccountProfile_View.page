@@ -1,0 +1,514 @@
+<apex:page standardController="Account_Profile__c"
+        extensions="AccountProfile_ControllerExtension,AccountProfile_PS_ControllerExtension,AccountProfile_OP_ControllerExtension,AccountProfile_PM_ControllerExtension,AccountProfile_Env_ControllerExtension"
+        tabStyle="Account_Profile__c"
+        showHeader="{!AND($CurrentPage.parameters.print!='1',$CurrentPage.parameters.renderas!='PDF')}"
+        sidebar="{!AND($CurrentPage.parameters.print!='1',$CurrentPage.parameters.renderas!='PDF')}"
+        readonly="false"
+        renderas="{!IF($CurrentPage.parameters.renderas='pdf','pdf','html')}"
+        standardStylesheets="true"
+        id="AccountProfile_View">
+    <apex:variable var="IsPreferredPartnersRendered" value="{!AND(OR(IsFullView,IsTopView),$ObjectType.AccountProfile_PartnerStatus__c.accessible,$ObjectType.PartnerStatus__c.accessible,$ObjectType.Classification__c.accessible)}"/>
+    <apex:variable var="IsPreferredPartnersCreateable" value="{!AND(NOT(IsPrintableView),$ObjectType.AccountProfile_PartnerStatus__c.createable)}"/>
+    <apex:variable var="IsPreferredPartnersUpdateable" value="{!AND(NOT(IsPrintableView),$ObjectType.AccountProfile_PartnerStatus__c.updateable)}"/>
+    <apex:variable var="IsPreferredPartnersDeletable" value="{!AND(NOT(IsPrintableView),$ObjectType.AccountProfile_PartnerStatus__c.deletable)}"/>
+    <apex:variable var="IsOtherPartnersRendered" value="{!AND(OR(IsFullView,IsTopView),$ObjectType.Account_Profile_Other_Partner__c.accessible)}"/>
+    <apex:variable var="IsOtherPartnersCreateable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_Other_Partner__c.createable)}"/>
+    <apex:variable var="IsOtherPartnersUpdateable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_Other_Partner__c.updateable)}"/>
+    <apex:variable var="IsOtherPartnersDeletable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_Other_Partner__c.deletable)}"/>
+    <apex:variable var="IsPowerMapRendered" value="{!AND(OR(IsFullView,IsTopView),$ObjectType.Account_Profile_Power_Map__c.fields.name.accessible)}"/>
+    <apex:variable var="IsPowerMapCreateable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_Power_Map__c.createable)}"/>
+    <apex:variable var="IsPowerMapUpdateable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_Power_Map__c.updateable)}"/>
+    <apex:variable var="IsPowerMapDeletable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_Power_Map__c.deletable)}"/>
+    <apex:variable var="IsEnvironmentCreatable" value="{!AND(NOT(IsPrintableView),$ObjectType.Environment__c.createable)}"/>
+    <apex:variable var="IsEnvironmentUpdateable" value="{!AND(NOT(IsPrintableView),$ObjectType.Environment__c.updateable)}"/>
+    <apex:variable var="IsEnvironmentDeletable" value="{!AND(NOT(IsPrintableView),$ObjectType.Environment__c.deletable)}"/> 
+    <apex:variable var="IsStrategicPlansRendered" value="{!AND(IsFullView,$ObjectType.StrategicPlan__c.accessible)}"/>
+    <apex:variable var="IsStrategicPlansCreateable" value="{!AND(NOT(IsPrintableView),$ObjectType.StrategicPlan__c.createable)}"/>
+    <apex:variable var="IsSWOTAnalysisRendered" value="{!AND(OR(IsFullView,IsTopView),$ObjectType.Account_Profile_SWOT__c.accessible)}"/>
+    <apex:variable var="IsSWOTAnalysisCreateable" value="{!AND(NOT(IsPrintableView),$ObjectType.Account_Profile_SWOT__c.createable)}"/>
+    <apex:variable var="IsCompeditorsRendered" value="{!AND(IsFullView,$ObjectType.Competitor__c.accessible)}"/>
+    <apex:variable var="IsMessagingStrategiesRendered" value="{!AND(IsFullView,$ObjectType.Messaging_Strategy__c.accessible)}"/>
+    <apex:variable var="IsAssessmentSummaryRendered" value="{!AND(IsFullView,$ObjectType.Assessment_Summary__c.accessible)}"/>
+    <apex:variable var="IsLegacyAccountSWOTAnalysisRendered" value="{!AND(IsFullView,$ObjectType.Account_SWOT_Analysis__c.accessible)}"/>
+    <apex:variable var="IsParentOrSubsidiaryAccountRendered" value="{!OR(IsFullView,IsTopView)}"/>
+    <apex:variable var="IsCompanyOverviewRendered" value="{!OR(IsFullView,IsTopView)}"/>
+    <apex:variable var="IsFinancialHighlightsRendered" value="{!OR(IsFullView,IsTopView)}"/>
+    <apex:variable var="IsAccountObjectivesRendered" value="{!OR(IsFullView,IsTopView)}"/>
+    <apex:variable var="IsRedHatSalesInputRendered" value="{!OR(IsFullView,IsTopView)}"/>
+    <apex:variable var="IsInfrastructureRendered" value="{!OR(IsFullView,IsInfrastructureView)}"/>
+    <apex:variable var="IsSystemInformationRendered" value="{!IsFullView}"/>
+    <apex:outputPanel layout="none" rendered="{!IsRenderAsPDF}">
+        <!-- When renderas="pdf" the standardStylesheets attribute is ignored, we we have to manually load style sheets. -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/zen-componentsCompatible.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/zen-componentsCompatible.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/elements.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/elements.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/common.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/common.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dStandard.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dStandard.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom0.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom0.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom1.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom1.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom2.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom2.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/extended.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/extended.css -->
+        <apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/setup.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/setup.css -->
+    </apex:outputPanel>
+    <apex:stylesheet value="{!$Resource.AccountProfileStyle}"/>
+    <apex:outputPanel layout="none" rendered="{!IsPrintableView}">
+        <apex:stylesheet value="{!$Resource.PrintableStylesheet}"/>
+    </apex:outputPanel>
+    <apex:includeScript value="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"/>
+    <script type="text/javascript">
+        function showSendCurrentPageAsPDF() {
+            var element = document.getElementById('SendCurrentPageAsPDF');
+            if(element) {
+                element.style.display = 'block';
+                element = document.getElementById('printHeader');
+                if(element) {
+                    element.style.display = 'none';
+                }
+            }
+        }
+        function hideSendCurrentPageAsPDF() {
+            var element = document.getElementById('SendCurrentPageAsPDF');
+            if(element) {
+                element.style.display = 'none';
+                element = document.getElementById('printHeader');
+                if(element) {
+                    element.style.display = 'block';
+                }
+            }
+        }
+    </script>
+    <script>
+      function showTotalSpend() {
+        var pv0 = '{!JSENCODE(Account_Profile__c.Account__r.Ultimate_Parent_Account__c)}';
+        if(pv0 == '') {
+          alert('No {!JSENCODE($ObjectType.Account.fields.Ultimate_Parent_Account__c.Label)} value has been set.');
+        }
+        else {
+          openPopupFocus('/apex/MatrixReport?id={!TotalSpendReportId}&name=AccountProfile_TotalSpend&aggregatenum=1&pv0='+escape(pv0)+'&subtitle='+escape(pv0),'{!JSENCODE($Label.AccountProfile_TotalSpend_Title)}',1000,700,'width=1000,height=700,resizable=yes,toolbar=no,status=no,scrollbars=yes,menubar=no,directories=yes,location=no,dependant=no',false,false);
+        }
+        return false;
+      }
+    </script>
+    <script>
+      function showPotentialSpending() {
+        var pv0 = '{!JSENCODE(Account_Profile__c.Account__r.Ultimate_Parent_Account__c)}';
+        if(pv0 == '') {
+          alert('No {!JSENCODE($ObjectType.Account.fields.Ultimate_Parent_Account__c.Label)} value has been set.');
+        }
+        else {
+          openPopupFocus('/apex/MatrixReport?id={!PotentialSpendingReportId}&name=AccountProfile_PotentialSpending&aggregatenum=1&pv0='+escape(pv0)+'&subtitle='+escape(pv0),'{!JSENCODE($Label.AccountProfile_PotentialSpending_Title)}',1000,700,'width=1000,height=700,resizable=yes,toolbar=no,status=no,scrollbars=yes,menubar=no,directories=yes,location=no,dependant=no',false,false);
+        }
+        return false;
+      }
+    </script>
+    <script type="text/javascript">
+        jQuery(document).ready(function(){
+            var printLinksDest = $('a[href^="javascript:printWin"]');
+//          alert('printLinksDest:'+printLinksDest.first().attr('href'));
+            var printLinksSrc = $('a[href^="javascript:openPopupFocus"][href*="'+"'"+'PrintableView'+"'"+',"]');
+//          alert('printLinksSrc:'+printLinksSrc.first().attr('href'));
+            try {
+                printLinksDest.first().attr('href',printLinksSrc.first().attr('href'));
+            }
+            catch(e) {}
+        });
+    </script>
+    <apex:outputPanel styleClass="hideforprint" style="padding:5px 5px 5px 5px;margin:5px 5px 5px 5px;" rendered="{!IsPrintableView}" layout="block">
+        <apex:outputPanel layout="none" rendered="{!IsFullView}">
+            {!$Label.AccountProfile_FullView}
+        </apex:outputPanel>
+        <apex:outputLink value="/apex/AccountProfile_View?id={!Account_Profile__c.Id}&print=1" rendered="{!NOT(IsFullView)}">
+            {!$Label.AccountProfile_FullView}
+        </apex:outputLink>
+        <apex:outputText value=" | " styleClass="pipe"/>
+        <apex:outputPanel layout="none" rendered="{!IsInfrastructureView}">
+            {!$Label.AccountProfile_InfrastructureView}
+        </apex:outputPanel>
+        <apex:outputLink value="/apex/AccountProfile_View?id={!Account_Profile__c.Id}&print=1&view=infrastructure" rendered="{!NOT(IsInfrastructureView)}">
+            {!$Label.AccountProfile_InfrastructureView}
+        </apex:outputLink>
+        <apex:outputText value=" | " styleClass="pipe"/>
+        <apex:outputPanel layout="none" rendered="{!IsTopView}">
+            {!$Label.AccountProfile_TopView}
+        </apex:outputPanel>
+        <apex:outputLink value="/apex/AccountProfile_View?id={!Account_Profile__c.Id}&print=1&view=top" rendered="{!NOT(IsTopView)}">
+            {!$Label.AccountProfile_TopView}
+        </apex:outputLink>
+        <apex:outputText value=" | " styleClass="pipe"/>
+        <apex:outputLink value="/apex/AccountProfile_ExecSummary?id={!Account_Profile__c.Id}">
+            {!$Label.AccountProfile_ExecutiveSummary}
+        </apex:outputLink>      
+    </apex:outputPanel>
+    <!-- This is ugly.  The easiest way to get the tag bar on the page is this hidden block. -->
+    <apex:outputPanel style="display:none" rendered="{!NOT(IsPrintableView)}" layout="block">
+        <apex:sectionHeader title="{!$ObjectType.Account_Profile__c.Label}" subtitle="{!Account_Profile__c.Name}" printUrl="/apex/{!$CurrentPage.Name}?id={!Account_Profile__c.Id}&print=1"/>
+        <apex:detail relatedList="false" relatedListHover="false" inlineEdit="true" showChatter="true"/>
+    </apex:outputPanel>
+    <apex:form id="form">
+        <apex:outputPanel style="padding:5px 5px 5px 5px;margin:5px 5px 5px 5px;z-index:2;position:absolute;right:0px;top 0px;background-color:#ffffff;opacity=1.0;" styleClass="print hideforprint" rendered="{!AND(NOT(IsRenderAsPDF),IsPrintableView)}" layout="block">
+            <div class="printHeader" style="padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;" id="printHeader">
+                <div class="printControls" style="padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;">
+                    <ul rip-style-borderwidth-backup="" rip-style-borderstyle-backup="" class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;" rip-style-bordercolor-backup="">
+                        <apex:outputLink value="javascript:window.close();">
+                            <li>{!$Label.AccountProfile_CloseWindow}</li>
+                        </apex:outputLink>
+                        <apex:outputLink value="javascript:window.print();">
+                            <li>{!$Label.AccountProfile_PrintThisPage}</li>
+                        </apex:outputLink>
+                        <apex:outputLink value="/apex/AccountProfile_View?id={!Account_Profile__c.Id}&renderas=pdf&view={!$CurrentPage.parameters.view}">
+                            <li>{!$Label.AccountProfile_Download}</li>
+                        </apex:outputLink>
+                        <apex:outputLink value="javascript:showSendCurrentPageAsPDF();">
+                            <li>{!$Label.AccountProfile_SendAsPDF}</li>
+                        </apex:outputLink>
+                    </ul>
+                </div>
+            </div>
+        </apex:outputPanel>
+        <div style="width:100%;display:none;" id="SendCurrentPageAsPDF">
+            <c:SendPageByEmail href="/apex/AccountProfile_View?id={!Account_Profile__c.Id}&renderas=pdf&view={!$CurrentPage.parameters.view}"
+                fileName="AccountProfile-{!Account_Profile__c.Id}-{!YEAR(TODAY())*10000+MONTH(TODAY())*100+DAY(TODAY())}{!IF(ISBLANK($CurrentPage.parameters.view),'','-'+$CurrentPage.parameters.view)}.pdf"
+                accountId="{!Account_Profile__c.Account__c}"
+                accountContactRoleLookup="{!IF(IsInfrastructureView,'AccountId = :accountId','')}"
+                contactLookup="{!IF(IsInfrastructureView,'AccountId = :accountId','')}"
+                label="{!$ObjectType.Account_Profile__c.Label}"
+                name="{!Account_Profile__c.Name}"
+                newEmailLines="0"
+                newUserLines="4"
+                oncancel="hideSendCurrentPageAsPDF()"
+                templateUniqueName="Account_Profile_By_Email" />
+        </div>
+        <apex:sectionHeader title="{!$ObjectType.Account_Profile__c.Label}" subtitle="{!Account_Profile__c.Name}" rendered="{!IsPrintableView}" />
+        <apex:outputPanel style="visibility: visible;" styleClass="listHoverLinks hideforprint" rendered="{!NOT(IsPrintableView)}" layout="block">
+            <apex:outputPanel layout="none" rendered="{!IsPreferredPartnersRendered}">
+                <a class="linklet" href="#PreferredPartners_target" id="PreferredPartners_link"><span class="listTitle">{!$Label.AccountProfile_PreferredRedHatPartners}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsOtherPartnersRendered}">
+                <a class="linklet" href="#OtherPartners_target" id="OtherPartners_link"><span class="listTitle">{!$Label.AccountProfile_OtherPartnersandAlliances}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsPowerMapRendered}">
+                <a class="linklet" href="#PowerMap_target" id="PowerMap_link"><span class="listTitle">{!$Label.AccountProfile_PowerMap}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsSWOTAnalysisRendered}">
+                <a class="linklet" href="#SWOTAnalysis_target" id="SWOTAnalysis_link"><span class="listTitle">{!$Label.AccountProfile_SWOTAnalysis}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsInfrastructureRendered}">
+                <a class="linklet" href="#Infrastructure_target" id="Infrastructure_link"><span class="listTitle">{!$Label.AccountProfile_InfrastructureProfile}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsStrategicPlansRendered}">
+                <a class="linklet" href="#StrategicPlans_target" id="StrategicPlans_link"><span class="listTitle" style="white-space:nowrap;">{!$ObjectType.StrategicPlan__c.LabelPlural}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsCompeditorsRendered}">
+                <a class="linklet" href="#Compeditors_target" id="Compeditors_link"><span class="listTitle">{!$Label.AccountProfile_Competitors}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsMessagingStrategiesRendered}">
+                <a class="linklet" href="#MessagingStrategies_target" id="MessagingStrategies_link"><span class="listTitle">{!$Label.AccountProfile_MessagingStrategies}</span></a>
+                <apex:outputText value=" | " styleClass="pipe"/>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!IsAssessmentSummaryRendered}">
+                <a class="linklet" href="#AssessmentSummary_target" id="AssessmentSummary_link"><span class="listTitle">{!$Label.AccountProfile_AssessmentSummary}</span></a>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:pageMessages id="pageMessages"/>
+        <apex:pageBlock title="{!$Label.AccountProfile_AccountProfileDetail}" mode="{!IF(IsPrintableView,'maindetail','inlineEdit')}" >
+            <apex:pageBlockButtons location="both" rendered="{!NOT(IsPrintableView)}">
+                <apex:commandButton action="{!edit}" id="editButton" value="{!$Label.AccountProfile_Edit}"/>
+                <apex:commandButton action="{!delete}" id="deleteButton" value="{!$Label.AccountProfile_Delete}"/>
+                <!--<apex:commandButton onclick="top.location.href='/{!Account_Profile__c.Id}/e?clone=1&retURL=/{!Account_Profile__c.Id}';return false" id="cloneButton" value="Clone"/>-->
+                <apex:commandButton onclick="openPopupFocus('/apex/AccountProfile_ShowSummary?id={!Account_Profile__c.Id}','Show Summary',800,600,'width=800,height=600,resizable=yes,toolbar=no,status=no,scrollbars=yes,menubar=no,directories=yes,location=no,dependant=no',false,false);return false" id="showSummaryButton" value="Show Summary" rendered="{!showSummary}"/>
+                <apex:commandButton onclick="return showPotentialSpending()" id="showPotentialSpendingButton" value="{!$Label.AccountProfile_PotentialSpending}" rendered="{!NOT(ISBLANK(PotentialSpendingReportId))}"/>
+                <apex:commandButton onclick="return showTotalSpend()" id="showTotalSpendButton" value="{!$Label.AccountProfile_TotalSpend}" rendered="{!NOT(ISBLANK(TotalSpendReportId))}"/>
+                <apex:commandButton action="{!save}" id="saveButton" value="{!$Label.AccountProfile_Save}" style="display:none" />
+                <apex:commandButton onclick="resetInlineEdit()" id="cancelButton" value="{!$Label.AccountProfile_Cancel}" style="display:none" />
+            </apex:pageBlockButtons>
+            <a name="ParentOrSubsidiaryAccount_target" class="anchor" rendered="{!IsParentOrSubsidiaryAccountRendered}">
+                <div class="anchor">
+                    <apex:pageBlockSection title="{!$Label.AccountProfile_ParentorSubsidiaryAccount}" columns="2" collapsible="{!NOT(IsPrintableView)}" rendered="{!IsParentOrSubsidiaryAccountRendered}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, showSummaryButton, showTotalSpendButton, showPotentialSpendingButton, manageSwotAnalysisButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!NOT(IsPrintableView)}" />
+                        <apex:outputField value="{!Account_Profile__c.Name}"/>
+                        <apex:outputField value="{!Account_Profile__c.Account__c}" rendered="{!NOT(IsPrintableView)}"/>
+                        <apex:pageBlockSectionItem rendered="{!IsPrintableView}">
+                            <apex:outputLabel value="{!$ObjectType.Account_Profile__c.fields.Account__c.Label}" for="accountName"/>
+                            <apex:outputText value="{!Account_Profile__c.Account__r.Name}" id="accountName"/>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="CompanyOverview_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection title="{!$Label.AccountProfile_CompanyOverview}" columns="1" collapsible="{!NOT(IsPrintableView)}" rendered="{!IsCompanyOverviewRendered}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, showSummaryButton, showTotalSpendButton, showPotentialSpendingButton, manageSwotAnalysisButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!NOT(IsPrintableView)}" />
+                        <apex:outputField value="{!Account_Profile__c.Industry_Position_Market_Share_History__c}"/>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="FinancialHighlights_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection title="{!$Label.AccountProfile_FinancialHighlights}" columns="2" collapsible="{!NOT(IsPrintableView)}" rendered="{!IsFinancialHighlightsRendered}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, showSummaryButton, showTotalSpendButton, showPotentialSpendingButton, manageSwotAnalysisButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!NOT(IsPrintableView)}" />
+                        <apex:outputField value="{!Account_Profile__c.AnnualRevenue__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.AnnualITBudget__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.Number_of_Employees__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.Fiscal_Year_End__c}"/>                       
+                    </apex:pageBlockSection>            
+                </div>
+            </a>                
+            <a name="AccountObjectives_target"  class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection title="{!$Label.AccountProfile_AccountObjectives}" columns="1" collapsible="{!NOT(IsPrintableView)}" rendered="{!IsAccountObjectivesRendered}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, showSummaryButton, showTotalSpendButton, showPotentialSpendingButton, manageSwotAnalysisButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!NOT(IsPrintableView)}" />
+                        <!-- <apex:outputField value="{!Account_Profile__c.Corporate_Objectives__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.Account_end_users__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.Company_Mission_Statement__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.Account_s_Biggest_Competitor_s__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.Direct_Indirect__c}"/>
+                        <apex:outputField value="{!Account_Profile__c.MSA_in_Place__c}"/> -->
+                        <apex:pageBlockSection showHeader="false" columns="1" collapsible="false" rendered="{!IsAccountObjectivesRendered}">
+                            <apex:outputField value="{!Account_Profile__c.Corporate_Objectives__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Account_end_users__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Company_Mission_Statement__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Account_s_Biggest_Competitor_s__c}"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection showHeader="false" columns="2" collapsible="false" rendered="{!IsAccountObjectivesRendered}">
+                            <apex:outputField value="{!Account_Profile__c.Direct_Indirect__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.MSA_in_Place__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Industry__c}"/>
+                        </apex:pageBlockSection>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="PreferredPartners_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection columns="1" showHeader="false" collapsible="false" rendered="{!IsPreferredPartnersRendered}">
+                        <apex:inlineEditSupport disabled="true"/>
+                        <apex:pageBlock title="{!$Label.AccountProfile_PreferredRedHatPartners}" mode="view" id="preferredPartners">
+                            <apex:pageBlockButtons location="top" rendered="{!IsPreferredPartnersCreateable}">
+                                <apex:commandbutton value="{!$Label.AccountProfile_ManagePartners}" action="{!managePreferredPartners}"/>
+                            </apex:pageBlockButtons>
+                            <apex:pageBlockTable value="{!partnerStatuses}" var="ps" rendered="{!(partnerStatuses.size != 0)}">
+                                <apex:facet name="caption">
+                                    <apex:outputPanel layout="block" style="font-style:italic;text-align:left;" rendered="{!IsPreferredPartnersUpdateable}">
+                                        <apex:outputText value="{!$Label.AccountProfile_PreferredRedHatPartnersHelp}"/>
+                                    </apex:outputPanel>
+                                </apex:facet>
+                                <apex:column headerValue="{!$Label.AccountProfile_Action}" styleClass="actionColumn" rendered="{!IsPreferredPartnersDeletable}">
+                                    <apex:commandLink action="{!ps.deletePartnerStatus}" reRender="preferredPartners,pageMessages" styleClass="actionLink">{!$Label.AccountProfile_Del}</apex:commandLink>
+                                </apex:column>
+                                <apex:column headerValue="{!$ObjectType.PartnerStatus__c.fields.Partner__c.Label}">
+                                    <apex:outputField value="{!ps.PartnerStatus.Partner__c}" rendered="{!NOT(OR(ISBLANK(ps.PartnerStatus.Partner__c),IsPrintableView))}"/>
+                                    <apex:outputText value="{!ps.PartnerStatus.Partner__r.Name}" rendered="{!IsPrintableView}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$ObjectType.Account.Fields.Site.Label}" value="{!ps.PartnerStatus.Partner__r.Site}" rendered="false"/>
+                                <apex:column headerValue="{!$ObjectType.Account.Fields.OracleAccountNumber__c.Label}" value="{!ps.PartnerStatus.Partner__r.OracleAccountNumber__c}" rendered="false"/>
+                                <apex:column headerValue="{!$ObjectType.OpportunityPartner__c.Fields.PartnerTier__c.Label}">
+                                    <apex:outputText value="{!SUBSTITUTE(ps.PartnerStatus.PartnerTier__r.Hierarchy__c,'Partner Tier » ','')}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$ObjectType.OpportunityPartner__c.Fields.PartnerType__c.Label}">
+                                    <apex:outputText value="{!SUBSTITUTE(ps.PartnerStatus.PartnerType__r.Hierarchy__c,'Partner Type » ','')}"/>
+                                </apex:column>
+                                <apex:column value="{!ps.PartnerStatus.Partner__r.Type}" headerValue="{!$ObjectType.Account.Fields.Type.Label}" rendered="false"/>
+                                <apex:column value="{!ps.PartnerStatus.Partner__r.Owner.Alias}" headerValue="Owner {!$ObjectType.User.Fields.Alias.Label}" rendered="false"/>
+                                <apex:column value="{!ps.PartnerStatus.Partner__r.RecordType.Name}" headerValue="Record Type" rendered="false"/>
+                            </apex:pageBlockTable>
+                            <apex:outputPanel layout="none" rendered="{!AND(OR(IsPreferredPartnersCreateable,IsPreferredPartnersDeletable,IsPreferredPartnersUpdateable),(partnerStatuses.size = 0))}">
+                                <apex:outputText style="font-style:italic;text-aliglefter;" value="{!$Label.AccountProfile_PreferredRedHatPartnersHelp}"/>
+                                <hr />
+                                <apex:outputText value="{!$Label.No_records_to_display}" />
+                            </apex:outputPanel>
+                            <apex:outputText value="{!$Label.No_records_to_display}" rendered="{!AND(Not(OR(IsPreferredPartnersCreateable,IsPreferredPartnersDeletable,IsPreferredPartnersUpdateable)),(partnerStatuses.size = 0))}"/>
+                        </apex:pageBlock>
+                    </apex:pageblockSection>
+                </div>
+            </a>
+            <a name="OtherPartners_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection columns="1" showHeader="false" collapsible="false" rendered="{!IsOtherPartnersRendered}">
+                        <apex:inlineEditSupport disabled="true"/>
+                        <apex:pageBlock title="{!$Label.AccountProfile_OtherPartnersandAlliances}" id="otherPartners">
+                            <apex:pageBlockButtons location="top" rendered="{!IsOtherPartnersCreateable}">
+                                <apex:commandbutton value="{!$Label.AccountProfile_NewOtherPartner}" action="{!addOtherPartner}" reRender="otherPartners,pageMessages"/>
+                            </apex:pageBlockButtons>
+                            <apex:pageBlockTable value="{!otherPartners}" var="op" rendered="{!(otherPartners.size != 0)}"> 
+                                <apex:facet name="caption">
+                                    <apex:outputPanel layout="block" style="font-style:italic;text-align:left;" rendered="{!IsOtherPartnersUpdateable}">
+                                        <apex:outputText value="{!$Label.AccountProfile_OtherAccountPartnersAndAlliancesHelp}"/>
+                                    </apex:outputPanel>
+                                </apex:facet>
+                                <apex:column headerValue="{!$Label.AccountProfile_Action}" styleClass="actionColumn" rendered="{!OR(IsOtherPartnersUpdateable,IsOtherPartnersDeletable)}">
+                                    <apex:commandLink action="{!op.editOtherPartner}" reRender="otherPartners,pageMessages" styleClass="actionLink"  rendered="{!IsOtherPartnersUpdateable}">{!$Label.AccountProfile_Edit}</apex:commandLink>
+                                    <apex:outputPanel layout="none" rendered="{!AND(IsOtherPartnersUpdateable,IsOtherPartnersDeletable)}">&#160;|&#160;</apex:outputPanel> 
+                                    <apex:commandLink action="{!op.deleteOtherPartner}" reRender="otherPartners,pageMessages" styleClass="actionLink" rendered="{!IsOtherPartnersDeletable}">{!$Label.AccountProfile_Del}</apex:commandLink>
+                                </apex:column>
+                                <apex:column width="30%" value="{!op.accountProfile_OtherPartner.Name}"/>
+                                <apex:column value="{!op.accountProfile_OtherPartner.Partner_Type__r.Name}" headerValue="{!$ObjectType.Account_Profile_Other_Partner__c.Fields.Partner_Type__c.Label}"/>
+                            </apex:pageBlockTable>
+                            <apex:outputPanel layout="none" rendered="{!AND(OR(IsOtherPartnersCreateable,IsOtherPartnersDeletable,IsOtherPartnersUpdateable),(otherPartners.size = 0))}">
+                                <apex:outputText style="font-style:italic;text-align:left;" value="{!$Label.AccountProfile_OtherAccountPartnersAndAlliancesHelp}"/>
+                                <hr />
+                                <apex:outputText value="{!$Label.No_records_to_display}" />
+                            </apex:outputPanel>
+                            <apex:outputText value="{!$Label.No_records_to_display}" rendered="{!AND(Not(OR(IsOtherPartnersCreateable,IsOtherPartnersDeletable,IsOtherPartnersUpdateable)),(otherPartners.size = 0))}" />
+                        </apex:pageBlock>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="PowerMap_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection columns="1" showHeader="false" collapsible="false" rendered="{!IsPowerMapRendered}">
+                        <apex:inlineEditSupport disabled="true"/>
+                        <apex:pageBlock title="{!$Label.AccountProfile_PowerMap}" id="powerMap">
+                            <apex:pageBlockButtons location="top" rendered="{!IsPowerMapCreateable}">
+                                <apex:commandbutton action="{!addPowerMapEntry}" value="{!$Label.AccountProfile_NewPowerMapEntry}" reRender="powerMap,pageMessages"/>
+                            </apex:pageBlockButtons>
+                            <apex:pageBlockTable value="{!powerMap}" var="pm" rendered="{!(powerMap.size != 0)}">   
+                                <apex:column headerValue="{!$Label.AccountProfile_Action}" rendered="{!NOT(IsPrintableView)}" styleClass="actionColumn">
+                                    <apex:commandLink action="{!pm.editPowerMapEntry}" reRender="powerMap,pageMessages" styleClass="actionLink" rendered="{!IsPowerMapUpdateable}">{!$Label.AccountProfile_Edit}</apex:commandLink>
+                                    <apex:outputText value=" | " styleClass="pipe" rendered="{!AND(IsPowerMapUpdateable,IsPowerMapDeletable)}"/>
+                                    <apex:commandLink action="{!pm.deletePowerMapEntry}" reRender="powerMap,pageMessages" styleClass="actionLink" rendered="{!IsPowerMapDeletable}">{!$Label.AccountProfile_Del}</apex:commandLink>
+                                    <apex:outputText value=" | " styleClass="pipe" rendered="{!OR(IsPowerMapUpdateable,IsPowerMapDeletable)}"/>
+                                    <apex:commandLink action="{!pm.viewPowerMapEntry}" target="_blank" styleClass="actionLink">{!$Label.AccountProfile_View}</apex:commandLink>
+                                </apex:column>      
+                                <apex:column headerValue="{!$ObjectType.Account_Profile_Power_Map__c.fields.CustomerKeyContact__c.Label}">
+                                    <apex:outputField value="{!pm.accountProfile_PowerMapEntry.CustomerKeyContact__c}" rendered="{!NOT(IsPrintableView)}"/>
+                                    <apex:outputText value="{!pm.accountProfile_PowerMapEntry.CustomerKeyContact__r.Name}" rendered="{!IsPrintableView}"/>
+                                </apex:column>
+                                <apex:column value="{!pm.accountProfile_PowerMapEntry.Title__c}"/>
+                                <apex:column headerValue="{!$ObjectType.Account_Profile_Power_Map__c.fields.Reports_To__c.Label}">
+                                    <apex:outputField value="{!pm.accountProfile_PowerMapEntry.CustomerKeyContact__r.ReportsToId}" rendered="{!NOT(OR(ISBLANK(pm.accountProfile_PowerMapEntry.CustomerKeyContact__r.ReportsToId),IsPrintableView))}"/>
+                                    <apex:outputText value="{!pm.accountProfile_PowerMapEntry.CustomerKeyContact__r.ReportsTo.Name}" rendered="{!IsPrintableView}"/>
+                                </apex:column>
+                                <apex:column headerValue="{!$Label.AccountProfile_PointPerson}" value="{!pm.accountProfile_PowerMapEntry.Point_Person_on_Red_Hat_Account_Team__c}"/>
+                                <apex:column value="{!pm.accountProfile_PowerMapEntry.Business_Agenda__c}"/>
+                                <apex:column value="{!pm.accountProfile_PowerMapEntry.Personal_Agenda__c}"/>
+                                <apex:column value="{!pm.accountProfile_PowerMapEntry.Your_Relationship__c}"/>
+                            </apex:pageBlockTable>
+                            <apex:outputText rendered="{!(powerMap.size = 0)}" value="{!$Label.No_records_to_display}" />
+                        </apex:pageBlock>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="RedHatSalesInput_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection title="{!$Label.AccountProfile_RedHatSalesInput}" columns="1" collapsible="{!NOT(IsPrintableView)}" rendered="{!IsRedHatSalesInputRendered}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, showSummaryButton, showTotalSpendButton, showPotentialSpendingButton, manageSwotAnalysisButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!NOT(IsPrintableView)}" />
+                        <apex:pageBlockSection showHeader="false" columns="2" collapsible="false" rendered="{!IsAccountObjectivesRendered}">
+                            <apex:outputField value="{!Account_Profile__c.Corporate_Strategy_Current_Initiatives__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Pain_Point_1__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Critical_Success_Factors__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Pain_Point_2__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Cultural_and_political_landscape__c}"/>
+                            <apex:outputField value="{!Account_Profile__c.Pain_Point_3__c}"/>
+                        </apex:pageBlockSection>
+                        <apex:pageBlockSection showHeader="false" columns="1" collapsible="false" rendered="{!IsAccountObjectivesRendered}">
+                            <apex:outputField value="{!Account_Profile__c.What_makes_them_successful__c}"/>
+                        </apex:pageBlockSection>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="SWOTAnalysis_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlock title="{!$Label.AccountProfile_SWOT_Analysis}" mode="detail" rendered="{!IsSWOTAnalysisRendered}">
+                        <apex:inlineEditSupport disabled="true"/>
+                        <apex:pageBlockButtons location="top" rendered="{!IsSWOTAnalysisCreateable}">
+                            <apex:commandButton onclick="top.location.href='/apex/AccountProfile_ManageSWOT?id={!Account_Profile__c.Id}&retURL={!Account_Profile__c.Id}';return false" id="manageSwotAnalysisButton" value="{!$Label.AccountProfile_ManageSWOTAnalysis}" rendered="{!IsSWOTAnalysisCreateable}"/>
+                        </apex:pageBlockButtons>
+                        <c:AccountProfileSWOT profileId="{!Account_Profile__c.Id}" showTableHeader="true" renderAsPDF="{!IsRenderAsPDF}"/>
+                    </apex:pageBlock>
+                </div>
+            </a>
+            <a name="Infrastructure_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection columns="1" showHeader="false" collapsible="false" rendered="{!IsInfrastructureRendered}">
+                        <apex:inlineEditSupport disabled="true"/>
+                        <apex:pageBlock title="{!$Label.AccountProfile_InfrastructureProfile}" id="infrastructure">
+                            <apex:pageBlockButtons location="top" rendered="{!IsEnvironmentCreatable}">
+                                <apex:commandbutton action="{!addEnvironment}" value="{!$Label.AccountProfile_NewEnvironment}" reRender="infrastructure,pageMessages"/>
+                            </apex:pageBlockButtons>
+                            <apex:pageBlockTable value="{!environments}" var="environment" rendered="{!(environments.size != 0)}">  
+                                <apex:column headerValue="{!$Label.AccountProfile_Action}" rendered="{!NOT(IsPrintableView)}" styleClass="actionColumn">
+                                    <apex:commandLink action="{!environment.editEnvironment}" reRender="infrastructure,pageMessages" styleClass="actionLink" rendered="{!IsEnvironmentUpdateable}">{!$Label.AccountProfile_Edit}</apex:commandLink>
+                                    <apex:outputText value=" | " styleClass="pipe" rendered="{!AND(IsEnvironmentUpdateable,IsEnvironmentDeletable)}"/>
+                                    <apex:commandLink action="{!environment.deleteEnvironment}" reRender="infrastructure,pageMessages" styleClass="actionLink" rendered="{!IsEnvironmentDeletable}">{!$Label.AccountProfile_Del}</apex:commandLink>
+                                    <apex:outputText value=" | " styleClass="pipe" rendered="{!OR(IsEnvironmentUpdateable,IsEnvironmentDeletable)}"/>
+                                    <apex:commandLink action="{!environment.viewEnvironment}" target="_blank" styleClass="actionLink">{!$Label.AccountProfile_View}</apex:commandLink>
+                                </apex:column>      
+                                <apex:column value="{!environment.accountProfile_Environment.Name}"/>
+                                <apex:column value="{!environment.accountProfile_Environment.LastModifiedById}"/>
+                                <apex:column value="{!environment.accountProfile_Environment.LastModifiedDate}"/>
+                            </apex:pageBlockTable>
+                            <apex:outputText rendered="{!(environments.size = 0)}" value="{!$Label.No_records_to_display}" />
+                        </apex:pageBlock>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+            <a name="SystemInformation_target" class="anchor">
+                <div class="anchor">
+                    <apex:pageBlockSection title="{!$Label.AccountProfile_SystemInformation}" columns="2" collapsible="false" rendered="{!IsSystemInformationRendered}">
+                        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton" hideOnEdit="editButton, deleteButton, showSummaryButton, showTotalSpendButton, showPotentialSpendingButton, manageSwotAnalysisButton" event="ondblclick" resetFunction="resetInlineEdit" rendered="{!NOT(IsPrintableView)}" />
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$ObjectType.Account_Profile__c.fields.CreatedById.Label}" for="createdBy"/>
+                            <apex:outputPanel layout="inline" id="createdBy">
+                                <apex:outputField value="{!Account_Profile__c.CreatedById}" rendered="{!NOT(IsPrintableView)}" />
+                                <apex:outputText value="{!IF(IsPrintableView,Account_Profile__c.CreatedBy.FirstName+' '+Account_Profile__c.CreatedBy.LastName,'')} ({!Account_Profile__c.CreatedDate})"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$ObjectType.Account_Profile__c.fields.LastModifiedById.Label}" for="lastModifiedBy"/>
+                            <apex:outputPanel layout="inline" id="lastModifiedBy">
+                                <apex:outputField value="{!Account_Profile__c.LastModifiedById}" rendered="{!NOT(IsPrintableView)}" />
+                                <apex:outputText value="{!IF(IsPrintableView,Account_Profile__c.LastModifiedBy.FirstName+' '+Account_Profile__c.LastModifiedBy.LastName,'')} ({!Account_Profile__c.LastModifiedDate})"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                </div>
+            </a>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:outputPanel layout="block" style="{!IF(IsPrintableView,'page-break-before:always;','')}" rendered="{!OR(IsStrategicPlansRendered,IsCompeditorsRendered,IsMessagingStrategiesRendered,IsAssessmentSummaryRendered,IsLegacyAccountSWOTAnalysisRendered)}">
+        <a name="StrategicPlans_target" class="anchor">
+            <div class="anchor">
+                <apex:outputPanel layout="none" rendered="{!IsStrategicPlansRendered}">
+                    <apex:form id="strategicPlans">
+                        <apex:pageBlock title="{!$ObjectType.StrategicPlan__c.LabelPlural}" mode="detail" id="plans">
+                            <apex:pageBlockButtons location="top">
+                                <apex:commandButton action="{!cancel}" onclick="top.location.href='/apex/StrategicPlanTabSet?ids={!Account_Profile__c.Id},{!Account_Profile__c.Account__c}&mode=new&activeTab=StrategicPlan__c&retURL=/{!Account_Profile__c.Id}';return false" id="newStrategicPlan" value="{!$Label.StrategicPlan_New}" immediate="true" rendered="{!IsStrategicPlansCreateable}" />
+                            </apex:pageBlockButtons>
+                            <c:QueriedList object="StrategicPlan__c"
+                                fields="PlanNumber__c,Name,Status__c,PlanStartDate__c,PlanEndDate__c"
+                                sortFields="PlanNumber__c,Name,Status__c,PlanStartDate__c,PlanEndDate__c"
+                                conditions="AccountProfile__c='{!Account_Profile__c.Id}'"
+                                order="PlanNumber__c,Name,Id"
+                                recordsPerPage="50"
+                                actionField="{!IF(IsPrintableView,'','PlanNumber__c')}"
+                                panelClass=""
+                                styleClass=""
+                                panelStyle="{!IF(IsPrintableView,'','max-height:28ex;overflow-y:auto;overflow-x:hidden;')}"
+                                rendered="{!NOT(ISBLANK(Account_Profile__c.Id))}" />
+                        </apex:pageBlock>
+                    </apex:form>
+                </apex:outputPanel>
+            </div>
+        </a>
+        <a name="Compeditors_target" class="anchor">
+            <div class="anchor">
+                <apex:relatedList list="Competitor__r" id="Competitors" pageSize="{!IF(IsPrintableView,'100','5')}" rendered="{!IsCompeditorsRendered}"/>
+            </div>
+        </a>
+        <a name="MessagingStrategies_target" class="anchor">
+            <div class="anchor">
+                <apex:relatedList list="Messaging_Strategy__r" pageSize="{!IF(IsPrintableView,'100','5')}" id="MessagingStrategies" rendered="{!IsMessagingStrategiesRendered}"/>
+            </div>
+        </a>
+        <a name="AssessmentSummary_target" class="anchor">
+            <div class="anchor">
+                <apex:relatedList list="Account_Manager_Summary__r" pageSize="{!IF(IsPrintableView,'100','5')}" id="AssessmentSummary" rendered="{!IsAssessmentSummaryRendered}"/>
+            </div>
+        </a>
+    </apex:outputPanel>
+</apex:page>

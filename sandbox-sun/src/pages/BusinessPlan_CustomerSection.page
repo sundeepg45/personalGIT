@@ -1,0 +1,111 @@
+<apex:page standardController="SFDC_Channel_Account_Plan__c" extensions="BusinessPlan_CustomerSectionController">
+    <apex:stylesheet value="{!$Resource.Common_EmbeddedPageStylesheet}"/>
+
+	<style>
+<!--
+	.bPageBlock .detailList .dataCol {
+		width:15%;
+		text-align:right;
+        display:table-column;
+	}
+	.bPageBlock .detailList .labelCol {
+		width:15%;
+		text-align:right;
+        display:table-column;
+	}
+    .bPageBlock .detailList .yesnoCol {
+		width:15%;
+		text-align:right;
+        display:table-column;
+    }
+	div.header {
+		font-size: 91%;
+		font-weight: bold;
+		color: #4a4a56;
+	}
+        -->
+
+    table#topCustomerTable {
+        width: 100%;
+    }
+    table#topCustomerTable td {
+        width: 15%;
+    }
+	</style>
+
+   	<apex:form >
+    <div id="BusinessPlan_CustomerSection"><apex:pageBlock >
+
+    <apex:pageBlockButtons location="top" >
+        <apex:commandButton id="editCustomersButton" value="{!$Label.Business_Plan_Add_Edit_Customers}"
+        onclick="window.top.location.href='/apex/BusinessPlan_Customers?bpid={!bp.Id}'"
+        />
+    </apex:pageBlockButtons>
+
+	<div class="pbSubsection"><div class="detailList">
+
+   	<apex:outputPanel rendered="{!customers.size > 0}">
+        <table id="topCustomerTable">
+        <tr>
+            <th>{!$ObjectType.Business_Plan_Customer__c.fields.Customer_Name__c.label}</th>
+            <th>{!$ObjectType.Business_Plan_Customer__c.fields.Technology__c.label}</th>
+            <th>{!$ObjectType.Business_Plan_Customer__c.fields.Technology_Goal__c.label}</th>
+            <th>{!$ObjectType.Business_Plan_Customer__c.fields.Delivering_All_Tech__c.label}</th>
+            <th>{!$ObjectType.Business_Plan_Customer__c.fields.Willing_to_Influence__c.label}</th>
+        </tr>
+            <apex:repeat value="{!customers}" var="cust" >
+                <tr>
+                    <td>
+                		{!cust.Customer_Name__c}
+                    </td>
+                    <td>
+                		{!cust.Technology__c}
+                    </td>
+                    <td>
+                		{!cust.Technology_Goal__c}
+                    </td>
+                    <td>
+                        <apex:outputText rendered="{!cust.Delivering_All_Tech__c == true}" value="{!$Label.yes}"/>
+                        <apex:outputText rendered="{!cust.Delivering_All_Tech__c == false}" value="{!$Label.no}"/>
+                    </td>
+                    <td>
+                        <apex:outputText rendered="{!cust.Willing_to_Influence__c == true}" value="{!$Label.yes}"/>
+                        <apex:outputText rendered="{!cust.Willing_to_Influence__c == false}" value="{!$Label.no}"/>
+                    </td>
+                </tr>
+            </apex:repeat>
+        </table>
+    </apex:outputPanel>
+<!--
+   	<apex:outputPanel rendered="{!customers.size > 0}" style="display:table">
+        <div style="display:table-row">
+            <div class="labelCol first">{!$ObjectType.Business_Plan_Customer__c.fields.Customer_Name__c.label}</div>
+            <div class="dataCol header">{!$ObjectType.Business_Plan_Customer__c.fields.Technology__c.label}</div>
+            <div class="dataCol header">{!$ObjectType.Business_Plan_Customer__c.fields.Technology_Goal__c.label}</div>
+            <div class="dataCol header">{!$ObjectType.Business_Plan_Customer__c.fields.Delivering_All_Tech__c.label}</div>
+            <div class="dataCol header">{!$ObjectType.Business_Plan_Customer__c.fields.Willing_to_Influence__c.label}</div>
+        </div>
+        <apex:repeat value="{!customers}" var="cust" >
+            <div style="display:table-row">
+                <div class="labelCol first">{!cust.Customer_Name__c}</div>
+                <div class="dataCol">{!cust.Technology__c}</div>
+                <div class="dataCol">{!cust.Technology_Goal__c}</div>
+                <div class="dataCol">
+                    <apex:outputText rendered="{!cust.Delivering_All_Tech__c == true}" value="{!$Label.yes}"/>
+                    <apex:outputText rendered="{!cust.Delivering_All_Tech__c == false}" value="{!$Label.no}"/>
+                </div>
+                <div class="dataCol">
+                    <apex:outputText rendered="{!cust.Willing_to_Influence__c == true}" value="{!$Label.yes}"/>
+                    <apex:outputText rendered="{!cust.Willing_to_Influence__c == false}" value="{!$Label.no}"/>
+                </div>
+            </div>
+        </apex:repeat>
+    </apex:outputPanel>
+        -->
+    <apex:outputLabel rendered="{!customers.size == 0}" id="noCustomersLabel" value="{!$Label.Business_Plan_No_Customers}"/>
+    </div>
+</div>
+</apex:pageBlock></div>
+</apex:form>
+
+</apex:page>

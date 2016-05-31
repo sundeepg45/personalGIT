@@ -1,0 +1,325 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page controller="refedge.NewOpportunityAttributeController" id="pageId" sidebar="false" tabStyle="refedge__Attribute__c">
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessages id="pgmsgId" escape="false"/>
+    <style>
+        .bPageBlock{
+            float:left !important;
+            width:100% !important;
+        }
+        a{
+            text-decoration: none;
+        }
+        a:hover{
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        var isMoreFilterActive = false;
+        function selectAllChk(cb, size){
+            var selectSingleId = 'input:checkbox[id*=selectSingleProductId]';
+            if(jQuery(cb).attr("checked")){
+                jQuery(selectSingleId).each(function(){
+                    jQuery(this).attr('checked','checked');
+                    jQuery(this).closest('tr').css("background-color","#B0E1FA");
+                });
+            }
+            else {
+                jQuery(selectSingleId).removeAttr('checked');  
+                jQuery(selectSingleId).each(function(){
+                    jQuery(this).closest('tr').css("background-color","#FFFFFF");
+                });
+            }
+        }
+        function enableDisable(){
+            var selectSingleId = 'input:checkbox[id*=selectSingleProductId]';
+            var selectAllId = 'input:checkbox[id*=selectAllProductId]';
+            jQuery(selectSingleId).each(function(){
+                if(jQuery(this).attr("checked"))
+                    jQuery(this).closest('tr').css("background-color","#B0E1FA");
+                else
+                    jQuery(this).closest('tr').css("background-color","#FFFFFF");
+            });
+            if(jQuery(selectSingleId+":checked").length == jQuery(selectSingleId).length){
+                jQuery(selectAllId).attr('checked', 'checked');
+            }
+            else
+                jQuery(selectAllId).removeAttr('checked');
+        }
+        function showHideFilters(str){
+            if(str == 'one'){
+                isMoreFilterActive = false;
+                document.getElementById('moreFilter').style.display = 'none';
+                document.getElementById('oneFilter').style.display = 'block';
+                document.getElementById('pageId:formId:pbId:selectField').value = document.getElementById('pageId:formId:pbId:repeatId:0:selectField').value;
+                document.getElementById('pageId:formId:pbId:selectOp').value = document.getElementById('pageId:formId:pbId:repeatId:0:selectOp').value;
+                document.getElementById('pageId:formId:pbId:selectValue').value = document.getElementById('pageId:formId:pbId:repeatId:0:selectValue').value;
+            }
+            else if(str == 'more'){
+                isMoreFilterActive = true;
+                document.getElementById('oneFilter').style.display = 'none';
+                document.getElementById('moreFilter').style.display = 'block';
+                if(document.getElementById('moreFilter').children[9].innerHTML == '')
+                    document.getElementById('moreFilter').children[9].remove();
+                document.getElementById('moreFilter').children[8].children[3].style.display = 'none';
+                document.getElementById('pageId:formId:pbId:repeatId:0:selectField').value = document.getElementById('pageId:formId:pbId:selectField').value;
+                document.getElementById('pageId:formId:pbId:repeatId:0:selectOp').value = document.getElementById('pageId:formId:pbId:selectOp').value;
+                document.getElementById('pageId:formId:pbId:repeatId:0:selectValue').value = document.getElementById('pageId:formId:pbId:selectValue').value;
+            }
+        }
+        function runScript(e, value) {
+            if (e.keyCode == 13) {
+                var numbers = /^[0-9]+$/;  
+                if ((value.length > 0 && value.length < 4) && value.match(numbers)) {
+                    if(value != pageNo3){
+                        PORShowLoading();
+                        setPageNumber(value);
+                    }
+                }
+                else {
+                    document.getElementById('pageId:formId:ProductId:productsectionId:input3').value = pageNo3;
+                }
+            }
+        }
+        function stopRKey(evt) { 
+          var evt = (evt) ? evt : ((event) ? event : null); 
+          var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+          if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+        } 
+        document.onkeypress = stopRKey; 
+        
+        function changeOptions(evt){
+            var newOptions = {
+                            '0' : '--None--'
+                        };
+            if(evt.value == null || evt.value == ''){
+                newOptions = {
+                            '0' : '--None--',
+                            '1' : 'equals',
+                            '2' : 'not equals to',
+                            '3' : 'starts with',
+                            '4' : 'contains',
+                            '5' : 'does not contain',
+                            '6' : 'less than',
+                            '7' : 'greater than',
+                            '8' : 'less or equal',
+                            '9' : 'greater or equal',
+                            '10' : 'includes',
+                            '11' : 'excludes',
+                            '12' : 'within'
+                        };
+            }
+            else if(evt.value == 'Name' || evt.value == 'ProductCode' || evt.value == 'Family' || evt.value == 'Description' ){
+                newOptions = {
+                            '0' : '--None--',
+                            '1' : 'equals',
+                            '2' : 'not equals to',
+                            '6' : 'less than',
+                            '7' : 'greater than',
+                            '8' : 'less or equal',
+                            '9' : 'greater or equal',
+                            '4' : 'contains',
+                            '5' : 'does not contain',
+                            '3' :  'starts with'
+                        };
+            }
+            var select;
+            if(evt.id == 'pageId:formId:pbId:selectField' || evt.id == 'pageId:formId:pbId:repeatId:0:selectField'){
+                select = document.getElementById('pageId:formId:pbId:selectOp');
+                jQuery('option', select).remove();
+                jQuery.each(newOptions, function(text, key) {
+                    var node = document.createElement("Option");                 
+                    var textnode = document.createTextNode(key, text);         
+                    node.appendChild(textnode);  
+                    node.value = text;       
+                    select.appendChild(node);   
+                });
+                select = document.getElementById('pageId:formId:pbId:repeatId:0:selectOp');
+                jQuery('option', select).remove();
+                jQuery.each(newOptions, function(text, key) {
+                    var node = document.createElement("Option");                 
+                    var textnode = document.createTextNode(key, text);         
+                    node.appendChild(textnode);  
+                    node.value = text;                           
+                    select.appendChild(node);   
+                });
+            } 
+            else{
+                for(var chkCount = 0; chkCount < 5; chkCount++){
+                    if(evt.id == 'pageId:formId:pbId:repeatId:'+chkCount+':selectField'){
+                        select = document.getElementById('pageId:formId:pbId:repeatId:'+chkCount+':selectOp');
+                        jQuery('option', select).remove();
+                        jQuery.each(newOptions, function(text, key) {
+                            var node = document.createElement("Option");                 
+                            var textnode = document.createTextNode(key, text);         
+                            node.appendChild(textnode);       
+                            node.value = text;                      
+                            select.appendChild(node);   
+                        });
+                    }
+                }
+            }
+            return false;
+        }
+        function searchJs(){
+            if(isMoreFilterActive || isMoreFilterActive == true){
+                search(document.getElementById('pageId:formId:pbId:repeatId:0:selectField').value,document.getElementById('pageId:formId:pbId:repeatId:0:selectOp').value,document.getElementById('pageId:formId:pbId:repeatId:0:selectValue').value);
+            }
+            else{
+                search(document.getElementById('pageId:formId:pbId:selectField').value,document.getElementById('pageId:formId:pbId:selectOp').value,document.getElementById('pageId:formId:pbId:selectValue').value);
+            }
+        }
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="setPageNumber" action="{!setPageNumber}" status="status" reRender="pgmsgId,productPanelId"  oncomplete="PORHideLoading();">
+            <apex:param name="param1" value="" assignTo="{!PageNumber}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="search" action="{!showResultsByKeyword}" oncomplete="PORHideLoading();" reRender="productPanelId,pgmsgId,errorPanelId">
+            <apex:param name="param1" value="" assignTo="{!filterList[0].selectedField}"/>
+            <apex:param name="param2" value="" assignTo="{!filterList[0].selectedOperator}"/>
+            <apex:param name="param3" value="" assignTo="{!filterList[0].value}"/>
+        </apex:actionFunction>
+        <apex:sectionHeader title="{!$Label.Add_Opportunity_Attributes}"/>
+        <apex:outputText value="{!$Label.Filter_info}"/>
+        <br/>
+        <apex:commandButton action="{!createProductAttributes}" style="margin-right: 5px;margin-left: 40%;" value="{!$Label.Create_Attribute}"/>
+        <apex:commandButton action="{!cancel}" value="{!$Label.Cancel}"/>
+        <apex:pageBlock id="pbId">
+            <div style="float:left;margin-left:5px;"><h3>{!$Label.Search}</h3></div><br/>
+            <apex:outputPanel id="searchPanelId" style="float:left;border:1px solid #d6d6d6;width:99%;margin:10px 0px 10px 5px;padding:10px;border-top-left-radius: 4px;border-top-right-radius: 4px;background: #f2f2f2 url('/img/alohaSkin/bPageBlock_gradient.png') repeat-x;">
+                <div style="float:left;width:100%">
+                    <div style="float:left;">
+                        <apex:outputText style="font-weight:bold;" value="{!$Label.By_Keyword}"/><br/>
+                        <apex:inputText style="margin-top:5px;" value="{!searchText}"/>
+                    </div>
+                    <div style="float:left;margin-left:10px;">
+                        <apex:outputText style="font-weight:bold;" value="{!$Label.By_Field_Filter}"/><br/>
+                        <div style="float:left;margin-top:3px;display:none;" id="moreFilter">
+                            <apex:repeat id="repeatId" value="{!filterList}" var="filter">
+                                <div style="float:left;margin-top:4px;">
+                                    <apex:selectList size="1" value="{!filter.selectedField}" id="selectField" style="font-size: 91%;margin-right: 7px;margin-top: 1px;" onchange="changeOptions(this);return false;">
+                                        <apex:selectOptions value="{!productFields}"/>
+                                    </apex:selectList>
+                                    <apex:selectList size="1" value="{!filter.selectedOperator}" id="selectOp" style="width: 105px;font-size: 91%;margin-right: 7px;margin-top: 1px;">
+                                        <apex:selectOptions value="{!operators}"/>
+                                    </apex:selectList> 
+                                    <apex:inputText value="{!filter.value}" id="selectValue" maxlength="80" style="  margin-right: 5px;"/>
+                                    <span>AND</span>
+                                </div><br/>
+                            </apex:repeat>
+                            <apex:outputLink style="margin-top: 7px;  float: left;" onclick="showHideFilters('one');return false;">{!$Label.Fewer_filters}</apex:outputLink><br/>
+                        </div>
+                        <div style="float:left;margin-top:3px;display:block;" id="oneFilter">
+                            <div style="float:left;margin-top:4px;">
+                                <apex:selectList size="1" value="{!filterList[0].selectedField}" id="selectField" style="font-size: 91%;margin-right: 7px;margin-top: 1px;" onchange="changeOptions(this);return false;">
+                                    <apex:selectOptions value="{!productFields}"/>
+                                </apex:selectList>
+                                <apex:selectList size="1" value="{!filterList[0].selectedOperator}" id="selectOp" style="width: 105px;font-size: 91%;margin-right: 7px;margin-top: 1px;">
+                                    <apex:selectOptions value="{!operators}"/>
+                                </apex:selectList>
+                                <apex:inputText value="{!filterList[0].value}" id="selectValue" maxlength="80" style="  margin-right: 5px;"/>
+                                <apex:outputLink style="color: #015ba7;" onclick="showHideFilters('more');return false;">{!$Label.More_filters}</apex:outputLink>
+                            </div><br/>
+                        </div>
+                    </div>
+                </div>
+                <div style="width:100%;margin-top:5px;">
+                    <apex:commandButton value="{!$Label.Search}" onclick="PORShowLoading();searchJs();return false;"/>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel id="errorPanelId">
+                <apex:outputPanel rendered="{!OR(appliedFilter != '',errorMsg != '',searchText != '')}" style="float:left;border:1px solid #d6d6d6;word-wrap: break-word;width:25%;margin:10px 0px 10px 5px;padding:10px;background-color: #f2f2f2;">
+                    <apex:outputText style="font-weight:bold;" value="{!$Label.Keyword}: " rendered="{!searchText != ''}"/>
+                    <apex:outputText value="{!searchText}"/>&nbsp;&nbsp;
+                    <apex:outputText style="font-weight:bold;" value="{!$Label.Filtered_By}: " rendered="{!appliedFilter != ''}"/>
+                    <apex:outputText value="{!appliedFilter}"/>
+                    <apex:outputtext rendered="{!OR(appliedFilter != '',errorMsg != '')}">&nbsp;&nbsp;|&nbsp;&nbsp;</apex:outputtext>
+                    <apex:commandLink action="{!clearFilters}" style="color:black;text-decoration:underline;" rendered="{!OR(appliedFilter != '',errorMsg != '')}" value="{!$Label.ClearFilters}"  reRender="searchPanelId,productPanelId,errorPanelId" onclick="PORShowLoading();"  oncomplete="PORHideLoading();"/><br/>
+                    <apex:outputText style="color : #d74c3b;" value="{!JSENCODE(errorMsg)}" escape="false"/>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageBlock>
+        <apex:pageBlock id="ProductId">
+            <apex:pageBlockButtons id="pbbIdTop" location="top" >
+                <div style="width: 100%;text-align:right;font-size:91%;">
+                    <apex:repeat value="{!alphabets}" var="alpha" id="alphaRptId">&nbsp;&nbsp;
+                        <apex:commandLink style="{!IF(alpha == character,'color:black !important;font-weight: bold !important;','color: #015ba7;')}" action="{!showResultsByAlphabet}" value="{!alpha}"  reRender="ProductId,productPanelId" onclick="PORShowLoading();"  oncomplete="PORHideLoading();" id="alphaCmdLinkId">
+                            <apex:param name="alphabet" value="{!alpha}" assignTo="{!character}"/>
+                        </apex:commandLink>
+                    </apex:repeat>
+                </div>
+            </apex:pageBlockButtons>
+            <apex:outputPanel id="productPanelId" layout="block">
+                <apex:pageBlockSection columns="1" id="productsectionId">
+                    <apex:pageBlockTable value="{!productList}" var="productWrap" id="products" >
+                        <apex:column >
+                            <apex:facet name="header">
+                                <apex:inputCheckBox id="selectAllProductId"  onclick="selectAllChk(this, '{!productList.size}')" />
+                            </apex:facet>
+                            <apex:inputCheckBox id="selectSingleProductId" value="{!productWrap.isSelected}" onclick="enableDisable();"/>
+                        </apex:column>
+                        <apex:column headerValue="{!$ObjectType.Product2.fields.Name.Label}">
+                            <apex:outputField value="{!productWrap.product.Name}" />
+                        </apex:column>
+                        <apex:column headerValue="{!$ObjectType.Product2.fields.ProductCode.Label}">
+                            <apex:outputField value="{!productWrap.product.ProductCode}"/>
+                        </apex:column>
+                        <apex:column headerValue="{!$ObjectType.Product2.fields.Description.Label}" > 
+                            <apex:outputField value="{!productWrap.product.Description}"/>
+                        </apex:column>
+                        <apex:column headerValue="{!$ObjectType.Product2.fields.Family.Label}">
+                            <apex:outputField value="{!productWrap.product.Family}"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                    <apex:outputPanel layout="block" styleClass="paginatorWrap" rendered="true">
+                        <div class="paginator" id="pager">
+                            <span class="left">
+                                {!(pageNumber * size)+1-size}-{!IF((pageNumber * size) > noOfRecords, noOfRecords,(pageNumber * size))} of {!noOfRecords}
+                            </span>
+                            <span class="prevNextLinks">           
+                                <span class="prevNext">
+                                    <apex:commandLink action="{!previous}" onclick="PORShowLoading();"  oncomplete="PORHideLoading();" reRender="ProductId" rendered="{!hasPrevious}" style="color:black;">
+                                        <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!hasPrevious}" width="5px" height="8px"/>&nbsp;{!$Label.Previous_Page}
+                                    </apex:commandLink> 
+                                </span>
+                                <span class="prevNext">
+                                    <apex:commandLink action="{!next}" onclick="PORShowLoading();"  oncomplete="PORHideLoading();" reRender="ProductId" rendered="{!hasNext}" style="color:black;">{!$Label.Next_Page}&nbsp; 
+                                        <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!hasNext}" width="5px" height="8px"/>       
+                                    </apex:commandLink>
+                                </span>
+                            </span>
+                            <span class="right">
+                                {!$Label.Page}&nbsp; 
+                                <apex:inputText id="input3" value="{!pageNumberString}" onkeyDown="runScript(event, this.value);" styleClass="pageInput"/> of {!totalPage}
+                            </span>       
+                            <script>
+                                pageNo3 = {!PageNumber};
+                                enableDisable();
+                            </script>  
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form> 
+</apex:page>

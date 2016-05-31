@@ -1,0 +1,61 @@
+<apex:page controller="CommunitiesPopularDocsDisplayController" showHeader="{!showHeader}" sidebar="{!showHeader}" standardStylesheets="false">
+
+    <!--CSS Files 
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+    -->
+    <!--JS Files 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+    -->
+
+    <div class="red-hat-content" style="background: none;">
+        <table class="table table-striped">
+            <tr>
+                <th><apex:image value="{!$Resource.rhLogo}"/></th>
+                <th style="vertical-align: bottom;"><b> {!$Label.Popular_Documents} </b> </th>
+            </tr>
+            <tr>
+                <td><b>{!$Label.Published_Date}</b></td>
+                <td><b>{!$Label.Title}</b></td>
+            </tr>
+            <apex:repeat value="{!documentsList}" var="doc">
+
+                    <tr>
+                        <td>
+                            <apex:outputText value="{0,date, M/d/yyyy}">
+                                 <apex:param value="{!doc.LatestPublishedVersion.CreatedDate}"/>
+                            </apex:outputText>
+                        </td>
+                        <td id="{!doc.id}">
+                            <a href="/sfc/#version/{!doc.Id}" target="_blank">
+                                <apex:outputText value="{!doc.Title}" />
+                            </a>
+                        </td>
+                    </tr>
+
+            </apex:repeat>
+                <tr>
+                <td>
+                    <apex:outputPanel id="morePanel" rendered="{!limitNumber != 30 && documentsList.size>4}">
+                        <apex:outputLink value="/CommunitiesPopDocs" target="_blank" id="moreLink">
+                            <apex:param name="viewMore" value="true"/>
+                            <apex:param name="language" value="{!selectedLanguageCode}"/>
+                            {!$Label.View_More}
+                        </apex:outputLink>
+                    </apex:outputPanel>
+                </td>
+                <td>
+                     <apex:outputPanel id="englishPanel" rendered="{!selectedLanguageCode != 'en_US'}">
+                        <apex:outputLink value="/CommunitiesPopDocs" target="_blank" id="englishLink">
+                            <apex:param name="language" value="en_US"/>
+                            <apex:param name="viewMore" value="{!viewMore}"/>
+                        {!$Label.Show_English_Documents}
+                        </apex:outputLink>
+                    </apex:outputPanel>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</apex:page>

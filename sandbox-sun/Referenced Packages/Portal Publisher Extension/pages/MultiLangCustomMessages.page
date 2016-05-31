@@ -1,0 +1,137 @@
+<apex:page standardController="APPR_PUB__Headline__c" extensions="APPR_PUB_XT.LocalizedCustomMessageController" showheader="false" sidebar="false">
+
+<apex:variable var="standardUI" value="newSkinOn" rendered="{!ISNULL(resourceLocation)}">
+    <apex:stylesheet value="{!$Resource.APPR_PUB__CustomMessagesCSS}"/>
+</apex:variable>
+
+<apex:variable var="customUI" value="newSkinOn" rendered="{!NOT(ISNULL(resourceLocation))}">
+    <apex:stylesheet value="{!resourceLocation}"/>
+</apex:variable>
+<!-- PRIMARY COLOR - change the six character hex value below-->
+
+<apex:variable var="customPrimaryColor" value="customPrimaryColor" rendered="{!NOT(ISNULL(primaryColor))}">
+	<APPR_PUB:primaryColor primaryColor="{!primaryColor}"/>
+</apex:variable>
+
+<!-- LINK COLOR - change the six character hex value below-->
+<apex:variable var="customLinkColor" value="customLinkColor" rendered="{!NOT(ISNULL(linkColor))}">
+	<APPR_PUB:linkColor linkColor="{!linkColor}"/>
+</apex:variable>
+
+<!-- Loop to build the list of row divs -->
+<apex:repeat value="{!headlineRowList}" var="headlineRow" id="headlineRowList">
+    <div id="uiRowWrapper"> 
+
+   
+        <!-- Loop to build the list of column divs -->
+        <apex:repeat value="{!headlineRow}" var="headlineCol" id="headlineColList">
+            <div id="uiColWrapper">
+            
+                <!-- Loop to build the list of headlines in each column -->
+                <apex:repeat value="{!headlineCol}" var="headline" id="headlineList">
+        
+                    <!-- Display multi line headline box -->
+                    <apex:outputPanel rendered="{!IF(headline.RecordType.Name = 'Multi Line', true, false)}" >
+                        <div id="uiBoxWrapper" class="{!IF(headline.APPR_PUB__Vertical_Stack__c, 'vst', '')}" >
+                            <div id="uiBoxHeader"><h1>{!headline.Name}</h1></div>             
+                            <div id="uiBoxImage">
+                                <apex:outputPanel rendered="{!NOT(ISNULL(headline.APPR_PUB__Image_Url__c))}" layout="none">
+                                    <apex:outputlink value="{!headline.APPR_PUB__Image_Url__c}" target="_blank" 
+                                        rendered="{!IF(headline.APPR_PUB__Image_Url__c != null, true, false)}" > 
+                                        <apex:image url="{!headline.APPR_PUB__Image_Path__c}" style="border:none"/>
+                                    </apex:outputlink>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!ISNULL(headline.APPR_PUB__Image_Url__c)}" layout="none">
+                                    <apex:image url="{!headline.APPR_PUB__Image_Path__c}" style="border:none"/>
+                                </apex:outputPanel>
+                            </div>                      
+                            <div id="uiBoxContent"><p><apex:outputText escape="false" value="{!headline.APPR_PUB__Description__c}" /></p><br/>            
+                                         
+        
+                                <!-- Loop to build the links in each headline -->
+                                <apex:repeat value="{!headline.APPR_PUB__Headline_Links__r}" var="headlineLinks" id="headlineLinks">
+                                    <!-- this needs to be rendered if newline is true -->
+                                    <apex:outputPanel rendered="{!headlineLinks.APPR_PUB__Newline__c}" layout="none" ><br/></apex:outputPanel>
+                                    <a href="{!headlineLinks.APPR_PUB__URL__c}" target="{!IF(headlineLinks.APPR_PUB__Open_In_New_Window__c, '_blank', '_parent')}">
+                                        <apex:outputText value="{!IF(ISNULL(headlineLinks.APPR_PUB__Display_Name__c), headlineLinks.Name, headlineLinks.APPR_PUB__Display_Name__c )}" />
+                                    </a>
+                                    <apex:outputPanel rendered="{!headlineLinks.APPR_PUB__Show_New__c}" layout="none">
+                                        <font color="red"><sup>NEW!</sup></font></apex:outputPanel>
+                                </apex:repeat>    
+                            </div>            
+                            <div rendered="{!IF(headline.RecordType.Name = 'Multi Line', true, false)}" id="uiFooter"></div>    
+                        </div>  
+                    </apex:outputPanel>  
+      
+                    <!-- Display single line image box -->
+                    <apex:outputPanel rendered="{!IF(headline.RecordType.Name = 'Single Line' && headline.APPR_PUB__Image_Path__c != null, true, false)}" >
+                        <div id="imageBoxWrapper" class="{!IF(headline.APPR_PUB__Vertical_Stack__c, 'imgvst', '')}" >            
+                            <div id="uiSingleImage">
+                                <!-- Display if image has a destination link -->
+                                <apex:outputlink value="{!headline.APPR_PUB__Image_Url__c}" target="_blank" rendered="{!IF(headline.APPR_PUB__Image_Url__c != null, true, false)}"> <apex:image url="{!headline.APPR_PUB__Image_Path__c}"/></apex:outputlink>
+                                <!-- Display if image does not have a destination link -->
+                                <apex:image url="{!headline.APPR_PUB__Image_Path__c}" rendered="{!IF((headline.APPR_PUB__Image_Url__c == '') || (headline.APPR_PUB__Image_Url__c == null), true, false)}"/>
+                            </div>  
+                        </div>    
+                    </apex:outputPanel>
+                    
+                    <!-- Display single line text box -->
+                    <apex:outputPanel rendered="{!IF(headline.RecordType.Name = 'Single Line' && headline.APPR_PUB__Image_Path__c == '', true, false)}" >               
+                        <div id="textBoxWrapper" class="{!IF(headline.APPR_PUB__Vertical_Stack__c, 'vst', '')}" >            
+                            <div id="uiSingleText"><p><apex:outputText escape="false" value="{!headline.APPR_PUB__Description__c}" /></p></div>
+                            <div id="uiFooter"></div>
+                        </div>    
+                    </apex:outputPanel>
+                    
+                    
+                    <!-- for the left navs -->
+                    <apex:outputpanel rendered="{!(headline.RecordType.Name = 'Multi Group')}">
+                    
+                        <div id="portletWrapper"> 
+                            <div id="portletHeader">
+                                <div id="leftTitle"><h1>{!headline.APPR_PUB__Group_Header__c}</h1></div>
+                                <div id="rightTitle"><h1>{!headline.APPR_PUB__Link_Header__c}</h1></div>
+                            </div>
+                        
+                            <div id="portletContent">
+                                <apex:form id="theForm">
+                                    <div id="leftColumnWrapper"> 
+                                        <ul id="portletLeftNav">
+                                            <apex:repeat value="{!headline.APPR_PUB__Headline_Link_Groups__r}" var="leftNav" id="leftNav">
+                                                <li id="{!IF(BEGINS(leftNav.Id, selectedNav), 'selectedNav', 'nav')}"><apex:commandLink action="{!selectLeftNav}" reRender="theForm">
+                                                    {!leftNav.Name}
+                                                    <apex:param name="leftNavId" value="{!leftNav.Id}"/>
+                                                    </apex:commandLink>
+                                                </li>
+                                            </apex:repeat>
+                                        </ul>
+                                        <div id="leftSideBG"></div>
+                                    </div>
+                            
+                                    <ul id="portletRightNav">
+                                        <apex:repeat value="{!rightNavs}" var="rightNav" id="rightNav">
+                                            <li><a href="{!rightNav.APPR_PUB__URL__c}" target="{!IF(rightNav.APPR_PUB__Open_In_New_Window__c, '_blank', '_parent')}">
+                                                <apex:outputText value="{!IF(ISNULL(rightNav.APPR_PUB__Display_Name__c), rightNav.Name, rightNav.APPR_PUB__Display_Name__c )}" />
+                                            </a>
+                                            <apex:outputPanel rendered="{!rightNav.APPR_PUB__Show_New__c}" layout="none">
+                                                    <font color="red"><sup>NEW!</sup></font></apex:outputPanel>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>
+                                    
+                                </apex:form>
+                                    
+                                <div id="portletClearBoth"></div>
+                            </div>    
+                        
+                            <div id="portletFooter"></div>
+                        </div>
+                    </apex:outputpanel>
+                     
+                </apex:repeat>
+            </div>
+        </apex:repeat>
+ 
+    </div>
+</apex:repeat>
+</apex:page>

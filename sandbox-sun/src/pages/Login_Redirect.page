@@ -1,0 +1,91 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false" cache="false" >
+    <!-- apex:stylesheet value="{!URLFOR($Resource.Onboarding_ScreenCSS)}" / -->
+    <apex:stylesheet value="/partner/resource/Partner_Onboarding_CSS" />
+       <style type="text/css">
+    .messageTable { width: 100%; border: 2px solid red; margin-bottom: 1em; }
+    .messageTable h4 { color: red; }
+    </style>
+
+    <style type="text/css">
+    table.multiSelectPicklistTable select { width: auto; min-width: 265px; }
+    .simpleRow p { margin: 0; }
+    .simpleRow > label:first-child { display: none; }
+
+    .rowform { position: relative; vertical-align: middle; padding: 0; margin-bottom: 10px; }
+    .rowform .radioButtons label { float: none; width: auto; padding-right: 2em; }
+    .rowform .radioButtons td { padding: 0; }
+    .rowform .radioButtons td input { padding: 0; margin: 0; }
+    .rowform .requiredBlock { background-color:#CC0000; bottom: 1px; left: -5px; position :absolute; top: 1px; width: 3px; display: block; }
+    .rowform .note { margin-left: 5px; }
+    </style>
+    
+    <div id="wrapo">
+    <div id="wrapi">
+    <div id="main">    
+        
+    <apex:outputPanel layout="none">
+    <div id="utility-links">
+        <div id="utilityAccount">
+            <p>
+               <span class="hide"><strong>{!$Label.Onboarding_Header_Account_Links}</strong> </span>
+           </p>
+        </div>    
+    </div>    
+    </apex:outputPanel>
+
+    <apex:outputPanel layout="none">
+        <div id="header">
+        <div id="branding">
+        <h1 class="hide"><apex:outputText value="{!$Label.Onboarding_Label_Red_Hat}" escape="false"/></h1>
+        <a id="rh-logo" href="http://www.redhat.com" title="Red Hat"><img src="http://www.redhat.com/g/chrome/logo_rh_home.png" width="96" height="31" alt="Red Hat" /></a></div>
+        </div>
+    </apex:outputPanel>
+
+    <div id="content-wrap">
+    <div id="content-full">
+    <div class="col2right">
+    
+            <h2><font color="red"><strong><apex:outputText value="{!$Label.Login_Redirect_01}"/></strong></font></h2>
+            <h3><strong><apex:outputText value="{!$Label.Login_Redirect_02}"/></strong></h3>
+             <p><apex:outputText value="{!$Label.Login_Redirect_03} "escape="false"/></p>
+             <h3><strong><apex:outputText value="{!$Label.Login_Redirect_04}"/></strong></h3>
+            <ul>
+                <li  style="{font-weight: bold;)}"><apex:outputText value="{!$Label.Login_Redirect_05}" escape="false"/></li>
+                <li  style="{font-weight: bold;)}"><apex:outputText value="{!$Label.Login_Redirect_06}" escape="false"/></li>
+               
+            </ul>
+            <p><apex:outputText value="{!$Label.Login_Redirect_07}" escape="false" /></p>
+            <p><apex:outputText value="{!$Label.Login_Redirect_08}" escape="false" /></p>
+        
+        </div>
+
+  
+
+    <!-- div><apex:outputText value="{!debugparams}" style="border: 1px dotted yellow; padding: 1em;" /></div-->
+    <!-- div>Page Name: <apex:outputText value="{!currentPageName}" style="border: 1px dotted yellow; padding: 1em;" /></div-->
+
+    <!-- End of content-wrap, content-full, and col2right -->
+    </div>
+    </div>
+    </div>
+    
+    <apex:outputPanel layout="none">
+        <div id="footer">
+        <ul class="separate">
+            <li class="first"><a href="{!$Label.Red_Hat_Domain_Name}/legal/privacy_statement.html"><strong><apex:outputText value="{!$Label.Onboarding_Privacy_Policy}"/></strong></a></li>
+            <li><a href="{!$Label.Red_Hat_Domain_Name}/legal/legal_statement.html"><apex:outputText value="{!$Label.Onboarding_Terms_Of_Use}"/></a></li>
+            <li><a href="{!$Label.Red_Hat_Domain_Name}/legal/patent_policy.html"><apex:outputText value="{!$Label.Onboarding_Patent_Promise}"/></a></li>
+            <li><a href="{!$Label.Red_Hat_Domain_Name}"><apex:outputText value="{!$Label.Onboarding_Go_To_Corporate_Site}"/></a></li>
+        </ul>
+        <p><apex:outputText value="{!$Label.Onboarding_Copyright}"/></p>
+        </div>
+    </apex:outputPanel> 
+
+    <!-- End of wrapo, wrapi, and main -->
+    </div>
+    </div>
+
+
+
+
+</apex:page>

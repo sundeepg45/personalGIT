@@ -1,0 +1,181 @@
+<apex:page standardcontroller="NFR_Request__c" extensions="NFRPageLayoutController" tabStyle="NFR_Request__c" action="{!doOnLoad}">
+
+  <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+
+  <script type="text/javascript">
+
+      $(document).ready(function(){
+          $('#UseCaseBlock tbody tr:nth-child(1)').mouseenter(function(){
+              $('.modal-window p').remove();
+              $('.modal-window').append('<p>{!$Label.NFR_Cust_Demo}</p>');
+          });
+          $('#UseCaseBlock tbody tr:nth-child(2)').mouseenter(function(){
+              $('.modal-window p').remove();
+              $('.modal-window').append('<p>{!$Label.NFR_Cust_Sup}</p>');
+          });
+          $('#UseCaseBlock tbody tr:nth-child(3)').mouseenter(function(){
+              $('.modal-window p').remove();
+              $('.modal-window').append('<p>{!$Label.NFR_Development}</p>');
+          });
+          $('#UseCaseBlock tbody tr:nth-child(4)').mouseenter(function(){
+              $('.modal-window p').remove();
+              $('.modal-window').append('<p>{!$Label.NFR_Non_Prod}</p>');
+          });
+          $('#UseCaseBlock tbody tr:nth-child(5)').mouseenter(function(){
+              $('.modal-window p').remove();
+              $('.modal-window').append('<p>{!$Label.NFR_Internal_Enablement}</p>');
+          });
+          $('#UseCaseBlock tbody tr:nth-child(6)').mouseenter(function(){
+              $('.modal-window p').remove();
+              $('.modal-window').append('<p>{!$Label.NFR_Testing}</p>');
+          });
+         $('#UseCaseBlock tbody').mouseleave(function(){
+              $('.modal-window p').remove();
+          });
+      });
+
+      function handlePartnerInput() {
+          var pid = $('input[name$=PartnerInput_lkid]').val();
+          doTest(pid);
+      }
+
+  </script>
+
+  <apex:pageMessages id="ErrorMessage" />
+
+  <apex:form rendered="{!maxQuantityExceeded}">
+    <apex:commandButton value="{!$Label.NFR_OK}" action="{!doOK}" id="OK"/>
+  </apex:form>
+
+  <apex:form rendered="{!NOT(maxQuantityExceeded)}">
+
+    <apex:actionFunction name="doTest" action="{!setPartnerId}" immediate="true" rerender="PartnerTypeAndTierPanel,NFRProducts">
+        <apex:param name="partnerId" value=""/>
+    </apex:actionFunction>
+
+    <apex:actionRegion >
+    <apex:commandButton value="{!$Label.NFR_Create_Case}" action="{!doCreateCase}" rendered="{!stopCreation}"/>
+
+    <apex:pageBlock title="{!$Label.NFR_Detail}" rendered="{!editmode==true && stopCreation==false}">
+
+      <apex:pageBlockButtons location="top" >
+        <apex:commandButton action="{!save_submit}" value="{!$Label.NFR_Save_and_Submit}" id="submit" onclick="if(!confirm('{!$Label.NFR_Save_and_Submit_Confirm}')) return false;" />
+        <apex:commandButton action="{!cancel}" value="{!$Label.NFR_Cancel}" id="cancel"/>
+      </apex:pageBlockButtons>
+
+      <apex:actionRegion >
+      <apex:pageBlockSection id="NFRDetail" columns="2">
+        <apex:outputText id="Requestor" label="{!$Label.NFR_Requested_By}" value="{!requestedBy}" />
+        <apex:outputField id="PartnerOutput" value="{!NFR_Request.Partner__c}" rendered="{!AND(NOT(partnerAccountId==null), isPartnerUser)}" />
+        <apex:inputField id="PartnerInput" value="{!NFR_Request.Partner__c}" onchange="handlePartnerInput();" required="true" rendered="{!OR(partnerAccountId==null, NOT(isPartnerUser))}" />
+        <apex:pageBlockSectionItem >
+          <apex:outputPanel >
+            <apex:outputLabel for="Contact" value="{!$ObjectType.NFR_Request__c.Fields.Contact_at_Partner__c.Label}" />
+          </apex:outputPanel>
+          <apex:outputPanel >
+            <apex:inputField id="Contact" value="{!NFR_Request.Contact_at_Partner__c}" required="true">
+              <apex:actionSupport event="onchange" reRender="RHNLoginPanel"/>
+            </apex:inputField>
+          </apex:outputPanel>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+          <apex:outputPanel >
+            <apex:outputLabel for="PartnerTypeAndTier" value="{!$Label.NFR_Partner_Type}" />
+          </apex:outputPanel>
+          <apex:outputPanel id="PartnerTypeAndTierPanel">
+            <apex:outputText id="PartnerTypeAndTier" value="{!partnerTypeAndTier}" />
+          </apex:outputPanel>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+          <apex:outputPanel >
+            <apex:outputLabel for="RHNLogin" value="{!$ObjectType.NFR_Request__c.Fields.RHN_Login__c.Label}" />
+          </apex:outputPanel>
+          <apex:outputPanel id="RHNLoginPanel">
+            <apex:outputText id="RHNLogin" value="{!rhnLogin}" />
+          </apex:outputPanel>
+        </apex:pageBlockSectionItem>
+      </apex:pageBlockSection>
+      </apex:actionRegion>
+
+    </apex:pageBlock>
+
+    <apex:pageBlock title="{!$Label.NFR_Request_Use_Cases}" rendered="{!stopCreation==false}" >
+
+      <div id="UseCaseBlock" style="width: 30%; float: left;" >
+        <apex:outputText value="{!$Label.NFR_Select_All_That_Apply}" />
+        <apex:selectCheckboxes layout="pageDirection" value="{!useCases}" >
+          <apex:selectOptions value="{!useCaseNames}" >
+          </apex:selectOptions>
+        </apex:selectCheckboxes>
+      </div>
+
+      <div class="modal-window" style="width: 70%; float: right;" ></div>
+
+    </apex:pageBlock>
+
+    <apex:pageBlock title="{!$Label.NFR_Purpose_Title}" rendered="{!stopCreation==false}" >
+      <apex:outputText value="{!$Label.NFR_Purpose}" />
+      <apex:pageBlockSection >
+        <apex:outputPanel >
+          <apex:inputField id="ReasonForNFR" value="{!NFR_Request.Comments__c}" required="true" style="width: 100%"/>
+        </apex:outputPanel>
+      </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <apex:pageBlock title="{!$Label.NFR_Select_Products}" rendered="{!editmode==true && stopCreation==false}" >
+
+      <apex:pageblocksection columns="1">
+
+        <apex:outputPanel id="NFRProducts">
+          <apex:PageBlockTable id="pageblock" value="{!skumatrix}" var="newitems" rendered="{!NOT(partnerAccountId==null)}" width="40%" >
+            <apex:column >
+              <apex:facet name="header">{!$Label.NFR_Select_Product}</apex:facet>
+              <apex:inputCheckbox value="{!newitems.Selected__c}" id="selectLine"/>
+            </apex:column>
+            <apex:column headervalue="{!$Label.NFR_Products}">
+              <apex:outputtext value="{!newitems.Name}" id="name"/>
+            </apex:column>
+            <apex:column headervalue="{!$Label.NFR_Quantity}">
+              <apex:inputtext value="{!newitems.Default_Quantity__c}" size="3" id="quantity"/>
+            </apex:column>
+            <apex:column headervalue="{!$Label.NFR_Active}">
+              <apex:outputText value="{0, number, ###,##0}" id="activequantity" escape="False">
+                <apex:param value="{!newitems.Active_Line_Items__c}" />
+              </apex:outputText>
+            </apex:column>
+            <apex:column headervalue="{!$Label.NFR_Max_Quantity}">
+              <apex:outputText value="{0, number, ###,##0}" id="maxquantity" escape="False">
+                <apex:param value="{!newitems.Max_Quantity__c}" />
+              </apex:outputText>
+            </apex:column>
+            <apex:column headervalue="{!$Label.NFR_Description}">
+              <apex:outputtext value="{!newitems.Product_Description__c}" id="description" escape="False"/>
+            </apex:column>
+            <apex:column rendered="{!partnerAccount.Global_Region__c=='APAC' && newitems.Product_Code__c=='SER0366'}">
+              {!$Label.NFRAPACMessage} <a href="/apex/PartnerCertificationsList">Link</a>
+            </apex:column>
+          </apex:PageBlockTable>
+        </apex:outputPanel>
+
+      </apex:pageblocksection>
+
+    </apex:pageblock>
+
+    <apex:pageBlock title="{!$Label.NFR_Terms}" rendered="{!stopCreation==false}" >
+
+      <apex:pageBlockSection >
+        <apex:inputCheckbox value="{!agreeToTerms}" id="Terms" />
+        <apex:outputLabel value="{!$Label.NFR_Terms_Detail}" />
+      </apex:pageBlockSection>
+
+      <apex:pageBlockButtons location="bottom" >
+        <apex:commandButton action="{!save_submit}" value="{!$Label.NFR_Save_and_Submit}" id="submit" onclick="if(!confirm('{!$Label.NFR_Save_and_Submit_Confirm}')) return false;" />
+        <apex:commandButton action="{!cancel}" value="{!$Label.NFR_Cancel}" id="cancel"/>
+      </apex:pageBlockButtons>
+
+    </apex:pageBlock>
+
+    </apex:actionRegion>
+  </apex:form>
+
+</apex:page>

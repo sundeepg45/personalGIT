@@ -1,0 +1,31 @@
+<apex:component controller="AccountComponentController">
+	<apex:attribute name="value" description="Account to show" type="Account" required="true" assignto="{!account}" />
+	<apex:attribute name="showHeader" description="True if the header should be displayed" type="Boolean" required="false" default="true" />
+	<apex:attribute name="showTable" description="True if the list should be displayed as a table" type="Boolean" required="false" default="true" />
+	<apex:outputPanel rendered="{!showHeader}" layout="block" styleClass="pbSubheader tertiaryPalette">
+		<h3>ACCOUNT TEAM MEMBERS <span class="titleSeparatingColon">:</span></h3>
+	</apex:outputPanel>
+	<apex:outputPanel rendered="{!showTable}" layout="block" styleClass="pbSubsection">
+		<table style="font-size: 100%;" class="detailList" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+				<apex:componentBody />
+				<tr>
+					<td align="left"><b>&#160;&#160;Team Member</b></td>
+					<td align="left"><b>&#160;&#160;Role</b></td>
+				</tr>
+				<apex:repeat value="{!AccountTeamMemberList}" var="accountTeamMember">
+					<tr>
+						<td class="dataCol" align="left"><c:OutputString value="{!accountTeamMember.User.Name}">&#160;</c:OutputString></td>
+						<td class="dataCol" align="left"><c:OutputString value="{!accountTeamMember.TeamMemberRole}">&#160;</c:OutputString></td>
+					</tr>
+				</apex:repeat>
+			</tbody>
+		</table>
+	</apex:outputPanel>
+	<apex:repeat rendered="{!AND(NOT(showTable),AccountTeamMemberCount>1)}" value="{!AccountTeamMemberList}" var="accountTeamMember" first="0" rows="{!IF(AccountTeamMemberCount>0,AccountTeamMemberCount-1,0)}">
+		<c:OutputString value="{!accountTeamMember.User.Name}" suffix=", " />
+	</apex:repeat>
+	<apex:repeat rendered="{!NOT(showTable)}" value="{!AccountTeamMemberList}" var="accountTeamMember" first="{!IF(AccountTeamMemberCount>0,AccountTeamMemberCount-1,0)}">
+		<c:OutputString value="{!accountTeamMember.User.Name}">&#160;</c:OutputString>
+	</apex:repeat>
+</apex:component>

@@ -1,0 +1,67 @@
+<apex:page controller="LMSResync" showHeader="true" sidebar="true">
+
+    <script>
+        var previousOnload = window.onload;
+        window.onload = function() {
+            if (previousOnload) {
+                previousOnload();
+            }
+            setTimeout(refresh, 10000);
+        }
+    </script>
+
+    <apex:pageMessages />
+
+    <apex:form >
+
+        <apex:pageBlock title="LMS Resync">
+            <apex:pageBlockSection >
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Specify id of user to resync."/>
+                    <apex:inputText value="{!userId}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection >
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Select CSV file containing ids of users to resync."/>
+                    <apex:inputFile contentType="{!contentType}" size="60" fileName="{!fileName}" value="{!file}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton action="{!submit}" value="Submit"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+
+        <apex:pageBlock id="resyncStatus" title="LMS Resync Status">
+            <apex:pageBlockTable value="{!requests}" var="request" rendered="{!if(requests.size > 0, true, false)}">
+                <apex:column headerValue="User">
+                    <apex:outputLink value="/{!request.User__c}" target="_blank">{!request.User__r.Name}</apex:outputLink> ({!request.User__c})
+                </apex:column>
+                <apex:column headerValue="Status">
+                    <apex:outputText value="{!request.Status__c}"/>
+                </apex:column>
+                <apex:column headerValue="Status Message">
+                    <apex:outputText value="{!request.Status_Message__c}"/>
+                </apex:column>
+                <apex:column headerValue="Submit Time">
+                    <apex:outputField value="{!request.SubmitTime__c}"/>
+                </apex:column>
+                <apex:column headerValue="Complete Time">
+                    <apex:outputField value="{!request.CompleteTime__c}"/>
+                </apex:column>
+            </apex:pageBlockTable>
+
+            <apex:outputText rendered="{!if(requests.size < 1, true, false)}" value="No resync records to display."/>
+
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Delete All Resync Requests" action="{!deleteResyncRequests}" onclick="return window.confirm('Are you sure you want to delete all resync requests?');"/>
+                <apex:commandButton value="Refresh" action="{!updateRequests}"/>
+            </apex:pageBlockButtons>
+
+        </apex:pageBlock>
+
+        <apex:actionFunction action="{!updateRequests}" name="refresh"/>
+
+    </apex:form>
+
+</apex:page>

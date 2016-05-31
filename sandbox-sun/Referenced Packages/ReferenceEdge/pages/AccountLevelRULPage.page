@@ -1,0 +1,174 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page standardController="Account"  sidebar="false" id="pageId" extensions="refedge.AccountLevelRULController"> 
+    
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <script>
+        function validate(compValue) {
+            if (compValue.checked) {
+                var result = confirm("{!$Label.AccountLevelRUL_Checked_Msg}");
+                if (result) {
+                    updateAccountLevelRUL('true');
+                } else {
+                    document.getElementById('pageId:frmId:accLevelRul').value = false;
+                    window.top.location = '/{!JSENCODE(RBI.refedge__Account__c)}';
+                }
+            } else {
+                var result = confirm("{!$Label.AccountLevelRUL_UnChecked_Msg}");
+                if (result) {
+                    updateAccountLevelRUL('false');
+                } else {
+                    document.getElementById('pageId:frmId:accLevelRul').value = true;
+                    window.top.location = '/{!JSENCODE(RBI.refedge__Account__c)}';
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/css">
+        .bPageHeader {
+            display:none;
+        }
+    </style>
+    
+    <apex:outputPanel id="JSPanel" >
+        <script>
+            function refreshPage() {
+                if(('{!isError}' == false || '{!isError}' == 'false') && (document.getElementById('pageId:pgmsgId').innerHTML == '')){
+                    window.top.location = '/{!JSENCODE(RBI.refedge__Account__c)}';
+                }
+                else {
+                    return false;
+                }
+            }
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="frmId"  rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="updateAccountLevelRUL" reRender="pgmsgId"  action="{!updateAccount}" oncomplete="window.top.location = '/{!JSENCODE(RBI.refedge__Account__c)}';">
+            <apex:param name="rulValue" value="" assignTo="{!accountLevelRULValue}"/>
+        </apex:actionFunction>
+        
+        <apex:pageBlock mode="Detail" id="pageblockId" rendered="{!OR(isInformationSection, isUseLimitSection, isRewardSection)}">
+            <apex:pageBlockButtons id="buttons" location="top">
+                <apex:commandButton value="{!$Label.Edit}" action="{!editRBI}" reRender="Block,pageblockId,pgmsgId" rendered="{!!isEdit}"/>
+                <apex:commandButton value="{!$Label.Save}" action="{!saveRBI}" reRender="Block,pageblockId,pgmsgId,JSPanel"  oncomplete="return refreshPage();" rendered="{!isEdit}"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancelRBI}" immediate="true" reRender="Block,pageblockId,pgmsgId" rendered="{!isEdit}"/>
+            </apex:pageBlockButtons>
+                        
+            <apex:outputPanel id="Block" >
+                <apex:outputPanel id="detailBlock" rendered="{!!isEdit}">
+                    <apex:pageBlockSection title="{!$Label.Reference_Information}" collapsible="false" id="pbsecId" rendered="{!isInformationSection}">
+                        <apex:repeat value="{!informationFields}" var="field" id="repeadID1">
+                            <apex:outputField id="rbiId1" value="{!RBI[field]}" rendered="{!field != ''}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection title="{!$Label.Reference_Use_Limits}" id="pbsecId1" collapsible="false" rendered="{!isUseLimitSection}">
+                        <apex:repeat value="{!limitFields}" var="field" id="repeadID2">
+                            <apex:outputField id="rbiId2"  value="{!RBI[field]}" rendered="{!AND(field != '', field != 'Account_Level_RUL__c')}"/>
+                            <apex:inputField value="{!RBI.refedge__Account_Level_RUL__c}" onclick="validate(this);" id="accLevelRul" rendered="{!field == 'Account_Level_RUL__c'}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection title="{!$Label.Rewards_Status}" id="pbsecId2" collapsible="false" rendered="{!AND(NOT(isthisBasic), isRewardSection)}">
+                        <apex:repeat value="{!rewardFields}" var="field" id="repeadID3">
+                            <apex:outputField id="rbiId3"  value="{!RBI[field]}" rendered="{!field != ''}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection title="{!lastSectionHeader}" collapsible="false" id="pbsecId6" rendered="{!isExtraSection}">
+                        <apex:repeat value="{!extraFields}" var="field" id="repeadID6">
+                            <apex:outputField id="rbiId8" value="{!RBI[field]}" rendered="{!field != ''}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+                
+                <apex:outputPanel id="editBlock" rendered="{!isEdit}">
+                    <apex:pageBlockSection title="{!$Label.Reference_Information}" id="pbsecId3" collapsible="false" rendered="{!isInformationSection}">
+                        <apex:repeat value="{!informationFields}" var="field" id="repeadID4">
+                            <apex:outputField id="rbiId11"  value="{!RBI[field]}" rendered="{!AND(field != '', field != 'Reference_Program_Candidate__c', field != 'Is_Referenceable__c',field != 'Referenceability_Status__c',field != 'Managed_Reference_Account__c',field != 'Reference_Owner__c')}"/>
+                            <apex:inputField id="rbiId12" value="{!RBI[field]}" rendered="{!AND(field != '',field != 'Total_Reference_Use__c',field != 'Referenceability__c',field != 'Attributes__c',field != 'Joined_Reference_Program__c')}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection title="{!$Label.Reference_Use_Limits}" id="pbsecId4" collapsible="false" rendered="{!isUseLimitSection}">
+                        <apex:repeat value="{!limitFields}" var="field" id="repeadID5">
+                            <apex:outputField id="rbiId13" value="{!RBI[field]}" rendered="{!AND(field != '', field != 'Account_Level_RUL__c',field != 'RUL_Activities_will_do__c',field != 'RUL_Period__c')}"/>
+                            <apex:inputField value="{!RBI.refedge__Account_Level_RUL__c}" onclick="validate(this);" id="accLevelRul" rendered="{!field == 'Account_Level_RUL__c'}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Period__c.InlineHelpText}" rendered="{!AND($ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Period__c.updateable, field == 'RUL_Period__c')}">
+                                <apex:outputLabel value="{!$ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Period__c.Label}"/>
+                                <apex:inputText value="{!RUL_Period}" size="3" maxlength="3" />
+                            </apex:pageBlockSectionItem>
+                            <apex:outputField value="{!RBI.refedge__RUL_Period__c}" rendered="{!AND(!$ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Period__c.updateable, field == 'RUL_Period__c')}"/>
+                            <apex:pageBlockSectionItem helpText="{!$ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Activities_will_do__c.InlineHelpText}" rendered="{!AND($ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Activities_will_do__c.updateable, field == 'RUL_Activities_will_do__c')}">
+                                <apex:outputLabel value="{!$ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Activities_will_do__c.Label}"/>
+                                <apex:inputText value="{!RUL_Activities_will_do}" size="3" maxlength="3" />
+                            </apex:pageBlockSectionItem>
+                            <apex:outputField id="rbiId15" value="{!RBI.refedge__RUL_Activities_will_do__c}" rendered="{!AND(!$ObjectType.refedge__Reference_Basic_Information__c.fields.refedge__RUL_Activities_will_do__c.updateable, field == 'RUL_Activities_will_do__c')}"/>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection title="{!$Label.Rewards_Status}" id="pbsecId5" collapsible="false" rendered="{!AND(NOT(isthisBasic), isRewardSection)}">
+                        <apex:repeat value="{!rewardFields}" var="field" id="repeadID6">
+                            <apex:outputField id="rbiId16" value="{!RBI[field]}" rendered="{!field != ''}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection title="{!lastSectionHeader}" id="pbsecId7" collapsible="false" rendered="{!isExtraSection}">
+                        <apex:repeat value="{!extraFields}" var="field" id="repeadID7">
+                            <apex:inputField id="rbiId16" value="{!RBI[field]}" rendered="{!field != ''}"/>
+                            <apex:pageBlockSectionItem rendered="{!field == ''}">
+                                <apex:outputLabel value=" "/>
+                                <apex:outputText value=""/>
+                            </apex:pageBlockSectionItem>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!NOT(OR(isInformationSection, isUseLimitSection, isRewardSection))}">
+            <apex:pageMessage summary="{!$Label.NopermissionRBIFields}" severity="Info" strength="3" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

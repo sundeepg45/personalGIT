@@ -1,0 +1,58 @@
+<apex:page controller="KalturaAssetsController" >
+
+<apex:sectionHeader title="Kaltura Assets" />
+<apex:form >
+<apex:pageMessages />
+
+<apex:pageBlock >
+    <apex:pageBlockButtons >
+        <apex:commandButton action="{!fetchContent}" value="Load Kaltura Assets"/>
+    </apex:pageBlockButtons>
+
+    <apex:pageBlockSection columns="2">
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Kaltura category"/>
+            <apex:selectList size="1" value="{!selectedCategory}">
+                <apex:selectOptions value="{!kalturaCategories}"/>
+            </apex:selectList>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputLabel value="Target content library"/>
+            <apex:selectList size="1" value="{!selectedWorkspaceName}">
+                <apex:selectOptions value="{!contentWorkspaces}"/>
+            </apex:selectList>
+        </apex:pageBlockSectionItem>
+    </apex:pageBlockSection>    
+</apex:pageBlock>
+
+<apex:pageBlock rendered="{!NOT(ISNULL(assetList))}" >
+    <apex:pageBlockButtons >
+        <apex:commandButton action="{!addContent}" value="Add Selected Content"/>
+    </apex:pageBlockButtons>
+    <apex:pageBlockTable value="{!assetList}" var="entry">
+        <apex:column >
+            <apex:inputCheckbox value="{!entry.doImport}" rendered="{!NOT(entry.imported)}"/>
+        </apex:column>
+        <apex:column >
+            <apex:facet name="header">
+                <apex:outputText value="Name" />
+            </apex:facet>
+            <apex:outputText value="{!entry.media.name}"/>
+        </apex:column>
+        <apex:column >
+            <apex:facet name="header">
+                <apex:outputText value="Description" />
+            </apex:facet>
+            <apex:outputText value="{!entry.media.description}"/>
+        </apex:column>
+        <apex:column >
+            <apex:facet name="header">
+                <apex:outputText value="Created" />
+            </apex:facet>
+            <apex:outputText value="{!entry.media.created}"/>
+        </apex:column>
+    </apex:pageBlockTable>
+</apex:pageBlock>
+</apex:form>
+
+</apex:page>

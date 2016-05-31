@@ -1,0 +1,3 @@
+<apex:page standardController="OpportunityPartner__c" extensions="OpportunityPartner_RedirectToManage" action="{!redirect}">
+    <apex:variable value="{!OpportunityPartner__c.Opportunity__c}" var="opportunityId" />
+</apex:page>

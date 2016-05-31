@@ -1,0 +1,604 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.RfSearchController" showHeader="false" sidebar="false" docType="html-5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+    <style>
+        .contentsDivClass{
+            margin-top: 10px;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+        .tableStyleClass{
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        .tableStyleClass .a{ 
+            pointer-events: none !important;
+        }
+        .panel-footer{
+            position: fixed;
+            display: block;
+            bottom: 0;
+            width: 100%;
+        }
+        .sf1input[type="checkbox"] {
+            -webkit-appearance: none;
+            display: inline-block;
+            height: 22px;
+            margin: 0 6px 0 0;
+            border: 1px solid black;
+            padding: 0;
+            width: 22px;
+            border-radius: 5px;
+            vertical-align: middle;
+            background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+        }
+        .sf1input[type="checkbox"][disabled] {
+            border: none;
+            background:none;
+        }
+        .sf1input[type="checkbox"]:checked {
+            border: 1px solid #2c75a3;
+            background-color: #3b9fdd;
+            -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+            background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        }
+        
+        .sf1input[type="checkbox"]:checked::after {
+            display: block;
+            left: 3px;
+            top: 3px;
+            height: 9px;
+            width: 14px;
+            border-bottom: 4px solid white;
+            border-left: 4px solid white;
+            -webkit-transform: rotate(-45deg);
+            position: relative;
+            content: '';
+        }
+        .ui-dialog-titlebar{
+            display:none;
+            
+        }
+        footer {
+            background-color:#208ACB;
+            position:absolute; 
+            z-index:2;
+            bottom:0; left:0;
+            width:100%;
+            padding: 1% 0 1% 10%;
+        }
+        
+        #wrapper {
+            position:absolute; 
+            z-index:1;
+            top:25px; bottom:60px; left:0;
+            width:100%;
+            overflow:auto;
+        }
+         
+        #scroll-content {
+            position:absolute; 
+            z-index:1;
+            width:100%;
+            padding:0;
+        }
+        .ui-loader {
+            display : none !important;
+        }
+       
+        
+    </style>
+    <apex:outputPanel id="scriptPanel">
+    <script>
+        var keyupTimer;
+        
+        //Search button
+        function doSearch() {
+            clearTimeout(keyupTimer);
+            keyupTimer = setTimeout(sendInput,500); // will activate when the user has stopped typing for 0.5 second
+        }
+        function sendInput(){
+            var searchText = jQuery('input:text[id*=inputTextId]').val();
+            jsSearchRecord(searchText);
+        }
+        //Selected Acounts
+        function sendSelectedIdsAccount(size,showMoreLink,button){
+            var ids2='';
+            var count=0;
+            PORShowLoading();
+            if(showMoreLink){
+                for(var i=0; i < size; i++) {
+                     var id = "pageId:formId:accountRepeatId:"+i+":selectAccountId"; 
+                     var id2 = "pageId:formId:accountRepeatId:"+i+":selectsingleHidden"; 
+                     if(document.getElementById(id).checked ) {
+                         count = count+1;
+                         if(ids2 == '') {
+                             ids2 = document.getElementById(id2).value ;
+                         } else {
+                             ids2 = ids2+','+document.getElementById(id2).value ;
+                         }
+                     }
+                }
+                jsCallShowMoreLink(ids2,true,false,false);
+             }
+             else{
+                if(button == 'previous'){
+                    jsAccountPrevious();
+                }
+                else if(button == 'next'){
+                    jsAccountNext();
+                }
+            }
+            return false;
+        }
+        
+        //Selected Contents
+        function sendSelectedIdsContent(size,showMoreLink,button){
+            var ids2='';
+            var count=0;
+            PORShowLoading();
+            if(showMoreLink){
+                for(var i=0; i < size; i++) {
+                     var id = "pageId:formId:contentRepeatId:"+i+":selectcontentId"; 
+                     var id2 = "pageId:formId:contentRepeatId:"+i+":selectSingleContentIdHidden"; 
+                     if(document.getElementById(id).checked ) {
+                         count = count+1;
+                         if(ids2 == '') {
+                             ids2 = document.getElementById(id2).value ;
+                         } else {
+                             ids2 = ids2+','+document.getElementById(id2).value ;
+                         }
+                     }
+                }
+                jsCallShowMoreLink(ids2,false,false,true);
+            } else {
+                if(button == 'previous'){
+                    jsContentPrevious(ids2);
+                }
+                else if(button == 'next'){
+                    jsContentNext(ids2);
+                }
+            }
+            return false;
+        }
+       PORShowLoading();
+        jQuery(window).load(function() {
+            var height = jQuery('#footer').outerHeight();
+            jQuery("#outerDiv").css('padding-bottom',height);
+            PORHideLoading();
+            //alert('***'+height);
+        });
+        function downloadContents(size){
+            var hasChecked = false;
+            var selectedContentIds = '' ;
+            var hasLinkUrl = false;
+            <apex:repeat value="{!contentSearch.mapContent}" var="key">
+                if({!key} != {!contentSearch.pageIndex}){
+                    <apex:repeat value="{!contentSearch.mapContent[key]}" var="contentList">
+                        if({!contentList.isSelected} ){
+                            hasChecked = true;
+                            
+                        }
+                        if('{!contentList.contentVersion.FileType}' == 'LINK')
+                            hasLinkUrl = true;
+                        
+                    </apex:repeat>
+                }
+            </apex:repeat>
+            
+            for(var i=0; i < size; i++) {
+                var id = "pageId:formId:contentRepeatId:"+i+":selectcontentId"; 
+                if(document.getElementById(id).checked ) {
+                    hasChecked = true;
+                    break ;  
+                }
+            }
+            if (hasChecked == false){
+                alert('{!$Label.Select_Atleast_One_Content}');
+                return false;
+            }
+            if(hasLinkUrl){
+                alert('{!$Label.Link_Content_Message}');
+            }
+            
+            downloadContentFiles(); 
+            return false;
+        }
+        var IE = document.all?true:false;
+        var tempX = 0;
+        var tempY = 0;
+        function showDiv(contentId, refconId, e) {     
+            PORShowLoading();
+            fetchContentItem(contentId, refconId);
+        }
+        function showDivOnComplete(){
+            jQuery("#dvContentDetails").dialog({
+               width:400,
+                modal     : true,
+                resizable : false,                 
+            });
+        }
+        function hideDiv() {
+            jQuery("#dvContentDetails").dialog( "destroy" );
+            PORHideLoading();
+        }
+        //Method to open Link
+        function openLinkContent(contentUrl) {
+            if (contentUrl.indexOf("http://")>=0 || contentUrl.indexOf("https://")>=0) 
+                window.open('','_blank').location.href = contentUrl;
+            else
+                window.open('','_blank').location.href = 'http://'+contentUrl;
+        }
+        
+    </script>
+    
+    </apex:outputPanel>
+    <!--
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js"></script>
+    <apex:outputPanel id="swipePanel">
+        
+    <script>
+        var showmoreaccounts = {!accountSearch.showMoreAccountRecords};
+        var accountsize = {!accountSearch.isNextRender};
+        var index = {!accountSearch.pageIndex};
+        jQuery(document).on("pagecreate","#pageone",function(){
+            jQuery("#testId1").on("swipeleft",function(){
+                //alert(accountsize+'  left  '+showmoreaccounts);
+                if(showmoreaccounts == true && accountsize == true){
+                    PORShowLoading();
+                    jsAccountNext();
+                }
+            });    
+            jQuery("#testId1").on("swiperight",function(){
+                //alert(index+'  right  '+showmoreaccounts);
+                if(showmoreaccounts == true && index > 1){
+                    PORShowLoading();
+                    jsAccountPrevious();
+                }
+            });                   
+        });
+    
+    </script>
+    </apex:outputPanel>
+    -->
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <body style="background:#f0f1f2;">
+        <div data-role="page" id="pageone">
+        <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+            <apex:actionFunction name="jsSearchRecord" action="{!search}" reRender="accountOpId, contactOpId, contentOpId, pageMsgId">
+                <apex:param name="searchParam" value="" assignTo="{!inputTextValue}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="redirectContentDetailPage" action="{!redirectContentDetailPage}"/>
+            <apex:actionFunction name="fetchContentItem" action="{!contentSearch.fetchHoverContentItem}" rerender="mainOpId,scriptPanel" oncomplete="redirectContentDetailPage();">
+                <apex:param name="contId" value="" assignTo="{!contentSearch.hoverContentId}"/>
+                <apex:param name="refContId" value="" assignTo="{!contentSearch.hoverRefContentId}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="downloadContentFiles" reRender="pgmsgId" action="{!contentSearch.downloadContents}" >
+            </apex:actionFunction>
+            <apex:actionFunction name="jsCallShowMoreLink" action="{!callShowMoreLink}" reRender="accountOpId, contactOpId, contentOpId,scriptPanel" oncomplete="PORHideLoading();">
+                <apex:param name="selectedIds" value="one" assignTo="{!selectedId}"/>
+                <apex:param name="accountParam" value="" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+                <apex:param name="contactParam" value="" assignTo="{!contactSearch.showMoreContactRecords}"/>
+                <apex:param name="contentParam" value="" assignTo="{!contentSearch.showMoreContentRecords}"/>
+            </apex:actionFunction>
+            <apex:actionfunction name="jsAccountPrevious" reRender="accountOpId" action="{!accountSearch.previous}" oncomplete="PORHideLoading();" />
+            <apex:actionFunction name="jsAccountNext" reRender="accountOpId" action="{!accountSearch.next}" oncomplete="PORHideLoading();"/>
+            
+            <apex:actionFunction name="jsContentPrevious" rerender="contentOpId,scriptPanel" action="{!contentSearch.previous}" onComplete="PORHideLoading();">
+                <apex:param name="selectedIds" value="" assignTo="{!selectedId}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="jsContentNext" rerender="contentOpId,scriptPanel" action="{!contentSearch.next}" onComplete="PORHideLoading();">
+                <apex:param name="selectedIds" value="" assignTo="{!selectedId}"/>
+            </apex:actionFunction>
+            <apex:actionFunction name="selectFilters" action="{!selectFilters}" />
+            <apex:actionFunction name="redirectToInvitationPage" action="{!redirectToSF1Invitation}"/>
+            <apex:actionFunction name="Sf1refUseRequestWithAccount" action="{!Sf1refUseRequestWithAccount}"/>
+            <apex:actionFunction name="Sf1refUseRequestWithoutAccount" action="{!Sf1refUseRequestWithoutAccount}"/>
+            <div id="wrapper">
+            <div id="scroll-content">
+            <!-- Main Div -->
+            <apex:outputPanel layout="block" styleclass="container" id="mainOpId">
+                <apex:pageMessages id="pgmsgId"/>
+                <!--  Search Box -->
+                <apex:outputPanel layout="block" styleClass="contentsDivClass" id="searchOpId">
+                    <div class="form-group">
+                        <apex:inputText styleClass="form-control" html-placeholder="Search References" id="inputTextId" value="{!tempTextValue}" onkeyup="doSearch();return false;"/>
+                    </div>
+                </apex:outputPanel>
+                
+                <!-- Accounts -->
+                <div id="testId1">
+                <apex:outputPanel id="accountOpId">
+                    <apex:outputPanel layout="block" styleClass="contentsDivClass" rendered="{!AND(NOT(OR(contactSearch.showMoreContactRecords,contentSearch.showMoreContentRecords)),showAccount)}">
+                        <apex:outputPanel id="accountImageOpId">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_StaticResource,'/images/account_120.png')}" style="background-color: #6f7ccb;border-radius: 5px;" width="30px" height="30px"/> 
+                            <B>{!$Label.Accounts} ({!IF(accountSearch.isAccountLimitExceed, TEXT(accountSearch.pageLimit)+'+', accounts.size)})</B>
+                        </apex:outputPanel>
+                        
+                        <div style="height:10px;clear:both; "></div>
+                        <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!accountSearch.showMoreAccountRecords}" reRender="accountOpId, contactOpId, contentOpId"/>
+                        <div class="panel-group" id="accountDivId" style="width:100%;background:#EAEAEA;">
+                            <apex:repeat value="{!accounts}" var="accWrap" id="accountRepeatId">
+                                <div class="panel panel-default" style="width:100%;">
+                                    <apex:outputPanel id="accountContentOpId">
+                                        <table class="tableStyleClass">
+                                            <tr>
+                                                <td><apex:inputCheckBox styleClass="sf1input" id="selectAccountId" value="{!accWrap.isSelected}"/>
+                                                    <apex:inputhidden value="{!accWrap.accountId}" id="selectsingleHidden"/>
+                                                </td>
+                                                <td>
+                                                    <apex:outputText style="font-weight: bold;" id="accNameId" value="{!accWrap.acc.Account__r.name}"/>&nbsp;&nbsp;&nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <apex:outputText style="color:red;" id="accountNoticeId" value="{!IF(accWrap.acc.refedge__Account_Level_RUL__c, IF(accWrap.acc.refedge__RUL_Limit_Reached__c, $Label.Limit_Reached,''),IF(accWrap.acc.refedge__Is_Contact_Limit_Reached__c, $Label.Limit_Reached,''))}" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </apex:outputPanel>
+                                </div>
+                                <div style="height:10px;clear:both; "></div>
+                            </apex:repeat>
+                        </div>
+                        
+                        <apex:actionRegion >
+                            <apex:outputpanel layout="block" style="text-align: right;">
+                                <apex:commandLink style="font-weight: bold;" onclick="PORShowLoading();sendSelectedIdsAccount('{!accounts.size}',true,'link');return false;"  value="{!$Label.More_Accounts}"  rendered="{!AND(accountSearch.isAccountLimitExceed, NOT(accountSearch.showMoreAccountRecords),NOT(refMatch))}"  />
+                                &nbsp; 
+                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!AND(accountSearch.isAccountLimitExceed, NOT(accountSearch.showMoreAccountRecords))}" width="5px" height="8px"/>
+                            </apex:outputpanel>
+                        </apex:actionRegion>
+                        
+                        <apex:outputPanel id="pagingPanelAccounts" >
+                            <apex:actionRegion >
+                                <apex:outputPanel rendered="{!AND(accountSearch.showMoreAccountRecords, accounts.size > 0)}">
+                                <table border="0" align="center">
+                                    <tr> 
+                                        <td align="center">
+                                            <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!accountSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                            <apex:commandLink value="{!$Label.Previous_Page}" reRender="accountPbId" rendered="{!accountSearch.pageIndex > 1}" onclick="sendSelectedIdsAccount('{!accounts.size}',false,'previous');return false;" /> 
+                                            &nbsp;&nbsp;
+                                            <apex:outputText >
+                                                {!(accountSearch.pageIndex * accountSearch.pageLimit)+1-accountSearch.pageLimit}-{!(accountSearch.pageIndex * accountSearch.pageLimit) - (accountSearch.pageLimit - accounts.size)}
+                                            </apex:outputText>
+                                            &nbsp;&nbsp;
+                                            <apex:commandLink value="{!$Label.Next_Page} " reRender="accountPbId" rendered="{!accountSearch.isNextRender}" onclick="sendSelectedIdsAccount('{!accounts.size}',false,'next');return false;" />&nbsp; 
+                                            <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!accountSearch.isNextRender}" width="5px" height="8px"/>
+                                        </td>                                                  
+                                    </tr>
+                                </table>   
+                                </apex:outputPanel> 
+                            </apex:actionRegion> 
+                        </apex:outputPanel>
+                        
+                    </apex:outputPanel>             
+                </apex:outputPanel>
+                </div>
+                <!-- Contacts -->
+                <apex:outputPanel id="contactOpId">
+                    <apex:outputPanel layout="block" styleClass="contentsDivClass"  rendered="{!AND(NOT(OR(accountSearch.showMoreAccountRecords, contentSearch.showMoreContentRecords)),showContact)}">
+                        <apex:outputPanel id="contactImageOpId">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_StaticResource,'/images/contact_120.png')}" style="background-color: #b76db7;border-radius: 5px;" width="30px" height="30px"/> 
+                            <B>{!$Label.Contacts} ({!IF(contactSearch.isContactLimitExceed, TEXT(contactSearch.pageLimit)+'+', contacts.size)})</B>
+                        </apex:outputPanel>
+                        <div style="height:10px;clear:both; "></div>
+                        <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(contactSearch.showMoreContactRecords)}" reRender="accountOpId, contactOpId, contentOpId"/>
+                        <div class="panel-group" id="contactDivId" style="width:100%;background:#EAEAEA;">
+                            <apex:repeat value="{!contacts}" var="contWrap" id="contactRepeatId">
+                                <div class="panel panel-default" style="width:100%;">
+                                    <apex:outputPanel id="contactContentOpId">
+                                        <table class="tableStyleClass" >
+                                            <tr>
+                                                <td><apex:inputCheckBox styleClass="sf1input" id="selectContactId" value="{!contWrap.isSelected}"/></td>
+                                                <td>
+                                                    <apex:outputText style="font-weight: bold;" id="accNameId" value="{!contWrap.con.contact__r.name}"/>&nbsp;&nbsp;&nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>{!$Label.Account_Name}: <apex:outputText value="{!contWrap.con.Account__r.Name}"/></td>
+                                            </tr>
+                                        </table>
+                                    </apex:outputPanel>
+                                </div>
+                                <div style="height:10px;clear:both; "></div>
+                            </apex:repeat>
+                        </div>
+                        <!-- Show more Link-->
+                        <apex:actionRegion >
+                            <apex:outputpanel layout="block" style="text-align: right;">
+                                <apex:commandLink style="font-weight: bold;" action="{!callShowMoreLink}"  value="{!$Label.More_Contacts}" reRender="accountOpId, contactOpId, contentOpId" rendered="{!AND(contactSearch.isContactLimitExceed, NOT(contactSearch.showMoreContactRecords))}" onclick="PORShowLoading();" oncomplete="PORHideLoading();">
+                                    <apex:param name="accountParam" value="false" assignTo="{!accountSearch.showMoreAccountRecords}"/>
+                                    <apex:param name="contactParam" value="true" assignTo="{!contactSearch.showMoreContactRecords}"/>
+                                    <apex:param name="contentParam" value="false" assignTo="{!contentSearch.showMoreContentRecords}"/>&nbsp; 
+                                    <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!AND(contactSearch.isContactLimitExceed, NOT(contactSearch.showMoreContactRecords))}" width="5px" height="8px"/>
+                                </apex:commandLink>
+                            </apex:outputPanel>
+                        </apex:actionRegion>
+
+                        <!-- Paging Panel-->
+                        <apex:outputPanel id="pagingPanelContacts" >
+                            <apex:actionRegion >
+                                <apex:outputPanel rendered="{!AND(contactSearch.showMoreContactRecords, contacts.size > 0)}">
+                                <table border="0" align="center">
+                                    <tr> 
+                                        <td align="center">
+                                            <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!contactSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                            <apex:commandLink action="{!contactSearch.previous}" value="{!$Label.Previous_Page}" reRender="contactPbId" rendered="{!contactSearch.pageIndex > 1}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"/> 
+                                            &nbsp;&nbsp;
+                                            <apex:outputText >
+                                                {!(contactSearch.pageIndex * contactSearch.pageLimit)+1-contactSearch.pageLimit}-{!(contactSearch.pageIndex * contactSearch.pageLimit) - (contactSearch.pageLimit - contacts.size)}
+                                            </apex:outputText>
+                                            &nbsp;&nbsp;
+                                            <apex:commandLink action="{!contactSearch.next}" value="{!$Label.Next_Page} " reRender="contactPbId" rendered="{!contactSearch.isNextRender}" onclick="PORShowLoading();" oncomplete="PORHideLoading();"/>&nbsp; 
+                                            <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!contactSearch.isNextRender}" width="5px" height="8px"/>
+                                        </td>                                                  
+                                    </tr>
+                                </table>   
+                                </apex:outputPanel> 
+                            </apex:actionRegion> 
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+                
+                <!-- Contents -->
+                <apex:outputPanel id="contentOpId">
+                    <apex:outputPanel layout="block" styleClass="contentsDivClass"  rendered="{!AND(NOT(OR(accountSearch.showMoreAccountRecords, contactSearch.showMoreContactRecords)),showRefContent)}">
+                        <apex:outputPanel id="contentImageOpId">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_StaticResource,'/images/file_120.png')}" style="background-color: #BAAC93;border-radius: 5px;" width="30px" height="30px"/> 
+                            <B>{!$Label.Content} ({!IF(contentSearch.isContentLimitExceed, TEXT(contentSearch.pageLimit)+'+', contents.size)})</B>
+                        </apex:outputPanel>
+                        <div style="height:10px;clear:both; "></div>
+                        <apex:commandLink style="font-weight: bold;" value="{!$Label.Back_to_RF_Search}" action="{!backToReSearch}" rendered="{!AND(contentSearch.showMoreContentRecords)}" reRender="accountOpId, contactOpId, contentOpId"/>
+                        <div class="panel-group" id="contentDivId" style="width:100%;background:#EAEAEA;">
+                            <apex:repeat value="{!contents}" var="contentWrap" id="contentRepeatId">
+                                <div class="panel panel-default" style="width:100%;">
+                                    <apex:outputPanel id="contentContentOpId">
+                                        <apex:inputhidden value="{!contentWrap.contentVersion.ContentDocumentId}" id="selectSingleContentIdHidden"/>
+                                        
+                                        <table class="tableStyleClass" >
+                                            <tr>
+                                                <td><apex:inputCheckBox title="{!$Label.CheckBox_is_not_enabled_for_internal_contents}" styleClass="sf1input" id="selectcontentId"  disabled="{!OR(NOT(isCRMContentUser),contentWrap.refContent.refedge__Internal_Use__c)}"  value="{!contentWrap.isSelected}"/></td>
+                                                <td>
+                                                    <apex:outputLabel style="font-weight: bold;" id="contentTitleId" onClick="showDiv('{!JSENCODE(contentWrap.refContent.refedge__Content_ID__c)}', '{!JSENCODE(contentWrap.refContent.Id)}',event);return false;" value="{!contentWrap.refContent.refedge__Title__c}"/>&nbsp;&nbsp;&nbsp;
+                                                    
+                                                </td>
+                                                
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <apex:outputText value="{!contentWrap.refContent.refedge__Language__c}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>{!$Label.Account_Name}: <apex:outputText value=" {!contentWrap.accountName}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>{!$Label.Content_Type}: <apex:outputText value=" {!contentWrap.refContent.Reference_Content_Type__r.refedge__Name__c}"/></td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td></td>
+                                                <td>{!$Label.Publish_Date}:
+                                                    <apex:outputText value="{0, date, MM'/'dd'/'yyyy}">
+                                                        <apex:param value="{!contentWrap.refContent.refedge__Publish_date__c}" /> 
+                                                    </apex:outputText>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </apex:outputPanel>
+                                </div>
+                                <div style="height:10px;clear:both; "></div>
+                            </apex:repeat>
+                        </div>
+                        
+                        <!-- Show more Link-->
+                        <apex:actionRegion >
+                            <apex:outputpanel layout="block" style="text-align: right;">
+                                <apex:commandLink style="font-weight: bold;" value="{!$Label.More_Contents}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',true,'link');return false;" rendered="{!AND(contentSearch.isContentLimitExceed, NOT(contentSearch.showMoreContentRecords))}"/>
+                            </apex:outputPanel>
+                        </apex:actionRegion>
+                        
+                        <!-- Paging Panel--> 
+                        <apex:outputPanel id="pagingPanel" rendered="{!AND(contentSearch.showMoreContentRecords, contents.size > 0)}">
+                            <apex:actionRegion >
+                            <table border="0" align="center">
+                                <tr> 
+                                    <td align="center">
+                                        <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!contentSearch.pageIndex > 1}" width="5px" height="8px"/>&nbsp;
+                                        <apex:commandLink value="{!$Label.Previous_Page}"  rendered="{!contentSearch.pageIndex > 1}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',false,'previous');return false;" oncomplete="PORHideLoading();"/> 
+                                        &nbsp;&nbsp;
+                                        <apex:outputText >
+                                            {!(contentSearch.pageIndex * contentSearch.pageLimit)+1-contentSearch.pageLimit}-{!(contentSearch.pageIndex * contentSearch.pageLimit) - (contentSearch.pageLimit - contents.size)}
+                                        </apex:outputText>
+                                        &nbsp;&nbsp;
+                                        <apex:commandLink value="{!$Label.Next_Page} " rendered="{!contentSearch.isNextRender}" onclick="PORShowLoading();sendSelectedIdsContent('{!contents.size}',false,'next');return false;" oncomplete="PORHideLoading();"/>&nbsp; 
+                                        <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!contentSearch.isNextRender}" width="5px" height="8px"/>
+                                    </td>                                                  
+                                </tr>
+                            </table>  
+                            </apex:actionRegion>    
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                </apex:outputPanel>
+            </apex:outputPanel>
+            
+            </div>
+            </div>
+            <footer> 
+                <apex:outputPanel layout="block">
+                    <apex:outputPanel style="cursor:pointer;width:{!If(isthisBasic,'25%','20%')};float:left;" layout="block">
+                        <a style="text-decoration: none;" onclick="PORShowLoading();selectFilters();return false;" title="{!$Label.RF_Filters}">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_ReferenceSearchImages, 'empty_funnel.png')}" />
+                        </a>
+                    </apex:outputPanel>
+        
+                    <apex:outputPanel style="cursor:pointer;width:{!If(isthisBasic,'25%','20%')};float:left;" title="{!$Label.Request_accounts}" layout="block">
+                        <a style="text-decoration: none;" onclick="PORShowLoading();Sf1refUseRequestWithAccount();return false;">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_ReferenceSearchImages, 'request-accounts.png')}"/> 
+                        </a>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!NOT(isthisBasic)}" style="cursor:pointer;width:{!If(isthisBasic,'25%','20%')};float:left;" layout="block" title="{!$Label.Request_without_accounts}">
+                        <a style="text-decoration: none;" onclick="PORShowLoading();Sf1refUseRequestWithoutAccount();return false;">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_ReferenceSearchImages, 'request(no-accounts).png')}" />
+                        </a>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel style="cursor:pointer;width:{!If(isthisBasic,'25%','20%')};float:left;" layout="block" title="{!$Label.Share}">
+                        <a style="text-decoration: none;" onclick="PORShowLoading();redirectToInvitationPage();">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_ReferenceSearchImages, 'share.png')}" />
+                        </a>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel style="cursor:pointer;width:{!If(isthisBasic,'25%','20%')};float:left;" layout="block" title="{!$Label.Download}">
+                        <a style="text-decoration: none;" onclick="downloadContents({!contents.size});">
+                            <apex:image url="{!URLFOR($Resource.refedge__SF1_ReferenceSearchImages, 'download.png')}" />
+                        </a>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </footer>
+        </apex:form>
+        </div>
+    </body>
+</apex:page>

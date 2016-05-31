@@ -1,0 +1,633 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page Controller="refedge.ReferenceWorkSpaceController" sidebar="false" id="pgId" tabStyle="Ref_Workspace__tab">
+    
+    <div class = "waitingSearchDiv" id = "el_loading" > 
+        <div class = "waitingHolder">
+            <img class = "waitingImage" src = "/resource/1447657355000/{!nameSpace}LoaderSpinner" width="60" height="60"/>
+        </div>
+    </div>
+    
+    <!-- Add Style-->
+    <style>
+        
+        .coleredDiv {
+            float: left;
+            //position: relative;
+            //left: -50%;
+            text-align: left;
+            width:60%;
+        }
+        
+        .coleredDiv ul {
+            list-style: none;
+            //position: relative;
+            //left: 50%;  
+        }
+        
+        .coleredDiv li {
+            float: left;
+            margin: 0 10px 0 0;
+        }
+        .coleredDiv li a {
+            float: left;
+            position: relative;
+            top: 0px;
+            color: white;
+            text-decoration: none;
+            padding: 6px 10px;
+            font-weight: bold;
+            
+        }
+        .listCol1{
+            background: #000000 !important;
+        }
+        .listCol2{
+            background: #FF0000 !important;
+        }
+        .listCol3{
+            background: #FFCC00 !important;
+        }
+        .listCol4{
+            background: #3ADF00 !important;
+        }
+        
+        .listCol5{
+            background: #A9F5F2 !important;
+            color: #000000 !important;
+        }
+        
+        .circle {
+            height:15px;
+            width:15px;
+            position: relative;
+            -moz-border-radius: 7.5px;
+            -webkit-border-radius: 7.5px;
+            border-radius: 7.5px;
+        }
+        #el_loading{
+            background-color : #FFFFFF;
+            height : 100%;
+            top : 0px;
+            opacity : .7;
+            width : 100%;
+            overflow: hidden;
+        }
+        
+        #el_loading .waitingHolder{
+            
+            //width : 350px;
+            //height : 70px;
+            //background-color : white;
+            position: relative; 
+            overflow: hidden; 
+            margin-top: -50px; 
+            left: 40%; 
+            margin-left: -75px; 
+            padding-left: 30px;
+            border-radius: 10px; /* W3C */   
+            opacity : 1;
+            z-index:  1000;
+       
+        }
+        #el_loading .waitingHolder .waitingImage {
+            align : center;
+            padding-top : 20px;
+            z-index:  9998;
+        }
+        #el_loading .waitingHolder .waitingDescription {
+            align : center;
+            padding-top : 30px;
+            z-index:  9998;
+        }
+        .image{
+            width: 12px;
+            height: 12px;
+        }
+        
+        .paginatorWrap{
+            background: url("/img/alohaSkin/listFooter.png") repeat-x scroll 0 0 #F2F2F2;
+            border: 1px solid #EAEAEA;
+            background-color: #F3F3F3;
+            border-top: 1px solid #FFFFFF;
+            padding: 5px;
+        }
+        .activeTab {background-color: none; font-size: 12px; font-weight: bold; color:white; background-image:url('/img/alohaSkin/subtab_sprite.png');}
+        .inactiveTab { background-color: lightgrey; font-size: 12px; font-weight: bold; color:black; background-image:none;}
+    </style>
+    
+    <apex:includeScript value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-1.8.3.js')}"/>
+    <script>
+        var j = $.noConflict();
+        j(window).load(function() {
+            
+            j("#newProjectId").focus();
+            if('{!JSENCODE(activeTab)}' == 'specTab')
+                j("#tab1").scrollTop(0); 
+            else if('{!JSENCODE(activeTab)}' == 'unspecTab')
+                j("#tab2").scrollTop(0); 
+            if({!IsPageAccessible} && {!isFullLicenseAccessible})
+                setFilter();
+            j('#el_loading').hide(); 
+        });
+        function selectBox(el,Id){
+            if(Id == 'reqColorId'){
+                for(var i = 1; i< 6; i++){
+                    if(el.id == 'pgId:formId:li'+i){
+                        document.getElementById('pgId:formId:li'+i).style.border = '2px solid #000000';
+                        if(i == 1)
+                            reqSelected = 'requestAll';
+                        if(i == 2)
+                            reqSelected = 'requestRed';
+                        if(i == 3)
+                            reqSelected = 'requestOrange';
+                        if(i == 4)
+                            reqSelected = 'requestGreen';
+                        if(i == 5)
+                            reqSelected = 'requestHold';
+                    }
+                    else
+                        document.getElementById('pgId:formId:li'+i).style.border = '0px';
+                }
+                if(el.id == 'pgId:formId:li1')
+                    document.getElementById(el.id).style.border = '2px solid red';
+            }
+            if(Id == 'nomiColorId'){
+                for(var i = 1; i< 5; i++){
+                    if(el.id == 'pgId:formId:li1'+i){
+                        document.getElementById('pgId:formId:li1'+i).style.border = '2px solid #000000';
+                        if(i == 1)
+                            nominationSelected = 'nominationAll';
+                        if(i == 2)
+                            nominationSelected = 'nominationRed';
+                        if(i == 3)
+                            nominationSelected = 'nominationGreen';
+                        if(i == 4)
+                            nominationSelected = 'nominationHold';
+                    }
+                    else
+                        document.getElementById('pgId:formId:li1'+i).style.border = '0px';
+                }
+                if(el.id == 'pgId:formId:li11')
+                    document.getElementById(el.id).style.border = '2px solid red';
+            }
+        }
+        var reqSelected = '';
+        var nominationSelected = '';
+        function showHideTab(Id){
+            
+            if(Id == 'nomiColorId'){
+                document.getElementById('nomiColorId').style.display = 'block';
+                document.getElementById('reqColorId').style.display = 'none';
+            }
+            if(Id == 'reqColorId'){
+                document.getElementById('nomiColorId').style.display = 'none';
+                document.getElementById('reqColorId').style.display = 'block';
+            }
+            for(var i = 1; i< 6; i++){
+                var border = document.getElementById('pgId:formId:li'+i).style.border;
+                if(border.indexOf("solid") > -1){
+                    if(i == 1)
+                        reqSelected = 'requestAll';
+                    if(i == 2)
+                        reqSelected = 'requestRed';
+                    if(i == 3)
+                        reqSelected = 'requestOrange';
+                    if(i == 4)
+                        reqSelected = 'requestGreen';
+                    if(i == 5)
+                        reqSelected = 'requestHold';
+                }
+            }
+            
+            for(var i = 1; i< 5; i++){
+                var border = document.getElementById('pgId:formId:li1'+i).style.border;
+                if(border.indexOf("solid") > -1){
+                    if(i == 1)
+                        nominationSelected = 'nominationAll';
+                    if(i == 2)
+                        nominationSelected = 'nominationRed';
+                    if(i == 3)
+                        nominationSelected = 'nominationGreen';
+                    if(i == 4)
+                        nominationSelected = 'nominationHold';
+                }
+            }
+            //alert(reqSelected+'        '+nominationSelected);
+        }
+        function changeColor1(currentColor){
+            
+            if(nominationSelected == '')
+                nominationSelected = 'nominationAll';
+            changeTab(currentColor,nominationSelected);
+        }
+        function changeColor2(currentColor){
+            
+            if(reqSelected == '')
+                reqSelected = 'requestAll';
+            changeTab(reqSelected,currentColor);
+        }
+        function setColorBox(){
+            if(reqSelected == 'requestAll')
+                document.getElementById('pgId:formId:li1').style.border = '2px solid red';
+            else if(reqSelected == 'requestRed')
+                document.getElementById('pgId:formId:li2').style.border = '2px solid #000000';
+            else if(reqSelected == 'requestOrange')
+                document.getElementById('pgId:formId:li3').style.border = '2px solid #000000';
+            else if(reqSelected == 'requestGreen')
+                document.getElementById('pgId:formId:li4').style.border = '2px solid #000000';
+            else if(reqSelected == 'requestHold')
+                document.getElementById('pgId:formId:li5').style.border = '2px solid #000000';
+            if(nominationSelected == 'nominationAll')
+                document.getElementById('pgId:formId:li11').style.border = '2px solid red';
+            else if(nominationSelected == 'nominationRed')
+                document.getElementById('pgId:formId:li12').style.border = '2px solid #000000';
+            else if(nominationSelected == 'nominationGreen')
+                document.getElementById('pgId:formId:li13').style.border = '2px solid #000000';
+            else if(nominationSelected == 'nominationHold')
+                document.getElementById('pgId:formId:li14').style.border = '2px solid #000000';
+            
+        }
+        var pageNo1 = 1;
+        var pageNo2 = 1;
+        var pageNo3 = 1;
+        function runScript1(e, value) {
+            if (e.keyCode == 13) {
+                var numbers = /^[0-9]+$/;  
+                if ((value.length > 0 && value.length < 4) && value.match(numbers)) {
+                    if(value != pageNo1){
+                        setPageNumber1(value);
+                    }
+                }
+                else {
+                    document.getElementById('pgId:formId:reqProPbId:reaWithOppId:reqProPbsId:input1').value = pageNo1;
+                }
+            }
+        }
+        function runScript2(e, value) {
+            if (e.keyCode == 13) {
+                var numbers = /^[0-9]+$/;  
+                if ((value.length > 0 && value.length < 4) && value.match(numbers)) {
+                    if(value != pageNo2){
+                        setPageNumber2(value);
+                    }
+                }
+                else {
+                    document.getElementById('pgId:formId:reqProPbId:reaWithoutOppId:reqProPbsId:input2').value = pageNo2;
+                }
+            }
+            
+        }
+        function runScript3(e, value) {
+            if (e.keyCode == 13) {
+                var numbers = /^[0-9]+$/;  
+                if ((value.length > 0 && value.length < 4) && value.match(numbers)) {
+                    if(value != pageNo3){
+                        setPageNumber3(value);
+                    }
+                }
+                else {
+                    document.getElementById('pgId:formId:reqProPbId:reaWithoutOppId:reqProPbsId:input3').value = pageNo3;
+                }
+            }
+            
+        }
+        function stopRKey(evt) { 
+          var evt = (evt) ? evt : ((event) ? event : null); 
+          var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+          if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+        } 
+        
+        document.onkeypress = stopRKey; 
+    </script>
+   
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible, NOT(isError))}">
+        <!-- Sction Header-->
+        <apex:sectionHeader title="{!$Label.Reference_Program_Workspace}" subtitle="Home"/>
+        
+        <!-- Main Div -->
+        <apex:actionFunction name="changeProcess" action="{!changeProcess}" status="status" reRender="reqProPbId" />
+        <apex:actionFunction name="newProject" action="{!createNewProject}"/>
+        <apex:actionFunction name="setPageNumber1" action="{!requestWithOppCon.setPageNumber}" status="status" reRender="pgmsgId, reaWithOppIdPanel">
+            <apex:param name="param1" value="" assignTo="{!requestWithOppCon.PageNumber}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="setPageNumber2" action="{!requestWithoutOppCon.setPageNumber}" status="status" reRender="pgmsgId,reaWithoutOppIdPanel">
+            <apex:param name="param1" value="" assignTo="{!requestWithoutOppCon.PageNumber}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="setPageNumber3" action="{!nominationCon.setPageNumber}" status="status" reRender="pgmsgId,nominationIdPanel">
+            <apex:param name="param1" value="" assignTo="{!nominationCon.PageNumber}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="changeTab" action="{!changeTab}" status="status" reRender="pgmsgId,reqProPbId">
+            <apex:param name="param1" value="" assignTo="{!selectedMethodRequest}"/>
+            <apex:param name="param2" value="" assignTo="{!selectedMethodNomination}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="saveDefault" action="{!saveAsDefaultView}" status="status" reRender="pgmsgId,reqProPbId"/>
+        <apex:actionFunction name="setFilter" action="{!setFilter}"  status="status" reRender="pgmsgId,reqProPbId,viewsId"/>
+        <div style="width:100%;border:0px;" id="mainDivId">
+            <div style="margin-left:5px;float:left;width:35%;">
+                <div style="font-weight:bold;float:left;">{!$Label.View}: </div>
+                <apex:selectList style="margin-left:2px;float:left;" id="viewsId" title="{!$Label.View}: " size="1" value="{!selectedFilter}">
+                       <apex:selectOptions value="{!filters}"  id="selectFilter"></apex:selectOptions>
+                </apex:selectList>
+                <apex:commandButton style="margin-left:2px;" id="btnGo" value="{!$Label.Go}!" action="{!searchByFilter}" status="status" reRender="pgmsgId,reqProPbId"/>
+                <apex:commandLink id="defaultFilterId" style="color:#5C95C4;margin-left:2px;" value="{!$Label.Save_as_default}" onClick="saveDefault();return false;"/>
+            </div>
+            <div class="coleredDiv" id="reqColorId">
+                <apex:outputPanel id="requestColorBlock">
+                <ul>
+                    <li><apex:commandLink id="li1" value="{!allOpenReq}" styleClass="listCol1" onclick="selectBox(this,'reqColorId');changeColor1('requestAll');return false;" status="status" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span><b>{!$Label.All_Open} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.Due_In}:</b></span></li>
+                    <li><apex:commandLink id="li2" value="{!criticalReq}" styleClass="listCol2" onclick="selectBox(this,'reqColorId');changeColor1('requestRed');return false;" status="status" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span> {!cs.refedge__Critical_Deadline_window__c} {!$Label.days}</span></li>
+                    <li><apex:commandLink id="li3" value="{!bwtCriticalCautionReq}" styleClass="listCol3" onclick="selectBox(this,'reqColorId');changeColor1('requestOrange');return false;" status="status" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span>{!cs.refedge__Critical_Deadline_window__c+1}-{!cs.refedge__Caution_deadline_window__c} {!$Label.days}</span></li>
+                    <li><apex:commandLink id="li4" value="{!cautionReq}" styleClass="listCol4" status="status" onclick="selectBox(this,'reqColorId');changeColor1('requestGreen');return false;" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span> &gt;{!cs.Caution_deadline_window__c} {!$Label.days}</span></li>
+                    <li><apex:commandLink id="li5" value="{!onHoldReq}" styleClass="listCol5" status="status" onclick="selectBox(this,'reqColorId');changeColor1('requestHold');return false;" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span>{!$Label.On_Hold}</span></li>
+                </ul>
+                </apex:outputPanel>
+            </div>
+            <div class="coleredDiv" id="nomiColorId" style="display:none;">
+                <apex:outputPanel id="nomiColorBlock">
+                <ul>
+                    <li><apex:commandLink id="li11" value="{!nominationCon.allOpenReq}" styleClass="listCol1"  onclick="selectBox(this,'nomiColorId');changeColor2('nominationAll');return false;" status="status" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span><b>{!$Label.All_Open} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></span></li>
+                    <li><apex:commandLink id="li12" value="{!nominationCon.criticalReq}" styleClass="listCol2" onclick="selectBox(this,'nomiColorId');changeColor2('nominationRed');return false;" status="status" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span> &gt;{!cs.Nomination_disposition_window__c} {!$Label.days}</span></li>
+                    <li><apex:commandLink id="li13" value="{!nominationCon.cautionReq}" styleClass="listCol4"  status="status" onclick="selectBox(this,'nomiColorId');changeColor2('nominationGreen');return false;" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span> &lt;={!cs.Nomination_disposition_window__c} {!$Label.days}</span></li>
+                    <li><apex:commandLink id="li14" value="{!nominationCon.onHoldReq}" styleClass="listCol5"  status="status" onclick="selectBox(this,'nomiColorId');changeColor2('nominationHold');return false;" reRender="reqProPbId"></apex:commandLink><br/><br/><br/><span>{!$Label.On_Hold}</span></li>
+                </ul>
+                </apex:outputPanel>
+            </div>
+            <apex:pageBlock id="reqProPbId">
+                <span style="margin-left: 50%;"> 
+                    <input id="newProjectId" type="button" onclick="newProject();" class="btn" value="{!$Label.New_Project}"/>
+                </span>
+                <span style="float: right;"> 
+                    <apex:selectList value="{!selectedProcess}" size="1" onChange="changeProcess();">
+                        <apex:selectOptions value="{!process}"/>
+                    </apex:selectList>
+                </span>
+                
+                
+                  <apex:tabPanel id="RefWorkSpaceTabPanel" switchType="client" tabClass="activeTab" inactiveTabClass="inactiveTab" value="{!activeTab}">  
+                     <apex:tab label="{!$Label.Requests_with_Opportunities}" name="specTab" id="specTab" ontabenter="showHideTab('reqColorId');">
+                        <apex:outputPanel id="reaWithOppIdPanel">
+                            <apex:pageBlock id="reaWithOppId" title="{!$Label.Specified_Open_Requests_Projects} ({!requestWithOppCon.noOfRecords})" rendered="{!IF(AND(requestWithOppCon.noOfRecords != null,requestWithOppCon.noOfRecords > 0), true, false)}">
+                                <div id="tab1" style="height:250px;overflow:scroll;">
+                                <apex:pageBlockSection columns="1" id="reqProPbsId">
+                                    <apex:pageBlockTable value="{!requestWithOppCon.allAccountReq}" var="reqWrap" id="specPbtRequest" >
+                                        <apex:column headerValue="{!$Label.Project}">
+                                            <apex:commandLink rendered="{!reqWrap.isReq}" onclick="window.location.href = '{!$Page.refedge__RefRequestProject}?Id={!JSENCODE(reqWrap.request.Id)}&activeTab=specTab';return false;" >{!$Label.Details}</apex:commandLink>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Requester}">
+                                            <apex:outputField value="{!reqWrap.request.refedge__Requester__c}" rendered="{!reqWrap.isReq}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Opportunity}">
+                                            <apex:outputField value="{!reqWrap.request.refedge__Opportunity__c}" rendered="{!reqWrap.isReq}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Opportunity_Account}">
+                                            <apex:outputField value="{!reqWrap.request.Opportunity__r.AccountId}" rendered="{!reqWrap.isReq}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Type}">
+                                            <apex:outputField value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                            <apex:outputField value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!(reqWrap.isUR)}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Account_Requested}" >
+                                            <apex:outputField value="{!reqWrap.rra.refedge__Account__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                            <apex:outputText value="{!$Label.Unspecified}" rendered="{!(reqWrap.isUR)}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Deadline}">
+                                            <apex:outputField value="{!reqWrap.rra.refedge__Deadline__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                            <apex:outputField value="{!reqWrap.unSpec.refedge__Deadline__c}" rendered="{!(reqWrap.isUR)}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Due_In}">
+                                            <div class="circle" style="background-color:{!JSENCODE(reqWrap.backgroundColor)}"></div>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Status}">
+                                            <apex:outputField value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                            <apex:outputField value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!(reqWrap.isUR)}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Owner}">
+                                            <apex:outputField value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                            <apex:outputField value="{!reqWrap.unSpec.refedge__Project_Owner__c}" rendered="{!(reqWrap.isUR)}"/>
+                                        </apex:column>
+                                        <apex:column headerValue="{!$Label.Process}">
+                                            <apex:outputText value="{!reqWrap.processStatus}"/>
+                                        </apex:column>
+                                    </apex:pageBlockTable>
+                                    
+                                    <apex:outputPanel layout="block" styleClass="paginatorWrap" rendered="true">
+                                        <div class="paginator" id="pager">
+                                            <span class="left">
+                                                {!(requestWithOppCon.pageNumber * requestWithOppCon.size)+1-requestWithOppCon.size}-{!IF((requestWithOppCon.pageNumber * requestWithOppCon.size) > requestWithOppCon.noOfRecords, requestWithOppCon.noOfRecords,(requestWithOppCon.pageNumber * requestWithOppCon.size))} of {!requestWithOppCon.noOfRecords}
+                                            </span>
+                                            <span class="prevNextLinks">            
+                                                <span class="prevNext">
+                                                    <apex:commandLink action="{!requestWithOppCon.previous}" rendered="{!requestWithOppCon.hasPrevious}" status="status" reRender="reaWithOppId">
+                                                        <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!requestWithOppCon.hasPrevious}" width="5px" height="8px"/>&nbsp;{!$Label.Previous_Page}
+                                                    </apex:commandLink>
+                                                </span>
+                                                <span class="prevNext">
+                                                    <apex:commandLink action="{!requestWithOppCon.next}" rendered="{!requestWithOppCon.hasNext}" status="status" reRender="reaWithOppId">{!$Label.Next_Page}&nbsp; 
+                                                        <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!requestWithOppCon.hasNext}" width="5px" height="8px"/>       
+                                                    </apex:commandLink>
+                                                </span>
+                                            </span>
+                                            <span class="right">
+                                                {!$Label.Page}&nbsp; 
+                                                <apex:inputText id="input1" value="{!requestWithOppCon.pageNumberString}" onkeyup="runScript1(event, this.value);" styleClass="pageInput"/> of {!requestWithOppCon.totalPage}
+                                            </span>
+                                            <script>
+                                                pageNo1 = {!requestWithOppCon.PageNumber};
+                                            </script>       
+                                        </div>
+                                    </apex:outputPanel>
+                                </apex:pageBlockSection>
+                                </div>
+                            </apex:pageBlock>
+                            <apex:pageBlock title="Message" rendered="{!IF(NOT(requestWithOppCon.noOfRecords > 0), true, false)}">
+                                <apex:pageMessage summary="{!$Label.No_Records_Found}" severity="Warning" strength="3" />
+                            </apex:pageBlock>
+                        </apex:outputPanel>
+                    </apex:tab>
+                   
+                    <apex:tab label="{!$Label.Requests_without_Opportunities}" name="unspecTab" id="unspecTab" ontabenter="showHideTab('reqColorId');"> 
+                            <apex:outputPanel id="reaWithoutOppIdPanel">
+                                <apex:pageBlock id="reaWithoutOppId" title="{!$Label.Specified_Open_Requests_Projects} ({!requestWithoutOppCon.noOfRecords})" rendered="{!IF(AND(requestWithoutOppCon.noOfRecords != null,requestWithoutOppCon.noOfRecords > 0), true, false)}">
+                                    <div id="tab2"  style="height:250px;overflow:scroll;">
+                                        <apex:pageBlockSection columns="1" id="reqProPbsId">
+                                            <apex:pageBlockTable value="{!requestWithoutOppCon.allReqWithoutOpp}" var="reqWrap" id="specPbtRequest" >
+                                                <apex:column headerValue="{!$Label.Project}">
+                                                    <apex:commandLink rendered="{!reqWrap.isReq}" onclick="window.location.href = '{!$Page.refedge__RefRequestProject}?Id={!JSENCODE(reqWrap.request.Id)}&activeTab=unspecTab';return false;" >{!$Label.Details}</apex:commandLink>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Requester}">
+                                                    <apex:outputField rendered="{!reqWrap.isReq}" value="{!reqWrap.request.refedge__Requester__c}" />
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Subject}">
+                                                    <apex:outputField rendered="{!AND(NOT(isEdit),reqWrap.isReq)}" value="{!reqWrap.request.refedge__Title__c}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Type}">
+                                                    <apex:outputField value="{!reqWrap.rra.refedge__Reference_Type_Needed__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                                    <apex:outputField value="{!reqWrap.unSpec.refedge__Reference_Type_Needed__c}" rendered="{!(reqWrap.isUR)}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Account_Requested}" > 
+                                                    <apex:outputField value="{!reqWrap.rra.refedge__Account__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                                    <apex:outputText value="{!$Label.Unspecified}" rendered="{!(reqWrap.isUR)}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Deadline}">
+                                                    <apex:outputField value="{!reqWrap.rra.refedge__Deadline__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                                    <apex:outputField value="{!reqWrap.unSpec.refedge__Deadline__c}" rendered="{!(reqWrap.isUR)}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Due_In}">
+                                                    <div class="circle" style="background-color:{!JSENCODE(reqWrap.backgroundColor)}"></div>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Status}">
+                                                    <apex:outputField value="{!reqWrap.rra.refedge__Account_Request_Status__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                                    <apex:outputField value="{!reqWrap.unSpec.refedge__Unspecified_Request_Status__c}" rendered="{!(reqWrap.isUR)}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Owner}">
+                                                    <apex:outputField value="{!reqWrap.rra.refedge__Project_Owner__c}" rendered="{!!(reqWrap.isUR)}"/>
+                                                    <apex:outputField value="{!reqWrap.unSpec.refedge__Project_Owner__c}" rendered="{!(reqWrap.isUR)}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Process}">
+                                                    <apex:outputText value="{!reqWrap.processStatus}"/>
+                                                </apex:column>
+                                            </apex:pageBlockTable>
+                                            <apex:outputPanel layout="block" styleClass="paginatorWrap" rendered="true">
+                                                <div class="paginator" id="pager">
+                                                    <span class="left">
+                                                        {!(requestWithoutOppCon.pageNumber * requestWithoutOppCon.size)+1-requestWithoutOppCon.size}-{!IF((requestWithoutOppCon.pageNumber * requestWithoutOppCon.size) > requestWithoutOppCon.noOfRecords, requestWithoutOppCon.noOfRecords,(requestWithoutOppCon.pageNumber * requestWithoutOppCon.size))} of {!requestWithoutOppCon.noOfRecords}
+                                                    </span>
+                                                    <span class="prevNextLinks">           
+                                                        <span class="prevNext">
+                                                            <apex:commandLink action="{!requestWithoutOppCon.previous}" status="status" reRender="reaWithoutOppId" rendered="{!requestWithoutOppCon.hasPrevious}">
+                                                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!requestWithoutOppCon.hasPrevious}" width="5px" height="8px"/>&nbsp;{!$Label.Previous_Page}
+                                                            </apex:commandLink>
+                                                        </span>
+                                                        <span class="prevNext">
+                                                            <apex:commandLink action="{!requestWithoutOppCon.next}" status="status" reRender="reaWithoutOppId" rendered="{!requestWithoutOppCon.hasNext}">{!$Label.Next_Page}&nbsp; 
+                                                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!requestWithoutOppCon.hasNext}" width="5px" height="8px"/>       
+                                                            </apex:commandLink>
+                                                        </span>
+                                                    </span>
+                                                    <span class="right">
+                                                        {!$Label.Page}&nbsp; 
+                                                        <apex:inputText id="input2" value="{!requestWithoutOppCon.pageNumberString}" onkeyDown="runScript2(event, this.value);" styleClass="pageInput"/> of {!requestWithoutOppCon.totalPage}
+                                                    </span>       
+                                                    <script>
+                                                        pageNo2 = {!requestWithoutOppCon.PageNumber};
+                                                    </script>  
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSection>
+                                    </div>
+                                </apex:pageBlock>
+                                <apex:pageBlock title="Message" rendered="{!IF(NOT(requestWithoutOppCon.noOfRecords > 0), true, false)}">
+                                    <apex:pageMessage summary="{!$Label.No_Records_Found}" severity="Warning" strength="3" />
+                                </apex:pageBlock>
+                            </apex:outputPanel>
+                            
+                       
+                     </apex:tab>
+                     <apex:tab label="{!$Label.Nominations}" name="nomination" id="nominationTab" ontabenter="showHideTab('nomiColorId');"> 
+                            <apex:outputPanel id="nominationIdPanel">
+                                <apex:pageBlock id="nominationId" title="{!$Label.Open_Nominations} ({!nominationCon.noOfRecords})" rendered="{!IF(AND(nominationCon.noOfRecords != null,nominationCon.noOfRecords > 0), true, false)}">
+                                    <apex:outputPanel id="tab2" layout="block"  style="height:250px;overflow:scroll;">
+                                        <apex:pageBlockSection columns="1" id="nominationPbsId">
+                                            <apex:pageBlockTable value="{!nominationCon.allNomination}" var="nomiWrap" id="nominations" >
+                                                <apex:column headerValue="{!$Label.Project}">
+                                                    <apex:commandLink onclick="window.location.href = '/{!JSENCODE(nomiWrap.nomination.Id)}';return false;" >{!$Label.Details}</apex:commandLink>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Account}">
+                                                    <apex:outputField value="{!nomiWrap.nomination.refedge__Account__c}" />
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Contact}">
+                                                    <apex:outputField value="{!nomiWrap.nomination.refedge__Contact__c}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Created_By}" > 
+                                                    <apex:outputField value="{!nomiWrap.nomination.CreatedById}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$ObjectType.refedge__Nomination__c.fields.CreatedDate.Label}">
+                                                    <apex:outputField value="{!nomiWrap.nomination.CreatedDate}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Due_In}">
+                                                    <div class="circle" style="background-color:{!JSENCODE(nomiWrap.backgroundColor)}"></div>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Status}">
+                                                    <apex:outputField value="{!nomiWrap.nomination.refedge__Status__c}"/>
+                                                </apex:column>
+                                                <apex:column headerValue="{!$Label.Owner}">
+                                                    <apex:outputField value="{!nomiWrap.nomination.OwnerId}"/>
+                                                </apex:column>
+                                            </apex:pageBlockTable>
+                                            <apex:outputPanel layout="block" styleClass="paginatorWrap" rendered="true">
+                                                <div class="paginator" id="pager">
+                                                    <span class="left">
+                                                        {!(nominationCon.pageNumber * nominationCon.size)+1-nominationCon.size}-{!IF((nominationCon.pageNumber * nominationCon.size) > nominationCon.noOfRecords, nominationCon.noOfRecords,(nominationCon.pageNumber * nominationCon.size))} of {!nominationCon.noOfRecords}
+                                                    </span>
+                                                    <span class="prevNextLinks">           
+                                                        <span class="prevNext">
+                                                            <apex:commandLink action="{!nominationCon.previous}" status="status" reRender="nominationId" rendered="{!nominationCon.hasPrevious}">
+                                                                <apex:image url="{!$Resource.refedge__Search_prevarrow}" rendered="{!nominationCon.hasPrevious}" width="5px" height="8px"/>&nbsp;{!$Label.Previous_Page}
+                                                            </apex:commandLink>
+                                                        </span>
+                                                        <span class="prevNext">
+                                                            <apex:commandLink action="{!nominationCon.next}" status="status" reRender="nominationId" rendered="{!nominationCon.hasNext}">{!$Label.Next_Page}&nbsp; 
+                                                                <apex:image url="{!$Resource.refedge__Search_nextarrow}" rendered="{!nominationCon.hasNext}" width="5px" height="8px"/>       
+                                                            </apex:commandLink>
+                                                        </span>
+                                                    </span>
+                                                    <span class="right">
+                                                        {!$Label.Page}&nbsp; 
+                                                        <apex:inputText id="input3" value="{!nominationCon.pageNumberString}" onkeyDown="runScript3(event, this.value);" styleClass="pageInput"/> of {!nominationCon.totalPage}
+                                                    </span>       
+                                                    <script>
+                                                        pageNo3 = {!nominationCon.PageNumber};
+                                                    </script>  
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSection>
+                                    </apex:outputPanel>
+                                </apex:pageBlock>
+                                <apex:pageBlock title="Message" rendered="{!IF(NOT(nominationCon.noOfRecords > 0), true, false)}">
+                                    <apex:pageMessage summary="{!$Label.No_Records_Found}" severity="Warning" strength="3" />
+                                </apex:pageBlock>
+                            </apex:outputPanel>
+                            
+                       
+                     </apex:tab>
+                 </apex:tabPanel>  
+            </apex:pageBlock> 
+            <apex:outputpanel >
+                <apex:actionstatus id="status" >
+                    <apex:facet name="start" >
+                        <div class = "waitingSearchDiv" id = "el_loading" > 
+                            <div class = "waitingHolder" >
+                                <img class = "waitingImage" src = "/resource/1447657355000/{!nameSpace}LoaderSpinner" width="60" height="60"/>
+                            </div>
+                        </div>
+                    </apex:facet>
+                </apex:actionstatus>
+            </apex:outputpanel>
+            
+        </div>    
+    </apex:form>
+</apex:page>

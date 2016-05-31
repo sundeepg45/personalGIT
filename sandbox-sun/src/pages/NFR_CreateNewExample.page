@@ -1,0 +1,3 @@
+<apex:page standardController="NFR_Request__c">
+    <apex:sectionHeader title="Hellow World!" />
+</apex:page>

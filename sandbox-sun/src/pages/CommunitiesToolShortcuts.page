@@ -1,0 +1,20 @@
+<apex:page controller="CommunitiesToolShortcuts" standardStylesheets="false" showHeader="true" sidebar="true" tabStyle="Communities_Tool_Shortcut__c">
+	<apex:form >
+		<apex:pageBlock title="{!$Label.CommunitiesSidebarToolShortcuts}">
+			<apex:pageMessage summary="{!$Label.CommunitiesToolShortcutsLimitError}" severity="error" rendered="{!hasErrors}"/>
+			<apex:pageMessages />
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton value="{!$Label.Save}" action="{!save}"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection title="{!$Label.CommunitiesToolShortcutsLimitWarning}">
+				<apex:pageBlockTable value="{!shortcutWrappers}" var="shortcut">
+	                <apex:column value="{!shortcut.label}" headerValue="{!$Label.Tool}"/>
+	                <apex:column value="{!shortcut.helpText}" headerValue="{!$Label.description}"/>
+	                <apex:column headerValue="{!$Label.Select}">
+	                	<apex:inputCheckbox value="{!shortcut.checked}"/>
+	            	</apex:column>
+	            </apex:pageBlockTable>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

@@ -1,0 +1,135 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Nomination__c" extensions="refedge.CopyNominationDetailsController" sideBar="false" id="pageId" tabStyle="refedge__Nomination__c">
+    <!-- Add JavaScript & Jquery-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <style type="text/css">
+        table.gridtable {
+            font-family: verdana,arial,sans-serif;
+            font-size:11px;
+            color:#333333;
+            border-collapse: collapse;
+            width: 100%;
+            border-spacing: 0px;
+        }
+        table.gridtable th {
+            padding: 8px;
+            background-color: #F2F3F3;
+        }
+        table.gridtable td {
+            padding: 4px;
+            background-color: #ffffff;
+        }
+        .col0 {
+            width: 20%;
+            text-align:right;
+            font-weight:bold;
+            padding-right: 10px !important;
+            background-color: #F8F8F8 !important;
+        }
+        .col1 {
+            width: 55%;
+            padding-left: 10px !important;
+            border-left: 1px solid #CFCCCC;
+            border-bottom: 1px solid #CFCCCC;
+        }
+        .col2 {
+            width: 25%;
+            text-align:center;
+            border-right: 1px solid #CFCCCC;
+            border-bottom: 1px solid #CFCCCC;
+        }
+    </style>
+    <script>
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        jQuery(document).ready(function() {
+            jQuery('.col2').each(function() {
+                jQuery(this).children().css({"width":"100%","border-spacing" : "0"});
+            });
+        });
+    </script>
+    <apex:pageMessages id="pgMsgId"/>
+    <apex:form id="FormId" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader title="{!$Label.Copy_Nomination}" subTitle="{!$Label.Copy_Nomination_Details}"/>
+        <apex:pageBlock id="pbId">
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton style="margin-left:20%;" value="{!$Label.Copy}"  action="{!copyDetails}" />
+                <apex:commandButton value="{!$Label.Cancel}" immediate="true" action="{!cancelNomination}"/>
+            </apex:pageBlockButtons>
+            <apex:outputpanel id="dataId" layout="block">
+                <apex:outputLabel style="font-weight:bold;" value="{!$Label.Account}"/>&nbsp;&nbsp;&nbsp;<apex:outputField value="{!nominationObj.refedge__Account__c}" /><br/><br/>
+                <apex:outputLabel style="font-weight:bold;" value="{!$Label.Contact}"/>&nbsp;&nbsp;&nbsp;<apex:outputField value="{!nominationObj.refedge__Contact__c}" /><br/><br/>
+                <apex:outputText value="{!$Label.Additional_Information_and_Comments}"/><br/>
+            </apex:outputpanel>
+            <apex:outputpanel id="tableId">
+                <script>
+                    jQuery(document).ready(function() {
+                        jQuery('.checkBoxCls').each(function() {
+                            jQuery(this).css({"width":"100%","border-spacing" : "0"});
+                        });
+                    });
+                </script>
+                <table class="gridtable">
+                    <tr>
+                        <td class="col0"></td>
+                        <th class="col1" style="border-top: 1px solid #CFCCCC;"></th>
+                        <th class="col2" style="border-top: 1px solid #CFCCCC;">{!$Label.Copy}[<apex:commandLink value="{!$Label.Select_All}" action="{!selectAll}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="tableId"/>]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.Do_Not_Copy}[<apex:commandLink value="{!$Label.Select_All}" action="{!deSelectAll}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="tableId"/>]</th>
+                    </tr>
+                    <apex:repeat value="{!rowValues}" var="row">
+                        <tr>
+                            <td class="col0"><apex:outputText style="color:red;" value="{!$Label.Note_Mapped_Attributes_will_NOT_be_copied}" rendered="{!row == 'Attributes'}"/></td>
+                            <th class="col1"><apex:outputText value="{!rowValuesMap[row]}"/></th>
+                            <th class="col2"></th>
+                        </tr>
+                        <apex:repeat value="{!tableMap[row]}" var="wrapperObj">
+                            <tr>
+                                <td class="col0">{!wrapperObj.label}</td>
+                                <td class="col1">{!wrapperObj.valueName}</td>
+                                <td class="col2">
+                                    <apex:outputPanel rendered="{!OR(wrapperObj.isCopy != null,wrapperObj.isDisable)}">
+                                        <apex:selectRadio styleClass="checkBoxCls" value="{!wrapperObj.isCopy}" Disabled="{!wrapperObj.isDisable}">
+                                            <apex:selectOptions value="{!Options}"/>
+                                        </apex:selectRadio>
+                                    </apex:outputPanel>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </apex:repeat>
+                </table><br/>
+            </apex:outputpanel>
+            <apex:outputPanel style="{!IF(isReferenceableStatus, 'color : lightgray;', '')}" layout="block" id="detailId">
+                <apex:outputText value="{!$Label.Mapped_Attributes_created}"/><br/>
+                <table class="gridtable">
+                    <apex:repeat value="{!labelAttributes}" var="wrapperObj">
+                        <tr>
+                            <td class="col0" style="{!IF(isReferenceableStatus, 'color : lightgray;', '')}">{!wrapperObj}</td>
+                            <td class="col1" style="{!IF(isReferenceableStatus, 'color : lightgray;', '')}border-top: 1px solid #CFCCCC;border-right: 1px solid #CFCCCC; width:80% !important;">{!labelAttributes[wrapperObj]}</td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

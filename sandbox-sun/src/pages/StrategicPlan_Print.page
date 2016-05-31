@@ -1,0 +1,248 @@
+<apex:page controller="TabUIController"
+	extensions="StrategicPlanControllerExtension"
+	tabStyle="StrategicPlan__c"
+	showHeader="false"
+	sidebar="false"
+	readonly="false"
+	renderas="{!IF($CurrentPage.parameters.renderas='pdf','pdf','html')}"
+	standardStylesheets="true"
+	id="StrategicPlan_Print">
+	<apex:variable var="IsRenderAsPDF" value="{!$CurrentPage.parameters.renderas='pdf'}"/>
+	<apex:outputPanel layout="none" rendered="{!IsRenderAsPDF}">
+		<!-- When renderas="pdf" the standardStylesheets attribute is ignored, we we have to manually load style sheets. -->
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/zen-componentsCompatible.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/zen-componentsCompatible.css -->
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/elements.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/elements.css -->
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/common.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/common.css -->
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dStandard.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dStandard.css" />
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom0.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom0.css" />
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom1.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom1.css" />
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/base/dCustom2.css')}"/><!-- /sCSS/27.0/sprites/1355438850000/Theme3/base/dCustom2.css" />
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/extended.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/extended.css -->
+		<apex:stylesheet value="{!URLFOR($Resource.Theme3NoImages, '/default/base/setup.css')}"/><!-- /sCSS/27.0/sprites/1357830382000/Theme3/default/base/setup.css -->
+	</apex:outputPanel>
+	<apex:stylesheet value="{!$Resource.AccountProfileStyle}"/>
+	<apex:stylesheet value="{!$Resource.PrintableStylesheet}"/>
+	<apex:includeScript value="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"/>
+	<script type="text/javascript">
+		function showSendCurrentPageAsPDF() {
+			var element = document.getElementById('SendCurrentPageAsPDF');
+			if(element) {
+				element.style.display = 'block';
+				element = document.getElementById('printHeader');
+				if(element) {
+					element.style.display = 'none';
+				}
+			}
+		}
+		function hideSendCurrentPageAsPDF() {
+			var element = document.getElementById('SendCurrentPageAsPDF');
+			if(element) {
+				element.style.display = 'none';
+				element = document.getElementById('printHeader');
+				if(element) {
+					element.style.display = 'block';
+				}
+			}
+		}
+	</script>
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+			var printLinksDest = $('a[href^="javascript:printWin"]');
+//			alert('printLinksDest:'+printLinksDest.first().attr('href'));
+			var printLinksSrc = $('a[href^="javascript:openPopupFocus"][href*="'+"'"+'PrintableView'+"'"+',"]');
+//			alert('printLinksSrc:'+printLinksSrc.first().attr('href'));
+			try {
+				printLinksDest.first().attr('href',printLinksSrc.first().attr('href'));
+			}
+			catch(e) {}
+		});
+	</script>
+	<apex:outputPanel id="plan">
+		<apex:form id="form">
+			<apex:outputPanel style="padding:5px 5px 5px 5px;margin:5px 5px 5px 5px;z-index:2;position:absolute;right:0px;top 0px;background-color:#ffffff;opacity=1.0;" styleClass="print hideforprint" rendered="{!NOT(IsRenderAsPDF)}" layout="block">
+				<div class="printHeader" style="padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;" id="printHeader">
+					<div class="printControls" style="padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;">
+						<ul rip-style-borderwidth-backup="" rip-style-borderstyle-backup="" class="noindent" style="text-align:left;vertical-align:top;border-spacing:0px 0px 0px 0px;padding:2px 2px 2px 2px;margin:0px 0px 0px 0px;" rip-style-bordercolor-backup="">
+							<apex:outputLink value="javascript:window.close();">
+								<li>{!$Label.AccountProfile_CloseWindow}</li>
+							</apex:outputLink>
+							<apex:outputLink value="javascript:window.print();">
+								<li>{!$Label.AccountProfile_PrintThisPage}</li>
+							</apex:outputLink>
+							<apex:outputLink value="/apex/StrategicPlan_Print?id={!Id}&renderas=pdf">
+								<li>{!$Label.AccountProfile_Download}</li>
+							</apex:outputLink>
+							<apex:outputLink value="javascript:showSendCurrentPageAsPDF();">
+								<li>{!$Label.AccountProfile_SendAsPDF}</li>
+							</apex:outputLink>
+						</ul>
+					</div>
+				</div>
+			</apex:outputPanel>
+			<div style="width:100%;display:none;" id="SendCurrentPageAsPDF">
+				<c:SendPageByEmail href="/apex/StrategicPlan_Print?id={!Id}&renderas=pdf"
+					fileName="StrategicPlan-{!Id}-{!YEAR(TODAY())*10000+MONTH(TODAY())*100+DAY(TODAY())}.pdf"
+					accountId="{!StrategicPlan.Account__c}"
+					accountContactRoleLookup="AccountId = :accountId"
+					contactLookup="AccountId = :accountId"
+					label="{!$ObjectType.StrategicPlan__c.Label}"
+					name="{!StrategicPlan.Name}"
+					newEmailLines="0"
+					newUserLines="4"
+					oncancel="hideSendCurrentPageAsPDF()"
+					templateUniqueName="StrategicPlan_By_Email" />
+			</div>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$Label.StrategicPlan_DetailTitle}" mode="view" >
+					<apex:outputPanel layout="none">
+						<apex:pageBlockSection columns="2" collapsible="false">
+							<apex:pageBlockSection columns="1" collapsible="false">
+								<apex:outputField value="{!StrategicPlan.Name}"  id="strategicPlanNameOutput"/>
+								<apex:outputField value="{!StrategicPlan.PlanNumber__c}" id="strategicPlanNumberOutput"/>
+								<apex:outputField value="{!StrategicPlan.PlanStartDate__c}" id="strategicPlanStartDateOutput"/>
+								<apex:outputField value="{!StrategicPlan.PlanEndDate__c}" id="strategicPlanEndDateOutput"/>
+								<apex:outputField value="{!StrategicPlan.FiscalYear__c}" id="strategicPlanFiscalYearOutput"/>
+								<apex:outputField value="{!StrategicPlan.Status__c}" id="strategicPlanStatusOutput"/>
+								<apex:pageBlockSectionItem >
+									<apex:outputLabel value="{!$ObjectType.StrategicPlan__c.Fields.AccountProfile__c.Label}" for="strategicPlanAccountProfileOutput"/>
+									<apex:outputText value="{!StrategicPlan.AccountProfile__r.Name}" id="strategicPlanAccountProfileOutput"/>
+								</apex:pageBlockSectionItem>
+								<apex:pageBlockSectionItem >
+									<apex:outputLabel value="{!$Label.CreatedBy}" for="createdBy"/>
+									<apex:outputPanel layout="inline" id="createdBy">
+										<apex:outputText value="{!StrategicPlan.CreatedBy.Name}" id="strategicPlanCreatedByOutput" />
+										<apex:outputText value=", {!StrategicPlan.CreatedDate}" id="strategicPlanCreatedDateOutput"/>
+									</apex:outputPanel>
+								</apex:pageBlockSectionItem>
+								<apex:pageBlockSectionItem >
+									<apex:outputLabel value="{!$Label.LastModifiedBy}" for="lastModifiedBy"/>
+									<apex:outputPanel layout="inline" id="lastModifiedBy">
+										<apex:outputText value="{!StrategicPlan.LastModifiedBy.Name}" id="strategicPlanModifiedByOutput" />
+										<apex:outputText value=", {!StrategicPlan.LastModifiedDate}" id="strategicPlanModifiedDateOutput"/>
+									</apex:outputPanel>
+								</apex:pageBlockSectionItem>
+								<apex:outputField value="{!StrategicPlan.Industry__c}" id="strategicPlanIndustryOutput"/>
+								<apex:outputField value="{!StrategicPlan.AnnualRevenue__c}" id="strategicPlanAnnualRevenueOutput"/>
+								<apex:outputField value="{!StrategicPlan.AnnualITBudget__c}" id="strategicPlanAnnualITBudgetOutput"/>
+								<apex:outputField value="{!StrategicPlan.NumberOfEmployees__c}" id="strategicPlanNumberOfEmployeesOutput"/>
+							</apex:pageBlockSection>
+							<apex:pageBlockSection columns="1" collapsible="false">
+								<apex:pageBlockSectionItem >
+									<apex:outputLabel value="{!$ObjectType.StrategicPlan__c.Fields.Account__c.Label}" for="strategicPlanAccountOutput"/>
+									<apex:outputText value="{!StrategicPlan.Account__r.Name}" id="strategicPlanAccountOutput"/>
+								</apex:pageBlockSectionItem>
+								<apex:outputField value="{!StrategicPlan.AccountNumber__c}" id="strategicPlanAccountNumberOutput"/>
+								<apex:outputField value="{!StrategicPlan.AccountClassification__c}" id="strategicPlanAccountClassificationOutput"/>
+								<apex:outputField value="{!StrategicPlan.AccountType__c}" id="strategicPlanAccountTypeOutput"/>
+								<apex:outputField value="{!StrategicPlan.AccountBillingAddress__c}" id="strategicPlanAccountBillingAddressOutput"/>
+								<apex:pageBlockSectionItem >
+									<apex:outputLabel value="{!$ObjectType.StrategicPlan__c.Fields.ParentAccount__c.Label}" for="strategicPlanParentAccountOutput"/>
+									<apex:outputField value="{!StrategicPlan.Account__r.Parent.Name}" id="strategicPlanParentAccountOutput"/>
+								</apex:pageBlockSectionItem>
+								<apex:pageBlockTable value="{!accountTeamMembers}" var="accountTeamMember" cellPadding="4" border="1">
+									<apex:column headerValue="{!$Label.StrategicPlan_AccountTeamMember}">
+										<apex:outputField value="{!accountTeamMember.User.Name}" id="accountTeamMemberNameOutput"/>
+									</apex:column>
+									<apex:column headerValue="{!$Label.StrategicPlan_AccountTeamRole}">
+										<apex:outputField value="{!accountTeamMember.TeamMemberRole}" id="accountTeamMemberRoleOutput"/>
+									</apex:column>
+								</apex:pageBlockTable>
+							</apex:pageBlockSection>
+						</apex:pageBlockSection>
+					</apex:outputPanel>
+				</apex:pageBlock>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$Label.StrategicPlan_ReviewHistoryTitle}" >
+					<c:QueriedList sequenceNumber="{!sequenceNumber}"
+						object="StrategicPlan_ReviewHistory__c"
+						fields="ActionDate__c,Action__c,UserName__c,Comments__c"
+						noSort="true"
+						conditions="StrategicPlan__c='{!Id}'"
+						order="ActionDate__c DESC NULLS LAST,Action__c,UserName__c,Id"
+						recordsPerPage="500"
+						actionField="None"
+						panelClass=""
+						styleClass=""
+						panelStyle="" />
+				</apex:pageBlock>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$Label.StrategicPlan_ContributorsTitle}" >
+					<apex:pageBlockTable value="{!planContributors}" var="planContributor" cellPadding="4" border="1">
+						<apex:column headerValue="{!$Label.StrategicPlan_Contributor}">
+							<apex:outputText value="{!planContributor.fullName}" id="planContributorFullName"/>
+						</apex:column>
+						<apex:column headerValue="{!$Label.StrategicPlan_PlanUpdate}">
+							<apex:outputText value="{!planContributor.editCount}" id="planContributorEditCount"/>
+						</apex:column>
+					</apex:pageBlockTable>
+				</apex:pageBlock>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$ObjectType.StrategicPlan_Strategy__c.LabelPlural}" mode="detail" id="strategies">
+					<c:QueriedList sequenceNumber="{!sequenceNumber}"
+						object="StrategicPlan_Strategy__c"
+						fields="StrategyNumber__c,Name,Status__c,GoalName__c,GoalType__c,PainPointName__c,InitiativeName__c"
+						noSort="true"
+						labels=",,,,{!$Label.StrategicPlan_GoalType},{!$Label.StrategicPlan_PainPoint},{!$Label.StrategicPlan_Initiative}"
+						conditions="StrategicPlan__c='{!Id}'"
+						order="StrategyNumber__c"
+						recordsPerPage="500"
+						actionField="None"
+						panelClass=""
+						styleClass=""
+						panelStyle="" />
+				</apex:pageBlock>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$ObjectType.StrategicPlan_Solution__c.LabelPlural}" mode="detail" id="solutions">
+					<c:QueriedList sequenceNumber="{!sequenceNumber}"
+						object="StrategicPlan_Solution__c"
+						fields="SolutionNumber__c,Name,BusinessUnit__c,StrategyNumber__c,Strategy__r.Name"
+						noSort="true"
+						labels=",,,,{!$ObjectType.StrategicPlan_Solution__c.Fields.Strategy__c.Label}"
+						conditions="Strategy__r.StrategicPlan__c='{!Id}'"
+						order="SolutionNumber__c"
+						recordsPerPage="500"
+						actionField="None"
+						panelClass=""
+						styleClass=""
+						panelStyle="" />
+				</apex:pageBlock>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$ObjectType.StrategicPlan_SolutionOpportunity__c.LabelPlural}" mode="detail" id="solutionopportunities">
+					<c:QueriedList sequenceNumber="{!sequenceNumber}"
+						object="StrategicPlan_SolutionOpportunity__c"
+						fields="Opportunity__r.Name,Opportunity__r.Account.Name,StageName__c,Amount__c,CloseDate__c,StrategicPlan_Solution__r.Name"
+						noSort="true"
+						labels="{!$ObjectType.Opportunity.Label},{!$ObjectType.Account.Label},{!$ObjectType.Opportunity.Fields.StageName.Label},{!$ObjectType.Opportunity.Fields.Amount.Label},{!$ObjectType.Opportunity.Fields.CloseDate.Label},{!$ObjectType.StrategicPlan_Solution__c.Label}"
+						conditions="StrategicPlan_Solution__r.StrategicPlan__c='{!Id}'"
+						order="CloseDate__c,StrategicPlan_Solution__r.Name,Opportunity__r.Account.Name,Opportunity__r.Name,Amount__c,Id"
+						recordsPerPage="500"
+						actionField="None"
+						panelClass=""
+						styleClass=""
+						panelStyle=""/>
+				</apex:pageBlock>
+			</apex:outputPanel>
+			<apex:outputPanel layout="block" style="page-break-inside:avoid;">
+				<apex:pageBlock title="{!$ObjectType.StrategicPlan_Action__c.LabelPlural}" mode="detail" id="actions">
+					<c:QueriedList sequenceNumber="{!sequenceNumber}"
+						object="StrategicPlan_Action__c"
+						fields="Name,ActionSubject__c,AssignedTo__r.Name,Status__c,Start__c,End__c,RelatedTo_Number__c"
+						noSort="true"
+						labels=",,{!$ObjectType.StrategicPlan_Action__c.Fields.AssignedTo__c.Label},,,,{!$ObjectType.StrategicPlan_Action__c.Fields.RelatedTo__c.Label}"
+						conditions="StrategicPlan__c='{!Id}'"
+						order="Name,ActionSubject__c,RelatedTo__c,Id"
+						recordsPerPage="500"
+						actionField="None"
+						panelClass=""
+						styleClass=""
+						panelStyle="" />
+				</apex:pageBlock>
+			</apex:outputPanel>
+		</apex:form>
+	</apex:outputPanel>
+</apex:page>

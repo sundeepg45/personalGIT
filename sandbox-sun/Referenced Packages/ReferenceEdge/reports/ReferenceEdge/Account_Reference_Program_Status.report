@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>FK_NAME</field>
+    </columns>
+    <columns>
+        <field>FK_ACC_OWNER_NAME</field>
+    </columns>
+    <columns>
+        <field>FK_$Account.Global_Region__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Referenceability__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Current_Available_Balance_Points__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Lifetime_Points__c</field>
+    </columns>
+    <currency>USD</currency>
+    <description>All Members of the Reference Program and their Status in the program.</description>
+    <filter>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.Is_Referenceable__c</column>
+            <operator>equals</operator>
+            <value>1</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.Contact__c</column>
+            <operator>equals</operator>
+            <value></value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Reference_Basic_Information__c.Referenceability_Status__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Account Reference Program Status</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Reference_Basic_Information__c@Reference_Basic_Information__c.Account__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>Reference_Basic_Information__c.RUL_Date_Available__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

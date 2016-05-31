@@ -1,0 +1,180 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page id="pageId" controller="refedge.RefedgeCommunityHome" sidebar="false">
+    <c:RefedgeCommunityHeader id="customCompId" />
+    <apex:pagemessages id="pgMsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isCommunityLicenseAccessible,NOT(IsPageAccessible),isCommunityLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.Contact_must_reference_program_member}" strength="3" severity="Info" rendered="{!AND(IsPageAccessible,NOT(isRefedgeProgramMember),isCommunityLicenseAccessible)}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <style> 
+        .container{
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+        
+        
+        .tilestyle{
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            background:white;
+            color: color: #7F7F7F;;
+            padding-top: 3%;
+            padding-bottom: 3%; 
+            cursor: pointer;
+            float:left;
+            width:50%;
+        }
+        
+        .outertextstyle{
+            color: #7F7F7F;;
+            font-size: x-large;
+            text-align: center;
+        }
+        
+        .descstyle{
+            float:left;
+            width:48%;
+            color: #7F7F7F;;
+            padding-left: 1%;
+            padding-top: 1%;
+            font-size: small;
+        }
+        
+        .menuoptionstyle{
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            background: #FFF;
+            color: #595959;
+            padding: 3%;
+        }
+        
+        .headingstyle{
+            font-size: x-large;
+            cursor: pointer;
+        }
+        
+        .descriptionstyle{
+            font-size: 14px;
+        }
+        
+        .newsstyle{
+            border: 1px solid #CCC;
+            border-radius: 5px;
+            background:white;
+            color: #5C5B5B;
+            padding : 3%;
+            cursor: pointer;
+            height: 328px;
+            overflow-y:scroll;
+        }
+        
+        .newstextstyle{
+            color: #7F7F7F;
+            font-size: x-large;
+        }
+        .HeaderText{
+            color: #7F7F7F !important;
+            font-size:x-large;
+            margin-top: -3%;
+            margin-bottom: 3%;
+            font-weight: bold;
+        }
+        .card{
+            margin-bottom: 4%;
+            width:100%;
+            float:left;
+        }
+    </style>
+    
+    <script>
+        document.getElementById('pageId:customCompId:communityHeader:frmId:cmdLinkId').style.display = "none";
+    </script>
+    
+    <apex:form id="frmId">
+        <apex:actionFunction name="jsredirectNewPage"  action="{!redirectNewPage}" rerender="pgMsgId">
+            <apex:param name="pageName" assignTo="{!pageName}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="jsredirectNewsPage"  action="{!redirectNewsPage}" rerender="pgMsgId">
+            <apex:param name="newsId" assignTo="{!newsId}" value="" />
+        </apex:actionFunction>
+        
+        <body class="bodyclass">
+            <apex:outputPanel id="opContainerId" rendered="{!AND(IsPageAccessible, isRefedgeProgramMember, isCommunityLicenseAccessible)}">
+                <div class="container">
+                    
+                     <div class="HeaderText">
+                        {!cs.refedge__Community_Home_Text__c}
+                     </div>
+                     
+                      <div style="width:45%;float:left;">
+                        <apex:outputPanel id="optileId" layout="block" styleClass="menuoptionstyle" >
+                            <apex:outputPanel id="opProId" layout="block" onclick="jsredirectNewPage('RefedgeCommunityParticipate');return false;">
+                                <div class="headingstyle">{!$Label.Participate}</div>
+                                <div class="descriptionstyle">{!$Label.Check_out_the_reference_opportunities}</div>
+                            </apex:outputPanel>
+                            
+                            <br/>
+                            <div style="height: 1px;background-color: #D0D0CE;"></div>
+                            <br/>
+                            
+                            <apex:outputPanel id="opAhsId" layout="block" onclick="jsredirectNewPage('RefedgeCommunityActivityHistory');return false;">
+                                <div class="headingstyle">{!$Label.Activity_History}</div>
+                                <div class="descriptionstyle">{!$Label.See_the_list_of_reference_activities}</div>
+                            </apex:outputPanel>
+                            
+                            <br/>
+                            <div style="height: 1px;background-color: #D0D0CE;"></div>
+                            <br/>
+                            
+                            <apex:outputPanel id="opChaId" layout="block" onclick="jsredirectNewPage('RefedgeCommunityChatter');return false;">
+                                <div class="headingstyle">{!$Label.Network}</div>
+                                <div class="descriptionstyle">{!$Label.Network_and_communicate}</div>
+                            </apex:outputPanel>
+                            
+                            <br/>
+                            <div style="height: 1px;background-color: #D0D0CE;"></div>
+                            <br/>
+                            
+                            <apex:outputPanel id="opParId" layout="block" onclick="jsredirectNewPage('RefedgeCommunityProfile');return false;">
+                                <div class="headingstyle">{!$Label.Profile}  </div>
+                                <div class="descriptionstyle">{!$Label.Manage_your_preferences_and_profile_information}</div>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                     </div>
+                     
+                     <div style="width:45%;float:left;margin-left: 10%;">
+                        <apex:outputPanel id="opNewId" layout="block" styleClass="newsstyle" >
+                            <div class="newstextstyle">{!$Label.News} </div> 
+                            <apex:repeat value="{!newsWrapper}" var="news">
+                                <div style="padding-top: 10px;color: #5C5B5B" onclick="jsredirectNewsPage('{!JSENCODE(news.comNews.Id)}');return false;">
+                                    <div style="font-weight:bold;font-size:14px;">{!news.comNews.Name}</div>
+                                    <div style="font-size:14px;">{!news.newsBody}</div>
+                                </div>
+                            </apex:repeat>
+                        </apex:outputPanel>
+                     </div>
+                    
+                </div>
+            </apex:outputPanel>
+        </body>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,38 @@
+<apex:page controller="BusinessPlan_MktResourcesController">
+
+<apex:form >
+<apex:pageMessages />
+<apex:pageBlock title="Marketing Resources">
+    <apex:pageBlockButtons >
+        <apex:commandButton id="saveButton" action="{!saveContacts}" value="Save"/>
+        <apex:commandButton id="backButton" action="{!toPlan}" value="Back to Plan"/>
+    </apex:pageBlockButtons>
+	<apex:outputLabel value="Select marketing contacts for this business plan and click Save"/>
+    <apex:pageBlockTable value="{!contacts}" var="contact" rendered="{!contacts.size > 0}">
+        <apex:column title="Selected" headerValue="Selected">
+            <apex:outputPanel rendered="{!contact.selected}">
+            	<input type="checkbox" name="checkbox_{!contact.info.id}" checked="checked" />
+			</apex:outputPanel>
+            <apex:outputPanel rendered="{!NOT(contact.selected)}">
+            	<input type="checkbox" name="checkbox_{!contact.info.id}" />
+			</apex:outputPanel>
+        </apex:column>
+		<apex:column title="{!$ObjectType.Contact.fields.Name.label}" headerValue="{!$ObjectType.Contact.fields.Name.label}">
+            <apex:outputLabel id="contactName" value="{!contact.info.Name}"/>
+        </apex:column>
+		<apex:column title="{!$ObjectType.Contact.fields.Title.label}" headerValue="{!$ObjectType.Contact.fields.Title.label}">
+            <apex:outputLabel id="contactTitle" value="{!contact.info.Title}"/>
+        </apex:column>
+		<apex:column title="{!$ObjectType.Contact.fields.Phone.label}" headerValue="{!$ObjectType.Contact.fields.Phone.label}">
+            <apex:outputLabel id="contactPhone" value="{!contact.info.Phone}"/>
+        </apex:column>
+		<apex:column title="{!$ObjectType.Contact.fields.Email.label}" headerValue="{!$ObjectType.Contact.fields.Email.label}">
+            <apex:outputLabel id="contactEmail" value="{!contact.info.Email}"/>
+        </apex:column>
+    </apex:pageBlockTable>
+    <apex:outputLabel rendered="{!contacts.size == 0}" id="noMarketingContactsLabel" value="There are no marketing contacts found"/>
+</apex:pageBlock>
+    
+</apex:form>
+
+</apex:page>

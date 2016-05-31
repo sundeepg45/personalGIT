@@ -1,0 +1,21 @@
+<apex:page Controller="ReferenceUsageController" sidebar="false" showHeader="true">
+
+    <apex:sectionHeader title="Select Opportunity and Contact" subtitle=""/>
+    <apex:form >
+        <apex:pageBlock id="thePageBlock" mode="edit">
+            <center>
+            <apex:pageMessages /> 
+            </center>
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Proceed" action="{!proceed}" />
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true"/>                
+            </apex:pageBlockButtons>
+ 
+            <apex:pageBlockSection columns="1">
+                <apex:inputField value="{!cusRefIn.Contact__c}" required="true"/>
+                <apex:inputField value="{!cusRefIn.Opportunity__c}" required="true"/>
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

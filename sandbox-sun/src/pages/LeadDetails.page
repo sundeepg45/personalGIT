@@ -1,0 +1,372 @@
+<apex:page standardController="Opportunity" extensions="leaddetailInfo" tabStyle="Account" sidebar="false" showHeader="false">
+
+         <style>
+                h1 {
+                color:#cc0000;
+                font-size:18px;
+                font-size:18px;
+                font-weight:bold;
+                text-align:center;
+                }
+        </style>
+        <script language="JavaScript">
+            if ({!objOpp.Deal_Registration__c} == false AND leadExists == FALSE) {
+                alert("The opportunity you are referencing is not a Deal Registration Lead and is not an opportunity that was converted from a Lead");
+                window.close();
+            }
+        </script>
+
+                <h1>Converted Lead Details</h1>
+
+                <p></p>
+
+<apex:pagemessages />
+
+
+<!--
+  ( ( ( ( ( NA, APAC ) ) ) ) )
+ -->
+
+       <apex:pageBlock rendered="{!AND(NOT(isEMEA),NOT(isLATAM))}"  >
+           <apex:pageBlockSection title="Customer Information">
+               <apex:outputField value="{!objLead.RecordType.Name}"  label="Lead Record Type"/>
+               <apex:outputField value="{!objLead.Status}"/>
+               <apex:outputField value="{!objLead.Company}"/>
+               <apex:outputField value="{!objLead.Name}" label="Contact Name"/>
+               <apex:outputField value="{!leadUser.Name}" label="Lead Owner Name"/>
+               <apex:outputField value="{!objLead.Revenue_Type__c}"/>
+               <apex:outputField value="{!objLead.Title}"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Status__c}" rendered="{!Contains(objLead.RecordType.Name,'NA Subscription Deal Registration')}"/>
+               <apex:outputField value="{!objLead.Decision_Role__c}"/>
+               <apex:outputField value="{!objLead.Stage__c}"/>
+               <apex:outputField value="{!objLead.PrimaryJobFunction__c}"/>
+            <apex:outputField value="{!objLead.ReasonForInboundCall__c}"/>
+
+               <apex:outputField value="{!objLead.Do_Not_Contact__c}"/>
+               <apex:outputField value="{!objLead.SIC_Code__c}"/>
+               <apex:outputField value="{!objLead.Email}"/>
+               <apex:outputField value="{!objLead.Country_of_Order__c}"/>
+               <apex:outputField value="{!objLead.Phone}"/>
+               <apex:outputField value="{!objLead.JBoss_Lead_ID__c}"/>
+               <apex:outputField value="{!objLead.MobilePhone}"/>
+               <apex:outputField value="{!objLead.Sales_Ops_Reviewed__c}"/>
+               <apex:outputField value="{!objLead.QualifiesForGSASchedule__c}"/>
+               <apex:outputField value="{!objLead.Reasons_for_Rejection__c}"/>
+               <apex:outputField value="{!objLead.Region__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Passed_to_Partner__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Assignment_Error__c}"/>
+           </apex:pageBlockSection>
+
+           <apex:pageBlockSection title="Opportunity Details">
+               <apex:outputField value="{!objLead.Deal_ID__c}"/>
+               <apex:outputField value="{!objLead.Deal_Type__c}"/>
+               <apex:outputField value="{!objLead.Competitive_Deal__c}"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Classification__c}"/>
+               <apex:outputField value="{!objLead.Competition__c}"/>
+               <apex:outputField value="{!objLead.Marketing_Program__c}" rendered="NOT(ISNULL({!objLead.Marketing_Program__c}))"/>
+               <apex:outputField value="{!objLead.Marketing_Program_na__c}"/>
+               <apex:outputField value="{!objLead.Competition_Details_if_Other__c}"/>
+               <apex:outputField value="{!objLead.Associated_Marketing_Program_Discount__c}"/>
+               <apex:outputField value="{!objLead.Distributor__c}"/>
+               <apex:outputField value="{!objLead.Project_Budgeted__c}"/>
+               <apex:outputField value="{!objLead.Distributor_if_other__c}"/>
+               <apex:outputField value="{!objLead.Project_Budget_Amount__c}"/>
+               <apex:outputField value="{!objLead.Estimated_Close_Date__c}"/>
+               <apex:outputField value="{!objLead.Red_Hat_Subscription_Revenue__c}"/>
+               <apex:outputField value="{!objLead.Deal_Approved_Date__c}"/>
+               <apex:outputField value="{!objLead.Red_Hat_Services_Revenue__c}"/>
+               <apex:outputField value="{!objLead.Days_Left_Until_Expiry__c}"/>
+               <apex:outputField value="{!objLead.Red_Hat_Total_Revenue__c}"/>
+               <apex:outputField value="{!objLead.Registration_Expiration__c}"/>
+               <apex:outputField value="{!objLead.Comments__c}"/>
+           </apex:pageBlockSection>
+
+           <apex:pageBlockSection title="Partner Information">
+               <apex:outputField value="{!objLead.Reseller_Company_Name__c}"/>
+               <apex:outputField value="{!objLead.Reseller_First_Name__c}"/>
+               <apex:outputField value="{!objLead.Project_Description__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Last_Name__c}"/>
+               <apex:outputField value="{!objLead.Value_Added_Sales_Activity__c}"/>
+               <apex:outputField value="{!objLead.Value_Added_Sales_Activity_Description__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Email__c}"/>
+               <apex:outputField value="{!objLead.Value_Added_Services_Proposed__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Phone__c}"/>
+               <apex:outputField value="{!objLead.Value_Added_Services_Proposed_Desc__c}"/>
+               <apex:outputField value="{!objLead.Are_you_the_Sales_Rep_for_this_Lead__c}"/>
+               <apex:outputField value="{!objLead.Sales_Rep_Name__c}"/>
+               <apex:outputField value="{!objLead.Sales_Rep_Email__c}"/>
+               <apex:outputField value="{!objLead.Sales_Rep_Phone__c}"/>
+         </apex:pageBlockSection>
+
+         <apex:pageBlockSection title="Partner Lead Conversion Information">
+              <apex:outputField value="{!objLead.Distributor__c}"/>
+              <apex:outputField value="{!objLead.Distributor_Quote_Number__c}"/>
+              <apex:outputField value="{!objLead.Sales_Stage__c}"/>
+              <apex:outputField value="{!objLead.JBoss_Products__c}"/>
+              <apex:outputField value="{!objLead.RHEV_Products__c}"/>
+              <apex:outputField value="{!objLead.RHEL_Products__c}"/>
+              <apex:outputField value="{!objLead.Cloud_Products__c}"/>
+              <apex:outputField value="{!objLead.Partner_Comments__c}"/>
+         </apex:pageBlockSection>
+
+         <apex:pageBlockSection title="Lead Notes">
+              <apex:outputField value="{!objLead.Details_from_Lead__c}"/>
+              <apex:outputLabel />
+              <apex:outputField value="{!objLead.Business_Unit__c}"/>
+              <apex:outputLabel />
+              <apex:outputField value="{!objLead.LeadSourceDetail__c}"/>
+              <apex:outputField value="{!objLead.Special_Deal_Type__c}"/>
+         </apex:pageBlockSection>
+
+      <apex:pageBlockSection title="Qualification Criteria (Per Hoover's)">
+              <apex:outputField value="{!objLead.AnnualRevenue}"/>
+              <apex:outputField value="{!objLead.NumberOfEmployees}"/>
+              <apex:outputField value="{!objLead.Website}"/>
+              <apex:outputField value="{!objLead.Fax}"/>
+      </apex:pageBlockSection>
+
+         <apex:pageBlockSection title="Lead Qualification Criteria">
+          <apex:outputField value="{!objLead.Industry}"/>
+          <apex:outputField value="{!objLead.EstAnnualRevForWWOrg__c}"/>
+          <apex:outputField value="{!objLead.LeadSource}"/>
+          <apex:outputField value="{!objLead.NumberOfServerClassSystemsInWWOrg__c}"/>
+          <apex:outputField value="{!objLead.LeadSourceDescription__c}"/>
+          <apex:outputField value="{!objLead.PurchasingHWWithThisDeployment__c}"/>
+          <apex:outputField value="{!objLead.NumberOfEmployeesInWWOrg__c}"/>
+          <apex:outputField value="{!objLead.PreferredHWVendor__c}"/>
+          <apex:outputField value="{!objLead.OtherHWVendor__c}"/>
+          <apex:outputLabel />
+          <apex:outputField value="{!objLead.PartnerProvidedLead__c}"/>
+          <apex:outputLabel />
+          <apex:outputField value="{!objLead.Purchasing_Services_with_this_Deployment__c}"/>
+          <apex:outputLabel />
+          <apex:outputField value="{!objLead.Estimated_Value_of_Services__c}"/>
+       </apex:pageBlockSection>
+
+       <apex:pageBlockSection title="Address Information">
+           <apex:outputField value="{!objLead.Street}"/>
+           <apex:outputLabel />
+           <apex:outputField value="{!objLead.City}"/>
+           <apex:outputLabel />
+           <apex:outputField value="{!objLead.State}"/>
+           <apex:outputLabel />
+           <apex:outputField value="{!objLead.Country}"/>
+           <apex:outputLabel />
+       </apex:pageBlockSection>
+
+       <apex:pageBlockSection title="Workloads">
+           <apex:outputField value="{!objLead.WorkloadsDeployedDeployingOnLinux__c}"/>
+       </apex:pageBlockSection>
+
+       <apex:pageBlockSection title="Oracle Information">
+           <apex:outputField value="{!objLead.Oracle_Account_Number__c}"/>
+           <apex:outputField value="{!objLead.RHNLogin__c}"/>
+       </apex:pageBlockSection>
+
+       <apex:pageBlockSection title="Preferred Purchasing Method">
+            <apex:outputField value="{!objLead.PreferredPurchasingMethod__c}"/>
+       </apex:pageBlockSection>
+
+       <apex:pageBlockSection title="System Information">
+            <apex:outputField value="{!objLead.CreatedById}"/>
+            <apex:outputField value="{!objLead.LastModifiedById}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+
+<!--
+  ( ( ( ( ( EMEA ) ) ) ) )
+ -->
+       <apex:pageBlock rendered="{!isEMEA}" >
+           <apex:pageBlockSection title="Customer Information">
+               <apex:outputField value="{!leadUser.Name}" label="Lead Owner"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Status__c}" />
+               <apex:outputField value="{!objLead.Name}" label="Name"/>
+               <apex:outputField value="{!objLead.Status}"/>
+               <apex:outputField value="{!objLead.Title}"/>
+               <apex:outputField value="{!objLead.RecordType.Name}" label="Lead Record Type"/>
+               <apex:outputField value="{!objLead.Decision_Role__c}"/>
+               <apex:outputField value="{!objLead.Revenue_Type__c}"/>
+               <apex:outputField value="{!objLead.PrimaryJobFunction__c}"/>
+               <apex:outputField value="{!objLead.Do_Not_Contact__c}"/>
+               <apex:outputField value="{!objLead.Company}"/>
+               <apex:outputField value="{!objLead.Email}"/>
+               <apex:outputField value="{!objLead.Country_of_Order__c}"/>
+               <apex:outputField value="{!objLead.Phone}"/>
+               <apex:outputField value="{!objLead.Note__c}"/>
+               <apex:outputField value="{!objLead.MobilePhone}"/>
+               <apex:outputField value="{!objLead.Reasons_for_Rejection__c}"/>
+               <apex:outputField value="{!objLead.Partner_Led_Lead__c}"/>
+           </apex:pageBlockSection>
+
+           <apex:pageBlockSection title="Opportunity Details">
+               <apex:outputField value="{!objLead.Deal_Type__c}"/>
+               <apex:outputField value="{!objLead.Distributor__c}"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Classification__c}"/>
+               <apex:outputField value="{!objLead.Competitive_Deal__c}"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Amount__c}"/>
+               <apex:outputField value="{!objLead.Competition__c}"/>
+               <apex:outputField value="{!objLead.Estimated_Close_Date__c}"/>
+               <apex:outputField value="{!objLead.Competition_Details_if_Other__c}"/>
+               <apex:outputField value="{!objLead.Deal_Approved_Date__c}"/>
+               <apex:outputField value="{!objLead.Days_Left_Until_Expiry__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Registration_Length_Days__c}"/>
+               <apex:outputField value="{!objLead.Comments__c}"/>
+           </apex:pageBlockSection>
+
+           <apex:pageBlockSection title="Partner Information">
+               <apex:outputField value="{!objLead.Partner_Full_Name__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Email__c}"/>
+               <apex:outputField value="{!objLead.Partner_Account_Name__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Phone__c}"/>
+               <apex:outputField value="{!objLead.Partner_Tier_Name__c}"/>
+               <apex:outputField value="{!objLead.Partner_Type_Name__c}"/>
+               <apex:outputField value="{!objLead.PartnerAccount.PartnerStatuses__c}"/>
+               <apex:outputField value="{!objLead.PartnerAccount.Owner.Name}"  label="Partner Manager"/>
+               <apex:outputField value="{!objLead.PartnerAccount.BillingCountry}"  label="Partner Billing Country"/>
+               <apex:outputField value="{!objLead.Partner_Program_Participation__c}"/>
+               <apex:outputField value="{!objLead.Red_Hat_can_contact_the_Customer__c}"/>
+               <apex:outputField value="{!objLead.I_need_additional_sales_presales_support__c}"/>
+         </apex:pageBlockSection>
+
+         <apex:pageBlockSection title="Project Description">
+             <apex:outputField value="{!objLead.Project_Description__c}"/>
+             <apex:outputLabel />
+             <apex:outputField value="{!objLead.Business_Unit__c}"/>
+         </apex:pageBlockSection>
+
+       <apex:pageBlockSection title="Address Information">
+           <apex:outputField value="{!objLead.Street}" label="Address"/>
+           <apex:outputLabel />
+           <apex:outputField value="{!objLead.City}" label=""/>
+           <apex:outputLabel />
+           <apex:outputField value="{!objLead.State}" label=""/>
+           <apex:outputLabel />
+           <apex:outputField value="{!objLead.Country}" label=""/>
+           <apex:outputLabel />
+       </apex:pageBlockSection>
+    </apex:pageBlock>
+
+
+    <!---- LATAM   --->
+
+     <apex:pageBlock rendered="{!isLATAM}"  >
+           <apex:pageBlockSection title="Customer Information">
+               <apex:outputField value="{!leadUser.Name}" label="Lead Owner Name"/>
+               <apex:outputField value="{!objLead.RecordType.Name}"  label="Lead Record Type"/>
+               <apex:outputField value="{!objLead.Company}"/>
+               <apex:outputField value="{!objLead.Status}"/>
+               <apex:outputField value="{!objLead.Name}"/>
+               <apex:outputField value="{!objLead.Revenue_Type__c}"/>
+               <apex:outputField value="{!objLead.PrimaryJobFunction__c}"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Status__c}" />
+               <apex:outputField value="{!objLead.Email}"/>
+               <apex:outputField value="{!objLead.Street}" label="Address"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.City}" label=""/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.State}" label=""/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Country}" label=""/>
+
+               <apex:outputField value="{!objLead.Phone}"/>
+               <apex:outputField value="{!objLead.Reasons_for_Rejection__c}"/>
+               <apex:outputField value="{!objLead.MobilePhone}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Country_of_Order__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.LeadSourceDetail__c}"/>
+
+           </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Opportunity Details">
+               <apex:outputField value="{!objLead.Deal_Type__c}"/>
+               <apex:outputField value="{!objLead.Distributor__c}"/>
+               <apex:outputField value="{!objLead.Deal_ID__c}"/>
+               <apex:outputField value="{!objLead.Competitive_Deal__c}"/>
+               <apex:outputField value="{!objLead.Deal_Registration_Classification__c}"/>
+               <apex:outputField value="{!objLead.Competition__c}"/>
+               <apex:outputField value="{!objLead.Marketing_Program__c}" />
+
+               <apex:outputField value="{!objLead.Competition_Details_if_Other__c}"/>
+               <apex:outputField value="{!objLead.Associated_Marketing_Program_Discount__c}"/>
+               <apex:outputField value="{!objLead.Estimated_Close_Date__c}"/>
+               <apex:outputField value="{!objLead.Red_Hat_Subscription_Revenue__c}"/>
+               <apex:outputField value="{!objLead.Deal_Approved_Date__c}"/>
+               <apex:outputField value="{!objLead.Red_Hat_Total_Revenue__c}"/>
+               <apex:outputField value="{!objLead.Days_Left_Until_Expiry__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Registration_Expiration__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Project Description">
+               <apex:outputField value="{!objLead.Project_Description__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Red_Hat_Products_SKU_Quantity__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Partner Information">
+               <apex:outputField value="{!objLead.Partner_Full_Name__c}"/>
+               <apex:outputField value="{!objLead.Partner_Account_Name__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Company_Name__c}"/>
+               <apex:outputField value="{!objLead.Are_You_a_Red_Hat_Distributor__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Phone__c}"/>
+               <apex:outputField value="{!objLead.Contact_First_and_Last_Name__c}"/>
+               <apex:outputField value="{!objLead.Reseller_Email__c}"/>
+               <apex:outputField value="{!objLead.Contact_Email__c}"/>
+               <apex:outputLabel />
+               <apex:outputField value="{!objLead.Contact_Phone__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Additional Information">
+               <apex:outputField value="{!objLead.Comments__c}"/>
+            </apex:pageBlockSection>
+
+
+<!---         <apex:pageBlockSection title="Partner Lead Conversion Information">
+              <apex:outputField value="{!objLead.Distributor__c}"/>
+              <apex:outputField value="{!objLead.Sales_Stage__c}"/>
+              <apex:outputField value="{!objLead.JBoss_Products__c}"/>
+              <apex:outputField value="{!objLead.RHEV_Products__c}"/>
+              <apex:outputField value="{!objLead.RHEL_Products__c}"/>
+              <apex:outputField value="{!objLead.Cloud_Products__c}"/>
+              <apex:outputField value="{!objLead.Partner_Comments__c}"/>
+         </apex:pageBlockSection> --->
+
+       <apex:pageBlockSection title="System Information">
+            <apex:outputField value="{!objLead.CreatedById}"/>
+            <apex:outputField value="{!objLead.LastModifiedById}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+<!---Common for all Regions---->
+
+
+    <apex:pageBlock title="B.A.N.T." rendered="{!objLead.Budget__c != null || objLead.Authority__c != null || objLead.Need__c != null || objLead.Time_Frame__c != null}">
+        <apex:pageBlockSection >
+            <apex:outputField value="{!objLead.Budget__c}" label="Budget" />
+            <apex:outputField value="{!objLead.Authority__c}" label="Authority" />
+            <apex:outputField value="{!objLead.Need__c}" label="Need"/>
+            <apex:outputField value="{!objLead.Time_Frame__c}" label="Time Frame"/>
+         </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <apex:pageBlock title="Approval History" >
+        <apex:pageBlockTable value="{!leadInstanceStep}" var="leadStep">
+            <apex:column >
+                <apex:facet name="header">Approval Status</apex:facet>
+                <apex:outputText value="{!leadStep.StepStatus}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Approver Comments</apex:facet>
+                <apex:outputText value="{!leadStep.Comments}"/>
+            </apex:column>
+            <apex:column value="{!leadStep.ActorId}"/>
+            <apex:column >
+                <apex:facet name="header">Date of Approval</apex:facet>
+                <apex:outputText value="{!leadStep.CreatedDate}"/>
+            </apex:column>
+         </apex:pageBlockTable>
+    </apex:pageBlock>
+
+</apex:page>

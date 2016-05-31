@@ -1,0 +1,284 @@
+<!-- 
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY. 
+ -->
+<apex:page standardController="refedge__Nomination__c" extensions="refedge.NominationFormController" id="pageId" showHeader="false" sidebar="false" docType="html-5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+    <style>
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        .sectionHeader {
+            font-size: 13px;
+            padding: 8px 14px;
+            font-weight: normal;
+            text-transform: uppercase;
+            background-color: #e8eaeb;
+            color: #696e71;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .centerDiv {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+        }
+        .datarow {
+            border-top: none;
+            padding: 14px;
+            padding-left: 14px;
+            //width: 50%;
+        }
+        .sf1label {
+            font-family: 'ProximaNovaSoft-Regular','Helvetica Neue';
+            font-size: 13px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            padding-top: 8px;
+            display: block;
+            min-width: 100px;
+        }
+        .selectList {
+            height: auto;
+            background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiP�YsMTguOCw1NS4wNjYsMTcuODY2eiIvPg0KCQk8L2c+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=),linear-gradient(#ffffff,#f1f1f1);
+            background-repeat: no-repeat;
+            background-position: 95% 50%;
+            background-size: 16px 16px,100% 100%;
+            color: #3c3d3e;
+            padding: 7px 14px;
+            line-height: 25px;
+            font-family: 'ProximaNovaSoft-Regular';
+            font-size: 15px;
+            align-items: center;
+            width: 100%;
+            border: 1px solid #bbc0c4;
+            border-radius: 5px;
+        }
+        .sf1input, .sf1textarea {
+           width:100%;
+           font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+           font-size: 15px;
+           color: #3c3d3e;
+           padding: 7px 14px;
+           line-height: 25px;
+           border: 1px solid #cfd0d2;
+           border-radius: 5px;
+           background-color: #e8eaeb;
+           box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+           box-sizing: border-box;
+        }
+        
+        .sf1input:focus, .sf1textarea:focus {
+           border: 1px solid #bbc0c4;
+           background-color: #fff;
+           outline-style: none;
+        }
+        .sf1input[type="checkbox"] {
+            -webkit-appearance: none;
+            display: inline-block;
+            height: 22px;
+            margin: 0 6px 0 0;
+            border: 1px solid #c3c6c9;
+            padding: 0;
+            width: 22px;
+            vertical-align: middle;
+            background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+        }
+        
+        .sf1input[type="checkbox"]:checked {
+            border: 1px solid #2c75a3;
+            background-color: #3b9fdd;
+            -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+            background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        }
+        
+        .sf1input[type="checkbox"]:checked::after {
+            display: block;
+            left: 3px;
+            top: 3px;
+            height: 9px;
+            width: 14px;
+            border-bottom: 4px solid white;
+            border-left: 4px solid white;
+            -webkit-transform: rotate(-45deg);
+            position: relative;
+            content: '';
+        }
+        .datarow a {
+            text-decoration: none;
+            color: #0e7abd;
+        }
+        .datarow a:hover {
+            text-decoration: none;
+            color: #0e7abd;
+        }
+        .dateFormat {
+            display : none !important;
+        }
+    </style>
+    
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <apex:outputPanel id="ErrorId">
+        <script>
+            function testFunction(){
+                if('{!isSubmitted}' == 'true'){
+                    redirect();
+                }
+                else{
+                    PORHideLoading();
+                }
+            }
+            
+            function redirect(){
+                //sforce.one.back();
+                if('{!JSENCODE(nominationForm.refedge__Contact__c)}' == '')
+                    sforce.one.navigateToSObject('{!JSENCODE(nominationForm.refedge__Account__c)}','detail');
+                else
+                    sforce.one.navigateToSObject('{!JSENCODE(nominationForm.refedge__Contact__c)}','detail');
+            }
+            
+        </script>
+    </apex:outputPanel>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    
+    <apex:form id="formId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction action="{!submitNomination}" name="Submit" onComplete="testFunction();return false;" reRender="ErrorId,pgmsgId"/>
+        <apex:outputPanel rendered="{!NOT(isSubmitted)}"  layout="block">
+            <body style="background:#f0f1f2;line-height: 1;">
+                <div class="centerDiv">
+                    <apex:pageMessages id="pgmsgId"/>
+                    <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                        <ul class="buttonList horizontal forceButtonBar">
+                            <li class="buttonItem">
+                                <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" value="{!$Label.Cancel}" styleClass="default one uiBlock uiButton forceActionButton" onclick="PORShowLoading();redirect();"/>
+                            </li>
+                            <li class="buttonItem">
+                                <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" styleClass="default one uiBlock uiButton forceActionButton" value="{!$Label.Submit}"  onclick="PORShowLoading();Submit();return false;"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <div style="width:100%;">
+                        <div class="sectionHeader">{!$Label.Account_Contact_Information}</div>
+                        <table style="width:100%;">
+                            <tr>
+                                <td class="datarow">
+                                    <div class="sf1label"><apex:outPutText value="{!$Label.Account}"/></div>
+                                    <div><apex:outputField value="{!nominationForm.refedge__Account__c}"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="datarow">
+                                    <div class="sf1label"><apex:outPutText value="{!$Label.Contact}"/></div>
+                                    <div>
+                                        <apex:outputPanel rendered="{!nominationForm.refedge__Contact__c == null}">
+                                            <apex:selectList StyleClass="selectList" value="{!selectedContact}"  size="1"> 
+                                                <apex:selectOptions value="{!ContactList}"/>
+                                            </apex:selectList>
+                                        </apex:outputPanel>
+                                        <apex:outputField value="{!nominationForm.refedge__Contact__c}" rendered="{!nominationForm.refedge__Contact__c != null}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div> 
+                    <apex:repeat id="headerId" value="{!nominationHeaders}" var="header">
+                        <apex:outputPanel rendered="{!AND(refUseAttr.AttributeLabels.size > 0, header.refedge__Visible__c, header.Name = 'Section 3 � Attributes')}">
+                            <div class="sectionHeader">{!header.refedge__Field_API_Name__c}</div>
+                            <table style="width:100%;">
+                                <apex:repeat value="{!refUseAttr.AttributeLabels}" var="label">
+                                    <tr>
+                                        <td class="datarow" style="float: left;">
+                                            <div class="sf1label" style="padding:14px;font-weight: bold;color: #0e7abd !important;word-break: break-all;"><apex:outputText style="">{!label.Name} <apex:outputText style="color : #CC0000;" value="{!IF(refUseAttr.mapRequiredLabel[label.Id],' * ','')}"/> </apex:outputText><br/>
+                                            <apex:outputText style="color: rgb(80, 81, 83);font-weight: normal;" value="{!refUseAttr.labelWrapperMap[label.Id].selectedAttributes}"/></div>
+                                        </td>
+                                        <td class="datarow" style="text-align:left;">
+                                            <div style="float:right;padding:14px;font-size: 20px;font-weight: bold;color: #0e7abd;">
+                                                <apex:commandLink value=">" action="{!getAttributeOfSelectedLabel}" onclick="PORShowLoading();">
+                                                    <apex:param value="{!label.Id}" name="labelId" assignTo="{!refUseAttr.selectedLabelId}"/>
+                                                </apex:commandLink>
+                                            </div>
+                                            
+                                        </td>
+                                    </tr>
+                                </apex:repeat>
+                            </table>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!AND(nominationFields.size > 0, header.refedge__Visible__c, header.Name='Section 4 � Custom Fields')}">
+                            <div class="sectionHeader">{!header.refedge__Field_API_Name__c}</div>
+                            <table style="width:100%;">
+                                <apex:repeat id="fieldSection"  value="{!nominationFields}" var="f">
+                                    <tr>
+                                        <td class="datarow">
+                                            <div class="sf1label"><apex:outputText >{!f.name}
+                                                <apex:outputText style="color : #CC0000;" value="{!IF(f.refedge__Required__c,' * ','')}"/>
+                                            </apex:outputText></div>
+                                            <apex:inputField Id="fieldId" styleClass="sf1input" value="{!nominationForm[f.refedge__Field_API_Name__c]}"/>
+                                        </td>
+                                    </tr>
+                                </apex:repeat>
+                            </table>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!AND(refTypeWrapperList.size > 0, header.refedge__Visible__c, header.Name = 'Section 5 � Reference Activities')}">
+                            <div class="sectionHeader">{!header.refedge__Field_API_Name__c}</div>
+                            <table style="width:100%;">
+                                <tr>
+                                    <td class="datarow" style="float: left;">
+                                        <div class="sf1label" style="padding:14px;font-weight: bold;color: #0e7abd !important;word-break: break-all;"><apex:outputText > {!$Label.Activities}</apex:outputText><br/>
+                                        <apex:outputText style="color: rgb(80, 81, 83);font-weight: normal;" value="{!nominationRef.SelectedReferenceabilities}"/></div>
+                                    </td>
+                                    <td class="datarow" style="text-align:left;">
+                                        <div style="float:right;padding:14px;font-size: 20px;font-weight: bold;color: #0e7abd;">
+                                            <apex:commandLink value=">" action="{!getReferenceability}" onclick="PORShowLoading();">
+                                            </apex:commandLink>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!AND(header.refedge__Visible__c, header.Name = 'Section 6 � Free Form Text')}">
+                            <div class="sectionHeader">{!header.refedge__Field_API_Name__c}</div>
+                            <div class="datarow">
+                                <div class="sf1label"><apex:outputText >{!$Label.Comments}
+                                    <apex:outputText style="color : #CC0000;" value="{!IF(header.refedge__Required__c,' * ','')}"/>
+                                </apex:outputText></div>
+                                <apex:inputField styleClass="sf1textarea" value="{!nominationForm.refedge__Other_Info__c}"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:repeat> 
+                </div>
+            </body>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

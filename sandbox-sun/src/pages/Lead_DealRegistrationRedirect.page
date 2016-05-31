@@ -1,0 +1,17 @@
+<apex:page standardController="Lead" extensions="Lead_DealRegistrationRedirect">
+
+<apex:sectionheader title="Leads / Deal Registration" />
+<apex:pageblock rendered="{!isNADealRegistration}" >
+<apex:pageblocksection >
+    <p>View or Download the  <a href="/sfc/#version?id=06960000001Z4PT">Deal Registration Partner Guide</a>  and  <a href="/sfc/#version?id=06860000001dXi2">Engagement Guidelines</a></p>
+<p>Watch the <a href="https://jboss.webex.com/jboss/ldr.php?AT=pb&SP=MC&rID=35950452&rKey=1f607249efce7b13">Deal Registration Instructional Video </a></p>
+
+</apex:pageblocksection>
+
+</apex:pageblock>
+
+ 
+ <apex:listViews type="Lead"/>
+
+ 
+    </apex:page>

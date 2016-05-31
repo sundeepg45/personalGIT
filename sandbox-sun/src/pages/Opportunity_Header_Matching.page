@@ -1,0 +1,39 @@
+<apex:page cache="false" standardController="Opportunity_Header_Staging__c" extensions="Order_Opportunity_ControllerExtension" action="{!matching}">
+	<style type="text/css">
+		input.btn[name="edit"] {
+			display: none;
+		}
+		input.btn[name="clone"] {
+			display: none;
+		}
+		input.btn[name="create_missing_party_records"] {
+			display: none;
+		}
+	</style>
+	<script type="text/javascript">
+		function reloadPage() {
+			if({!ISBLANK($CurrentPage.parameters.status__c)}) {
+				location.reload();
+			}
+			else {
+				var url = '/apex/Opportunity_Header_Matching?id={!currentRecord.Id}';
+				try {
+					top.windown.location.replace(url);
+				}
+				catch(ex) {
+					top.window.location = url;
+				}
+			}
+		}
+	</script>
+	<apex:form >
+		<apex:pageBlock title="Testing">
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton action="{!matchingNotProcessed}" value="Match as Not Processed" oncomplete="reloadPage()" />
+				<apex:commandButton action="{!matchingReadyForReprocessing}" value="Match as Ready For Reprocessing" oncomplete="reloadPage()" />
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+	<apex:pageMessages />
+	<apex:detail subject="{!currentRecord.Id}" inlineEdit="false" relatedLIst="true" title="true" oncomplete="reloadPage()" />
+</apex:page>

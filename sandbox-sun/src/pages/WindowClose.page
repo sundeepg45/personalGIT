@@ -1,0 +1,6 @@
+<apex:page title="Window Close" showHeader="false" sidebar="false">
+<script>
+window.top.close();
+</script>
+<h1>You may now close this window.</h1>
+</apex:page>

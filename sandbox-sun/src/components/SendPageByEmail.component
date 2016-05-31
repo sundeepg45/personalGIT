@@ -1,0 +1,91 @@
+<apex:component controller="SendPageByEmailController">
+	<apex:attribute name="accountContactRoleLookup" type="String" description="The where part of the query for looking up AccountContactRoles." assignTo="{!accountContactRoleWhereConditions}"/>
+	<apex:attribute name="accountId" type="String" description="The Account Id to use for lookup." assignTo="{!accountIdForLookup}"/>
+	<apex:attribute name="contactLookup" type="String" description="The where part of the query for looking up Contacts." assignTo="{!contactWhereConditions}"/>
+	<apex:attribute name="oncancel" type="String" description="The onclick event that happens when the user presses cancel." default="window.close()" />
+	<apex:attribute name="fileName" type="String" description="The output fileName." default="currentPage.pdf" assignTo="{!pageName}"/>
+	<apex:attribute name="href" type="String" description="The url to send." assignTo="{!pageUrl}" required="true"/>
+	<apex:attribute name="label" type="String" description="The label for the Sales Force object." default="Salesforce Object" assignTo="{!objectLabel}"/>
+	<apex:attribute name="name" type="String" description="Name of the object being sent." assignTo="{!displayName}" required="true"/>
+	<apex:attribute name="newEmailLines" type="Integer" description="Number of new e-mail address lines to list" default="0" assignTo="{!numberOfBlankEmailLines}"/>
+	<apex:attribute name="newUserLines" type="Integer" description="Number of new User address lines to list" default="0" assignTo="{!numberOfBlankUserLines}"/>
+	<apex:attribute name="subject" type="String" description="The subject for this e-mail." default="{Label} for: {Name}" assignTo="{!subjectForEmail}"/>
+	<apex:attribute name="templateUniqueName" type="String" description="The name of a plain text e-mail template to use." assignTo="{!templateDeveloperName}"/>
+	<apex:attribute name="userLookup" type="String" description="The where part of the query for looking up Users." assignTo="{!userWhereConditions}"/>
+	<apex:pageBlock id="block" title="{!$Label.AccountProfile_EmailRecipients}">
+		<apex:pageBlockButtons style="display:block;" >
+			<apex:commandButton value="{!$Label.AccountProfile_AddMore}" action="{!addMoreToAddresses}" style="display:inline;" reRender="block"/>
+			<apex:commandButton value="{!$Label.AccountProfile_Reset}" immediate="true" action="{!resetToAddresses}" style="display:inline;" reRender="block"/>
+			<apex:commandButton value="{!$Label.AccountProfile_SendPageAsPDF}" action="{!sendPageAsPDF}" style="display:inline;"/>
+			<apex:commandButton value="{!$Label.AccountProfile_Cancel}" immediate="true" reRender="block" onclick="{!oncancel};return false;"  style="display:inline;"/>
+		</apex:pageBlockButtons>
+		<apex:componentBody />
+		<table width="100%">
+			<tr>
+				<apex:outputPanel layout="none" rendered="{!NOT(isToUserAddressListEmpty)}">
+					<td width="width:{!IF(isToAddressListEmpty,'100%','65%')}" colspan="{!IF(isToAddressListEmpty,'2','1')}">
+						<apex:pageBlockTable value="{!toUserAddressList}" var="address" title="Users to Send To">
+							<apex:column headerValue="{!$Label.AccountProfile_Action}">
+								<apex:commandLink value="{!$Label.AccountProfile_AddToList}" action="{!address.addAddress}" rendered="{!AND(NOT(address.UseLookup),address.isDeleted)}" reRender="block"/>
+								<apex:commandLink value="{!$Label.AccountProfile_RemoveFromList}" action="{!address.deleteAddress}" rendered="{!AND(NOT(ISBlank(address.User.Id)),NOT(address.isDeleted))}" reRender="block"/>
+							</apex:column>
+							<apex:column headerValue="{!$Label.AccountProfile_User}">
+								<apex:inputField value="{!address.Lookup.User__c}" style="width:100%" rendered="{!address.UseLookup}"/>
+								<apex:outputLink value="/{!address.User.Id}" style="width:100%" rendered="{!NOT(address.UseLookup)}">
+									<apex:outputText value="{!TRIM(address.User.FirstName+' '+address.User.LastName)} "/>
+								</apex:outputLink>
+							</apex:column>
+						</apex:pageBlockTable>
+					</td>
+				</apex:outputPanel>
+				<apex:outputPanel layout="none" rendered="{!NOT(isToAddressListEmpty)}">
+					<td width="{!IF(isToUserAddressListEmpty,'100%','35%')};"  colspan="{!IF(isToUserAddressListEmpty,'2','1')}">
+						<apex:pageBlockTable value="{!toAddressList}" var="address" title="Email Addresses to Send To">
+							<apex:column headerValue="{!$Label.AccountProfile_Email}">
+								<apex:inputText value="{!address.Email}" style="width:100%"/>
+							</apex:column>
+						</apex:pageBlockTable>
+					</td>
+				</apex:outputPanel>
+			</tr>
+			<tr>
+				<apex:outputPanel layout="none" rendered="{!NOT(isToContactAddressListEmpty)}" >
+					<td width="100%" colspan="2">
+						<apex:pageBlockTable value="{!toContactAddressList}" var="address" title="Contacts to Send To">
+							<apex:column headerValue="{!$Label.AccountProfile_Action}">
+								<apex:commandLink value="{!$Label.AccountProfile_AddToList}" action="{!address.addAddress}" rendered="{!AND(NOT(ISBLANK(address.Contact.Id)),address.isDeleted)}" reRender="block"/>
+								<apex:commandLink value="{!$Label.AccountProfile_RemoveFromList}" action="{!address.deleteAddress}" rendered="{!AND(NOT(ISBLANK(address.Contact.Id)),NOT(address.isDeleted))}" reRender="block"/>
+							</apex:column>
+							<apex:column headerValue="{!$Label.AccountProfile_Name}">
+								<apex:outputLink value="/{!address.Contact.Id}" target="_blank">
+									<apex:outputText value="{!address.Contact.Name}"/>
+								</apex:outputLink>
+							</apex:column>
+							<apex:column headerValue="{!$Label.AccountProfile_Title}" value="{!address.Contact.Title}"/>
+						</apex:pageBlockTable>
+					</td>
+				</apex:outputPanel>
+			</tr>
+			<tr>
+				<apex:outputPanel layout="none" rendered="{!NOT(isToAccountContactRoleAddressListEmpty)}" >
+					<td width="100%" colspan="2">
+						<apex:pageBlockTable value="{!toAccountContactRoleAddressList}" var="address" title="Account Contact Roles to Send To">
+							<apex:column headerValue="{!$Label.AccountProfile_Action}">
+								<apex:commandLink value="{!$Label.AccountProfile_AddToList}" action="{!address.addAddress}" rendered="{!address.isDeleted}" reRender="block"/>
+								<apex:commandLink value="{!$Label.AccountProfile_RemoveFromList}" action="{!address.deleteAddress}" rendered="{!NOT(address.isDeleted)}" reRender="block"/>
+							</apex:column>
+							<apex:column headerValue="{!$Label.AccountProfile_Name}">
+								<apex:outputLink value="/{!address.AccountContactRole.Contact.Id}" target="_blank">
+									<apex:outputText value="{!address.AccountContactRole.Contact.Name}"/>
+								</apex:outputLink>
+							</apex:column>
+							<apex:column headerValue="{!$Label.AccountProfile_Title}" value="{!address.AccountContactRole.Contact.Title}"/>
+							<apex:column value="{!address.AccountContactRole.IsPrimary}"/>
+							<apex:column value="{!address.AccountContactRole.Role}"/>
+						</apex:pageBlockTable>
+					</td>
+				</apex:outputPanel>
+			</tr>
+		</table>
+	</apex:pageBlock>
+</apex:component>

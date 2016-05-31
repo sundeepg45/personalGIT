@@ -1,0 +1,105 @@
+<apex:page standardController="Lead" extensions="Lead_RejectControllerExtension" action="{!rejectionAllowed}" id="LeadRejection">
+    <style>
+        .pbBody label{
+            font-weight: bold;
+        {
+    </style>
+    <apex:outputText value="{!Lead.Stage__c}" rendered="false"/>
+    <apex:outputText value="{!Lead.Route_Around__c}" rendered="false"/>
+    <apex:outputText value="{!Lead.OwnerId}" rendered="false"/>
+    <apex:outputText value="{!Lead.PenaltyBoxExpiration__c}" rendered="false"/>
+    <apex:outputText value="{!Lead.Pre_Qualified__c}" rendered="false"/>
+    <!--- Sundeep 02/05/2015 --->
+    <apex:outputText value="{!Lead.Contact_Sales__c}" rendered="false"/>
+    <apex:outputText value="{!Lead.Sent_to_Lead_Development__c}" rendered="false"/>
+    <!----End--->
+    <apex:sectionHeader title="Lead Rejection" subtitle="{!Lead.Name}" />
+    <apex:form id="form">
+        <apex:pageBlock title="Lead Rejection" mode="View" id="pageBlock">
+            <apex:pageBlockButtons location="top">
+                <apex:actionStatus id="SubmitStatus">
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+                            <apex:commandButton status="SubmitStatus" value="Submit" action="{!rejectLead}" reRender="form" oncomplete="formComplete()" disabled="{!NOT(isRejectionAllowed)}"/>
+                            <apex:commandButton status="SubmitStatus" value="Cancel" action="{!cancel}" />
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <apex:commandButton status="SubmitStatus" value="Submit" disabled="true" />
+                            <apex:commandButton status="SubmitStatus" value="Cancel" disabled="true" />
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            <div id="pageMessages">
+                <apex:pageMessages />
+            </div>
+            <apex:outputPanel layout="block" id="blk1">
+            <table>
+             <tr>
+              <td width="300px">
+                <apex:outputLabel value="Rejection Reason" for="rejection_reason"/><br />
+                <apex:selectList value="{!rejectionReason}" id="rejection_reason" size="1" onchange="updateMessage(this);return true" style="margin-top: 5px;">
+                    <apex:selectOptions value="{!rejectionReasonOptions}"/>
+                </apex:selectList>
+               </td>
+               <td><b><apex:outputLabel value="Reason Description:"  rendered="{!if(rejectionReason!='',true,false)}"/></b><br/>
+                <apex:outputText value="{!DescriptionMessage}" style="margin-top: 5px; display: block;"></apex:outputText>
+               </td>
+              </tr>
+             </table>   
+                <apex:actionfunction action="{!showDescription}" name="showDesc" rerender="blk1"/>
+                <br />
+            </apex:outputPanel><br />
+            
+            <apex:outputPanel layout="block" id="commentBlock">
+                <div id="commentMessage" style="font-weight:bold;font-style:italic;display:none">
+                    <apex:outputText value="{!CommentRequiredMessage}" /><br />
+                </div>
+                <div id="commentMessageError">
+                    <apex:outputText rendered="{!isRejectionCommentMissing}" styleClass="error" value="{!CommentRequiredMessage}"/><br />
+                </div>
+                <apex:outputLabel value="Why are you rejecting this lead?" for="rejection_comment"/><br />
+                <apex:inputTextarea value="{!rejectionComment}" title="Rejection Comment" id="rejection_comment" style="width:100%; margin-top: 5px;" rows="10"/><br />
+            </apex:outputPanel>
+        </apex:pageBlock>
+        <!--apex:inputHidden value="{!hasErrorMessages}" id="hasErrorMessages"/ -->
+    </apex:form>
+
+    <script type="text/javascript">
+    function updateMessage(selObj) {
+     showDesc();
+        var el = document.getElementById('pageMessages');
+        if(el && el.style) {
+            el.style.display = 'none';
+        }
+        var el = document.getElementById('commentMessageError');
+        if(el && el.style) {
+            el.style.display = 'none';
+        }
+        var value = selObj.options[selObj.selectedIndex].value;
+        if(value) {
+            var showMessage = (value.toUpperCase() == 'OTHER');
+            el = document.getElementById('commentMessage');
+            if(el && el.style) {
+                el.style.display = showMessage?'block':'none';
+            }
+        }   
+    }
+    </script>
+    <script type="text/javascript">
+    function formComplete() {
+//    var isHasErrorMessagesElement = document.getElementById("Page:form:hasErrorMessages");
+//    if(isSuccessElement&&isSuccessElement.value == 'false') top.window.close();
+    }
+    </script>
+    <apex:facet name="footer">
+    <script type="text/javascript">
+        setTimeout(function(){var a=document.createElement("script");
+        var b=document.getElementsByTagName("script")[0];
+        a.src=document.location.protocol+"//script.crazyegg.com/pages/scripts/0028/7638.js?"+Math.floor(new Date().getTime()/3600000);
+        a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+    </script>
+    </apex:facet>
+</apex:page>

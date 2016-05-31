@@ -1,0 +1,42 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+
+<script type="text/javascript">
+s.loadModule("Media");
+        s.Media.trackWhilePlaying = true;
+        s.Media.autoTrack = false;
+        s.Media.playerName = "rhProjekktor";
+        s.Media.trackMilestones = "0,25,50,75";
+/* Review button link tracking code */
+function trackLink(foo) {
+  s.linkTrackVars='events';
+  s.linkTrackEvents='event13';
+  s.events='event13';
+  s.tl(true,'o','Video Play: ' + foo);
+}
+function myHandler(e) {
+    var vidName = currentVideo;
+    var playerName = "rhProjekktor";
+    var vidDuration = projekktor(vidName).getDuration();
+    var vidPosition = projekktor(vidName).getPosition();
+    if (e == "IDLE") {
+        // do not do anything at this time.
+    }   
+    else if (e == "PLAYING") {
+        s.Media.play(vidName,vidPosition);
+    }
+    else if (e == "FULL" && vidDuration > 0) {
+        s.Media.open(vidName,vidDuration,playerName);
+        s.Media.play(vidName,vidPosition);
+        trackLink(vidName);
+    }
+    else if (e == "PAUSED") {
+        s.Media.stop(vidName,vidPosition);
+    }
+    else if (e == "COMPLETED") {
+        s.Media.stop(vidName,vidPosition);
+        s.Media.close(vidName);
+    }
+}
+</script>
+
+</apex:page>

@@ -1,0 +1,198 @@
+<apex:page controller="RequalificationController" title="{!$Label.Requalification_Home}: {!$Label.RequalificationCertifications_Certifications}">
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+    </style>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript">
+		$.noConflict(); 
+		jQuery(document).ready(function($) {
+			jQuery('input[name="unverifiedCertId"]').each(function(index, domEl) {
+				certId = domEl.value;
+				jQuery.get(
+					"/apex/Validate_Certification",
+					{certId: certId},
+					function(data) {
+						//
+						// Since these requests will stack up multithreaded the value of variables like certId will not
+						// be preserved.  So, we have the service endpoint pass it back to us and we have to parse it out.
+						//
+						i = data.indexOf("PartnerTrainingId:");
+						if (i > 0) {
+							i += 18;
+							j = data.indexOf(":", i);
+							certId = data.substring(i, j);
+							//document.getElementById('throbber' + certId).style.display = 'none';
+							if (data.indexOf("Validation Result:Valid") != -1) {
+								document.getElementById('throbber' + certId).innerHTML = '{!$Label.Requalification_Certifications_Verified}';
+							}
+							else if (data.indexOf("Validation Result:Invalid") != -1) {
+								document.getElementById('throbber' + certId).innerHTML = '{!$Label.Requalification_Certifications_Invalid}';
+							}
+							else {
+								// invalid page result - should be logged somewhere
+								document.getElementById('throbber' + certId).innerHTML = '?';
+							}
+						}
+					}
+				);
+			});
+		});
+	</script>
+
+    <div class="bPageTitle">
+        <div class="ptBody secondaryPalette">
+            <div class="content">
+                <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                <h2 class="pageDescription"> <apex:outputText value="{!$Label.RequalificationCertifications_Certifications}"/></h2>
+                <apex:pageMessages />   
+            </div>
+        </div>
+    </div>
+    
+    <apex:pageBlock >
+        <apex:pageBlockSection columns="1">
+            <apex:outputText escape="false" value="{!$Label.PRQ_Certifications_Text}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    
+    <apex:pageBlock >
+	    
+	    <table class="list">
+	    	<thead class="rich-table-thead">
+	    		<tr class="headerRow">
+	    			<th class="headerRow">{!$Label.RequalificationCertifications_User_Type}</th>
+	    			<th class="headerRow" style="text-align:center;">{!$Label.RequalificationCertifications_Current}</th>
+	    			<th class="headerRow" style="text-align:center;">{!$Label.RequalificationCertifications_Required}</th>
+	    			<th class="headerRow">&nbsp;</th>
+	    		</tr>
+	    	</thead>
+	    	<tr class="dataRow odd">
+	    		<td class="dataCell"><b>{!$Label.RequalificationCertifications_Sales_Users}</b></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtSales" value="{!salesUsers}" style="width:35em"/></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtNeededSalesUsers" value="{!metReqs.Sales}" style="width:35em" /></td>
+	    		<td width="75%">&nbsp;</td> 
+	    	</tr>
+	    	<tr class="dataRow even">
+	    		<td class="dataCell"><b>{!$Label.RequalificationCertifications_Sales_Engineers}</b></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtSalesEng" value="{!presalesUsers}" style="width:35em"/></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtNeededPreSalesUsers" value="{!metReqs.SalesEngineer}" style="width:35em" /></td>
+	    		<td width="75%">&nbsp;</td>
+	    	</tr>
+	    	<tr class="dataRow odd">
+	    		<td class="dataCell"><b>{!$Label.RequalificationCertifications_Delivery_Users}</b></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtDelivery" value="{!deliveryUsers}" style="width:35em"/></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtNeededDeliverUsers" value="{!metReqs.Delivery}" style="width:35em" /></td>
+	    		<td width="75%">&nbsp;</td>
+	    	</tr>
+		    <tr class="dataRow even">
+	    		<td class="dataCell"><b>{!$Label.RequalificationCertifications_Technical_Users}</b></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtTechUsers" value="{!technicalUsers}" style="width:35em"/></td>
+	    		<td class="dataCell" align="center"><apex:outputText id="txtNeededTechUsers" value="{!metReqs.Rhce}" style="width:35em" /></td>
+	    		<td width="75%">&nbsp;</td>
+	    	</tr>
+		        
+		</table>
+		
+	</apex:pageBlock>
+
+
+    <apex:pageBlock >
+        <apex:pageBlockTable value="{!certificationList}" var="cert" id="certTable" rowClasses="odd,even" styleClass="tableClass">
+            
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Certification_Holder}</apex:facet>
+                <apex:outputText id="txtContactName" value="{!cert.Contact__r.Name}" style="width:35em"/>
+                <apex:outputText id="txtCertOwner" value="{!cert.Certificate_Owner__c}" style="width:35em" rendered="{!cert.Contact__c == null}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Certification}</apex:facet>
+                <apex:outputText id="txtCertName" value="{!cert.Certification__r.Name}"/>
+                <apex:outputText id="txtAccredName" value="{!cert.Accreditation_Name__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Certificate_Number}</apex:facet>
+                <apex:outputText id="txtCertNumber" value="{!cert.CertificateNumber__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Date_Achieved}</apex:facet>
+                <apex:outputText style="width:35em"/>
+                <apex:outputText id="txtDateAchieved" value="{0,date,MMM dd, yyyy}">
+                    <apex:param value="{!cert.Date_Achieved__c}" />
+                </apex:outputText>
+             </apex:column>
+            
+            
+            
+            
+            
+            
+            <apex:column >
+                
+                <apex:facet name="header">Track</apex:facet>
+                
+               <apex:outputText style="width:35em" rendered="{!cert.LMS_Assignment__r != null}" id="txtPartnerFunction" value="{!cert.LMS_Assignment__r.Training_Path__r.Partner_Function__c}"/>
+ 			   <apex:outputText style="width:35em" rendered="{!cert.Track__c == null && cert.Certifying_Entity__c = 'Redhat'}"  id="txtTrack" value="{!$Label.RequalificationCertifications_Technical}"/> 
+ 
+                
+            </apex:column>
+            
+            
+            
+            
+            
+            
+<!-- 
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Validation}</apex:facet>
+                <apex:outputText style="width:35em" rendered="{!cert.TrainingType__r.Name == 'Red Hat'}">
+                 <a target="_blank" href="{!$Label.Red_Hat_Domain_Name}/wapps/training/certification/verify.html?certNumber={!cert.CertificateNumber__c}">Validate</a>
+                </apex:outputText>
+            </apex:column>
+-->
+
+            <apex:column >
+                <apex:facet name="header">{!$Label.RequalificationCertifications_Validation}</apex:facet>
+                <apex:outputText style="width:35em" rendered="{!cert.TrainingType__r.Name == 'Red Hat' && cert.RedHatValidated__c == False}">
+	                <div id="throbber{!cert.Id}">
+		                 <img src="https://www.redhat.com/g/chrome/throbber_dickie.gif"/>
+		            </div>
+	                 <input type="hidden" id="unverifiedCertId{!cert.Id}" name="unverifiedCertId" style="display:none" value="{!cert.Id}"/>
+                </apex:outputText>
+                <apex:outputText style="width:35em" rendered="{!cert.TrainingType__r.Name == 'Red Hat' && cert.RedHatValidated__c == True && cert.IsValid__c == True}">
+                	{!$Label.Requalification_Certifications_Verified}
+                </apex:outputText>
+                <apex:outputText style="width:35em" rendered="{!cert.TrainingType__r.Name == 'Red Hat' && cert.RedHatValidated__c == True && cert.IsValid__c == False}">
+                	{!$Label.Requalification_Certifications_Invalid}
+                </apex:outputText>
+            </apex:column>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    
+    <apex:pageMessage id="additionalTechCertsReqMessage" title="{!$Label.RequalificationCertifications_Tech_Certs_Need}"
+        detail="{!$Label.RequalificationCertifications_Additional_Required}: {!requiredTechCerts}"
+        severity="info" strength="2"
+        rendered="{!requiredTechCerts > 0}" />
+    <apex:pageMessage id="additionalSalesCertsReqMessage" title="{!$Label.RequalificationCertifications_Sales_Certs_Need}"
+        detail="{!$Label.RequalificationCertifications_Additional_Required}: {!requiredSalesCerts}"
+        severity="info" strength="2"
+        rendered="{!requiredSalesCerts > 0}" />
+
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Back_to_Requalification_Home}"
+                            action="/apex/RequalificationHome" />
+                       <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" value="{!$Label.RequalificationHome_Confirm}" action="{!confirmCert}" styleClass="col1" disabled="{!requalRec.CertConfirmed__c}"/>
+                       <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1"/>
+                       <apex:commandButton onclick="alert('{!$Label.Requalification_LeavingRequalWarning}');" value="{!$Label.RequalificationHome_Edit_Content}" action="/apex/PartnerCertificationsList" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

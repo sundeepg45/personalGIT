@@ -1,0 +1,10 @@
+<apex:page standardController="AccountReadOnly__c" tabStyle="AccountReadOnly__c" cache="true" readOnly="true">
+	<script type="text/javascript">
+		try {
+			top.window.location.replace('{!URLFOR($Action.Account.View,AccountReadOnly__c.Account__c)}');
+		}
+		catch(e) {
+			top.window.location = '{!URLFOR($Action.Account.View,AccountReadOnly__c.Account__c)}';
+		}
+	</script>
+</apex:page>

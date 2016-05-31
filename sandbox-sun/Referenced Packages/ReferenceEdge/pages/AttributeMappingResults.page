@@ -1,0 +1,221 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RfSearchController" sidebar="false" id="pageId" tabStyle="RE_Search__tab">
+    <!-- Message -->
+    <apex:pageMessages id="pgmsgId"/>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <!-- Sction Header-->
+    <apex:sectionHeader title="{!$Label.RF_Filters}" help="RfSearchHelpPage" rendered="{!isFullLicenseAccessible}" />
+    
+
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+
+    <!-- Add JavaScript & Jquery-->
+    <script language="javascript" type="text/javascript">
+        PORShowLoading();
+        jQuery(window).load(function() {
+            PORHideLoading();
+        });
+        function doSearch() {
+            var searchText = jQuery('input:text[id*=inputTextId]').val();
+            if (searchText.trim().length <2) {
+                alert('{!$Label.Atleast_two_characters}');
+                return false;
+            }
+            else {
+                PORShowLoading();
+                searchRecord(searchText.trim());
+            }
+        }
+    </script>
+    <style type="text/css">
+        /* ---------------------- Div width -------------------------- */
+        .divClass{ 
+            width:900px;
+        }
+        /* ----------Change width here for item container------------- */
+        #divUlId li { 
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word; 
+        }
+        /* ----------Change width here for item container------------- */
+        #referenceabilityUl li { 
+            display:-moz-inline-box; -moz-box-orient:vertical;
+            display:inline-block; vertical-align:top; 
+            word-wrap:break-word; 
+        }
+        /* ----------Change width here for item container------------- */
+        .referenceabilityDiv div { 
+            width:950px; 
+            float:left;
+        }
+        /* ----------Change width here for item container------------- */
+        .divClass div { 
+            width:900px; 
+            float:left;
+        }
+
+        .rightImage {
+            display:inline-block; width:15px;
+        }                    
+
+        /* ----------Change item width here -------------------------- */
+        #referenceabilityUl li > * { 
+            //display:table; 
+            table-layout:fixed; 
+            width:250px; 
+            overflow:hidden; 
+        }
+        
+
+         /* ----------------- Item text aliment ----------------------- */
+        .referenceabilityDiv li { 
+            color:#333; 
+            text-align:left;
+        }
+        
+        .pbTitle{
+            display:none;
+        }
+        .referenceabilityUl1  { 
+             //display:table; 
+             table-layout:fixed; 
+             width:250px; 
+             overflow:hidden; 
+             float : left;
+             list-style-type: none;
+         }   
+        
+    </style>
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="gotoTheRelatedSearch" action="{!gotoTheRelatedSearch}" rerender="frmId" onComplete="PORHideLoading();"/>
+        <apex:actionStatus id="actionStatus" onstart="PORShowLoading();" onstop="PORHideLoading()"/>
+        <apex:actionFunction name="searchRecord" action="{!relatedMappingController.searchRecords}" reRender="frmId" oncomplete="PORHideLoading();">
+            <apex:param name="searchParam" value="" assignTo="{!relatedMappingController.inputTextValue}"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="saveTheSelected" action="{!relatedMappingController.saveTheSelected}" rerender="frmId" oncomplete="PORHideLoading();">
+            <apex:param name="searchParam" value="" assignTo="{!relatedMappingController.inputTextValue}"/>
+        </apex:actionFunction>
+            <!-- Right Div -->
+            
+                <apex:pageBlock id="pbId">
+                    <apex:PageBlockSection id="pbsId" columns="1">
+                        <div class="referenceabilitySelectAllDiv">
+                            <div style="text-align:left;text-indent:50px;font-size: 150%;">{!relatedMappingController.selectedFilterName}</div>
+                        </div>
+                        <apex:outputPanel rendered="{!AND(!relatedMappingController.isFieldPicklistType,relatedMappingController.showSearchBox)}">
+                            <apex:inputText maxlength="100" style="width:250px;" id="inputTextId" value="{!relatedMappingController.tempTextValue}"/> &nbsp;
+                            <apex:commandButton value="{!$Label.Search}" onclick="doSearch();return false;"/>
+                        </apex:outputPanel> 
+                       
+                        <apex:outputPanel rendered="{!relatedMappingController.hasBulkRecords}">
+                            <div style="color:red">{!$Label.BulkRecords}</div>
+                        </apex:outputPanel>
+                        <apex:outputPanel styleClass="divClass" layout="block" style="width:100%;float:left;" rendered="{!relatedMappingController.serchResults.size >0}">
+                            <div class="referenceabilityDiv">
+                                <ul class="referenceabilityUl1">
+                                    <apex:repeat value="{!relatedMappingController.serchResults}" var="wrapperObj"
+                                    first="0" rows="{!FLOOR(relatedMappingController.serchResults.size/3) + if(MOD(relatedMappingController.serchResults.size,3) > 0, 1,0)}">
+                                        <li >
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!wrapperObj.isSelected}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLabel onclick="PORShowLoading();saveTheSelected('{!JSENCODE(wrapperObj.label)}');return false;" style="font-weight :{!IF(wrapperObj.isSelected,'Bold','Normal')};" value="{!wrapperObj.label}"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>
+                                <ul class="referenceabilityUl1">
+                                    <apex:repeat value="{!relatedMappingController.serchResults}" var="wrapperObj"
+                                    first="{!FLOOR(relatedMappingController.serchResults.size/3) + if(MOD(relatedMappingController.serchResults.size,3) > 0, 1,0)}" 
+                                    rows="{!FLOOR(relatedMappingController.serchResults.size/3) + if(MOD(relatedMappingController.serchResults.size,3) > 1, 1,0)}">
+                                        <li >
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!wrapperObj.isSelected}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                        <apex:outputLabel onclick="PORShowLoading();saveTheSelected('{!JSENCODE(wrapperObj.label)}');return false;" style="font-weight :{!IF(wrapperObj.isSelected,'Bold','Normal')};" value="{!wrapperObj.label}"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>     
+                                <ul class="referenceabilityUl1">
+                                    <apex:repeat value="{!relatedMappingController.serchResults}" var="wrapperObj"
+                                    first="{!FLOOR(relatedMappingController.serchResults.size/3)*2 + if(MOD(relatedMappingController.serchResults.size,3) > 0, if(MOD(relatedMappingController.serchResults.size,3) > 1,2,1) ,0)}" rows="">
+                                        <li >
+                                            <table>
+                                                <tr>
+                                                    <td style="width:13px;">
+                                                        <apex:image url="{!$Resource.refedge__Tick}" rendered="{!wrapperObj.isSelected}" height="12px" width="12px"/>
+                                                    </td>
+                                                    <td style="width: 200px;">
+                                                            <apex:outputLabel onclick="PORShowLoading();saveTheSelected('{!JSENCODE(wrapperObj.label)}');return false;" style="font-weight :{!IF(wrapperObj.isSelected,'Bold','Normal')};" value="{!wrapperObj.label}"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                    </apex:repeat>
+                                </ul> 
+                            </div>
+                        </apex:outputPanel>
+                    </apex:PageBlockSection>
+                    <apex:pageBlockButtons id="pbbIdTop" location="top" >
+                        <div style="width:100%;">
+                            <div style="float:left ; width: 40%;">
+                                <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_RF_Search}" action="{!backToSearch}" id="backCmdLinkId" />
+                            </div>
+                            
+                            <div style="float:left ; width: 20%;">
+                                <apex:commandButton value="{!$Label.Done}" action="{!relatedMappingController.getAllTheResults}" id="doneCmdBtnId"/>
+                            </div>
+        
+                             <apex:outputPanel >
+                                <div style="float:left ; width: 40%;text-align:right;">
+                                    <apex:repeat value="{!relatedMappingController.alphabets}" var="alpha" id="alphaRptId">&nbsp;&nbsp;
+                                        <apex:commandLink style="color:#5C95C4;" action="{!relatedMappingController.showResultAlphabet}" value="{!alpha}"  reRender="pbsId" onclick="PORShowLoading();"  oncomplete="PORHideLoading();" id="alphaCmdLinkId">
+                                             <apex:param name="alphabet" value="{!alpha}" assignTo="{!relatedMappingController.character}"/> 
+                                        </apex:commandLink>
+                                    </apex:repeat>
+                                </div>
+                            </apex:outputPanel> 
+                        </div>
+                    </apex:pageBlockButtons>
+                    <!-- Page Block Buttons Bottom-->
+                    <apex:pageBlockButtons id="pbbIdBottom" location="bottom">
+                        <div style="width:100%;">
+                            <div style="float:left ; width: 20%;text-indent:40%;">
+                                <apex:commandButton value="{!$Label.Done}" action="{!relatedMappingController.getAllTheResults}" id="doneCmdBtnId"/>
+                            </div>
+                        </div>
+                    </apex:pageBlockButtons>
+                </apex:pageBlock>
+    </apex:form>
+</apex:page>

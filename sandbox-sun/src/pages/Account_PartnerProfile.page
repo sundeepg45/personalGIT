@@ -1,0 +1,7 @@
+<apex:page standardController="Account" extensions="Account_PartnerProfile" >
+  <apex:pageBlock title="Hello {!$User.FirstName}!">
+      You belong to the {!account.name}
+  </apex:pageBlock>
+  <apex:detail subject="{!account}" relatedList="true"/>
+
+</apex:page>

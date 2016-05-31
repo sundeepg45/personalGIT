@@ -1,0 +1,538 @@
+<apex:page controller="RegistrationHomeController" sidebar="false">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerRegResources, 'partnerRegResources/partner-reg-header-styles.css')}" />
+
+    <!--JS Files -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!--
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerRegResources, 'partnerRegResources/partner-reg-header-styles.js')}"></script>
+    -->
+<style>
+    .red-hat-content .header-wrapper{
+        background: none !important;
+    }
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+    $(".hero-link").hover(function () {
+        $(this).toggleClass("active");
+    });
+
+    $("#hero-tab1").click(function () {
+        loadDealRegLeads();
+
+        if( $("#tab1-dropdown").css("display") == 'none' ){
+            $("#tab1-dropdown").slideDown();
+            $(".sticky-nav-tab1").addClass("active1");
+            $(".sticky-nav-tab2").removeClass("active2");
+            $(".sticky-nav-tab3").removeClass("active1");
+            $(".sticky-nav-tab4").removeClass("active2");
+            $("#tab2-dropdown").slideUp();
+            $("#tab3-dropdown").slideUp();
+            $("#tab4-dropdown").slideUp();
+            $("#content-wrapper").css("margin-top", 60);
+            $('html, body').animate({
+                scrollTop: parseInt($(".target-div").offset().top)
+            }, 2000);
+        }
+       else{
+            $("#tab1-dropdown").slideUp(1700);
+            $(".sticky-nav-wrapper").fadeOut();
+            $("#content-wrapper").css("margin-top", 0);
+       }
+    });
+
+    $("#hero-tab2").click(function () {
+        loadParRegistrations();
+
+        if( $("#tab2-dropdown").css("display") == 'none' ){
+            $("#tab2-dropdown").slideDown();
+            $(".sticky-nav-tab2").addClass("active2");
+            $(".sticky-nav-tab1").removeClass("active1");
+            $(".sticky-nav-tab3").removeClass("active1");
+            $(".sticky-nav-tab4").removeClass("active2");
+            $("#tab1-dropdown").slideUp();
+            $("#tab3-dropdown").slideUp();
+            $("#tab4-dropdown").slideUp();
+            $("#content-wrapper").css("margin-top", 60);
+            $('html, body').animate({
+                scrollTop: parseInt($(".target-div").offset().top)
+            }, 2000);
+        }
+       else{
+            $("#tab2-dropdown").slideUp(1700);
+            $(".sticky-nav-wrapper").fadeOut();
+            $("#content-wrapper").css("margin-top", 0);
+       }
+    });
+
+    $("#hero-tab3").click(function () {
+        loadTeamingLeads();
+
+        if( $("#tab3-dropdown").css("display") == 'none' ){
+            $("#tab3-dropdown").slideDown();
+            $(".sticky-nav-tab3").addClass("active1");
+            $(".sticky-nav-tab1").removeClass("active1");
+            $(".sticky-nav-tab2").removeClass("active2");
+            $(".sticky-nav-tab4").removeClass("active2");
+            $("#tab1-dropdown").slideUp();
+            $("#tab2-dropdown").slideUp();
+            $("#tab4-dropdown").slideUp();
+            $("#content-wrapper").css("margin-top", 60);
+            $('html, body').animate({
+                scrollTop: parseInt($(".target-div").offset().top)
+            }, 2000);
+        }
+       else{
+            $("#tab3-dropdown").slideUp(1700);
+            $(".sticky-nav-wrapper").fadeOut();
+            $("#content-wrapper").css("margin-top", 0);
+        }
+    });
+
+    $("#hero-tab4").click(function () {
+        loadSalesLeads();
+
+        if( $("#tab4-dropdown").css("display") == 'none' ){
+            $("#tab4-dropdown").slideDown();
+            $(".sticky-nav-tab4").addClass("active2");
+            $(".sticky-nav-tab1").removeClass("active1");
+            $(".sticky-nav-tab2").removeClass("active2");
+            $(".sticky-nav-tab3").removeClass("active1");
+            $("#tab1-dropdown").slideUp();
+            $("#tab2-dropdown").slideUp();
+            $("#tab3-dropdown").slideUp();
+            $("#content-wrapper").css("margin-top", 60);
+            $('html, body').animate({
+                scrollTop: parseInt($(".target-div").offset().top)
+            }, 2000);
+        }
+       else{
+            $("#tab4-dropdown").slideUp(1700);
+            $(".sticky-nav-wrapper").fadeOut();
+            $("#content-wrapper").css("margin-top", 0);
+       }
+    });
+
+
+    //stick-nav click handlers
+    $(".sticky-nav-tab1").click(function () {
+        loadDealRegLeads();
+
+        if( $("#tab1-dropdown").css("display") == 'none' ){
+            $("#tab1-dropdown").fadeIn();
+            $("#tab2-dropdown").fadeOut();
+            $("#tab3-dropdown").fadeOut();
+            $("#tab4-dropdown").fadeOut();
+            $(".sticky-nav-tab1").addClass("active1");
+            $(".sticky-nav-tab2").removeClass("active2");
+            $(".sticky-nav-tab3").removeClass("active1");
+            $(".sticky-nav-tab4").removeClass("active2");
+        }else{
+            $(".partner-programs-dropdown").css("margin-top", 0);
+            $("#tab1-dropdown").slideUp(1700);
+        }
+    });
+    $(".sticky-nav-tab2").click(function () {
+        loadParRegistrations();
+
+        if( $("#tab2-dropdown").css("display") == 'none' ){
+            $("#tab2-dropdown").fadeIn();
+            $("#tab1-dropdown").fadeOut();
+            $("#tab3-dropdown").fadeOut();
+            $("#tab4-dropdown").fadeOut();
+            $(".sticky-nav-tab2").addClass("active2");
+            $(".sticky-nav-tab1").removeClass("active1");
+            $(".sticky-nav-tab3").removeClass("active1");
+            $(".sticky-nav-tab4").removeClass("active2");
+        }else{
+            $("#tab2-dropdown").slideUp(1700);
+            $(".partner-programs-dropdown").css("margin-top", 0);
+        }
+    });
+    $(".sticky-nav-tab3").click(function () {
+        loadTeamingLeads();
+
+        if( $("#tab3-dropdown").css("display") == 'none' ){
+            $("#tab3-dropdown").fadeIn();
+            $("#tab1-dropdown").fadeOut();
+            $("#tab2-dropdown").fadeOut();
+            $("#tab4-dropdown").fadeOut();
+            $(".sticky-nav-tab3").addClass("active1");
+            $(".sticky-nav-tab1").removeClass("active1");
+            $(".sticky-nav-tab2").removeClass("active2");
+            $(".sticky-nav-tab4").removeClass("active2");
+        }else{
+            $(".partner-programs-dropdown").css("margin-top", 0);
+            $("#tab3-dropdown").slideUp(1700);
+        }
+    });
+    $(".sticky-nav-tab4").click(function () {
+        loadSalesLeads();
+
+        if( $("#tab4-dropdown").css("display") == 'none' ){
+            $("#tab4-dropdown").fadeIn();
+            $("#tab1-dropdown").fadeOut();
+            $("#tab2-dropdown").fadeOut();
+            $("#tab3-dropdown").fadeOut();
+            $(".sticky-nav-tab4").addClass("active2");
+            $(".sticky-nav-tab1").removeClass("active1");
+            $(".sticky-nav-tab2").removeClass("active2");
+            $(".sticky-nav-tab3").removeClass("active1");
+        }else{
+            $(".partner-programs-dropdown").css("margin-top", 0);
+            $("#tab4-dropdown").slideUp(1700);
+        }
+    });
+
+    //make sticky navigation appear/disaper on window scroll
+    $(window).scroll(function(e) {
+
+        var offset = $("#main-header-wrap").height();
+        offset = offset += -40;  //add the height of custom header and padding to the height of salesforce header
+
+        var offset2 = parseInt($("#hero-links-wrap").offset().top)
+
+        if ($(this).scrollTop() >= offset) { //use `this`, not `document`
+            $(".sticky-nav-wrapper").slideDown();
+            $(".target-div").css("margin-top", 60);
+            $(".sticky-nav-wrapper").addClass("sticky-nav-wrapper-stuck");
+        }
+        else if ($(this).scrollTop() < offset2) { //use `this`, not `document`
+            $(".sticky-nav-wrapper").slideUp();
+        }
+        else if ($(this).scrollTop() < offset) {
+            $(".sticky-nav-wrapper").removeClass("sticky-nav-wrapper-stuck");
+            $(".target-div").css("margin-top", 0);
+        }
+    });
+});
+
+</script>
+
+</head>
+<body>
+    <header>
+
+        <!--This is where the header widget will go ! -->
+
+    </header>
+
+
+    <apex:form >
+    <apex:actionFunction action="{!dealRegLeadListSetup}" name="loadDealRegLeads" rerender="registration-deals">
+    </apex:actionFunction>
+    <apex:actionFunction action="{!salesLeadListSetup}" name="loadSalesLeads" rerender="registration-sales">
+    </apex:actionFunction>
+    <apex:actionFunction action="{!parListSetup}" name="loadParRegistrations" rerender="registration-par">
+    </apex:actionFunction>
+    <apex:actionFunction action="{!teamingListSetup}" name="loadTeamingLeads" rerender="registration-teaming">
+    </apex:actionFunction>
+
+    <div id="main-header-wrap">
+        <div id="main-header">
+            <div id="hero">
+                <div id="hero-wrap" class="clearfix">
+                    <h1 class="uppercase">{!$Label.Reg_Partner_Programs}</h1>
+                    <h2>{!$Label.Reg_Opportunity_Registration_Programs}</h2>
+                    <p>{!$Label.Reg_Introduction}</p>
+                </div><!-- close #hero-wrap -->
+                <div id="hero-links-wrap" class="clearfix">
+                    <apex:outputPanel rendered="{!hasDealRegAccess}">
+                        <div id="hero-tab1" class="hero-link ease">
+                            <a id="tab1">
+                                <h3 class="red uppercase">{!$Label.Reg_Deal_Registration_Program}</h3>
+                                <ul>
+                                    <apex:outputText value="{!$Label.Reg_Deal_Reg_Points}" escape="false"/>
+                                </ul>
+                            </a>
+                        </div><!-- close #hero-tab1 -->
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!hasParAccess}">
+                    <div id="hero-tab2" class="hero-link ease">
+                        <a id="tab2">
+                            <h3 class="red uppercase">{!$Label.Reg_Partner_assistance_reward_program}</h3>
+                            <ul>
+                                <apex:outputText value="{!$Label.Reg_par_points}" escape="false"/>
+                            </ul>
+                        </a>
+                    </div><!-- close #hero-tab2 -->
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!hasTeamingAccess}">
+                        <div id="hero-tab3" class="hero-link ease">
+                            <a id="tab3">
+                                <h3 class="red uppercase">{!$Label.Reg_Teaming_incentive_program}</h3>
+                                <ul>
+                                    <apex:outputText value="{!$Label.Reg_teaming_points}" escape="false"/>
+                                </ul>
+                            </a>
+                        </div><!-- close #hero-tab3 -->
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!hasSalesLeadAccess}">
+                    <div id="hero-tab4" class="hero-link ease">
+                        <a id="tab4">
+                            <h3 class="red uppercase">{!$Label.Reg_Sales_Leads_Program}</h3>
+                            <ul>
+                                <apex:outputText value="{!$Label.Reg_Sales_Leads_Points}" escape="false"/>
+                            </ul>
+                        </a>
+                    </div>
+                    </apex:outputPanel>
+                </div><!-- close #hero-links-wrap -->
+            </div><!-- close #hero -->
+        </div><!-- close #main-header -->
+    </div><!-- close #main-header-wrap -->
+
+    <div class="sticky-nav-wrapper">
+        <div class="sticky-nav-container">
+            <ul>
+                <apex:outputPanel rendered="{!hasDealRegAccess}">
+                    <li class="sticky-nav-tab1">{!$Label.Requalification_Deal_Reg}</li>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!hasParAccess}">
+                    <li class="sticky-nav-tab2">{!$Label.Reg_Partner_Assistance}</li>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!hasTeamingAccess}">
+                    <li class="sticky-nav-tab3">Teaming Incentive</li>
+                </apex:outputPanel>
+                <!--<apex:outputPanel rendered="{!hasSalesLeadAccess}">
+                    <li class="sticky-nav-tab4">Sales Leads</li>
+                </apex:outputPanel>-->
+            </ul>
+        </div>
+    </div><!--close .sticky-nav-wrapper -->
+
+    <div class="target-div"></div>
+    <div id="tab1-dropdown" class="partner-programs-dropdown white-bg">
+        <div id="partner-programs-dropdown-container">
+            <div class="headline-wrapper">
+                <div class="deal-registration-headline">
+                    <!--<h2 class="uppercase red">{!$Label.Requalification_Deal_Reg}</h2>-->
+                    <h3>{!$Label.Reg_Deal_Reg_Headline}</h3>
+                    <p><apex:outputText value="{!$Label.Reg_Deal_Reg_Description}" escape="false"/></p>
+                    <apex:commandLink styleClass="uppercase red-button ease" action="{!registerDeal}">{!$Label.Reg_Register_A_Deal}</apex:commandLink>
+                </div>
+                <!--
+                <div class="CTA">
+                    <img src="http://placehold.it/292x180&text=[Img]"/>
+                    <div class="CTA-content">
+                        <h4 class="uppercase grey-text">Partner story</h4>
+                        <h5 class="blue-text">HP Converged Infastructure to help reduce costs</h5>
+                        <img src="http://placehold.it/60x60&text=[Img]"/>
+                    </div>
+                </div>
+                -->
+            </div>
+            <apex:outputPanel id="registration-deals">
+            <div class="registration-deals">
+                <h2 class="uppercase red table-header">{!$Label.Reg_My_Pending_Registrations}</h2>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn ease" value="View All"/>
+                <table cellspacing="2">
+                    <thead>
+                        <tr class="x-grid3-hd-row uppercase border_bottom">
+                            <td>{!$ObjectType.Lead.Fields.CreatedDate.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Company.Label}</td>
+                            <td>{!$Label.Reg_Approval_Status}</td>
+                            <td>{!$ObjectType.Lead.Fields.Email.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Country_of_Order__c.Label}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!leads}" var="lead" id="dealRegLeadsTable" rendered="{!NOT(ISNULL(leads))}">
+                        <tr class="x-grid3-hd-row border_bottom">
+                            <td><apex:outputField value="{!lead.CreatedDate}" /></td>
+                            <td>
+                                <a href="/{!lead.Id}">{!lead.Company}</a>
+                            </td>
+                            <td>
+                                <apex:outputText value="{!lead.Status}" rendered="{!ISNULL(lead.Deal_Registration_Status__c)}"/>
+                                <apex:outputText value="{!lead.Deal_Registration_Status__c}" rendered="{!NOT(ISNULL(lead.Deal_Registration_Status__c))}"/>
+                            </td>
+                            <td><apex:outputField value="{!lead.Email}" /></td>
+                            <td>{!lead.Country_of_Order__c}</td>
+                            <td><a href="/{!lead.Id}/e" class="edit-button ease">{!$Label.Reg_Edit_Button}</a></td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn view-all-btn-bottom ease" value="View All"/>
+            </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+
+    <div id="tab2-dropdown" class="partner-programs-dropdown white-bg">
+        <div id="partner-programs-dropdown-container">
+            <div class="headline-wrapper">
+                <div class="deal-registration-headline">
+                    <!--<h2 class="uppercase red">{!$Label.Reg_Partner_Assitance_Reward_Program}</h2>-->
+                    <h3>{!$Label.Reg_PAR_Headline}</h3>
+                    <p><apex:outputText value="{!$Label.Reg_PAR_Description}" escape="false"/></p>
+                    <apex:commandLink styleClass="uppercase red-button ease" action="{!registerPar}">{!$Label.Reg_Register_a_PAR}</apex:commandLink>
+                </div>
+                <!--
+                <div class="CTA">
+                    <img src="http://placehold.it/293x180&text=[Img]"/>
+                    <div class="CTA-content">
+                        <h4 class="uppercase grey-text">Partner story</h4>
+                        <h5 class="blue-text">HP Converged Infastructure to help reduce costs</h5>
+                        <img src="http://placehold.it/60x60&text=[Img]"/>
+                    </div>
+                </div>
+                -->
+            </div>
+            <apex:outputPanel id="registration-par">
+            <div class="registration-deals">
+                <h2 class="uppercase red table-header">{!$Label.Reg_My_PAR_Registrations}</h2>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn ease" value="View All"/>
+                <table cellspacing="2">
+                    <thead>
+                        <tr class="x-grid3-hd-row uppercase border_bottom">
+                            <td>{!$ObjectType.Lead.Fields.CreatedDate.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Company.Label}</td>
+                            <td>{!$Label.Reg_Approval_Status}</td>
+                            <td>{!$ObjectType.Partner_Registration__c.Fields.Company_Contact_Email__c.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Country_of_Order__c.Label}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!parRegistrations}" var="par" id="parTable" rendered="{!NOT(ISNULL(parRegistrations))}">
+                        <tr class="x-grid3-hd-row border_bottom">
+                            <td><apex:outputField value="{!par.CreatedDate}" /></td>
+                            <td><a href="/{!par.Id}">{!par.Company_Name__c}</a></td>
+                            <td>{!par.Status__c}</td>
+                            <td><apex:outputField value="{!par.Company_Contact_Email__c}" /></td>
+                            <td>{!par.Company_Country__c}</td>
+                            <td><a href="/{!par.Id}/e" class="edit-button ease">{!$Label.Reg_Edit_Button}</a></td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn view-all-btn-bottom ease" value="View All"/>
+            </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+
+    <div id="tab3-dropdown" class="partner-programs-dropdown white-bg">
+        <div id="partner-programs-dropdown-container">
+            <div class="headline-wrapper">
+                <div class="deal-registration-headline">
+                    <!--<h2 class="uppercase red">{!$Label.Reg_Teaming_Incentive_Program}</h2>-->
+                    <h3>{!$Label.Reg_Teaming_Headline}</h3>
+                    <p><apex:outputText value="{!$Label.Reg_Teaming_Description}" escape="false"/></p>
+                    <apex:commandLink styleClass="uppercase red-button ease" action="{!registerTeaming}">{!$Label.Reg_Register_A_Teaming_Agreement}</apex:commandLink>
+                </div>
+                <!--
+                <div class="CTA">
+                    <img src="http://placehold.it/293x180&text=[Img]"/>
+                    <div class="CTA-content">
+                        <h4 class="uppercase grey-text">Partner story</h4>
+                        <h5 class="blue-text">HP Converged Infastructure to help reduce costs</h5>
+                        <img src="http://placehold.it/60x60&text=[Img]"/>
+                    </div>
+                </div>
+                -->
+            </div>
+            <apex:outputPanel id="registration-teaming">
+            <div class="registration-deals">
+                <h2 class="uppercase red table-header">{!$Label.Reg_My_Pending_Team_Deals}</h2>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn ease" value="View All"/>
+                <table cellspacing="2">
+                    <thead>
+                        <tr class="x-grid3-hd-row uppercase border_bottom">
+                            <td>{!$ObjectType.Lead.Fields.CreatedDate.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Company.Label}</td>
+                            <td>{!$Label.Reg_Approval_Status}</td>
+                            <td>{!$ObjectType.Lead.Fields.Email.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Country_of_Order__c.Label}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!leads}" var="lead" id="teamingLeadsTable" rendered="{!NOT(ISNULL(leads))}">
+                        <tr class="x-grid3-hd-row border_bottom">
+                            <td><apex:outputField value="{!lead.CreatedDate}" /></td>
+                            <td>
+                                <a href="/{!lead.Id}">{!lead.Company}</a>
+                            </td>
+                            <td>
+                                <apex:outputText value="{!lead.Status}" rendered="{!ISNULL(lead.Deal_Registration_Status__c)}"/>
+                                <apex:outputText value="{!lead.Deal_Registration_Status__c}" rendered="{!NOT(ISNULL(lead.Deal_Registration_Status__c))}"/>
+                            </td>
+                            <td><apex:outputField value="{!lead.Email}" /></td>
+                            <td>{!lead.Country_of_Order__c}</td>
+                            <td><a href="/{!lead.Id}/e" class="edit-button ease">{!$Label.Reg_Edit_Button}</a></td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn view-all-btn-bottom ease" value="View All"/>
+            </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+
+    <div id="tab4-dropdown" class="partner-programs-dropdown white-bg">
+        <div id="partner-programs-dropdown-container">
+            <div class="headline-wrapper">
+                <div class="deal-registration-headline">
+                    <h2 class="uppercase red">{!$Label.Reg_Sales_Leads_Program}</h2>
+                    <h3>{!$Label.Reg_Sales_Headline}</h3>
+                    <p><apex:outputText value="{!$Label.Reg_Sales_Description}" escape="false"/></p>
+                    <apex:commandLink styleClass="uppercase red-button ease" action="{!registerSales}">{!$Label.Reg_Register_A_Lead}</apex:commandLink>
+                </div>
+                <!--
+                <div class="CTA">
+                    <img src="http://placehold.it/293x180&text=[Img]"/>
+                    <div class="CTA-content">
+                        <h4 class="uppercase grey-text">Partner story</h4>
+                        <h5 class="blue-text">HP Converged Infastructure to help reduce costs</h5>
+                        <img src="http://placehold.it/60x60&text=[Img]"/>
+                    </div>
+                </div>
+                -->
+            </div>
+            <apex:outputPanel id="registration-sales">
+            <div class="registration-deals">
+                <h2 class="uppercase red table-header">{!$Label.Reg_My_Pending_Sales_Leads}</h2>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn ease" value="View All"/>
+                <table cellspacing="2">
+                    <thead>
+                        <tr class="x-grid3-hd-row uppercase border_bottom">
+                            <td>{!$ObjectType.Lead.Fields.CreatedDate.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Company.Label}</td>
+                            <td>{!$Label.Reg_Approval_Status}</td>
+                            <td>{!$ObjectType.Lead.Fields.Email.Label}</td>
+                            <td>{!$ObjectType.Lead.Fields.Country_of_Order__c.Label}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!leads}" var="lead" id="salesLeadsTable" rendered="{!NOT(ISNULL(leads))}">
+                        <tr class="x-grid3-hd-row border_bottom">
+                            <td><apex:outputField value="{!lead.CreatedDate}" /></td>
+                            <td>
+                                <a href="/{!lead.Id}">{!lead.Company}</a>
+                            </td>
+                            <td>
+                                <apex:outputText value="{!lead.Status}" />
+                            </td>
+                            <td><apex:outputField value="{!lead.Email}" /></td>
+                            <td>{!lead.Country_of_Order__c}</td>
+                            <td><a href="/{!lead.Id}/e" class="edit-button ease">{!$Label.Reg_Edit_Button}</a></td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+                <apex:commandLink action="{!viewAll}" styleClass="uppercase view-all-btn view-all-btn-bottom ease" value="View All"/>
+            </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+    </apex:form>
+
+</body>
+
+
+
+</apex:page>

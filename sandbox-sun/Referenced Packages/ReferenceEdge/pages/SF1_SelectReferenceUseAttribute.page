@@ -1,0 +1,174 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page Controller="refedge.ReferenceUseRequest" id="pageId" showHeader="false" sidebar="false" docType="html-5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"></meta> 
+    <c:SF1_POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__SF1_StaticResource,'/css/app.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.min.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.refedge__BootstrapFiles,'bootstrap.js')}"/>
+    <style>
+        .uiButton.default:hover{
+            background:none;
+            color: #44596c;
+            text-shadow: none;
+        }
+        .sectionHeader {
+            font-size: 13px;
+            padding: 8px 14px;
+            font-weight: normal;
+            text-transform: uppercase;
+            background-color: #e8eaeb;
+            color: #696e71;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .centerDiv {
+            margin: 0 auto;
+            width: 100%;
+            //max-width: 768px;
+            font-family: 'ProximaNovaSoft-Regular';
+        }
+        .datarow {
+            border-top: none;
+            padding: 14px;
+            padding-left: 14px;
+            width: 50%;
+        }
+        .sf1label {
+            font-family: 'ProximaNovaSoft-Regular','Helvetica Neue';
+            font-size: 16px;
+            color: #696e71;
+            margin: 0;
+            padding-bottom: 8px;
+            padding-top: 8px;
+            display: block;
+            min-width: 100px;
+        }
+        .sf1input[type="checkbox"] {
+            -webkit-appearance: none;
+            display: inline-block;
+            height: 22px;
+            margin: 0 6px 0 0;
+            border: 1px solid #c3c6c9;
+            padding: 0;
+            width: 22px;
+            vertical-align: middle;
+            background: white -webkit-linear-gradient(bottom,rgba(0,1,1,0.05) 0,rgba(255,255,255,0.05) 100%);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05),inset 0 0 1px 1px white;
+        }
+        
+        .sf1input[type="checkbox"]:checked {
+            border: 1px solid #2c75a3;
+            background-color: #3b9fdd;
+            -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            -moz-box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 2px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.2);
+            background-image: -webkit-gradient(linear,50% 100%,50% 0,color-stop(0,#3b9fdd),color-stop(100%,#3b9fdd));
+            background-image: -webkit-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -moz-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: -o-linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+            background-image: linear-gradient(bottom,#3b9fdd 0,#3b9fdd 100%);
+        }
+        
+        .sf1input[type="checkbox"]:checked::after {
+            display: block;
+            left: 3px;
+            top: 3px;
+            height: 9px;
+            width: 14px;
+            border-bottom: 4px solid white;
+            border-left: 4px solid white;
+            -webkit-transform: rotate(-45deg);
+            position: relative;
+            content: '';
+        }
+        .sf1input, .sf1textarea {
+           width:100%;
+           font-family: 'ProximaNovaSoft-Regular', 'Helvetica Neue';
+           font-size: 15px;
+           color: #3c3d3e;
+           padding: 7px 14px;
+           line-height: 25px;
+           border: 1px solid #cfd0d2;
+           border-radius: 5px;
+           background-color: #e8eaeb;
+           box-shadow: inset 0 2px 2px rgba(0,0,0,.07);
+           box-sizing: border-box;
+        }
+    </style>
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+    <script> 
+        Sfdc.canvas.publisher.subscribe({name: "publisher.showPanel",
+            onData:function(e) {
+                Sfdc.canvas.publisher.publish({name:"publisher.setValidForSubmit", payload:"false"});
+        }});
+    </script>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:actionFunction name="jsRedirect" action="{!redirect}" />
+        
+        <body style="background:#f0f1f2;line-height: 1;">
+            <apex:outputPanel id="errorBlock"  layout="block" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}">
+                <div class="centerDiv">
+                    <div style="width:100%;">
+                        <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info"/>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel id="errorBlock2"  layout="block" rendered="{!NOT(isFullLicenseAccessible)}">
+                <div class="centerDiv">
+                    <div style="width:100%;">
+                        <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info"/>
+                    </div>
+                </div>
+            </apex:outputPanel>
+            
+            <apex:outputPanel id="mainDiv"  layout="block" style="height:550px;overflow-y:auto;" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+                <div class="centerDiv">
+                    <div class="actionButtons" style="margin-top:1%;text-align:center;">
+                        <ul class="buttonList horizontal forceButtonBar">
+                            <li class="buttonItem">
+                                <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" onclick="PORShowLoading();" oncomplete="PORHideLoading();" value="{!$Label.Back}" styleClass="default one uiBlock uiButton forceActionButton" immediate="true" action="{!redirect}"/>
+                            </li>
+                            <li class="buttonItem">
+                                <apex:commandButton style="font-family: 'ProximaNovaSoft-Semibold';" onclick="PORShowLoading();" oncomplete="jsRedirect();" value="{!$Label.Save}"  styleClass="default one uiBlock uiButton forceActionButton" action="{!refUseAttr.backToSF1ReferenceUseRequestOnDone}"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <div style="width:100%;">
+                        <div class="sectionHeader">{!refUseAttr.labelWrapperMap[refUseAttr.selectedLabelId].label.Name}</div>
+                        <table>
+                            <apex:repeat value="{!refUseAttr.mapAllAttributesLabel[refUseAttr.selectedLabelId]}" var="attribute">
+                                <tr>
+                                    <td style="padding:10px; padding-left:35px;"><apex:inputCheckBox styleClass="sf1input" style="margin-left:2%;" value="{!attribute.isSelected}"/>
+                                </td>
+                                <td>
+                                <apex:outputText styleClass="sf1label" style="padding-left:2%;" value="{!attribute.attributeLabel.Attribute__r.Name}"/> 
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </body>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,103 @@
+<apex:page standardController="PartnerProduct__c" extensions="PartnerProducts_screenshots" standardStylesheets="false">
+	<apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js" />
+	<apex:includeScript value="{!$Resource.jqueryFancybox134js}" />
+	<apex:include pageName="Requalification_Fancybox_Widget_CSS"/>
+	
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("a.screenshot").fancybox();
+        });
+        function confirmDeleteLogo() {
+        var doDelete = confirm('{!$Label.PF_prod_MSG_deleteLogo}');
+          return doDelete;
+          }
+          
+
+    </script>   
+    <apex:pageMessages />   
+
+    <apex:form >
+      <apex:pageBlock title="{!$Label.PF_prod_Section_ProductLogo}">
+      <apex:pageBlockButtons location="top">
+      <apex:inputFile id="uploadLogo" value="{!productLogo.Body}" filename="{!productLogo.name}"  />
+      <apex:commandButton id="replaceLogo" value="{!$Label.PF_prod_BTN_ReplaceProductLogo}" action="{!replaceLogo}" onclick="return  ReplaceLogoConfirm()">
+      <apex:param name="id" value="{!partnerProductId}"/>
+      </apex:commandButton>
+      </apex:pageBlockButtons>
+      <apex:pageBlockTable value="{!partnerProductLogos}" var="Logos123" rendered="{!partnerProductLogos.size > 0}">
+      <apex:column width="20%">
+           <apex:facet name="header">{!$Label.PF_prod_Table_Name}</apex:facet>
+           <apex:outputLink value="/servlet/servlet.FileDownload?file={!Logos123.id}" target="_BLANK">
+           <apex:outputText value=" {0} ">
+           <apex:param value="{!Logos123.Name}" />
+           </apex:outputText>
+           </apex:outputLink>      
+         </apex:column>
+          <apex:column width="20%">
+          <apex:facet name="header">{!$Label.PF_prod_Table_Logo}</apex:facet>
+          <div style="display:none">
+          <div id="{!Logos123.id}">
+          <img src="{!URLFOR($Action.Attachment.Download,Logos123.id)}" />
+           </div>
+           </div>
+           <a rel="logos" class="screenshot" href="#{!Logos123.id}" target="_blank">
+           <img height="100" src="{!URLFOR($Action.Attachment.Download,Logos123.id)}"/>
+           </a>
+            &nbsp; &nbsp;
+      </apex:column>   
+         <apex:column >
+        <apex:facet name="header">Action</apex:facet>
+        <apex:commandLink action="{!deleteAttachments}" id="deleteattachmentlink" value="Delete" onClick="return confirmDeleteLogo()">
+            <apex:param name="partnerLogoId" value="{!Logos123.parentid}"/>
+            <apex:param name="id" value="{!partnerProductId}"/>
+        </apex:commandLink>
+        </apex:column>
+    </apex:pageBlockTable>
+
+    </apex:pageBlock>
+ 
+   <apex:pageBlock title="{!$Label.PF_prod_Section_ProductScreen}">
+         <apex:pageBlockButtons location="top" >
+         <apex:inputFile id="uploadScreenshot" value="{!attachmentFile}" filename="{!attachmentFilename}" rendered="{!partnerProductScreenShots.size < 5}"/>
+        <apex:commandButton id="addScreenshot" value="{!$Label.PF_prod_BTN_addScreenshot}" action="{!addScreenshot}" rendered="{!partnerProductScreenShots.size < 5}" >
+            <apex:param name="id" value="{!partnerProductId}"/>
+        </apex:commandButton>       
+      </apex:pageBlockButtons>
+   <apex:pageBlockTable value="{!partnerProductScreenShots}" var="screenShots123" rendered="{!partnerProductScreenShots.size > 0}" width="50%">
+      <apex:column width="20%">
+           <apex:facet name="header">{!$Label.PF_prod_Table_Name}</apex:facet>
+           <apex:outputLink value="/servlet/servlet.FileDownload?file={!screenShots123.id}" target="_BLANK">
+           <apex:outputText value=" {0} ">
+           <apex:param value="{!screenShots123.Name}" />
+           </apex:outputText>
+           </apex:outputLink>      
+           
+       </apex:column>
+      <apex:column width="20%">
+          <apex:facet name="header">{!$Label.PF_prod_Table_Screenshot}</apex:facet>
+          <div style="display:none">
+          <div id="{!screenShots123.id}">
+          <img src="{!URLFOR($Action.Attachment.Download,screenShots123.id)}"/>
+           </div>
+           </div>
+           <a rel="screenshots" class="screenshot" href="#{!screenShots123.id}">
+           <img height="100" src="{!URLFOR($Action.Attachment.Download,screenShots123.id)}"/>
+           </a>
+            &nbsp; &nbsp;
+      </apex:column>   
+     
+        <apex:column >
+        <apex:facet name="header">{!$Label.PF_prod_Table_Action}</apex:facet>
+         <apex:commandLink action="{!deleteAttachments}" id="deleteattachmentlink" value="Delete" onClick="return confirmDeleteLogo()">
+            <apex:param name="partnerScreenshotId" value="{!screenShots123.parentid}"/>
+            <apex:param name="id" value="{!partnerProductId}"/>
+        </apex:commandLink>
+      
+           </apex:column>
+    </apex:pageBlockTable>
+    </apex:pageBlock>
+
+      
+    </apex:form>
+
+</apex:page>

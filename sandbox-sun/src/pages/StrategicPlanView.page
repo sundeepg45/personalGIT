@@ -1,0 +1,11 @@
+<apex:page standardController="StrategicPlan__c" cache="false" readOnly="false" showChat="true" showHeader="true" sidebar="true" tabStyle="Account">
+	<script type="text/javascript">
+		var redirectURL='/apex/StrategicPlanTabSet?'+location.search.substr(location.search.indexOf("?")+1);
+		try {
+			top.window.location.replace(redirectURL);
+		} catch(e1) {
+			top.window.location = redirectURL;
+		}
+	</script>
+	<!-- apex:include pageName="StrategicPlanTabSet"/ -->
+</apex:page>

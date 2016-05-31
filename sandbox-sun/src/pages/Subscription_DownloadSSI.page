@@ -1,0 +1,21 @@
+<apex:page standardController="Subscription__c" extensions="SubscriptionControllerExtension" recordSetVar="subscriptions">
+	<apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+		<apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+		<apex:outputLink value="javascript:window.location=document.referrer">
+			<apex:outputText value="Back to List View" />
+		</apex:outputLink>
+	</apex:outputPanel>
+	<apex:form id="form">
+		<apex:pageBlock title="Ready for SSI">
+			<apex:pageBlockButtons location="both">
+				<apex:commandButton action="{!downloadSSI}" id="downloadSSIButton" value="Download for SSI"/>
+			</apex:pageBlockButtons>
+			<apex:pageMessages id="pageMessages"/>
+			<apex:pageBlockSection title="Criteria" columns="1" >
+				<apex:inputField value="{!subscriptionReportCriteria.SuperRegion__c}" required="true" />
+				<apex:inputField value="{!subscriptionReportCriteria.StartDate__c}" />
+				<apex:inputField value="{!SubscriptionReportCriteria.EndDate__c}" />
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

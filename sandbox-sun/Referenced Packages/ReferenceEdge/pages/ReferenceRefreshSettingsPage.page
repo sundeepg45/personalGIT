@@ -1,0 +1,75 @@
+<apex:page StandardController="refedge__Custom_Settings__c" tabStyle="refedge__Custom_Settings__c"  sidebar="false" extensions="refedge.ReferenceRefreshSettings">
+    <apex:pageMessages id="pgMsg"/>
+    <c:POR_ModalLoader id="loadingModalId"/>
+    <script>
+        PORShowLoading();
+        jQuery(document).ready(function(){
+            PORHideLoading();
+        });
+        
+        function jsLaunch() {
+            var islaunch = confirm("{!$Label.Are_you_sure}");
+            PORShowLoading();
+            if(islaunch)
+                launch();
+            else
+                PORHideLoading();
+        }
+    </script> 
+    <apex:form >
+        <apex:actionFunction name="jsChangeLaunchProcess" action="{!changeLaunchProcess}" oncomplete="PORHideLoading();" rerender="pbId, pgMsg"/>
+        <apex:actionFunction name="launch" action="{!launchReferenceRefresh}" oncomplete="PORHideLoading();" rerender="pbId, pgMsg"/>
+        <apex:actionFunction name="jsLaunchLink" action="{!launchLink}" oncomplete="PORHideLoading();" rerender="pbId, pgMsg"/>        
+
+        <div style="float:left ; width: 40%;">
+            <apex:commandLink style="color:#5C95C4;" value="{!$Label.Back_to_the_Custom_Setting_Page}" action="{!returnCustomSettings}"/><br/>
+        </div>
+        <apex:pageBlock id="pbId">
+            <apex:actionStatus onstart="PORShowLoading();" onstop="PORHideLoading()" id="porStatus"/>
+            <apex:actionPoller rendered="{!NOT(isEdit)}" action="{!refresh}" interval="60" oncomplete="PORShowLoading();PORHideLoading();" reRender="pbId, pgMsg" />
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Edit}" rendered="{!!isEdit}" status="porStatus" action="{!editTheSettings}" rerender="pbId"/>
+                <apex:commandButton value="{!$Label.Launch}" onclick="jsLaunch();return false;" rendered="{!AND(NOT(isEdit), customSetting.refedge__Manual_Automatic_Launch__c = 'Manual', customSetting.refedge__Reviewed_and_Ready_to_Launch__c)}" title="{!$Label.Launch_help_text}" />
+                <apex:commandButton value="{!$Label.Launch}" rendered="{!AND(NOT(isEdit), customSetting.refedge__Manual_Automatic_Launch__c = 'Manual', NOT(customSetting.refedge__Reviewed_and_Ready_to_Launch__c))}" title="{!$Label.Launch_help_text}" disabled="true" />
+                <apex:commandButton value="{!$Label.Save}" rendered="{!isEdit}" status="porStatus" action="{!saveTheSettings}" rerender="pbId,pgMsg"/>
+                <apex:commandButton value="{!$Label.Cancel}" rendered="{!isEdit}" status="porStatus" action="{!cancel}" rerender="pbId,pgMsg"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection columns="1" rendered="{!!isEdit}">
+                <apex:outputField value="{!customSetting.refedge__Enable_Reference_Refresh__c}"/>
+                <apex:outputField value="{!customSetting.refedge__Manual_Automatic_Launch__c}"/>
+                <apex:outputField value="{!customSetting.refedge__Launch_Frequency__c}" rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Automatic'}"/>
+                <apex:outputField value="{!customSetting.refedge__Refresh_Wait_Days__c}"/>
+                <apex:outputField value="{!customSetting.refedge__Next_Refresh_launch_Date__c}" rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Automatic'}"/>
+                <apex:outputField value="{!customSetting.refedge__Last_Refresh_Date__c}"/>
+                
+                <apex:pageBlockSectionItem rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Manual'}">
+                    <apex:outputPanel >
+                        <apex:commandLink rendered="{!AND(isMatched, NOT(isBatchProcess))}" style="color:#5C95C4;" onclick="PORShowLoading();jsLaunchLink();return false;" value="{!$Label.Generate_Profile_Updates}" />
+                        <apex:commandLink rendered="{!OR(NOT(isMatched), isBatchProcess)}" style="pointer-events: none;color: #78787d;" value="{!$Label.Generate_Profile_Updates}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:outputText rendered="{!AND(isMatched, NOT(isBatchProcess))}" style="font-weight: bold;color:#ff0000;" value="{!$Label.To_Be_Done}"/>
+                        <apex:outputText rendered="{!isBatchProcess}" style="font-weight: bold;color:#dac210;" value="{!$Label.In_Progress}"/>
+                        <apex:outputLink rendered="{!AND(NOT(isMatched), NOT(isBatchProcess))}" style="font-weight: bold;color:#00b050;" value="/{!rrKeyPerfix}" target="_blank">{!$Label.Complete_Review_Profile_Updates}</apex:outputLink>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem> 
+                
+                <apex:outputField value="{!customSetting.refedge__Quarantine_updates__c}"/>
+                <apex:outputField value="{!customSetting.refedge__Reviewed_and_Ready_to_Launch__c}" rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Manual'}"/>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="1" rendered="{!isEdit}">
+                <apex:inputField value="{!customSetting.refedge__Enable_Reference_Refresh__c}"/>
+                <apex:inputField value="{!customSetting.refedge__Manual_Automatic_Launch__c}" onchange="PORShowLoading();jsChangeLaunchProcess();return false;"/>
+                <apex:inputField value="{!customSetting.refedge__Launch_Frequency__c}" rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Automatic'}"/>
+                <apex:inputField value="{!customSetting.refedge__Refresh_Wait_Days__c}"/>
+                <apex:inputField value="{!customSetting.refedge__Next_Refresh_launch_Date__c}" rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Automatic'}"/>
+                <apex:outputField value="{!customSetting.refedge__Last_Refresh_Date__c}"/>
+                <apex:inputField value="{!customSetting.refedge__Quarantine_updates__c}"/>
+                <apex:inputField value="{!customSetting.refedge__Reviewed_and_Ready_to_Launch__c}" rendered="{!customSetting.refedge__Manual_Automatic_Launch__c = 'Manual'}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

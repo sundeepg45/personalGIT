@@ -1,0 +1,358 @@
+<apex:page controller="CCSP_Terms_Controller" showHeader="false" sidebar="false" action="{!init}">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!-- WHEN READY TO USE RESPONSIVE UPDATE META TAG BELOW TO STANDARD RESPONSIVE VERSION -->
+    <meta name="viewport" content="width=1200"/>
+    <title>Apply</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="https://partnercenter.force.com/favicon.ico"/>
+
+    <!--CSS Files -->
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/bootstrap.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/font-awesome.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/css/extranet.css')}" />
+
+    <!--JS Files -->
+
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/jquery_v1.11.0.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.partnerCenterResources, 'partnerCenterResources/js/bootstrap.min.js')}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+  <style>
+    .noSidebarCell, .sidebarCell {
+      padding: 0px !important;
+    }
+    body{
+      margin: 0px !important;
+    }
+    body .bPageBlock {
+      border-top-width: 0;
+    }
+    .bPageFooter{
+      padding: 0px !important;
+      display: none;
+    }
+    .bodyDiv .outerNoSidebar {
+      padding: 0px;
+    }
+    .globalHeaderBar {
+      margin: 0;
+    }
+    .red-hat-content input[type="radio"], .red-hat-content input[type="checkbox"] {
+        margin: 0 5px;
+    }
+    .red-hat-content label {
+        margin-bottom: 0px;
+    }
+    .pbBottomButtons .pbTitle, .pbHeader .pbTitle{
+        display: none;
+    }
+    .pbBottomButtons .pbButtonb, .pbHeader .pbButton{
+        text-align: center;
+    }
+    li a:hover{
+      color: #08C0FC !important;
+    }
+    body .bPageBlock {
+      margin-bottom: 0px;
+    }
+    .custom-terms-required textarea{
+      width: 100%;
+      max-width: 100%;
+    }
+    .custom-terms-required .input-field{
+      margin: 0 0 20px 0;
+    }
+    .custom-terms-required .input-field td{
+      text-align: center;
+      padding-right: 10px;
+    }
+    .custom-terms-required .input-field td input{
+      width: 15px;
+      height: auto;
+      padding-left: 0 !important;
+      padding-top: 10px;
+    }
+    .red-hat-content .input-container input, .input-container select {
+      background: none;
+      border: 1px solid #969ba0;
+      width: auto;
+      font-size: 17px;
+      color: #555657;
+      font-family: 'Overpass Light';
+      height: auto;
+      line-height: 40px;
+      padding-left: 8px;
+      margin-top: 25px !important;
+    }
+    #customDelayMsg{
+      margin-top: 2px !important;
+    }
+    #custom-section fieldset{
+      font-family: 'Overpass';
+      width: 60%;
+      margin: 0 auto;
+    }
+    .custom-terms-required textarea{
+      display: block !important;
+      width: 60%;
+      max-width: 60%;
+      margin: 0 auto;
+      margin-top: 25px;
+    }
+    #custom-section h2{
+      width: 60%;
+      margin: 15px auto 0;
+      font-size: 1.6em;
+    }
+    #custom-section fieldset p{
+      margin-top: 2px !important;
+      font-family: 'Overpass Light';
+    }
+  </style>
+
+<script>
+
+    function selectTermType(theType) {
+        var sel = $('[id$=selectedTermType]');
+        sel.val(theType);
+        if (theType == 'custom' || theType == 'decline') {
+            $('[id$=customTermsText]').show();
+        }
+        else {
+            $('[id$=customTermsText]').hide();
+        }
+/*
+        if (theType == 'custom') {
+            $('#customDelayMsg').show();
+        }
+        else {
+            $('#customDelayMsg').hide();
+        }
+*/
+    }
+
+    function validateBeforeSubmit() {
+        var theType = $('input[name=termtype]:checked').val();
+        if (theType == null) {
+            return false;
+        }
+        if (theType == 'Custom' || theType == 'Decline') {
+            var txt = $('textarea[id$=customTermsText]').val();
+            if (txt == null || txt.length == 0) {
+                alert('{!$Label.CCSP_Terms_Please_provide_text}');
+                return false;
+            }
+        }
+        return true;
+    }
+
+</script>
+
+  <body id="main">
+
+  <div class="red-hat-content">
+
+    <div class="user-header">
+      <div class="container">
+        <div class="row">
+          <div class="row">
+            <div class="col-xs-5">
+              <a href="#" class="logo">{!$Label.ONB_Redhat_Partner_Portal}</a>
+            </div><!-- /.col-xs-5 -->
+            <div class="col-xs-7">
+              <div class="description">
+                <apex:outputText value="{!$Label.CCSP_Terms_Title}" escape="false" rendered="{!NOT(thankYou) && NOT(customThankYou) && NOT(thankYouDeclined)}"/>
+                <apex:outputText value="{!$Label.CCSP_Terms_Title_Standard_Submit}" escape="false" rendered="{!thankYou}"/>
+                <apex:outputText value="{!$Label.CCSP_Terms_Title_NonStandard_Submit}" escape="false" rendered="{!customThankYou}"/>
+                <apex:outputText value="{!$Label.CCSP_Terms_Title_Declined}" escape="false" rendered="{!thankYouDeclined}"/>
+              </div>
+            </div><!-- /.col-xs-7 -->
+          </div><!-- /.row -->
+        </div><!-- /.row -->
+      </div><!-- /.container -->
+    </div><!-- /.partner-portal-header -->
+
+    <apex:form >
+        <apex:pageMessages />
+        <apex:pageblock rendered="{!NOT(thankYou) && NOT(customThankYou) && NOT(thankYouDeclined)}" >
+
+            <apex:outputPanel id="agreementsPanel" rendered="{!NOT(showCustomTerms)}">
+                <div class="container">
+                  <apex:outputText value="{!$Label.CCSP_Terms_Intro}" escape="false"/>
+                  <br />
+                </div>
+                <div id="pdf">
+                  <center>
+                    <object type="application/pdf" height="400" id="pdf_content" width="70%" data="/partner/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}">Your browser doesn't support PDF viewing. To see the PDF click the link: <a target="_blank" href="/partner/servlet/servlet.FileDownload?file={!mainTermsAgreementAttachmentId}">Download PDF</a></object>
+                  </center>
+                </div>
+                <hr />
+                <ul class="container">
+                    <apex:repeat var="agreement" value="{!agreementList}">
+                        <apex:variable var="agreementAttachmentNumber" value="{!VALUE('1')}" />
+
+                           <apex:repeat var="agreementAttachment" value="{!agreement.Attachments}">
+                               <li>
+                               <apex:outputLink target="_blank" value="/servlet/servlet.FileDownload?file={!agreementAttachment.Id}">
+                                   <apex:outputText value="{0}">
+                                       <apex:param value="{!IF((Find('.',agreementAttachment.Name) == 0), agreementAttachment.Name, (LEFT(agreementAttachment.Name,(Find('.',agreementAttachment.Name) -1))))}" />
+                                   </apex:outputText>
+                               </apex:outputLink>
+                               <apex:outputText value=" ({0})" rendered="{!(agreement.IsSignatureRequired__c || lead.Country__r.IsAgreementSignatureRequired__c)}">
+                                    <apex:param value="{!$Label.Onboarding_RegisterAgreements_Sig_required}" />
+                               </apex:outputText>
+                               </li>
+                            <apex:variable var="agreementAttachmentNumber" value="{!agreementAttachmentNumber + 1}" />
+                           </apex:repeat>
+                    </apex:repeat>
+                </ul>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!showCustomTerms}">
+              <div class="container">
+                <br />
+                  <div class="row">
+                      <div class="col-xs-12 custom-terms-required">
+                          <div class="input-container" id="custom-section">
+                              <div>
+                                  <apex:outputPanel rendered="{!customTermsReq == false}">
+                                    <h2>{!$Label.Unsure}</h2>
+                                  </apex:outputPanel>
+                                  <p><apex:outputText value="{!$Label.CCSP_Terms_Custom_Intro}" escape="false" rendered="{!customTermsReq == true}"/></p>
+                                  <fieldset>
+                                    <apex:outputPanel rendered="{!customTermsReq == false}">
+                                      <input type="radio" name="termtype" value="Standard" onchange="selectTermType('standard')"/> {!$Label.CCSP_Terms_Accept_Standard_Terms}
+                                      <p><label>{!$Label.CCSP_Terms_Standard_Desc}</label></p>
+                                    </apex:outputPanel>
+                                    <input type="radio" name="termtype" value="Custom" onchange="selectTermType('custom')"/> {!$Label.CCSP_Terms_Request_nonstandard_Terms}
+                                        <p>
+                                            <label id="customDelayMsg">{!$Label.Onboarding_Terms_Delayed_Entry_Message}</label>
+                                        </p>
+                                    <input type="radio" name="termtype" value="Decline" onchange="selectTermType('decline')" class="decline"/> {!$Label.Decline}
+                                    <p> <label>{!$Label.CCSP_Terms_Custom_Desc}</label>
+                                    </p>
+                                  </fieldset>
+                              </div>
+                          </div>
+                          <div id="customTermsText" style="display:none">
+                              <apex:inputTextArea id="customTermsText" value="{!customText}" cols="80" rows="8" html-placeholder="{!$Label.CCSP_Custom_Reason}"/>
+                          </div>
+                          <apex:inputHidden id="selectedTermType" value="{!termType}"/>
+                      </div>
+                  </div>
+              </div>
+              </apex:outputPanel>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton id="gobackButton" action="{!gobackButton}" value="{!$Label.CCSP_Terms_Back_to_Review}" styleClass="ease previous" rendered="{!unsure == true && customTermsReq == false}"/>
+                <apex:commandButton id="submitButton" action="{!submitButton}" value="{!$Label.Submit}" styleClass="ease" onclick="return validateBeforeSubmit()" rendered="{!unsure == true || customTermsReq == true}"/>
+                <apex:commandButton id="acceptButton" action="{!acceptButton}" value="{!$Label.Accept}" styleClass="ease" rendered="{!NOT(unsure) && customTermsReq == false}"/>
+                <apex:commandButton id="unsureButton" action="{!unsureButton}" value="{!$Label.CCSP_Terms_Unsure}" styleClass="ease" rendered="{!unsure == false && customTermsReq == false}"/>
+            </apex:pageBlockButtons>
+        </apex:pageblock>
+
+
+        <apex:pageblock rendered="{!thankYou}" >
+            <div class="join-content-wrap user-signup">
+              <div class="container">
+                <div class="row">
+                  <div class="content-wrapper">
+                      <div class="row">
+                        <div class="col-xs-12">
+                          <h1 class="request-problem"></h1>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-12">
+
+                            <apex:outputPanel layout="none">
+
+                                <p>
+                                    <apex:outputText value="{!$Label.CCSP_Thank_You_Standard_Terms}" escape="false"/>
+                                </p>
+                                <br/>
+                                <br/>
+                              <apex:commandLink action="{!loginButton}" styleClass="btn login previous ease" value="{!$Label.CCSP_Take_me_to_my_account}"/>
+
+                            </apex:outputPanel>
+
+                          </div><!-- /.col-xs-12 -->
+                        </div><!-- /.row -->
+
+                  </div><!-- /.content-wrapper -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+            </div><!-- /.join-content-wrap /.user-signup -->
+        </apex:pageBlock>
+        <apex:pageblock rendered="{!customThankYou}" >
+            <div class="join-content-wrap user-signup">
+              <div class="container">
+                <div class="row">
+                  <div class="content-wrapper">
+                      <div class="row">
+                        <div class="col-xs-12">
+                          <h1 class="request-problem"></h1>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-12">
+
+                            <apex:outputPanel layout="none">
+
+                                <p>
+                                    <apex:outputText value="{!$Label.CCSP_Thank_You_Custom_Terms}" escape="false"/>
+                                </p>
+                                <br/>
+
+                            </apex:outputPanel>
+
+                          </div><!-- /.col-xs-12 -->
+                        </div><!-- /.row -->
+
+                  </div><!-- /.content-wrapper -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+            </div><!-- /.join-content-wrap /.user-signup -->
+        </apex:pageBlock>
+        <apex:pageblock rendered="{!thankYouDeclined}" >
+            <div class="join-content-wrap user-signup">
+              <div class="container">
+                <div class="row">
+                  <div class="content-wrapper">
+                      <div class="row">
+                        <div class="col-xs-12">
+                          <h1 class="request-problem"></h1>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-12">
+                            <apex:outputPanel layout="none">
+                                <p>
+                                    <apex:outputText value="{!$Label.CCSP_Thank_You_Declined_Terms}" escape="false"/>
+                                </p>
+                            </apex:outputPanel>
+
+                          </div><!-- /.col-xs-12 -->
+                        </div><!-- /.row -->
+
+                  </div><!-- /.content-wrapper -->
+                </div><!-- /.row -->
+              </div><!-- /.container -->
+            </div><!-- /.join-content-wrap /.user-signup -->
+        </apex:pageBlock>
+    </apex:form>
+
+</div>
+</body>
+
+</apex:page>

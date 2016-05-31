@@ -1,0 +1,69 @@
+<apex:page standardController="SFDC_Channel_Account_Plan__c"  standardStylesheets="false">
+    <style type="text/css">
+        /* Color for the title bar */
+      body
+        {
+        background-color:#F0F0F0 ;
+        border-style:none;
+        }
+        
+        .bPageBlock .pbHeader
+        {
+            background-color:#F0F0F0 ;
+            border-style:none;
+            
+        }
+        .bPageBlock .pbBody
+        {
+            /* Color for the pageblock background */
+            background-color:#F0F0F0 ;
+            border-style:none;
+        }
+
+
+    </style>
+
+<apex:form >
+
+<apex:pageBlock title="{!$Label.BusinessPlanEditAccountInformation} {!SFDC_Channel_Account_Plan__c.Partner_Name__r.name}"  >
+<apex:pageBlockButtons >
+<apex:commandButton value="Edit" action="/apex/BusinessPlan_EditAccountFields?bpId={!SFDC_Channel_Account_Plan__c.Id}&accountId={!SFDC_Channel_Account_Plan__c.Partner_Name__c}"  />
+</apex:pageBlockButtons>
+<apex:pageBlockSection >
+
+
+
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Phone}" />
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Fax}"/>
+
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.ShippingStreet}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.ShippingCity}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.ShippingState}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.ShippingCountry}"/>
+
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Offices_Locations__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.PartnerStatuses__c}"/>
+
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Additional_Partnerships__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Target_Market_Size__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Partner_s_Largest_Customer__c}"/>
+
+
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Number_Enrolled_Sales_Cert__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.NumberOfEmployeesInWWOrg__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Total_Partner_Sales_Certifications__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Total_Partner_Technical_Certifications__c}"/>
+<apex:outputField value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Software_Focus__c}"/>
+<apex:pageBlockSectionItem >
+    <apex:outputLabel value="{!$Label.BusinessPlanCustomerFocus}" for="specializations"/>
+    <apex:outputText value="{!SFDC_Channel_Account_Plan__c.Partner_Name__r.Select_Specialization_s__c}" id="specializations"/>
+</apex:pageBlockSectionItem>
+
+
+
+
+
+</apex:pageBlockSection>
+</apex:pageBlock>
+</apex:form>
+</apex:page>

@@ -1,0 +1,153 @@
+<apex:page standardController="Lead" extensions="OnboardingController" showHeader="false" standardStylesheets="false" sidebar="false">
+    <apex:outputPanel layout="none"  rendered="{! !(SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.SI' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.DISTRIBUTOR' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.OEM')}">
+        <p><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Hello}"/> <strong>{!Lead.FirstName} {!Lead.LastName}</strong><apex:outputText rendered="{!onboardingType == 'create'}" value="{!$Label.Onboarding_JoinOrRegister_Please_Do_One}"/></p>
+    </apex:outputPanel>
+
+    <!-- Register New -->
+    <apex:outputText rendered="{!onboardingType == 'create'}">
+    <apex:outputPanel layout="none" rendered="{! !(SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.SI' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.DISTRIBUTOR' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.OEM')}">
+        <apex:form >
+            <h3>1. <apex:commandLink id="linkRegisterStart" action="{!registerPartnerStart}"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Register_As_New_Partner}"/></apex:commandLink></h3>
+            <apex:outputPanel ><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Or}"/></apex:outputPanel>
+        </apex:form>
+    </apex:outputPanel>
+
+    <!-- Block New -->
+    <apex:outputPanel layout="none" rendered="{!(SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.SI' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.DISTRIBUTOR' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.OEM') && ExistingPartnerList.size = 0}">
+        <h3 id="registerPartnerBlockedHeading"><apex:outputText id="registerPartnerBlocked" value="{!$Label.Onboarding_Register_Create_Partner_Blocked}"/></h3>
+        <div id="registerPartnerBlockedContent"><a href="{!$Label.Red_Hat_Domain_Name}partners/helpdesk/"><apex:outputText value="{!$Label.Onboarding_Register_Create_Click_For_Helpdesk}"/> {!$Label.Red_Hat_Domain_Name}partners/helpdesk/</a></div>
+    </apex:outputPanel>
+    </apex:outputText>
+
+    <!-- Join with nobody found -->
+    <apex:outputText rendered="{!onboardingType == 'join'}">
+    	<div>&nbsp;</div>
+	    <apex:outputText rendered="{!ExistingPartnerList.size > 0}">
+	        <h3>1. {!$Label.Onboarding_Partner_missing_from_list}</h3>
+	    </apex:outputText>
+	    <apex:outputText rendered="{!ExistingPartnerList.size == 0}">
+	    	<h3 id="registerPartnerNoJoinPartnerFoundHeading">{!$Label.Onboarding_Could_not_find_join_match} <strong>'{!Lead.Company}'</strong>.</h3>
+	    </apex:outputText>
+    	<div id="registerPartnerNoJoinPartnerFoundContent">    	
+    	<apex:form >
+            <apex:outputPanel >
+                <apex:commandButton action="{!joinNoPartnerFoundSubmit}" value="{!$Label.Onboarding_Please_contact_me_to_help_me_resolve_this}" styleClass="rowbutton" id="joinNoPartnerFoundSubmit">
+                    <apex:param name="federation-id" value="{!FederationId}" assignTo="{!FederationId}" />
+                </apex:commandButton>
+                <apex:commandButton action="{!registerAgreementsCancel}" value="{!$Label.Onboarding_JoinConfirm_Back}" styleClass="rowbutton" id="buttonBack"/>
+            </apex:outputPanel>
+        </apex:form>
+    	<div>&nbsp;</div>
+    	</div>
+    </apex:outputText>
+
+
+    <!-- Join Existing -->
+    <apex:outputPanel layout="none" rendered="{!ExistingPartnerList.size > 0}">
+        <apex:form >
+            <h3><apex:outputText rendered="{! !(SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.SI' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.DISTRIBUTOR' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.OEM')}" value="2. "/>
+            <apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Assocaite_With_A_Partner}"/></h3>
+            <p><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Existing_Company_Matches}"/></p>
+
+            <apex:dataTable value="{!existingPartnerList}" var="partnerStatus" styleClass="existingCompanyTable">
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="" />
+                    </apex:facet>
+
+                    <span id="joinLinkFor{!partnerStatus.Partner__r.id}">
+	                    <apex:commandLink action="{!joinPartnerStart}" value="{!$Label.Onboarding_JoinOrRegister_Join}">
+	                        <apex:param name="partner-status-id" value="{!partnerStatus.Id}" />
+	                    </apex:commandLink>
+	                </span>
+                </apex:column>
+
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Company_Name}"/></apex:facet>
+                    <span id="partnerNameFor{!partnerStatus.Partner__r.id}"><apex:outputText value="{!partnerStatus.Partner__r.Name}"/><apex:outputText rendered="{!partnerStatus.Partner__r.AliasPublicViewable__c && partnerStatus.Partner__r.Account_Alias_Name__c != ''}" value=" / {!partnerStatus.Partner__r.Account_Alias_Name__c}"/></span>
+                </apex:column>
+
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Partner_Type}"/></apex:facet>
+		           	<apex:outputText rendered="{!partnerStatus.PartnerType__r.Name != 'Reseller' && partnerStatus.PartnerType__r.Name != 'Regional SI'}">{!partnerStatus.PartnerType__r.Name}</apex:outputText>
+		           	<apex:outputText rendered="{!partnerStatus.PartnerType__r.Name == 'Reseller'}">{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}</apex:outputText>
+		           	<apex:outputText rendered="{!partnerStatus.PartnerType__r.Name == 'Regional SI'}">{!$Label.Onboarding_Register_Partner_PicklistOption_Regional_SI}</apex:outputText>
+		        </apex:column>
+
+                <apex:column >
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Location}"/></apex:facet>
+                    <apex:outputText value="{!partnerStatus.Partner__r.BillingCity}, " rendered="{!NOT(ISBLANK(partnerStatus.Partner__r.BillingCity))}" />
+                    <apex:outputText value="{!partnerStatus.Partner__r.BillingState}, " rendered="{!NOT(ISBLANK(partnerStatus.Partner__r.BillingState))}" />
+                    <apex:outputText value="{!partnerStatus.Partner__r.BillingCountry}" rendered="{!NOT(ISBLANK(partnerStatus.Partner__r.BillingCountry))}" />
+                </apex:column>
+
+                <apex:column rendered="{!selectedCountry.Abbreviation__c == 'US'}">
+                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_Commercial_Public_Heading}"/></apex:facet>
+		           	<apex:outputText rendered="{!partnerStatus.Partner__r.Subregion__c == 'Fed Sled'}">{!$Label.Onboarding_Join_Public_Sector}</apex:outputText>
+		           	<apex:outputText rendered="{!partnerStatus.Partner__r.Subregion__c != 'Fed Sled'}">{!$Label.Onboarding_Join_Commercial}</apex:outputText>
+                </apex:column>
+
+            </apex:dataTable>
+        </apex:form>
+        <apex:outputPanel rendered="{!selectedCountry.SearchByVAT__c}"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Or}"/></apex:outputPanel>
+    </apex:outputPanel>
+
+    <!-- Search By VAT -->
+    <apex:outputPanel layout="none" rendered="{!selectedCountry.SearchByVAT__c}">
+        <apex:form >
+            <h3>
+            	<apex:outputText rendered="{! ExistingPartnerList.size == 0 && !(SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.SI' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.DISTRIBUTOR' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.OEM')}" value="2. "/>
+            	<apex:outputText rendered="{! ExistingPartnerList.size > 0 && !(SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.SI' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.DISTRIBUTOR' || SelectedPartnerType.HierarchyKey__c = 'PARTNER_TYPE.OEM')}" value="3. "/>
+	            <apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Searc_By_VAT}"/>
+            </h3>
+	        <apex:outputPanel styleClass="rowform" layout="block">
+	            <apex:outputLabel ><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_VAT_Number}"/></apex:outputLabel>
+	            <apex:outputPanel >
+		            <apex:inputText value="{!VATNumber}" id="txtVATNumber"/>
+		            <apex:commandButton action="{!searchByVAT}" value="{!$Label.Onboarding_Register_Partner_Button_Search_By_VAT}" styleClass="rowbutton" id="buttonSearchByVAT"/>
+		        </apex:outputPanel>
+	        </apex:outputPanel>
+	        
+	        <apex:outputPanel rendered="{!VATNumber != '' && matchingVATPartnerList.size == 0}">
+	        	<p>{! $Label.onboarding_JoinOrRegister_No_Partners_Matching } {!VATNumber}</p>
+	        </apex:outputPanel>
+	        <apex:outputPanel rendered="{!matchingVATPartnerList.size > 0}">
+	            <p><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_VAT_Results}"/></p>
+	
+	             <apex:dataTable value="{!matchingVATPartnerList}" var="partnerStatus" styleClass="existingCompanyTable">
+	                <apex:column >
+	                    <apex:facet name="header">
+	                        <apex:outputText value="" />
+	                    </apex:facet>
+	
+						<span id="joinVATLinkFor{!partnerStatus.Partner__r.id}">	
+		                    <apex:commandLink action="{!joinPartnerStart}" value="{!$Label.Onboarding_JoinOrRegister_Join}">
+		                        <apex:param name="partner-status-id" value="{!partnerStatus.Id}" />
+		                    </apex:commandLink>
+		                </span>
+		            </apex:column>
+	
+	                <apex:column >
+	                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Company_Name}"/></apex:facet>
+	                    <apex:outputText value="{!partnerStatus.Partner__r.Name}" /><apex:outputText rendered="{!partnerStatus.Partner__r.AliasPublicViewable__c && partnerStatus.Partner__r.Account_Alias_Name__c != ''}" value=" / {!partnerStatus.Partner__r.Account_Alias_Name__c}"/>
+	                </apex:column>
+	
+	                <apex:column >
+	                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Partner_Type}"/></apex:facet>
+			           	<apex:outputText rendered="{!partnerStatus.PartnerType__r.Name != 'Reseller' && partnerStatus.PartnerType__r.Name != 'Regional_SI'}">{!partnerStatus.PartnerType__r.Name}</apex:outputText>
+			           	<apex:outputText rendered="{!partnerStatus.PartnerType__r.Name == 'Reseller' || partnerStatus.PartnerType__r.Name == 'Regional_SI'}">{!$Label.Onboarding_Register_Partner_PicklistOption_Reseller}</apex:outputText>
+	                </apex:column>
+	
+	                <apex:column >
+	                    <apex:facet name="header"><apex:outputText value="{!$Label.Onboarding_JoinOrRegister_Location}"/></apex:facet>
+	                    <apex:outputText value="{!partnerStatus.Partner__r.BillingCity}, " rendered="{!NOT(ISBLANK(partnerStatus.Partner__r.BillingCity))}" />
+	                    <apex:outputText value="{!partnerStatus.Partner__r.BillingState}, " rendered="{!NOT(ISBLANK(partnerStatus.Partner__r.BillingState))}" />
+	                    <apex:outputText value="{!partnerStatus.Partner__r.BillingCountry}" rendered="{!NOT(ISBLANK(partnerStatus.Partner__r.BillingCountry))}" />
+	                </apex:column>
+	            </apex:dataTable>
+			</apex:outputPanel>
+        </apex:form>
+    </apex:outputPanel>
+
+
+</apex:page>

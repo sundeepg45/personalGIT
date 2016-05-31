@@ -1,0 +1,11 @@
+<apex:page showHeader="false" sidebar="false" title="OMValStaticResource">
+<!-- Eventually, all scontrol snippets should be replaced with static resources. -->
+<apex:includeScript value="{!$Resource.StaticResources}"/>
+<script>
+// simply add static resources to the following array
+var srcList = [ '{!JSENCODE(URLFOR($Resource.OMVal_Rule02_01))}',
+  ];
+// pass the code fragement to the top window to run.
+top.location.hash = '#'+escape(StaticResources.code(srcList));
+</script>
+</apex:page>

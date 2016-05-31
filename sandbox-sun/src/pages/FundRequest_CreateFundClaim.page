@@ -1,0 +1,15 @@
+<apex:page standardController="SFDC_MDF__c" extensions="FundRequest_CreateFundClaim" action="{!confirmUpdate}">
+    <apex:sectionHeader title="{!$ObjectType.SFDC_MDF__c.Label}" />
+
+    <apex:form >
+        <apex:pageBlock title="{!$ObjectType.SFDC_MDF__c.Label}" >
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Common_Cancel}" action="{!cancelUpdate}" />
+            </apex:pageBlockButtons>
+
+            <apex:pageMessage strength="3" severity="Error" rendered="{!fundRequest.Approval_Status_Partner__c != 'Approved'}" summary="{!$Label.FundClaim_ErrorRequestIsNotApproved}" />
+
+            <apex:pageMessage strength="3" severity="Error" rendered="{!fundRequest.Fund_Claims__r.size > 0}" summary="{!$Label.FundClaim_ErrorOneClaimPerRequest}" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

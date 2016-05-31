@@ -1,0 +1,11 @@
+<apex:page standardController="StrategicPlan_Action__c" cache="false" readOnly="false" showChat="true" showHeader="true" sidebar="true">
+	<script type="text/javascript">
+		var redirectURL='/apex/StrategicPlanTabSet?mode={!IF(ISBLANK(StrategicPlan_Action__c.Id),'new&actionTab=StrategicPlan_Action__c','edit')}&activeTab=StrategicPlan_Action__c&'+location.search.substr(location.search.indexOf("?")+1);
+		try {
+			top.window.location.replace(redirectURL);
+		} catch(e1) {
+			top.window.location = redirectURL;
+		}
+	</script>
+	<!-- apex:include pageName="StrategicPlanTabSet"/ -->
+</apex:page>

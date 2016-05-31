@@ -1,0 +1,90 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+	<apex:include pageName="RHEV_include_header"/>
+	<body id="second" class="ms dark">
+	<div id="wrapper">
+		<div id="page">
+			<div class="container_12 clearfix">
+				<div id="header" class="grid_12">
+					<div id="sm-logo"><a href="http://www.redhat.com">Red Hat</a></div><!-- /#sm-logo -->
+					<div id="header-links">
+					<ul style="margin-right: 8px;">
+						<li class="first" style=""></li>
+					</ul>
+						<div class="clear"></div>
+						<a target="_blank" class="header-button" href="http:/wwww.redhat.com">redhat.com</a><!-- /.header-button -->
+					</div><!-- /#header-links -->
+					<div id="nav-band">
+					  <div id="primary-nav">
+						<apex:include pageName="MSRHEV_include_nav"/>
+					  </div><!-- /#primary-nav -->
+					</div><!-- /#nav-band -->
+						<apex:include pageName="RHEV_include_promo"/>
+					
+				</div><!-- /#header -->
+				<div class="clear"></div>
+
+				<div id="main">
+<div class="grid_12">
+	
+	<div class="grid_9 alpha">
+<h1>Refreshingly open</h1>
+<p>Red Hat&reg; Enterprise Virtualization is built on 2 major open source projects: Kernel-based Virtual Machine (KVM) and oVirt. And Red Hat is an active member of the Open Virtualization Alliance (OVA).</p>
+<p class="look"><a href="http://www.redhat.com/about/whyopensource/">Read more about Red Hat and open source</a></p>
+
+<h2>KVM</h2>
+<p>Red Hat Enterprise Virtualization Hypervisor, built directly from the KVM hypervisor, leverages the performance, scalability, and ecosystem of the Red Hat Enterprise Linux&reg; kernel for virtualization. So your VMs are powered by the same high-performance kernel that supports your most challenging Linux workloads. </p>
+
+<p>KVM is a robust open source project supported by some of the leading vendors in the software industry, including:</p>
+<div class="grid_3 alpha">
+<ul>
+<li>Red Hat</li>
+<li>IBM</li>
+<li>SGI</li>
+</ul>
+</div><!-- grid_3 -->
+<div class="grid_3">
+<ul>
+<li>AMD</li>
+<li>Intel</li>
+</ul>
+</div><!-- grid_3 -->
+<div class="grid_3 omega">
+<ul>
+<li>HP</li>
+<li>Novell</li>
+</ul>
+</div><!-- grid_3 -->
+<div class="clear"></div>
+
+<p class="look"><a href="http://www.linux-kvm.org/">Read more about KVM</a></p>
+
+<h2>OVIRT</h2>
+<p>The growth of an open virtualization ecosystem requires more than just the hypervisor. That's why we joined industry leaders in creating oVirt. This project has been seeded with assets from Red Hat by open sourcing its virtualization management software, Red Hat Enterprise Virtualization.</p>
+
+<p class="look"><a href="http://www.ovirt.org">Read more about oVirt</a></p>
+
+<h2>Open Virtualization Alliance</h2>
+<p>Comprised of leading virtualization, datacenter, and cloud solution providers, the OVA's mission is to foster adoption of open source virtualization technologies, and drive innovation and interoperability within the enterprise software market for open virtualization solutions. The OVA is an important advocate for organizations who want a true open source and interoperable virtualization solution.</p>
+
+<p class="look"><a href="http://www.openvirtualizationalliance.org/">Read more about OVA</a></p>
+
+	</div><!-- /.grid_9 -->	
+	<div class="grid_3 omega">
+		<apex:include pageName="RHEV_include_contact"/>
+	</div><!-- /.grid_3 -->
+	<div class="clear"></div>
+
+		
+	</div><!-- /.grid_12 -->
+</div><!-- /#main -->
+<div class="clear"></div>
+		
+<apex:include pageName="RHEV_include_footer"/>
+
+</div>
+
+</div>
+</div>
+</body>
+
+</apex:page>

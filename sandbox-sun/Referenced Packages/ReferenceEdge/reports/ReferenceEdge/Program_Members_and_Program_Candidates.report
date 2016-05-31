@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <buckets>
+        <bucketType>text</bucketType>
+        <developerName>BucketField_31686445</developerName>
+        <masterLabel>members &amp; candidates</masterLabel>
+        <nullTreatment>n</nullTreatment>
+        <sourceColumnName>Reference_Basic_Information__c.Is_Referenceable_f__c</sourceColumnName>
+        <useOther>false</useOther>
+        <values>
+            <sourceValues>
+                <sourceValue>No</sourceValue>
+            </sourceValues>
+            <value>candidates</value>
+        </values>
+        <values>
+            <sourceValues>
+                <sourceValue>Yes</sourceValue>
+            </sourceValues>
+            <value>program members</value>
+        </values>
+    </buckets>
+    <columns>
+        <field>FK_NAME</field>
+    </columns>
+    <columns>
+        <field>FK_ACC_TYPE</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Is_Referenceable__c</field>
+    </columns>
+    <columns>
+        <field>Reference_Basic_Information__c.Is_Referenceable_f__c</field>
+    </columns>
+    <columns>
+        <field>FK_ACC_OWNER_NAME</field>
+    </columns>
+    <description>Reference Program Member and Reference Program Candidate Accounts</description>
+    <filter>
+        <criteriaItems>
+            <column>Reference_Basic_Information__c.Contact__c</column>
+            <operator>equals</operator>
+            <value></value>
+        </criteriaItems>
+        <language>en_US</language>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>BucketField_31686445</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Program Members and Program Candidates</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Reference_Basic_Information__c@Reference_Basic_Information__c.Account__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

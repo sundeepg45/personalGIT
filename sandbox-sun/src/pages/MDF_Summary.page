@@ -1,0 +1,76 @@
+<apex:page controller="MDF_SummaryController" tabStyle="SFDC_Budget__c" renderAs="{!renderAs}" showHeader="{!showHeader}" sidebar="{!showHeader}">
+    <apex:pageBlock title="Budget Information">
+        <apex:pageBlockButtons location="top">
+            <apex:form >
+                <apex:commandButton action="{!actionDone}" value="Done" rendered="{!showHeader}"/>
+                <apex:commandButton action="{!actionPrintableView}" value="Printable View" rendered="{!showHeader}"/>
+                <apex:commandButton action="{!actionDownloadAsPDF}" value="Download" rendered="{!showHeader}" />
+            </apex:form>
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection columns="1">
+            <apex:outputField value="{!budget.Name}" />
+            <apex:outputField value="{!budget.Account_Master__r.Name}" />
+            <apex:outputField value="{!budget.Allocated_Budget__c}" />
+            <apex:outputField value="{!budget.Available_Budget__c}" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+    <apex:repeat value="{!fundPairList}" var="fundPair">
+        <div><a name="{!fundPair.request.Id}" /></div>
+        <apex:pageBlock title="Activity Details ({!fundPair.position} of {!fundPairList.size})">
+            <apex:pageBlockSection title="Fund Request Information" columns="2">
+                <apex:outputField value="{!fundPair.request.Name}" />
+                <apex:outputField value="{!fundPair.request.Activity_Start_Date__c}" />
+
+                <apex:outputField value="{!fundPair.request.Approval_Status__c}" />
+                <apex:outputField value="{!fundPair.request.Target_Groups__c}" />
+
+                <apex:outputField value="{!fundPair.request.Red_Hat_Solution__c}" />
+                <apex:outputField value="{!fundPair.request.Estimated_Red_Hat_Funding_Requested__c}"/>
+
+                <apex:outputText >&nbsp;</apex:outputText>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="1">
+                <apex:outputField value="{!fundPair.request.Activity_Description__c}" />
+                <apex:outputField value="{!fundPair.request.Participating_Partners__c}" />
+                <apex:outputField value="{!fundPair.claim.Additional_Feedback__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Fund Claim Information" columns="2">
+                <apex:outputField value="{!fundPair.claim.Name}" />
+                <apex:outputField value="{!fundPair.claim.Requested_Amount__c}" />
+
+                <apex:outputField value="{!fundPair.claim.Approval_Status__c}" />
+                <apex:outputText >&nbsp;</apex:outputText>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Activity Results">
+                <apex:outputField value="{!fundPair.request.Planned_Attendees__c}" />
+                <apex:outputField value="{!fundPair.claim.Actual_Attendees__c}" />
+
+                <apex:outputField value="{!fundPair.request.Planned_Responses__c}" />
+                <apex:outputField value="{!fundPair.claim.Actual_Responses__c}" /> 
+
+                <apex:outputField value="{!fundPair.request.Planned_Leads__c}" />
+                <apex:outputField value="{!fundPair.claim.Actual_Leads__c}" />
+
+                <!-- <apex:outputField value="{!fundPair.request.Activity_Status__c}" /> -->
+                <apex:outputText />
+                <apex:outputField value="{!fundPair.claim.Activity_Result_Rating__c}" />
+
+                <apex:outputText >&nbsp;</apex:outputText>
+                <apex:outputField value="{!fundPair.claim.Should_We_Repeat__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:repeat>
+    
+    <script type="text/javascript">
+    if ({!showHeader} == false) {
+        var labels = document.getElementsByClassName ('labelCol');
+        for (var i = 0; i < labels.length; i++)
+            labels [i].style.textAlign = 'left';
+    }
+    </script>
+    
+</apex:page>

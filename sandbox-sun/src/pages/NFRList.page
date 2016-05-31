@@ -1,0 +1,60 @@
+<apex:page standardcontroller="account" extensions="NFRListController" showHeader="true" sidebar="true">
+    <apex:form >
+        <apex:sectionHeader title="NFRs" subtitle="{!account.name} account"/>
+
+            <apex:outputText rendered="{!(NfrList1.size = 0)}" value="Account currently has no Active NFRs"/>
+            <apex:repeat value="{!NfrList1}" var="n" rendered="{!(NfrList1.size != 0)}">
+
+                <apex:pageBlock title="{!n.Name}">
+
+                    <apex:pageBlockButtons location="top">
+                        <apex:commandButton action="{!createNewNFR}" value="New" id="New"/>
+                        <apex:commandButton action="{!Cancel}" value="Cancel" id="Cancel"/>
+                    </apex:pageBlockButtons>
+
+                    <apex:pageBlockSection >
+                        <apex:outputField value="{!n.Name}"/>
+                        <apex:outputField value="{!n.Active__c}"/>
+                        <apex:outputText label="Requested By" value="{!n.Owner.name}"/>
+                        <apex:outputField value="{!n.Partner_Status__c}"/>
+                        <apex:outputField value="{!n.Expiration_Date__c}"/>
+                        <apex:outputField value="{!n.Use_Case__c}"/>
+                        <apex:outputField value="{!n.Status__c}"/>
+                        <apex:outputField value="{!n.Contact_at_Partner__r.name}"/>
+                        <apex:outputField value="{!n.RHN_Login__c}"/>
+                        <apex:outputField value="{!n.Comments__c}"/>
+<!--                    <apex:pageBlockSectionItem>
+                            <apex:repeat value="{!n.NFR__r}" var="opp">
+                                <apex:outputLabel value="NFR Opportunity" styleClass="labelCol vfLabelColTextWrap"/>
+                                <apex:outputlink value="/{!opp.id}"> {!opp.Name} </apex:outputlink>
+                            </apex:repeat>
+                        </apex:pageBlockSectionItem>  -->
+                    </apex:pageBlockSection>
+
+                    <apex:pageBlockTable value="{!n.NFR__r}" var="op">
+                        <apex:facet name="header">NFR Opportunities:</apex:facet>
+                        <apex:column headerValue="Opportunity Name">
+                            <apex:outputLink value="/{!op.id}"> {!op.Name} </apex:outputLink>
+                        </apex:column>
+                        <apex:column value="{!op.StageName}"/>
+                        <apex:column value="{!op.CloseDate}"/>
+                    </apex:pageBlockTable>
+
+                    <apex:pageBlockTable value="{!n.NFR_LIs__r}" var="ln">
+                        <apex:facet name="header">NFR Line Items:</apex:facet>
+                        <apex:column headerValue="NFR Line Item Name">
+                            <apex:outputLink value="/{!ln.id}"> {!ln.Name} </apex:outputLink>
+                        </apex:column>
+                        <apex:column value="{!ln.Configured_SKU__c}"/>
+                        <apex:column value="{!ln.NFR_Product_Name__c}"/>
+                        <apex:column headerValue="Product Description">
+                            <apex:outputText escape="false" value="{!ln.Product_Description__c}"/>
+                        </apex:column>
+                        <apex:column value="{!ln.Product_Family__c}"/>
+                        <apex:column value="{!ln.Quantity__c}"/>
+                    </apex:pageBlockTable>
+
+                </apex:pageBlock>
+            </apex:repeat>
+    </apex:form>
+</apex:page>

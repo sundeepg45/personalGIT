@@ -1,0 +1,103 @@
+<apex:page controller="PartnerStatus_SetController" showHeader="false" sidebar="false">
+<apex:sectionHeader title="Partner Lookup"/>
+<apex:form id="pbForm">
+
+<apex:pageBlock mode="edit" title=" ">
+<apex:facet name="header">&nbsp;</apex:facet>
+<apex:pageBlockSection columns="1">
+<apex:pageBlockSectionItem >
+<apex:outputLabel value="Search    " for="search"/>
+<apex:outputPanel id="search">
+    <apex:inputText value="{!searchString}" size="20">
+        <apex:actionSupport action="{!updateSearchString}" event="onchange" rerender="pbForm" status="statusLoading" />
+    </apex:inputText>
+    <apex:commandButton value="GO!"/>
+    <br/>You can use &quot;*&quot; as a wildcard next to other characters to improve your search results.
+</apex:outputPanel>
+</apex:pageBlockSectionItem>
+</apex:pageBlockSection>
+<apex:pageBlockSection title="Search Results">
+<apex:pageBlockTable value="{!partnerStatusPagination}" var="ps">
+   <apex:column >
+     <apex:facet name="header">
+       <apex:outputText value="{!$ObjectType.Account.Fields.Name.Label}" />
+     </apex:facet>
+     <apex:outputLink value="javascript:returnValues('{!JSENCODE(ps.Partner__r.Name)}','{!ps.Id}')">
+        <apex:outputText value="{!ps.Partner__r.Name}"/>
+     </apex:outputLink>
+   </apex:column>
+   <apex:column value="{!ps.Partner__r.Site}"/>
+   <apex:column value="{!ps.Partner__r.OracleAccountNumber__c}"/>
+   <apex:column >
+     <apex:facet name="header">
+       <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.PartnerTier__c.Label}" />
+     </apex:facet>
+     <apex:outputText value="{!SUBSTITUTE(ps.PartnerTier__r.Hierarchy__c,'Partner Tier » ','')}"/>
+   </apex:column>
+   <apex:column >
+     <apex:facet name="header">
+       <apex:outputText value="{!$ObjectType.OpportunityPartner__c.Fields.PartnerType__c.Label}" />
+     </apex:facet>
+     <apex:outputText value="{!SUBSTITUTE(ps.PartnerType__r.Hierarchy__c,'Partner Type » ','')}"/>
+   </apex:column>
+   <apex:column value="{!ps.Partner__r.Type}">
+     <apex:facet name="header">
+       <apex:outputText value="{!$ObjectType.Account.Fields.Type.Label}" />
+     </apex:facet>
+   </apex:column>
+   <apex:column value="{!ps.Partner__r.Owner.Alias}">
+     <apex:facet name="header">
+       <apex:outputText value="Owner {!$ObjectType.User.Fields.Alias.Label}" />
+     </apex:facet>
+   </apex:column>
+   <apex:column value="{!ps.Partner__r.RecordType.Name}">
+     <apex:facet name="header">Record Type</apex:facet>
+   </apex:column>
+</apex:pageBlockTable>
+</apex:pageBlockSection>
+<apex:pageBlockButtons rendered="{!OR(partnerStatusRecords.HasPrevious,partnerStatusRecords.HasNext)}">
+<apex:outputPanel layout="none">
+<apex:commandLink action="{!first}" rendered="{!partnerStatusRecords.HasPrevious}">First</apex:commandlink>
+<apex:outputText rendered="{!NOT(partnerStatusRecords.HasPrevious)}" value="First"/>&nbsp;
+</apex:outputPanel>
+<apex:outputPanel layout="none">
+<apex:commandLink action="{!previous}" rendered="{!partnerStatusRecords.HasPrevious}">Previous</apex:commandlink>
+<apex:outputText rendered="{!NOT(partnerStatusRecords.HasPrevious)}" value="Previous"/>&nbsp;
+</apex:outputPanel>
+<apex:outputPanel layout="none">
+<apex:commandLink action="{!next}" rendered="{!partnerStatusRecords.HasNext}">Next</apex:commandlink>
+<apex:outputText rendered="{!NOT(partnerStatusRecords.HasNext)}" value="Next"/>&nbsp;
+</apex:outputPanel>
+<apex:outputPanel layout="none">
+<apex:commandLink action="{!last}" rendered="{!partnerStatusRecords.HasNext}">Last</apex:commandlink>
+<apex:outputText rendered="{!NOT(partnerStatusRecords.HasNext)}" value="Last"/>&nbsp;
+</apex:outputPanel>
+<apex:outputText value="({0} of {1})">
+   <apex:param value="{!partnerStatusRecords.PageNumber}"/>
+   <apex:param value="{!pageCount}"/>
+</apex:outputText>
+</apex:pageBlockButtons>
+</apex:pageBlock>
+</apex:form>
+<script type="text/javascript">
+   function returnValues(partnerName,partnerStatusId)
+   {
+       var d = window.top.window.opener.document;
+       if({!NOT(ISBLANK(partnerNameField))})
+           d.getElementById('{!JSENCODE(partnerNameField)}').value=partnerName;
+       if({!NOT(ISBLANK(partnerStatusIdField))}) {
+           var n = d.getElementById('{!JSENCODE(partnerStatusIdField)}2');
+           if(n != null)
+           {
+               for(var i in n.options) {
+                   if(n.options[i].value == partnerStatusId) {
+                       n.selectedIndex = i;
+                   }
+               }
+           }
+           d.getElementById('{!JSENCODE(partnerStatusIdField)}').value=partnerStatusId;
+       }
+       window.top.window.close();
+   }
+</script>
+</apex:page>

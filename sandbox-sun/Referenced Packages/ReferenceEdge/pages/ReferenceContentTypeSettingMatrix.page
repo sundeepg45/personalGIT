@@ -1,0 +1,138 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page controller="refedge.RequestSettingMatrixController" sideBar="false" id="pageId" tabStyle="refedge__Custom_Settings__c">
+<c:POR_ModalLoader id="loadingModalId"/>
+    <style>
+        .freezeColumn {
+            overflow-x:scroll;  
+            margin-left:160px;
+        }
+        
+        .Col1 {
+            position:absolute; 
+            width:160px; 
+            left:16px;
+            top:auto;
+            
+           
+        }
+        .headCol1 {
+            position:absolute; 
+            width:160px; 
+            left:16px;
+            top:97px;
+        }
+        .headCol2{
+            position:absolute; 
+            width:160px; 
+            left:16px;
+           
+        }
+        .headCol3{
+            height:15px;
+        }
+        
+        
+        
+    </style>
+    <script>
+      jQuery( document ).ready(function() {
+            deleteMapping(); 
+        });
+       
+    </script>
+    <apex:pageMessages id="pgmsgId" />
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <apex:form id="formId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction action="{!deleteMappings}" name="deleteMapping" rerender="pgmsgId"/>
+        <div style="float:left ; width: 100%;">
+            <apex:commandLink rendered="{!!isEdit}" style="color:#5C95C4;" action="{!backToCustomSetting}" value="{!$Label.Back_to_the_Custom_Setting_Page}"/><br/>
+        </div>
+        <apex:pageBlock rendered="{!AND(referenceTypes.size == 0,isContentSetting == 'false')}">
+            <apex:pageMessage summary="{!$Label.Referenceability_message}" strength="3" severity="Info"/>
+        </apex:pageBlock>
+        <apex:pageBlock id="blockId" rendered="{!recordsPresent}" >
+        
+            <div id="divMain" style="overflow:auto" class="freezeColumn">
+           
+            <!-- for Content Type fields -->
+            <apex:pageBlockTable id="blockTableIdForContent" value="{!contentFieldsMap}" var="fieldAPIName" rendered="{!isContentSetting == 'true'}">
+                <apex:column value="{!contentFieldsMap[fieldAPIName]}" headerValue="{!$Label.Field_Label}" styleClass="Col1" headerClass="headCol1"/>
+                <div style="border:1px solid black;overflow:auto;" id="matrixDiv">
+                    <apex:repeat value="{!refContentTypes}" var="refType">
+                        <apex:column id="ColumnId" >
+                            <apex:facet name="header"><div style="text-align:center;min-width:250px;">{!refType.refedge__Name__c}</div><br/>
+                                <div style="float:left;padding-left:15px;padding-right:15px;">Field Order</div><div style="float:left;padding-left:15px;padding-right:15px;">{!$Label.Visible}</div> <div style="float:right;padding-left:15px;padding-right:15px;"> {!$Label.Required} </div>
+                            </apex:facet> 
+                            <div id="orderDiv" style="padding-left:25px;float:left;width:50px;">
+                                <apex:outputField style="margin-left: 10px;" value="{!matrixMap[fieldAPIName+''+refType.Id].Order__c}" rendered="{!!isEdit}"/>
+                                <apex:inputField style="width:25px;margin-left: 7px;" value="{!matrixMap[fieldAPIName+''+refType.Id].Order__c}" rendered="{!isEdit}"/>
+                            </div>
+                            <div id="checkBoxDiv1" style="float:left;padding-left:40px;">
+                                <apex:outputField value="{!matrixMap[fieldAPIName+''+refType.Id].Visible__c}" rendered="{!!isEdit}"/>
+                                <apex:inputField id="VisibleId" value="{!matrixMap[fieldAPIName+''+refType.Id].Visible__c}" onclick="checkForDependencyOfVisible(this.id);" rendered="{!isEdit}"/>
+                            </div>
+                            <div id="checkBoxDiv2"  style="float:right;padding-right:30px;">
+                                <apex:outputField value="{!matrixMap[fieldAPIName+''+refType.Id].Required__c}" rendered="{!!isEdit}"/>
+                                <apex:inputField id="RequiredId" value="{!matrixMap[fieldAPIName+''+refType.Id].Required__c}" onclick="checkForDependencyOfRequired(this.id);" rendered="{!isEdit}"/>  
+                            </div>
+                        </apex:column>
+                    </apex:repeat>
+                </div>
+            </apex:pageBlockTable>
+
+           </div>
+            <apex:pageBlockButtons id="buttons">
+                <apex:commandButton value="{!$Label.Manage_Custom_Fields}" action="{!redirectFieldPage}" rendered="{!isContentSetting == 'false'}"/>
+                <apex:commandButton value="{!$Label.Save}" action="{!saveMatrix}" rendered="{!isEdit}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="formId,pgmsgId"/>
+                <apex:commandButton value="{!$Label.Edit}" action="{!editMatrix}" rendered="{!!isEdit}"  onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="formId"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!cancelMatrix}" rendered="{!isEdit}" onclick="PORShowLoading();" oncomplete="PORHideLoading();" reRender="formId"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:outputPanel style="float:left;width:100%;" rendered="{!!recordsPresent}">
+            <apex:pageMessage summary="{!$Label.Reference_Content_message}" severity="Info" strength="3" />
+        </apex:outputPanel>
+        <script>
+        
+        document.getElementById('divMain').style.width = window.screen.width - 190 +'px';
+        
+        function checkForDependencyOfRequired(requiredObj){
+           
+            if(document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.childNodes[1].firstChild;
+                 if(parentId==null)
+                     parentId=document.getElementById(requiredObj).parentNode.parentNode.childNodes[2].firstChild;
+                
+                parentId.checked=true;
+            }
+            
+         }
+        function checkForDependencyOfVisible(requiredObj){
+        
+            if(!document.getElementById(requiredObj).checked){
+                var parentId=document.getElementById(requiredObj).parentNode.parentNode.children[2].firstChild;
+                
+                parentId.checked=false;
+            }
+        }
+    </script>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,91 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page Controller="refedge.RedeemRewardController" id="pageId" tabstyle="refedge__Reward__c" sidebar="false"> 
+    <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:pageMessage summary="{!$Label.Insufficient_Privileges}" strength="3" severity="Info" rendered="{!IF(isFullLicenseAccessible,NOT(IsPageAccessible),isFullLicenseAccessible)}" />
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <!-- Java Script -->
+    <apex:outputPanel id="jsPanel">
+        <script>
+            var isContactReferenceable = {!contactReferenceability};
+            var isContactSelected = {!isContactSelected}; 
+            var accountMSG = '{!JSENCODE(status)}'.replace('@@@1', '{!$Label.Account}');
+            var contactMSG = '{!JSENCODE(status)}'.replace('@@@1', '{!$Label.Contact}');
+            function showPopup(){
+                if(isContactSelected && !isContactReferenceable){
+                    var where_to= confirm(contactMSG);
+                    if (where_to){
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else if({!!accountReferenceability}){
+                    var where_to= confirm(accountMSG);
+                    if (where_to){
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+            }
+        </script>
+    </apex:outputPanel>
+    <style>
+        .pbSubheader
+        {
+            background-image : none !important;
+        }
+    </style>
+    <!-- Form -->
+    <apex:form id="formId" rendered="{!AND(IsPageAccessible,isFullLicenseAccessible)}">
+        <apex:actionFunction name="findReferenceStatus" oncomplete="PORHideLoading();"  immediate="true" action="{!getReferenceStatus}" rerender="jsPanel">
+            <apex:param assignTo="{!selectedContact}" value="" name="paramName"/>
+        </apex:actionFunction>
+        <!-- Section Header-->
+        <apex:sectionHeader title="{!$Label.Redeem_Reward}"/>
+        <!-- Page Block -->
+        <apex:pageBlock id="blockId" title="{!$Label.Redeem_Reward}"  mode="Edit">
+        
+            <!-- Page Block Buttons-->
+            <apex:pageBlockButtons id="pbbId">
+                <apex:commandButton value="{!$Label.Save}" action="{!Save}"  onclick="return showPopup();"/>
+                <apex:commandButton value="{!$Label.Cancel}" action="{!Cancel}" immediate="true"/>
+            </apex:pageBlockButtons>
+            
+            <!-- Page Block Section-->
+            <apex:pageBlockSection id="sectionId" title="{!$Label.Information}" columns="1">
+                <apex:outputField value="{!reward.refedge__Account__c}"/>
+                <apex:selectList value="{!reward.refedge__Contact__c}" size="1" onchange="PORShowLoading();findReferenceStatus(this.value);">
+                    <apex:selectOptions value="{!contacts}" />
+                </apex:selectList>
+                <apex:inputField value="{!reward.refedge__Amount__c}" required="true">
+                    <apex:outputLabel value="{!$Label.Cannot_Exceed}"/>
+                </apex:inputField>
+                <apex:outputText label="{!$Label.Available_Balance}" value="{!availableBalance}"/>
+                <apex:outputField value="{!reward.refedge__RewardDate__c}"/>
+                <apex:inputField value="{!reward.refedge__Comments__c}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

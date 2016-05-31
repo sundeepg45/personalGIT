@@ -1,0 +1,59 @@
+<apex:page controller="Renewal_CotermSearchController" tabStyle="Opportunity">
+    <style type="text/css">
+    
+        body { margin: 25px; }
+        
+        .info {
+            display: block;
+            font-weight: bold;
+            color: darkred;
+            margin: 15px;
+            text-align: center;
+        }
+        
+    </style>
+  
+    <apex:form id="frmResults">
+        <apex:pageMessages />
+        <apex:outputText styleClass="info" value="No renewal opportunities were found" rendered="{!if (renewalOpportunities.size = 0, true, false)}"/>
+        
+        <apex:pageBlock title="Renewal Opportunities" id="searchResults" >
+            
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Co-term Opportunities" action="{!cotermProducts}"/> 
+                <apex:commandButton value="Cancel" action="{!cancel}"/> 
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockTable value="{!renewalOpportunities}" var="renewal">
+                <apex:column width="5%">
+                     <apex:inputCheckBox value="{!renewal.selected}" />
+                </apex:column>
+                
+                <apex:column headerValue="Opportunity Number" width="15%">
+                    <apex:outputText value="{!renewal.opportunity.OpportunityNumber__c}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Opportunity Name">
+                    <apex:commandLink action="{!renewalDetail}" value="{!renewal.opportunity.name}" target="_blank">
+                        <apex:param name="opportunityId" value="{!renewal.opportunity.id}"/>
+                    </apex:commandLink>
+                </apex:column>
+                
+                <apex:column headerValue="Opportunity Amount">
+                    <apex:outputText value="{!renewal.opportunity.amount}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Account Name">
+                    <apex:outputText value="{!renewal.opportunity.account.name}"/>
+                </apex:column>
+                
+                <apex:column headerValue="Oracle Account Number">
+                    <apex:outputText value="{!renewal.opportunity.account.OracleAccountNumber__c}"/>
+                </apex:column>
+                
+            </apex:pageBlockTable>
+            
+        </apex:pageBlock>
+        
+    </apex:form> 
+</apex:page>

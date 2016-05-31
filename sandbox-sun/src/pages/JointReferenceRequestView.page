@@ -1,0 +1,12 @@
+<apex:page standardController="Joint_Reference_Request__c">
+<script>
+  if ('{!$Profile.Name}'.indexOf('Partner Portal') > 0) {
+      // portal user can't view this page, just redirect
+    // just save a record, redirect
+    alert('Request saved and in progress. Thank You');
+    window.top.location = '/';
+  }
+</script>
+
+<apex:detail subject="{!Joint_Reference_Request__c}" relatedList="false"/>
+</apex:page>

@@ -1,0 +1,120 @@
+<apex:page controller="RequalificationController" title="{!$Label.Requalification_Home}: {!$Label.Requalification_Products_Title}">
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js" />
+    <apex:includeScript value="{!$Resource.jqueryFancybox134js}" />
+    <apex:include pageName="Requalification_Fancybox_Widget_CSS"/>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("a.screenshot").fancybox();
+        });
+    </script>
+
+    <style type="text/css">
+        .btn { margin-left:5px; margin-right:5px; }
+        .btnDisabled { margin-left:5px; margin-right:5px; }
+        .pbHeader {margin: 0px; spacing: 2px; }
+        #screenshot { }
+    </style>
+
+    <apex:form >
+        <div class="bPageTitle">
+            <div class="ptBody secondaryPalette">
+                <div class="content">
+                    <h1 class="pageType"><apex:outputText value="{!$Label.Requalification_Home}"/><span class="titleSeparatingColon">:</span></h1>
+                    <h2 class="pageDescription"> <apex:outputText value="{!$Label.Requalification_Products_Title}"/></h2>
+	                <apex:pageMessages />   
+                </div>
+            </div>
+        </div>
+            
+	    <apex:pageBlock >
+	        <apex:pageBlockSection columns="1">
+	            <apex:outputText escape="false" value="{!$Label.PRQ_PartnerProducts_Text}"/>
+	        </apex:pageBlockSection>
+	    </apex:pageBlock>
+
+        <apex:outputText value="{!$Label.Requalification_Products_Showing}"/>&nbsp;<apex:outputText value="{!partnerProductItemList.size}"/>&nbsp;<apex:outputText value="{!$Label.Requalification_Products_Pending_Active_Products_of}"/>&nbsp;<apex:outputText value="{!totalProductCount}"/>&nbsp;<apex:outputText value="{!$Label.Requalification_Products_Total}"/> <a onclick="alert('{!$Label.Requalification_LeavingRequalWarning}');" href="/a1k"><apex:outputText value="{!$Label.Requalification_Products_See_All}"/></a>
+        <br/><br/>
+        <apex:repeat value="{!partnerProductItemList}" var="productItem" id="productList">
+            <apex:pageBlock id="productDetails">
+                <table class="pbHeader" border="0" cellspacing="0" cellpadding="0" width="100%">
+                <tbody><tr><td class="pbTitle">
+                    <h2 class="mainTitle">
+                        {!productItem.product.Name}
+                    </h2>   
+                </td><td><span style="float:right;"><apex:commandButton onclick="alert('{!$Label.Requalification_LeavingRequalWarning}');" value="Edit Product" action="/{!productItem.product.Id}" styleClass="col1"/></span></td></tr></tbody>
+                </table>
+                <apex:pageBlockSection columns="2">
+                    <apex:pageBlockSectionItem id="statusColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Status}" style="width:15em"/>
+                        <apex:outputText id="txtStatus" value="{!productItem.product.Application_Status__c}"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageBlockSectionItem id="typesColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Application_Type}" style="width:15em"/>
+                        <apex:outputText id="txtTypes" value="{!productItem.product.Product_Types__c}"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageBlockSectionItem id="platformColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Supported_Platforms}" style="width:15em"/>
+                        <apex:repeat value="{!productItem.platforms}" var="prodListItem">
+                            <apex:outputText id="listPlatform" value="{!prodListItem}"/><br/>
+                        </apex:repeat>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageBlockSectionItem id="jbossPlatformColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Supported_JBoss_Platforms}" style="width:15em"/>
+                        <apex:repeat value="{!productItem.platformsJBoss}" var="prodListItem">
+                            <apex:outputText id="listJBossPlatform" value="{!prodListItem}"/><br/>
+                        </apex:repeat>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem id="logoColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Logo}" style="width:15em"/>
+                        <apex:outputPanel >
+                            <apex:image id="imgLogo" rendered="{!NOT(ISNULL(productItem.logo))}" value="{!URLFOR($Action.Attachment.Download,productItem.logo.id)}"/>
+                            <apex:outputText id="noteNoLogo" rendered="{!ISNULL(productItem.logo)}" value="No image available"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>    
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem id="detailsColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Description}" style="width:15em"/>
+                        <apex:outputText id="txtDetails" value="{!productItem.product.Product_Details__c}" escape="false"/>
+                    </apex:pageBlockSectionItem>    
+                </apex:pageBlockSection>            
+                <br />
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem id="screenshotColumn">
+                        <apex:outputLabel value="{!$Label.RequalificationProducts_Screenshots}" style="width:15em"/>
+                        <apex:outputPanel rendered="{!productItem.screenshots.size > 0}">
+                            <apex:repeat value="{!productItem.screenshots}" var="screenshot">
+                                <div style="display:none">
+                                    <div id="{!screenshot.id}">
+                                        <img src="{!URLFOR($Action.Attachment.Download,screenshot.id)}"/>
+                                    </div>
+                                </div>
+                                <a rel="screenshots" class="screenshot" href="#{!screenshot.id}">
+                                    <img id="imgScreenshot" height="100" src="{!URLFOR($Action.Attachment.Download,screenshot.id)}"/>
+                                </a>
+                                &nbsp; &nbsp;
+                            </apex:repeat>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>    
+                </apex:pageBlockSection>
+           </apex:pageBlock>
+        </apex:repeat>
+
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="float:right;">
+                       <apex:commandButton value="{!$Label.RequalificationHome_Previous}" action="{!previousPage}" styleClass="col1"/>
+                        <apex:commandButton value="{!$Label.RequalificationHome_Back_to_Requalification_Home}" action="/apex/RequalificationHome" />
+                        <apex:commandButton onclick="if(!confirm('{!$Label.Requalification_Are_You_Sure_Confirm}')){ return false; }" value="{!$Label.RequalificationHome_Confirm}" action="{!confirmProduct}" styleClass="col1" disabled="{!requalRec.ProductConfirmed__c}"/>
+                       <apex:commandButton value="{!$Label.RequalificationHome_Next}" action="{!nextPage}" styleClass="col1"/>
+                       <apex:commandButton onclick="alert('{!$Label.Requalification_LeavingRequalWarning}');" value="{!$Label.RequalificationHome_Edit_Content}" action="/a1k/o" styleClass="col1"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

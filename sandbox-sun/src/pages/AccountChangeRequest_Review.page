@@ -1,0 +1,241 @@
+<apex:page standardController="AccountChangeRequest__c" extensions="AccountChangeRequest_ControllerExtension" action="{!updateRefAccount}">
+	<apex:sectionHeader title="{!$ObjectType.AccountChangeRequest__c.Label}" subtitle="{!AccountChangeRequest__c.Name}" />
+	<apex:outputText rendered="false" value="{!AccountChangeRequest__c.Status__c}"/>
+	<apex:outputText rendered="false" value="{!AccountChangeRequest__c.CreatedDate}"/>
+	<script type="application/javascript">
+String.prototype.endsWith = function(str)
+{return (this.substring(this.length-str.length)==str);}
+
+function setAll(value)
+{
+	var elements = document.getElementsByTagName("input");
+	for(var i=0;i < elements.length;i++) {
+		var e = elements[i];
+		if(e.id != null && e.id.endsWith(':isApproved')) {
+			e.checked = value;
+		}
+	}
+	return false;
+}
+
+function setSelectAllOpacity(value) {
+	var elements = document.getElementsByTagName("input");
+	for(var i=0;i < elements.length;i++) {
+		var e = elements[i];
+		if(e.id != null && e.id.endsWith(':selectAll')) {
+			try {
+				e.style.opacity=value/100;
+				e.filters.alpha.opacity=value;
+			}
+			catch(ex) {
+				try {
+					e.filters.alpha.opacity=value;
+				}
+				catch(ex2) {}
+			}
+		}
+	}
+	return true;
+}
+	</script>
+	<apex:outputPanel style="display: block; margin-bottom: 1em; font-size: 90%;">
+		<apex:outputText value="«" style="padding-left: 0.5em; padding-right: 0.5em;" />
+		<apex:outputLink value="/{!AccountChangeRequest__c.Account__c}">
+			<apex:outputText value="Back to Account: " />
+			<apex:outputText value="{!AccountChangeRequest__c.Account__r.Name}" />
+		</apex:outputLink>
+	</apex:outputPanel>
+	<apex:form id="pbForm">
+		<apex:pageBlock title="Review {!$ObjectType.AccountChangeRequest__c.Label}" mode="{!if(isEdit,'EDIT','VIEW')}" >
+			<apex:pageBlockButtons location="both">
+				<apex:outputPanel rendered="{!isEdit}">
+					<!-- <apex:commandButton onclick="return setAll(true)" value="Approve All"/> -->
+					<!-- <apex:commandButton onclick="return setAll(false)" value="Reject All"/> -->
+					<apex:commandButton value="Save" action="{!save}"/>
+					<apex:commandButton value="Cancel" action="{!cancel}"/>
+				</apex:outputPanel>
+			</apex:pageBlockButtons>
+			<apex:pageMessages />
+			<apex:pageBlockTable rendered="{!pendingChangeCount > 0}" value="{!pendingChanges}" var="f" title="Pending {!$ObjectType.AccountChangeRequestField__c.LabelPlural}" >
+				<apex:column >
+					<apex:facet name="header">Field</apex:facet>
+					<apex:outputLabel value="{!f.label}" style="font-weight: bold" />
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Current Value</apex:facet>
+					<apex:outputPanel rendered="{!NOT(ISBLANK(f.oldName))}" >
+						<apex:outputLink value="/{!f.oldValue}">
+							<apex:outputText value="{!f.oldName}" />
+						</apex:outputLink>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.oldName),f.displayType == 'Boolean')}" >
+						<apex:outputField value="{!f.old.BooleanValue__c}" />
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.oldName),f.displayType == 'Date')}" >
+						<apex:outputField value="{!f.old.DateValue__c}" />
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.oldName),f.displayType == 'DateTime')}" >
+						<apex:outputField value="{!f.old.DateTimeValue__c}" />
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.oldName),f.displayType != 'Date',f.displayType != 'DateTime',f.displayType != 'Boolean')}" >
+						<apex:outputText value="{!f.oldTextValue}" />
+					</apex:outputPanel>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Requested Value</apex:facet>
+					<apex:outputPanel rendered="{!NOT(ISBLANK(f.newName))}" >
+						<apex:outputLink value="/{!f.newValue}">
+							<apex:outputText value="{!f.newName}" />
+						</apex:outputLink>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Boolean')}" >
+						<apex:outputField value="{!f.accountChangeRequestField.BooleanValue__c}" />
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Date')}" >
+						<apex:outputField value="{!f.accountChangeRequestField.DateValue__c}" />
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'DateTime')}" >
+						<apex:outputField value="{!f.accountChangeRequestField.DateTimeValue__c}" />
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType != 'Date',f.displayType != 'DateTime',f.displayType != 'Boolean')}" >
+						<apex:outputText value="{!f.newTextValue}" />
+					</apex:outputPanel>
+				</apex:column>
+				<apex:column styleClass="actionColumn" headerClass="actionColumn" rendered="{!isEdit}">
+					<apex:facet name="header">
+						<apex:outputPanel >
+							<apex:inputCheckbox onclick="setAll(this.checked);setSelectAllOpacity(100)" id="selectAll" />
+							<apex:outputText value="{!$ObjectType.AccountChangeRequestField__c.Fields.Approved__c.Label}" />
+						</apex:outputPanel>
+					</apex:facet>
+					<apex:outputPanel >
+						<apex:inputField onclick="setSelectAllOpacity(40)" value="{!f.accountChangeRequestField.Approved__c}" id="isApproved"/>
+					</apex:outputPanel>
+				</apex:column>
+				<apex:column rendered="{!NOT(isEdit)}">
+					<apex:facet name="header">
+						<apex:outputPanel >
+							<apex:outputText value="{!$ObjectType.AccountChangeRequestField__c.Fields.Approved__c.Label}" />
+						</apex:outputPanel>
+					</apex:facet>
+					<apex:outputPanel >
+						<apex:outputField value="{!f.accountChangeRequestField.Approved__c}"/>
+					</apex:outputPanel>
+				</apex:column>
+			</apex:pageBlockTable>
+			<apex:pageBlockSection columns="1" rendered="{!approvedChangeCount > 0}" title="Accepted {!$ObjectType.AccountChangeRequestField__c.LabelPlural}">
+				<apex:pageBlockTable value="{!approvedChanges}" var="f" title="Accepted {!$ObjectType.AccountChangeRequestField__c.LabelPlural}" columns="3" columnsWidth="20%,40%,40%" >
+					<apex:column >
+						<apex:facet name="header">Field</apex:facet>
+						<apex:outputLabel value="{!f.label}" style="font-weight: bold" />
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Original Value</apex:facet>
+						<apex:outputPanel rendered="{!NOT(ISBLANK(f.oldName))}" >
+							<apex:outputLink value="/{!f.oldValue}">
+								<apex:outputText value="{!f.oldName}" />
+							</apex:outputLink>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Boolean')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.OriginalBooleanValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Date')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.OriginalDateValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'DateTime')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.OriginalDateTimeValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType != 'Date',f.displayType != 'DateTime',f.displayType != 'Boolean')}" >
+							<apex:outputText value="{!f.oldTextValue}" />
+						</apex:outputPanel>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Accepted Value</apex:facet>
+						<apex:outputPanel rendered="{!NOT(ISBLANK(f.newName))}" >
+							<apex:outputLink value="/{!f.newValue}">
+								<apex:outputText value="{!f.newName}" />
+							</apex:outputLink>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Boolean')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.BooleanValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Date')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.DateValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'DateTime')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.DateTimeValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType != 'Date',f.displayType != 'DateTime',f.displayType != 'Boolean')}" >
+							<apex:outputText value="{!f.newTextValue}" />
+						</apex:outputPanel>
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection columns="1" rendered="{!rejectedChangeCount > 0}" title="Rejected {!$ObjectType.AccountChangeRequestField__c.LabelPlural}">
+				<apex:pageBlockTable value="{!rejectedChanges}" var="f" title="Rejected {!$ObjectType.AccountChangeRequestField__c.LabelPlural}" columns="3" columnsWidth="20%,40%,40%" >
+					<apex:column >
+						<apex:facet name="header">Field</apex:facet>
+						<apex:outputLabel value="{!f.label}" style="font-weight: bold" />
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Original Value</apex:facet>
+						<apex:outputPanel rendered="{!NOT(ISBLANK(f.oldName))}" >
+							<apex:outputLink value="/{!f.oldValue}">
+								<apex:outputText value="{!f.oldName}" />
+							</apex:outputLink>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Boolean')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.OriginalBooleanValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Date')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.OriginalDateValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'DateTime')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.OriginalDateTimeValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType != 'Date',f.displayType != 'DateTime',f.displayType != 'Boolean')}" >
+							<apex:outputText value="{!f.oldTextValue}" />
+						</apex:outputPanel>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Rejected Value</apex:facet>
+						<apex:outputPanel rendered="{!NOT(ISBLANK(f.newName))}" >
+							<apex:outputLink value="/{!f.newValue}">
+								<apex:outputText value="{!f.newName}" />
+							</apex:outputLink>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Boolean')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.BooleanValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'Date')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.DateValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType == 'DateTime')}" >
+							<apex:outputField value="{!f.accountChangeRequestField.DateTimeValue__c}" />
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!AND(ISBLANK(f.newName),f.displayType != 'Date',f.displayType != 'DateTime',f.displayType != 'Boolean')}" >
+							<apex:outputText value="{!f.newTextValue}" />
+						</apex:outputPanel>
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+			<apex:pageBlockSection columns="1" >
+				<apex:outputField value="{!AccountChangeRequest__c.Status__c}" />
+				<apex:inputField value="{!AccountChangeRequest__c.Comments__c}" rendered="{!isEdit}" style="width:100%"/>
+				<apex:outputField value="{!AccountChangeRequest__c.Comments__c}" rendered="{!NOT(isEdit)}" style="width:100%"/>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Change Requested By" for="createdBy"/>
+					<apex:outputLink value="/{!AccountChangeRequest__c.CreatedById}" id="createdBy">
+						<apex:outputText value="{!AccountChangeRequest__c.CreatedBy.Name}" />
+					</apex:outputLink>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!isReviewed}">
+					<apex:outputLabel value="Change Reviewed By" for="lastModifiedBy"/>
+					<apex:outputLink value="/{!AccountChangeRequest__c.LastModifiedById}" id="lastModifiedBy">
+						<apex:outputText value="{!AccountChangeRequest__c.LastModifiedBy.Name}" />
+					</apex:outputLink>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

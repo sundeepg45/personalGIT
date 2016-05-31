@@ -1,0 +1,40 @@
+<apex:page standardController="Subscription__c" extensions="SubscriptionControllerExtension">
+	<script src="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"></script>
+	<apex:pageMessages />
+<script type="text/javascript">
+function disableButton(name) {
+    try {
+        var a = $('input[name*="'+name+'"]');
+        if(a) { a.attr('disabled','disabled'); a.css("color","grey"); }
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function removeButton(name) {
+    try {
+        var a = $('input[name*="'+name+'"]');
+        if(a) { a.attr('disabled','disabled'); a.css("color","grey"); a.css("display","none"); }
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+    if({!NOT(canEdit)}) {
+        disableButton('edit');
+    }
+    if({!NOT(canCreateRenewalOpportunity)}) {
+        disableButton('readyforprocessing');
+        disableButton('readyforssi');
+        disableButton('donotload');
+    }
+});
+</script>
+	<apex:detail subject="{!Id}"
+		inlineEdit="{!canEdit}"
+		relatedList="true"
+		relatedListHover="true"
+		showChatter="true"
+		title="true" />
+</apex:page>

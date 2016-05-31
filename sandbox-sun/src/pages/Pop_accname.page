@@ -1,0 +1,5 @@
+<apex:page showheader="false" action="{!pageredirect}" standardcontroller="Contract" extensions="ContractNewPageRedirect">
+  <apex:pageBlock title="Redirect">
+    Loading...
+  </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,205 @@
+<apex:page standardController="Lead" extensions="Lead_ViewControllerExtension" tabStyle="Lead" action="{!nooverrideView}" id="LeadView">
+<script type="text/javascript">__sfdcSessionId="{!$Api.Session_ID}";</script>
+<script src="/soap/ajax/12.0/connection.js" type="text/javascript"></script>
+<script src="/soap/ajax/12.0/apex.js" type="text/javascript"></script>
+<script src="{!URLFOR($Resource.sfdc_js, '/js/jquery-1.4.2.min.js')}"></script>
+<div id="LeadViewContents" style="display:none">
+    <apex:pageMessages />
+    <apex:detail relatedList="true" relatedListHover="true" inlineEdit="{!isUnlocked}" showChatter="true"/>
+</div>
+<script type="text/javascript">
+function disableButtons() {
+    try {
+        $j('div[id="LeadViewContents"] input[disabled!="disabled"][type="button"][id!="tag_save"][id!="tag_cancel"][id!="publishersharebutton"][name!="send_to_sales"][name!="accept"][name!="reject"][name!="hoover_s_lead_tools"]').each(function (i) {
+            $j(this).attr('disabled','disabled');
+            $j(this).css('color','grey');
+        });
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function clickOnceButtons() {
+    try {
+        var d = 'this.disabled="disabled";';
+        $j('div[id="LeadViewContents"] input[disabled!="disabled"]').each(function (i) {
+            var a = ['send_to_sales','accept','reject'];
+            for(var n=0; n < a.length; n++) {
+                if($j(this).attr('name') == a[n]) {
+                    $j(this).click(function() { 
+                        $j(this).attr('disabled','disabled'); 
+                        $j(this).css('color','grey');
+                    });
+                }
+            }
+        });
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function disableLinks() {
+    try {
+        $j('div[id="LeadViewContents"] a[disabled!="disabled"]:contains("[Change]")').each(function(i) {
+            if($j(this).text() == '[Change]') {
+                $j(this).attr('disabled','disabled');
+                $j(this).css('color','grey');
+                $j(this).attr('href','javascript:return false');
+            }
+        });
+        var a = ['Edit','Del','View','Cls'];
+        for(var n=0; n < a.length; n++) {
+            $j('div[id="LeadViewContents"] a[class="actionLink"][disabled!="disabled"]:contains("'+a[n]+'")').each(function(i) {
+                if($j(this).text() == a[n]) {
+                    $j(this).attr('disabled','disabled');
+                    $j(this).css('color','grey');
+                    $j(this).attr('href','javascript:return false');
+                }
+            });
+        }
+        $j('div[id="LeadViewContents"] a:contains("Go to list")').each(function(i) {
+            if($j(this).text().indexOf("Go to list") == 0) {
+                $j(this).attr('disabled','disabled');
+                $j(this).css('color','grey');
+                $j(this).attr('href','javascript:return false');
+            }
+        });
+        a = [ '{!leadId}'.substring(0,15), '.salesforce.com/069', '.salesforce.com/00T', '.salesforce.com/002', '.salesforce.com/a0j', '.salesforce.com/701' ];
+        var q = '';
+        var s = '';
+        for(var i=0;i < a.length;i++) {
+            q+=s+'div[id="LeadViewContents"] a[href*="'+a[i]+'"][href^="https"][disabled!="disabled"]';
+            s=',';
+        }
+        $j(q).each(function(i) {
+            $j(this).attr('disabled','disabled');
+            $j(this).css('color','grey');
+            $j(this).attr('href','javascript:return false');
+        });
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function overloadLinks() {
+    try {
+        $j('div[id="LeadViewContents"] a[href^="javascript:showMoreList"]').each(function(i) {
+            $j(this).attr('href',unescape($j(this).attr('href')).replace(/^javascript:s/,'javascript:overloadedS'));
+        });
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function fixFrames() {
+    try {
+        $j('div[id="LeadViewContents"] iframe[title="ProspectProfilerLead"]').attr('src','https://login.eloqua.com/autoLogin?LoginPrefix=RHAT&Url=/apps/salesTools/profiler?emailAddress={!lead.email}');
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function locking() {
+    try {
+        if(! {!isUnlocked}) {
+            disableButtons();
+            disableLinks();
+            overloadLinks();
+        }
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+var intervalId2 = null;
+var lockCount = 0;
+function overloadedShowMoreList(a,b,c) {
+    try {
+        showMoreList(a,b,c);
+        locking();
+        clickOnceButtons();
+        lockCount = 0;
+        intervalId2=setInterval('relock()',100);
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+function relock() {
+    try {
+        if(++lockCount >= 40) {
+            clearInterval(intervalId2);
+        }
+        locking();
+        clickOnceButtons();
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+var intervalId = null;
+function reloadMessage() {
+    try {
+        //alert('hash='+top.location.hash+','+location.hash);
+        var msg = unescape(location.hash.substring(1));
+        if(msg == 'reload') {
+            clearInterval(intervalId);
+            location.hash = '';
+            location.reload();
+        }
+    }
+    catch(e) {}
+}
+</script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+$j(document).ready(function(){
+    try {
+        intervalId=setInterval('reloadMessage()',50);
+        locking();
+        clickOnceButtons();
+        fixFrames();
+        if('{!$User.Is_Marketing_User__c}' != 'true'  || {!Lead.Stage__c != 'Marketing Accepted'}) {
+            $j('div[id="LeadViewContents"] input[disabled!="disabled"][name="send_to_sales"]').each(function (i) {
+                $j(this).attr('disabled','disabled');
+                $j(this).css('color','grey');
+                if('{!$User.Is_Marketing_User__c}' != 'true') {
+                    $j(this).css('display','none');
+                }
+            });
+        }
+        $j('div[id="LeadViewContents"]').css('display','block');
+        if(sfdcPage.renderDetail) {
+            sfdcPage.saveReal = sfdcPage.save;
+            sfdcPage.save = function(domIdentifer) {
+                if(! sfdcPage.renderDetailReal) {
+                    sfdcPage.renderDetailReal = sfdcPage.renderDetail;
+                    sfdcPage.renderDetail = function(visualForce) {
+                        if(visualForce) {
+                            var result = sforce.connection.query("Select Stage__c from Lead where Id = '{!leadId}' ");
+                            var it = new sforce.QueryResultIterator(result);
+                            if(it.hasNext()) {
+                                var lead = it.next();
+                                if( '{!qlead.Stage__c}' != lead.Stage__c) {
+                                    try {
+                                        top.window.location.replace('{!URLFOR($Action.Lead.View,leadId)}');
+                                    } catch(e1) {
+                                        try {
+                                            window.location.reload();
+                                        } catch(e2) {
+                                            top.window.location = '{!URLFOR($Action.Lead.View,leadId)}';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return this.renderDetailReal(visualForce);
+                    }
+                }
+                return this.saveReal(domIdentifer);
+            }
+        }
+    }
+    catch(e) {}
+});
+</script></apex:page>

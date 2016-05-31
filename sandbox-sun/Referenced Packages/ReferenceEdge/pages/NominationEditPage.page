@@ -1,0 +1,271 @@
+<!--
+ * ReferenceEdge
+ * 
+ * Point of Reference, Inc. - Copyright 2014 All rights reserved.
+ *
+ * @company : Point of Reference, Inc.
+ * @website : www.point-of-reference.com
+ *
+ * Disclaimer: THIS SOFTWARE IS PROVIDED "AS-IS" BY POINT OF REFERENCE ("POR"), 
+ * WITH NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE SOFTWARE, 
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+ * POR SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, 
+ * MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. POR IS NOT LIABLE FOR, 
+ * AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING, THE ACTIONS OR OMISSIONS OF 
+ * ANY THIRD PARTIES (OR THE PRODUCTS OR SERVICES OFFERED BY ANY THIRD PARTIES) INCLUDING, 
+ * WITHOUT LIMIATION, SALESFORCE.COM. COPY, USE OR DISTRIBUTION PROHIBITED WITHOUT EXPRESS 
+ * WRITTEN CONSENT FROM COMPANY.
+ -->
+<apex:page standardController="refedge__Nomination__c" extensions="refedge.NominationEditPageController" sidebar="false">
+    <!-- Messages -->
+    <apex:pageMessages id="pgmsgId"/>
+    
+    <!-- Add POR_ModalLoader Component-->
+    <c:POR_ModalLoader id="PORLoader"/>
+    <apex:stylesheet value="{!URLFOR($Resource.refedge__JqueryFiles, 'jquery-ui-1.9.2.custom.min.css')}"/>
+    <style> 
+        .ui-widget-content{
+            min-height: 45px !important;
+        }
+        .ui-widget-header{
+            display : none !important;
+        }
+        .dialogButtonClass{
+            margin-left: 3px !important;
+            margin-right: 3px !important;
+            color: #333 !important;
+            border: 1px solid #b5b5b5 !important;
+            border-bottom-color: #7f7f7f !important;
+            background: #e8e8e9 url('/img/alohaSkin/btn_sprite.png') repeat-x right top !important;
+            font-weight: bold !important;
+            font-size: .9em !important;
+            -moz-border-radius: 3px !important;
+            -webkit-border-radius: 3px !important;
+            border-radius: 3px !important;
+         }
+         
+        .ui-button-text-only .ui-button-text {
+           padding: .2em 1em !important;
+        }
+    </style>
+    <apex:outputPanel id="msgPanel">
+           <script>
+            function showPopup(){
+                if('{!JSENCODE(nominationObj.refedge__Disposition__c)}' == 'Approved' && '{!JSENCODE(nominationObj.refedge__Disposition__c)}' != '{!JSENCODE(dispositionStatus)}'){
+                    if('{!JSENCODE(nominationObj.refedge__Contact__c)}' != null && '{!JSENCODE(nominationObj.refedge__Contact__c)}' != ''){
+                        if(!{!isContactReferenceableStatus}){
+                            jQuery( "#dialogBoxDiv1" ).dialog({
+                                width: '400px',
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                buttons: [{
+                                    text: "{!$Label.Yes}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        if(!{!isAccountReferenceableStatus}){
+                                            jQuery( "#dialogBoxDiv3" ).dialog({
+                                                width: '400px',
+                                                modal: true,
+                                                resizable: false,
+                                                draggable: false,
+                                                buttons: [{
+                                                    text: "{!$Label.Yes}",
+                                                    "class": "dialogButtonClass",
+                                                    click: function() {
+                                                        jQuery( this ).dialog( "close" );
+                                                        saveJs(true, true);
+                                                    }
+                                                },
+                                                {
+                                                    text: "{!$Label.No}",
+                                                    "class": "dialogButtonClass",
+                                                    click: function() {
+                                                        jQuery( this ).dialog( "close" ); 
+                                                        saveJs(true, false);
+                                                    }
+                                                }]
+                                            });
+                                            return false;
+                                        }
+                                        else {
+                                            saveJs(true, false);
+                                        }
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.No}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        saveJs(false, false);
+                                    }
+                                }]
+                            });
+                            jQuery(".ui-dialog-titlebar").hide();
+                            jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                            return false;
+                        }
+                        else{
+                            jQuery( "#dialogBoxDiv2" ).dialog({
+                                width: '400px',
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                buttons: [{
+                                    text: "{!$Label.Yes}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        if(!{!isAccountReferenceableStatus}){
+                                            jQuery( "#dialogBoxDiv3" ).dialog({
+                                                width: '400px',
+                                                modal: true,
+                                                resizable: false,
+                                                draggable: false,
+                                                buttons: [{
+                                                    text: "{!$Label.Yes}",
+                                                    "class": "dialogButtonClass",
+                                                    click: function() {
+                                                        jQuery( this ).dialog( "close" );
+                                                        saveJs(true, true);
+                                                    }
+                                                 },
+                                                 {
+                                                    text: "{!$Label.No}",
+                                                    "class": "dialogButtonClass",
+                                                    click: function() {
+                                                        jQuery( this ).dialog( "close" ); 
+                                                        saveJs(true, false);
+                                                    }
+                                                }]
+                                            });
+                                            return false;
+                                        }
+                                        else {
+                                            saveJs(true, false);
+                                        }
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.No}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" ); 
+                                        saveJs(false, false);
+                                    }
+                                }]
+                            });
+                            jQuery(".ui-dialog-titlebar").hide();
+                            jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                            return false;
+                        }
+                    }
+                    else {
+                        if({!isAccountReferenceableStatus}){
+                            jQuery( "#dialogBoxDiv2" ).dialog({
+                                width: '400px',
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                buttons: [{
+                                    text: "{!$Label.Yes}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        saveJs(true, false);
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.No}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        saveJs(false, false);
+                                    }
+                                }]
+                            });
+                            jQuery(".ui-dialog-titlebar").hide();
+                            jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                            return false;
+                        }
+                        else{
+                            jQuery( "#dialogBoxDiv1" ).dialog({
+                                width: '400px',
+                                modal: true,
+                                resizable: false,
+                                draggable: false,
+                                buttons: [{
+                                    text: "{!$Label.Yes}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        jQuery( this ).dialog( "close" );
+                                        saveJs(true, false);
+                                    }
+                                },
+                                {
+                                    text: "{!$Label.No}",
+                                    "class": "dialogButtonClass",
+                                    click: function() {
+                                        saveJs(false, false);
+                                    }
+                                }]
+                            });
+                            jQuery(".ui-dialog-titlebar").hide();
+                            jQuery(".ui-dialog-content ui-widget-content").css("height", "auto");
+                            return false;
+                        }
+                    }
+                }
+                else{
+                    saveJs(false, false);
+                }
+                return false;
+            }
+        </script>
+       </apex:outputPanel>
+    <apex:pageMessage summary="{!$Label.User_License}" strength="3" severity="Info" rendered="{!NOT(isFullLicenseAccessible)}" />
+    <!-- Form -->
+    <apex:form id="frmId" rendered="{!isFullLicenseAccessible}">
+        <apex:sectionHeader title="{!$Label.Nomination_Edit}" subTitle="{!nominationObj.Name}"/>
+        <apex:actionFunction name="saveJs"  action="{!saveNomination}" reRender="pgmsgId,pbId,msgPanel">
+            <apex:param assignTo="{!isMakeMember}" value="" name="contact"/>
+            <apex:param assignTo="{!isMakeAccountMember}" value="" name="account"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="saveDisposition" oncomplete="PORHideLoading();" action="{!saveDisposition}" reRender="pgmsgId,msgPanel"/>
+        <apex:pageBlock title="{!$Label.Nomination_Edit}" id="pbId">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="{!$Label.Save}" onclick="showPopup(); return false;"/>
+                <apex:commandButton value="{!$Label.Cancel}" immediate="true" action="{!cancelNomination}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="{!$Label.Information}">
+                <apex:outputField value="{!nominationObj.Name}" />
+                <apex:outputField value="{!nominationObj.OwnerId}" />
+                <apex:outputField value="{!nominationObj.refedge__Account__c}" />
+                <apex:outputField value="{!nominationObj.refedge__Contact__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="secId" title="{!$Label.Nomination_Status}">
+                <apex:inputField id="dispositionId" value="{!nominationObj.refedge__Disposition__c}" onchange="PORShowLoading();saveDisposition();"/>
+                <apex:inputField value="{!nominationObj.refedge__Status__c}" />
+                <apex:inputField value="{!nominationObj.refedge__Note__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="{!SUBSTITUTE($Label.Additional_Information, '@@@', '')}">
+                <apex:repeat value="{!FieldMap}" var="field">
+                    <apex:inputField value="{!nominationObj[field]}" />
+                </apex:repeat>
+                <apex:inputField value="{!nominationObj.refedge__Other_Info__c}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <div id="dialogBoxDiv1" style="display:none;height: 50px; !important;">
+            <apex:outPutText value="{!JSENCODE(alertMsgToMakeMember)}" escape="false"/>
+        </div>
+        <div id="dialogBoxDiv2" style="display:none;height: 50px; !important;">
+            <apex:outPutText value="{!JSENCODE(alertMsgTocopyDetails)}" escape="false"/>
+        </div>
+        <div id="dialogBoxDiv3" style="display:none !important;height: 50px; !important;">
+            <apex:outPutText value="{!JSENCODE(alertMsgToMakeAccountMember)}" escape="false"/>
+        </div>
+    </apex:form>
+</apex:page>
